@@ -39,6 +39,10 @@ ignore = [
     "PLR0913", # Too many arguments; sometimes acceptable in UI/config code.
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["PLR2004"]
+"packages/*/tests/**/*.py" = ["PLR2004"]
+
 [tool.ruff.format]
 docstring-code-format = true
 
