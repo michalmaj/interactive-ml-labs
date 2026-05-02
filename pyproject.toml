@@ -1,0 +1,15 @@
+[project]
+name = "interactive-ml-labs-workspace"
+version = "0.1.0"
+description = "Workspace for interactive machine learning teaching demos."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = [
+    "packages/ml_lab_core",
+]
