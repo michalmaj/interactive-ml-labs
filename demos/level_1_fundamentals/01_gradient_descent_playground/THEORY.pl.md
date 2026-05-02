@@ -43,3 +43,21 @@ Loss może maleć na danych treningowych, ale model nadal może źle generalizow
 ### Błąd 3: gradient descent zawsze znajduje najlepsze rozwiązanie
 
 W prostych problemach wypukłych często działa bardzo dobrze. W bardziej złożonych modelach może utknąć w słabszych rozwiązaniach lokalnych albo być wrażliwy na skalowanie danych.
+
+## Dane syntetyczne w pierwszej wersji demo
+
+Pierwsza wersja demo wykorzystuje dane syntetyczne generowane według równania:
+
+```text
+y = a * x + b + noise
+```
+
+gdzie:
+
+- `x` jest cechą wejściową,
+- `y` jest wartością docelową,
+- `a` jest prawdziwym nachyleniem prostej,
+- `b` jest prawdziwym wyrazem wolnym,
+- `noise` oznacza losowy szum dodany do danych.
+
+Dane syntetyczne są użyte celowo, ponieważ pozwalają kontrolować trudność problemu. Można zmieniać liczbę próbek, zakres wartości wejściowych, poziom szumu oraz prawdziwe parametry modelu.
