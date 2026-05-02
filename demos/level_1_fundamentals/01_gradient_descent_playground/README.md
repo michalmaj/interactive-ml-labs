@@ -16,6 +16,7 @@ Implemented:
 - smoke test,
 - placeholder connection to `ml_lab_core`,
 - synthetic linear regression dataset.
+- mean squared error metric.
 
 Not implemented yet:
 

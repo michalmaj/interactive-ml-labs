@@ -61,3 +61,17 @@ gdzie:
 - `noise` oznacza losowy szum dodany do danych.
 
 Dane syntetyczne są użyte celowo, ponieważ pozwalają kontrolować trudność problemu. Można zmieniać liczbę próbek, zakres wartości wejściowych, poziom szumu oraz prawdziwe parametry modelu.
+
+## Mean squared error
+
+W pierwszej wersji demo jako funkcja straty używany jest mean squared error, czyli średni błąd kwadratowy.
+
+Metryka ta oblicza średnią wartość kwadratu różnicy między wartością oczekiwaną a predykcją modelu.
+
+Intuicyjnie:
+
+- mały MSE oznacza, że predykcje są blisko wartości oczekiwanych,
+- duży MSE oznacza, że model popełnia duże błędy,
+- większe błędy są karane silniej, ponieważ różnica jest podnoszona do kwadratu.
+
+W tym demo gradient descent będzie próbował zmieniać parametry modelu tak, aby wartość MSE malała.
