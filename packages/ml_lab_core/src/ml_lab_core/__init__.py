@@ -1,3 +1,10 @@
 """Shared core utilities for Interactive ML Labs."""
 
-__all__: list[str] = []
+from ml_lab_core.algorithms import StepwiseAlgorithm
+from ml_lab_core.snapshots import AlgorithmSnapshot, DatasetSnapshot
+
+__all__ = [
+    "AlgorithmSnapshot",
+    "DatasetSnapshot",
+    "StepwiseAlgorithm",
+]
