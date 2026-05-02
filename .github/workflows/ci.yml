@@ -32,5 +32,10 @@ jobs:
       - name: Run Ruff format check
         run: uv run ruff format --check .
 
-      - name: Run tests
+      - name: Run ml-lab-core tests
         run: uv run --package ml-lab-core pytest packages/ml_lab_core/tests
+
+      - name: Run Gradient Descent Playground tests
+        run: >
+          uv run --package gradient-descent-playground
+          pytest demos/level_1_fundamentals/01_gradient_descent_playground/tests
