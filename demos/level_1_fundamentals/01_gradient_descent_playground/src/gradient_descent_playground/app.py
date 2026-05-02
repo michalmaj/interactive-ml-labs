@@ -2,20 +2,29 @@
 
 from __future__ import annotations
 
+import numpy as np
 from ml_lab_core import MetricsHistory
+
+from gradient_descent_playground.dataset import make_synthetic_regression_dataset
 
 
 def main() -> None:
     """Run a minimal placeholder version of the demo.
 
     The real interactive implementation will be added in later pull requests.
-    This entry point exists to verify that the demo package is correctly
-    connected to the workspace and can use `ml_lab_core`.
+    This entry point currently verifies that the package can generate a dataset
+    and use shared utilities from `ml_lab_core`.
     """
+    dataset = make_synthetic_regression_dataset()
+
+    features = np.asarray(dataset.features)
+    targets = np.asarray(dataset.targets)
+
     history = MetricsHistory()
-    history.add("loss", 1.0)
-    history.add("loss", 0.5)
+    history.add("sample_count", float(features.shape[0]))
 
     print("Gradient Descent Playground")
-    print("Package skeleton is configured correctly.")
-    print(f"Latest placeholder loss: {history.latest('loss')}")
+    print("Synthetic dataset generated successfully.")
+    print(f"Features shape: {features.shape}")
+    print(f"Targets shape: {targets.shape}")
+    print(f"Sample count metric: {history.latest('sample_count'):.0f}")

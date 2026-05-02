@@ -14,11 +14,11 @@ Implemented:
 - workspace configuration,
 - command-line entry point,
 - smoke test,
-- placeholder connection to `ml_lab_core`.
+- placeholder connection to `ml_lab_core`,
+- synthetic linear regression dataset.
 
 Not implemented yet:
 
-- synthetic regression dataset,
 - gradient descent algorithm,
 - loss history visualization,
 - Pygame renderer,
