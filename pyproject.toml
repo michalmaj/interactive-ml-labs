@@ -12,6 +12,7 @@ package = false
 [tool.uv.workspace]
 members = [
     "packages/ml_lab_core",
+    "demos/level_1_fundamentals/01_gradient_descent_playground",
 ]
 
 [dependency-groups]
