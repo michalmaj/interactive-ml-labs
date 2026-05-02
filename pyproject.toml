@@ -13,3 +13,43 @@ package = false
 members = [
     "packages/ml_lab_core",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "ruff>=0.15.12",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "F",      # pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "UP",     # pyupgrade
+    "SIM",    # flake8-simplify
+    "PL",     # pylint-inspired checks
+    "RUF",    # Ruff-specific rules
+]
+ignore = [
+    "PLR0913", # Too many arguments; sometimes acceptable in UI/config code.
+]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+]
+testpaths = [
+    "packages/ml_lab_core/tests",
+    "tests",
+]
