@@ -17,10 +17,10 @@ Implemented:
 - placeholder connection to `ml_lab_core`,
 - synthetic linear regression dataset.
 - mean squared error metric.
+- stepwise linear regression trained with gradient descent.
 
 Not implemented yet:
 
-- gradient descent algorithm,
 - loss history visualization,
 - Pygame renderer,
 - parameter controls,

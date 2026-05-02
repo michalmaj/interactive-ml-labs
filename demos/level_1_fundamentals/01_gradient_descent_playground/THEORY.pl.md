@@ -75,3 +75,32 @@ Intuicyjnie:
 - większe błędy są karane silniej, ponieważ różnica jest podnoszona do kwadratu.
 
 W tym demo gradient descent będzie próbował zmieniać parametry modelu tak, aby wartość MSE malała.
+
+## Regresja liniowa w demo
+
+Pierwsza wersja algorytmu uczy prosty model regresji liniowej:
+
+```text
+y_pred = weight * x + bias
+```
+
+Model ma dwa parametry:
+
+- `weight` — nachylenie prostej,
+- `bias` — wyraz wolny.
+
+Celem uczenia jest znalezienie takich wartości `weight` i `bias`, aby predykcje `y_pred` były jak najbliższe wartościom oczekiwanym `y`.
+
+## Jeden krok algorytmu
+
+W tym demo jeden krok oznacza jedną aktualizację parametrów modelu.
+
+W każdym kroku:
+
+1. model oblicza predykcje,
+2. obliczany jest błąd predykcji,
+3. obliczany jest gradient względem `weight` i `bias`,
+4. parametry są przesuwane w kierunku zmniejszającym MSE,
+5. zapisywana jest nowa wartość loss.
+
+Dzięki temu tryb step-by-step pozwala zobaczyć, jak model stopniowo dopasowuje prostą do danych.
