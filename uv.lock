@@ -1,0 +1,19 @@
+version = 1
+revision = 3
+requires-python = ">=3.12"
+
+[manifest]
+members = [
+    "interactive-ml-labs-workspace",
+    "ml-lab-core",
+]
+
+[[package]]
+name = "interactive-ml-labs-workspace"
+version = "0.1.0"
+source = { virtual = "." }
+
+[[package]]
+name = "ml-lab-core"
+version = "0.1.0"
+source = { editable = "packages/ml_lab_core" }
