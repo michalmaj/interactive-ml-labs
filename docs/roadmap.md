@@ -23,11 +23,11 @@ Goal: create the minimal shared infrastructure required by demos.
 
 Planned pull requests:
 
-- [ ] Add algorithm snapshots
-- [ ] Add dataset snapshots
-- [ ] Add stepwise algorithm protocol
-- [ ] Add base demo scene protocol
-- [ ] Add basic metrics history utilities
+- [x] Add algorithm snapshots
+- [x] Add dataset snapshots
+- [x] Add stepwise algorithm protocol
+- [x] Add base demo scene protocol
+- [x] Add basic metrics history utilities
 
 ## Phase 2 — First reference demo
 
