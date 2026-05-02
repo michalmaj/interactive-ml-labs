@@ -1,0 +1,71 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# uv
+# Keep uv.lock committed for reproducible environments.
+# Do not ignore uv.lock.
+
+# Test, coverage and tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyright/
+.coverage
+coverage.xml
+htmlcov/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment variables and local secrets
+.env
+.env.*
+!.env.example
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local generated outputs
+outputs/
+runs/
+artifacts/
+
+# Local datasets and caches
+.cache/
+data/raw/
+data/processed/
+data/external/
+
+# Local model checkpoints
+models/
+checkpoints/
+
+# Pygame / media exports generated during experiments
+*.mp4
+*.avi
+*.mov
+*.webm
