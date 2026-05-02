@@ -14,8 +14,8 @@ Status:
 - [x] Configure uv workspace
 - [x] Configure Ruff and pytest
 - [x] Add GitHub Actions CI
-- [ ] Add architecture and roadmap documentation
-- [ ] Add demo template
+- [x] Add architecture and roadmap documentation
+- [x] Add demo template
 
 ## Phase 1 — Core abstractions
 
@@ -39,12 +39,12 @@ Reference demo:
 
 Planned pull requests:
 
-- [ ] Add synthetic regression dataset
-- [ ] Add mean squared error metric
-- [ ] Add stepwise gradient descent implementation
-- [ ] Add algorithm tests
-- [ ] Add CLI prototype
-- [ ] Add Pygame renderer
+- [x] Add synthetic regression dataset
+- [x] Add mean squared error metric
+- [x] Add stepwise gradient descent implementation
+- [x] Add algorithm tests
+- [x] Add CLI prototype
+- [x] Add Pygame renderer
 - [ ] Add controls
 - [ ] Add live metrics panel
 - [ ] Add challenge mode

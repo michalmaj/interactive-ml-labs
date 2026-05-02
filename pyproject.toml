@@ -38,6 +38,7 @@ select = [
 ]
 ignore = [
     "PLR0913", # Too many arguments; sometimes acceptable in UI/config code.
+    "PLR2004", # Magic values are often acceptable in small visual/demo code.
 ]
 
 [tool.ruff.lint.per-file-ignores]
