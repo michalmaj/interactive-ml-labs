@@ -6,9 +6,9 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
-MetricValue: type = int | float | str | bool
-Metrics: type = Mapping[str, MetricValue]
-VisualState: type = Mapping[str, Any]
+type MetricValue = int | float | str | bool
+type Metrics = Mapping[str, MetricValue]
+type VisualState = Mapping[str, Any]
 
 
 @dataclass(frozen=True, slots=True)
