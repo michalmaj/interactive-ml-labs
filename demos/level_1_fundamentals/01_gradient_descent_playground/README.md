@@ -18,19 +18,28 @@ Implemented:
 - synthetic linear regression dataset.
 - mean squared error metric.
 - stepwise linear regression trained with gradient descent.
+- basic Pygame visualization,
+- keyboard controls for run, pause, step, reset, and quit.
 
 Not implemented yet:
 
 - loss history visualization,
-- Pygame renderer,
 - parameter controls,
 - challenge mode,
 - explanation panel.
 
 ## How to run
 
+Run the command-line version:
+
 ```bash
 uv run --package gradient-descent-playground gradient-descent-playground
+```
+
+Run the Pygame visualization:
+
+```bash
+uv run --package gradient-descent-playground gradient-descent-playground-ui
 ```
 
 ## Planned learning goals

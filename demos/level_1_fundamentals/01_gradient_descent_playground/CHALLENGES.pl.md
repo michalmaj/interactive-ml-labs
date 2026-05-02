@@ -1,5 +1,19 @@
 # Gradient Descent Playground — zadania
 
+## Sterowanie
+
+- `Space` — uruchom lub zatrzymaj automatyczne uczenie,
+- `N` — wykonaj jeden krok gradient descent,
+- `R` — zresetuj demo,
+- `Esc` — zamknij okno.
+
+## Pierwsze obserwacje
+
+1. Uruchom demo i wykonuj kroki pojedynczo klawiszem `N`.
+2. Obserwuj, jak zmienia się czerwona linia regresji.
+3. Obserwuj wartość `loss`.
+4. Zatrzymaj demo po kilku krokach i spróbuj wyjaśnić, dlaczego linia przesunęła się właśnie w tę stronę.
+
 ## Status
 
 Zadania zostaną rozszerzone po dodaniu właściwego algorytmu i interaktywnej wizualizacji.
