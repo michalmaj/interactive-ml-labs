@@ -28,6 +28,16 @@ DEFAULT_UI_SAMPLE_COUNT: Final[int] = 80
 DEFAULT_UI_NOISE_STD: Final[float] = 0.8
 DEFAULT_UI_SEED: Final[int] = 42
 
+LEARNING_RATE_STEP: Final[float] = 0.01
+MIN_LEARNING_RATE: Final[float] = 0.001
+MAX_LEARNING_RATE: Final[float] = 0.25
+
+NOISE_STEP: Final[float] = 0.2
+MIN_NOISE_STD: Final[float] = 0.0
+MAX_NOISE_STD: Final[float] = 5.0
+
+SEED_STEP: Final[int] = 1
+
 
 class GradientDescentPygameApp:
     """Small Pygame application showing stepwise gradient descent."""
@@ -46,18 +56,13 @@ class GradientDescentPygameApp:
         self._should_quit = False
         self._time_since_last_step = 0.0
 
-        self._model = StepwiseLinearRegression(
-            GradientDescentConfig(
-                learning_rate=DEFAULT_UI_LEARNING_RATE,
-                max_steps=DEFAULT_UI_MAX_STEPS,
-            ),
-        )
-        self._dataset_config = SyntheticRegressionConfig(
-            sample_count=DEFAULT_UI_SAMPLE_COUNT,
-            noise_std=DEFAULT_UI_NOISE_STD,
-            seed=DEFAULT_UI_SEED,
-        )
+        self._learning_rate = DEFAULT_UI_LEARNING_RATE
+        self._noise_std = DEFAULT_UI_NOISE_STD
+        self._seed = DEFAULT_UI_SEED
 
+        self._model: StepwiseLinearRegression
+        self._dataset_config: SyntheticRegressionConfig
+        self._rebuild_model()
         self._reset_demo()
 
     def run(self) -> None:
@@ -71,8 +76,28 @@ class GradientDescentPygameApp:
 
         pygame.quit()
 
+    def _rebuild_model(self) -> None:
+        """Recreate the model using current training parameters."""
+        self._model = StepwiseLinearRegression(
+            GradientDescentConfig(
+                learning_rate=self._learning_rate,
+                max_steps=DEFAULT_UI_MAX_STEPS,
+            ),
+        )
+
+    def _rebuild_dataset_config(self) -> None:
+        """Recreate dataset configuration using current data parameters."""
+        self._dataset_config = SyntheticRegressionConfig(
+            sample_count=DEFAULT_UI_SAMPLE_COUNT,
+            noise_std=self._noise_std,
+            seed=self._seed,
+        )
+
     def _reset_demo(self) -> None:
-        """Reset dataset and model state."""
+        """Reset dataset and model state using current parameters."""
+        self._rebuild_model()
+        self._rebuild_dataset_config()
+
         self._dataset = make_synthetic_regression_dataset(self._dataset_config)
         self._model.reset(self._dataset)
         self._snapshot = self._model.snapshot()
@@ -98,6 +123,53 @@ class GradientDescentPygameApp:
             self._step_once()
         elif event.key == pygame.K_r:
             self._reset_demo()
+        elif event.key == pygame.K_UP:
+            self._increase_learning_rate()
+        elif event.key == pygame.K_DOWN:
+            self._decrease_learning_rate()
+        elif event.key == pygame.K_RIGHT:
+            self._increase_noise()
+        elif event.key == pygame.K_LEFT:
+            self._decrease_noise()
+        elif event.key == pygame.K_s:
+            self._next_seed()
+
+    def _increase_learning_rate(self) -> None:
+        """Increase learning rate and reset the demo."""
+        self._learning_rate = min(
+            MAX_LEARNING_RATE,
+            self._learning_rate + LEARNING_RATE_STEP,
+        )
+        self._reset_demo()
+
+    def _decrease_learning_rate(self) -> None:
+        """Decrease learning rate and reset the demo."""
+        self._learning_rate = max(
+            MIN_LEARNING_RATE,
+            self._learning_rate - LEARNING_RATE_STEP,
+        )
+        self._reset_demo()
+
+    def _increase_noise(self) -> None:
+        """Increase data noise and reset the demo."""
+        self._noise_std = min(
+            MAX_NOISE_STD,
+            self._noise_std + NOISE_STEP,
+        )
+        self._reset_demo()
+
+    def _decrease_noise(self) -> None:
+        """Decrease data noise and reset the demo."""
+        self._noise_std = max(
+            MIN_NOISE_STD,
+            self._noise_std - NOISE_STEP,
+        )
+        self._reset_demo()
+
+    def _next_seed(self) -> None:
+        """Generate another dataset by changing the random seed."""
+        self._seed += SEED_STEP
+        self._reset_demo()
 
     def _update(self, dt: float) -> None:
         """Update automatic stepping state."""
@@ -117,7 +189,12 @@ class GradientDescentPygameApp:
 
     def _draw(self) -> None:
         """Draw the current application state."""
-        self._renderer.draw(self._snapshot, running=self._running)
+        self._renderer.draw(
+            self._snapshot,
+            running=self._running,
+            noise_std=self._noise_std,
+            seed=self._seed,
+        )
 
 
 def main() -> None:

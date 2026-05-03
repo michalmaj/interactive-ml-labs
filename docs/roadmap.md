@@ -45,7 +45,7 @@ Planned pull requests:
 - [x] Add algorithm tests
 - [x] Add CLI prototype
 - [x] Add Pygame renderer
-- [ ] Add controls
+- [x] Add controls
 - [ ] Add live metrics panel
 - [ ] Add challenge mode
 - [ ] Add explanation panel
