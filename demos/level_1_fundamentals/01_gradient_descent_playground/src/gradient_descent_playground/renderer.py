@@ -10,6 +10,8 @@ import pygame
 from ml_lab_core import AlgorithmSnapshot
 from numpy.typing import NDArray
 
+from gradient_descent_playground.challenge import ChallengeResult
+
 type FloatArray = NDArray[np.float64]
 
 WINDOW_WIDTH: Final[int] = 1100
@@ -72,6 +74,7 @@ class GradientDescentRenderer:
         running: bool,
         noise_std: float,
         seed: int,
+        challenge_result: ChallengeResult,
     ) -> None:
         """Draw the full frame.
 
@@ -80,6 +83,7 @@ class GradientDescentRenderer:
             running: Whether automatic stepping is active.
             noise_std: Current synthetic data noise standard deviation.
             seed: Current synthetic dataset seed.
+            challenge_result: Current challenge evaluation result.
         """
         self._screen.fill(BACKGROUND_COLOR)
 
@@ -88,8 +92,14 @@ class GradientDescentRenderer:
         self._draw_panel(BOTTOM_RECT)
 
         self._draw_main_plot(snapshot)
-        self._draw_side_panel(snapshot, running=running, noise_std=noise_std, seed=seed)
-        self._draw_bottom_panel()
+        self._draw_side_panel(
+            snapshot,
+            running=running,
+            noise_std=noise_std,
+            seed=seed,
+            challenge_result=challenge_result,
+        )
+        self._draw_bottom_panel(challenge_result)
 
         pygame.display.flip()
 
@@ -172,8 +182,9 @@ class GradientDescentRenderer:
         running: bool,
         noise_std: float,
         seed: int,
+        challenge_result: ChallengeResult,
     ) -> None:
-        """Draw metrics, parameters, and training status."""
+        """Draw metrics, parameters, challenge, and training status."""
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 22
 
@@ -202,7 +213,22 @@ class GradientDescentRenderer:
         y += 30
 
         loss_history = snapshot.visual_state["loss_history"]
-        self._draw_loss_history(loss_history, pygame.Rect(x, y, 220, 130))
+        self._draw_loss_history(loss_history, pygame.Rect(x, y, 220, 110))
+
+        y += 132
+        self._draw_text("Challenge", x, y, self._font, TEXT_COLOR)
+        y += 28
+
+        challenge_rows = [
+            ("Status", challenge_result.status),
+            ("Target loss", f"{challenge_result.target_loss:.4f}"),
+            ("Steps left", str(challenge_result.steps_remaining)),
+        ]
+
+        for label, value in challenge_rows:
+            self._draw_text(f"{label}:", x, y, self._small_font, MUTED_TEXT_COLOR)
+            self._draw_text(str(value), x + 120, y, self._small_font, TEXT_COLOR)
+            y += SMALL_TEXT_LINE_HEIGHT
 
     def _draw_loss_history(
         self,
@@ -230,8 +256,8 @@ class GradientDescentRenderer:
 
         pygame.draw.lines(self._screen, LOSS_COLOR, False, points, 2)
 
-    def _draw_bottom_panel(self) -> None:
-        """Draw keyboard controls and short explanation."""
+    def _draw_bottom_panel(self, challenge_result: ChallengeResult) -> None:
+        """Draw keyboard controls and challenge feedback."""
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 18
 
@@ -239,13 +265,15 @@ class GradientDescentRenderer:
             "Space: run/pause   N: step   R: reset   "
             "Up/Down: learning rate   Left/Right: noise   S: seed   Esc: quit"
         )
-        explanation = (
-            "Changing learning rate, noise, or seed resets the demo. "
-            "Observe how parameters affect convergence and loss."
-        )
 
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
-        self._draw_text(explanation, x, y + TEXT_LINE_HEIGHT, self._small_font, MUTED_TEXT_COLOR)
+        self._draw_text(
+            challenge_result.message,
+            x,
+            y + TEXT_LINE_HEIGHT,
+            self._small_font,
+            MUTED_TEXT_COLOR,
+        )
 
     def _draw_text(
         self,

@@ -10,6 +10,7 @@ from gradient_descent_playground.algorithm import (
     GradientDescentConfig,
     StepwiseLinearRegression,
 )
+from gradient_descent_playground.challenge import LossChallenge
 from gradient_descent_playground.dataset import (
     SyntheticRegressionConfig,
     make_synthetic_regression_dataset,
@@ -51,6 +52,7 @@ class GradientDescentPygameApp:
 
         self._clock = pygame.time.Clock()
         self._renderer = GradientDescentRenderer(self._screen)
+        self._challenge = LossChallenge()
 
         self._running = False
         self._should_quit = False
@@ -62,6 +64,7 @@ class GradientDescentPygameApp:
 
         self._model: StepwiseLinearRegression
         self._dataset_config: SyntheticRegressionConfig
+
         self._rebuild_model()
         self._reset_demo()
 
@@ -94,13 +97,15 @@ class GradientDescentPygameApp:
         )
 
     def _reset_demo(self) -> None:
-        """Reset dataset and model state using current parameters."""
+        """Reset dataset, model, and challenge state using current parameters."""
         self._rebuild_model()
         self._rebuild_dataset_config()
 
         self._dataset = make_synthetic_regression_dataset(self._dataset_config)
         self._model.reset(self._dataset)
         self._snapshot = self._model.snapshot()
+        self._challenge_result = self._challenge.evaluate(self._snapshot)
+
         self._running = False
         self._time_since_last_step = 0.0
 
@@ -173,7 +178,7 @@ class GradientDescentPygameApp:
 
     def _update(self, dt: float) -> None:
         """Update automatic stepping state."""
-        if not self._running or self._snapshot.done:
+        if not self._running or self._snapshot.done or self._challenge_result.success:
             return
 
         self._time_since_last_step += dt
@@ -183,9 +188,10 @@ class GradientDescentPygameApp:
             self._time_since_last_step = 0.0
 
     def _step_once(self) -> None:
-        """Perform one algorithm step."""
-        if not self._snapshot.done:
+        """Perform one algorithm step and update the challenge state."""
+        if not self._snapshot.done and not self._challenge_result.success:
             self._snapshot = self._model.step()
+            self._challenge_result = self._challenge.evaluate(self._snapshot)
 
     def _draw(self) -> None:
         """Draw the current application state."""
@@ -194,6 +200,7 @@ class GradientDescentPygameApp:
             running=self._running,
             noise_std=self._noise_std,
             seed=self._seed,
+            challenge_result=self._challenge_result,
         )
 
 

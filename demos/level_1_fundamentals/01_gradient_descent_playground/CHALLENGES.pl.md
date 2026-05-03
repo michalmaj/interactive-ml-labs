@@ -46,3 +46,22 @@ Zadania zostaną rozszerzone po dodaniu właściwego algorytmu i interaktywnej w
 1. Wyjaśnij, dlaczego skalowanie danych może wpływać na działanie gradient descent.
 2. Porównaj regresję liniową i wielomianową.
 3. Zaproponuj metrykę challenge mode dla tego demo.
+
+## Challenge mode
+
+Aktualny challenge:
+
+- osiągnij `loss <= 1.0`,
+- zanim minie `80` kroków gradient descent.
+
+Spróbuj wykonać challenge dla różnych ustawień:
+
+1. domyślny learning rate i domyślny szum,
+2. większy learning rate,
+3. bardzo mały learning rate,
+4. większy poziom szumu,
+5. kilka różnych seedów danych.
+
+Pytanie kontrolne:
+
+> Czy większy learning rate zawsze pomaga wygrać challenge?
