@@ -1,33 +1,63 @@
 # Gradient Descent Playground
 
-Gradient Descent Playground is an interactive demo planned for Level 1 of Interactive ML Labs.
+Gradient Descent Playground is an interactive Level 1 demo from **Interactive ML Labs**.
 
-The goal of this demo is to help students understand how a model can learn by gradually minimizing a loss function.
+The demo shows how a simple linear regression model learns by minimizing mean squared error using gradient descent.
 
-## Current status
+Students can observe:
 
-This package currently contains only the initial project skeleton.
+- synthetic regression data,
+- the current regression line,
+- loss decreasing over time,
+- model parameters changing step by step,
+- the effect of learning rate,
+- the effect of data noise,
+- a simple challenge mode.
+
+## What this demo teaches
+
+This demo focuses on the basic intuition behind optimization in machine learning.
+
+Students should understand that a model does not magically “know” the correct answer. It starts with initial parameters and gradually changes them to reduce prediction error.
+
+The demo is intentionally simple:
+
+```text
+y_pred = weight * x + bias
+```
+
+Only two parameters are learned:
+
+- `weight`,
+- `bias`.
+
+This makes it possible to see clearly what gradient descent does.
+
+## Current features
 
 Implemented:
 
-- package structure,
-- workspace configuration,
-- command-line entry point,
-- smoke test,
-- placeholder connection to `ml_lab_core`,
-- synthetic linear regression dataset.
-- mean squared error metric.
-- stepwise linear regression trained with gradient descent.
-- basic Pygame visualization,
-- keyboard controls for run, pause, step, reset, and quit.
-- separated Pygame application loop and renderer.
-- keyboard controls for learning rate, noise level, and dataset seed.
-- basic challenge mode based on target loss and step limit.
+- synthetic linear regression dataset,
+- mean squared error metric,
+- stepwise linear regression trained with gradient descent,
+- command-line prototype,
+- Pygame visualization,
+- keyboard controls,
+- learning rate adjustment,
+- data noise adjustment,
+- dataset seed changes,
+- live loss history,
+- challenge mode,
+- tests,
+- CI support.
 
 Not implemented yet:
 
-- loss history visualization,
-- explanation panel.
+- graphical sliders,
+- batch size control,
+- polynomial regression,
+- train/test split visualization,
+- comparison with closed-form linear regression.
 
 ## How to run
 
@@ -45,22 +75,57 @@ uv run --package gradient-descent-playground gradient-descent-playground-ui
 
 ## Controls
 
-- `Space` — run or pause automatic learning,
-- `N` — perform one gradient descent step,
-- `R` — reset the demo,
-- `Up` / `Down` — increase or decrease learning rate,
-- `Left` / `Right` — decrease or increase data noise,
-- `S` — generate a new dataset seed,
-- `Esc` — quit.
+| Key     | Action                            |
+| ------- | --------------------------------- |
+| `Space` | Run or pause automatic learning   |
+| `N`     | Perform one gradient descent step |
+| `R`     | Reset the demo                    |
+| `Up`    | Increase learning rate            |
+| `Down`  | Decrease learning rate            |
+| `Left`  | Decrease data noise               |
+| `Right` | Increase data noise               |
+| `S`     | Generate a new dataset seed       |
+| `Esc`   | Quit                              |
 
-## Planned learning goals
+Changing learning rate, noise, or seed resets the demo.
 
-Students should learn:
+## Challenge mode
 
-- what a loss function is,
-- what gradient descent does,
-- how learning rate affects optimization,
-- why too small learning rate is slow,
-- why too large learning rate may make training unstable,
-- how model parameters change during training.
+The current challenge is:
+
+```text
+Reach loss <= 1.0 before 80 gradient descent steps.
+```
+
+The challenge status is shown in the side panel.
+
+Possible statuses:
+
+- active — the challenge is still running,
+- success — the target loss was reached,
+- failed — the step limit was reached before the target loss.
+
+## Suggested classroom use
+
+A recommended classroom flow:
+
+1. Start with the default parameters.
+2. Press `N` several times and discuss what changes after each step.
+3. Press `Space` and observe automatic learning.
+4. Increase learning rate and compare convergence speed.
+5. Set learning rate too high and observe instability.
+6. Increase data noise and discuss why perfect fitting becomes harder.
+7. Ask students to beat the challenge for several seeds.
+
+## Related concepts
+
+- linear regression,
+- loss function,
+- mean squared error,
+- gradient,
+- learning rate,
+- optimization,
+- convergence,
+- overfitting intuition,
+- noisy data.
 

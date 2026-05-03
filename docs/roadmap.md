@@ -39,17 +39,20 @@ Reference demo:
 
 Planned pull requests:
 
+- [x] Add Gradient Descent Playground package skeleton
 - [x] Add synthetic regression dataset
 - [x] Add mean squared error metric
 - [x] Add stepwise gradient descent implementation
 - [x] Add algorithm tests
 - [x] Add CLI prototype
-- [x] Add Pygame renderer
-- [x] Add controls
-- [ ] Add live metrics panel
+- [x] Add basic Pygame renderer
+- [x] Split Pygame renderer from app loop
+- [x] Add keyboard parameter controls
 - [x] Add challenge mode
+- [x] Polish demo documentation
+- [ ] Add screenshots or GIF
+- [ ] Add graphical parameter controls
 - [ ] Add explanation panel
-- [ ] Add README, theory, and challenges documents
 
 ## Phase 3 — First three demos
 

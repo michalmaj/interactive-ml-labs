@@ -1,106 +1,208 @@
 # Gradient Descent — teoria
 
-## Cel algorytmu
+## 1. Cel demo
 
-Gradient descent jest metodą optymalizacji używaną do minimalizacji funkcji kosztu lub funkcji straty.
+Celem demo jest pokazanie, w jaki sposób prosty model regresji liniowej może uczyć się na podstawie danych.
 
-W kontekście uczenia maszynowego funkcja straty mierzy, jak bardzo predykcje modelu różnią się od oczekiwanych wyników.
+Model nie dostaje bezpośrednio informacji, jakie wartości parametrów są najlepsze. Zamiast tego zaczyna od wartości początkowych i stopniowo je poprawia, aby zmniejszyć błąd predykcji.
 
-## Intuicja
-
-Algorytm można rozumieć jako schodzenie po powierzchni błędu.
-
-Model zaczyna z pewnymi parametrami początkowymi. Następnie sprawdzane jest, w którą stronę należy te parametry zmienić, aby błąd był mniejszy.
-
-## Najważniejsze pojęcia
-
-- **loss** — wartość błędu modelu,
-- **gradient** — kierunek największego wzrostu funkcji,
-- **learning rate** — długość kroku wykonywanego podczas aktualizacji parametrów,
-- **iteration** — jedna aktualizacja parametrów.
-
-## Co będzie pokazywać demo?
-
-Docelowo demo będzie pokazywać:
-
-- punkty danych,
-- aktualną linię regresji,
-- zmianę parametrów modelu,
-- wykres wartości loss,
-- wpływ learning rate na stabilność uczenia,
-- tryb krokowy, w którym jedna akcja odpowiada jednej aktualizacji parametrów.
-
-## Typowe błędy interpretacyjne
-
-### Błąd 1: większy learning rate zawsze oznacza szybszą naukę
-
-Zbyt duży learning rate może powodować niestabilność. Model może przeskakiwać minimum funkcji straty albo całkowicie się rozbiegać.
-
-### Błąd 2: malejący loss zawsze oznacza dobry model
-
-Loss może maleć na danych treningowych, ale model nadal może źle generalizować na nowych danych.
-
-### Błąd 3: gradient descent zawsze znajduje najlepsze rozwiązanie
-
-W prostych problemach wypukłych często działa bardzo dobrze. W bardziej złożonych modelach może utknąć w słabszych rozwiązaniach lokalnych albo być wrażliwy na skalowanie danych.
-
-## Dane syntetyczne w pierwszej wersji demo
-
-Pierwsza wersja demo wykorzystuje dane syntetyczne generowane według równania:
+Demo pokazuje proces uczenia w sposób krokowy:
 
 ```text
-y = a * x + b + noise
+jeden krok = jedna aktualizacja parametrów modelu
 ```
 
-gdzie:
+Dzięki temu można obserwować, jak zmieniają się:
 
-- `x` jest cechą wejściową,
-- `y` jest wartością docelową,
-- `a` jest prawdziwym nachyleniem prostej,
-- `b` jest prawdziwym wyrazem wolnym,
-- `noise` oznacza losowy szum dodany do danych.
+- prosta regresji,
+- wartość funkcji straty,
+- parametr `weight`,
+- parametr `bias`.
 
-Dane syntetyczne są użyte celowo, ponieważ pozwalają kontrolować trudność problemu. Można zmieniać liczbę próbek, zakres wartości wejściowych, poziom szumu oraz prawdziwe parametry modelu.
+## 2. Problem regresji liniowej
 
-## Mean squared error
+W regresji liniowej celem jest przewidywanie wartości liczbowej.
 
-W pierwszej wersji demo jako funkcja straty używany jest mean squared error, czyli średni błąd kwadratowy.
+W tym demo dane mają jedną cechę wejściową `x` i jedną wartość docelową `y`.
 
-Metryka ta oblicza średnią wartość kwadratu różnicy między wartością oczekiwaną a predykcją modelu.
-
-Intuicyjnie:
-
-- mały MSE oznacza, że predykcje są blisko wartości oczekiwanych,
-- duży MSE oznacza, że model popełnia duże błędy,
-- większe błędy są karane silniej, ponieważ różnica jest podnoszona do kwadratu.
-
-W tym demo gradient descent będzie próbował zmieniać parametry modelu tak, aby wartość MSE malała.
-
-## Regresja liniowa w demo
-
-Pierwsza wersja algorytmu uczy prosty model regresji liniowej:
+Model ma postać:
 
 ```text
 y_pred = weight * x + bias
 ```
 
-Model ma dwa parametry:
+gdzie:
 
+- `y_pred` — predykcja modelu,
+- `x` — wartość wejściowa,
 - `weight` — nachylenie prostej,
 - `bias` — wyraz wolny.
 
-Celem uczenia jest znalezienie takich wartości `weight` i `bias`, aby predykcje `y_pred` były jak najbliższe wartościom oczekiwanym `y`.
+Model próbuje dobrać takie wartości `weight` i `bias`, aby jego predykcje były możliwie bliskie wartościom oczekiwanym `y`.
 
-## Jeden krok algorytmu
+## 3. Dane syntetyczne
 
-W tym demo jeden krok oznacza jedną aktualizację parametrów modelu.
+Pierwsza wersja demo wykorzystuje dane syntetyczne generowane według równania:
 
-W każdym kroku:
+```text
+y = true_weight * x + true_bias + noise
+```
 
-1. model oblicza predykcje,
-2. obliczany jest błąd predykcji,
-3. obliczany jest gradient względem `weight` i `bias`,
-4. parametry są przesuwane w kierunku zmniejszającym MSE,
-5. zapisywana jest nowa wartość loss.
+gdzie:
 
-Dzięki temu tryb step-by-step pozwala zobaczyć, jak model stopniowo dopasowuje prostą do danych.
+- `true_weight` — prawdziwe nachylenie prostej użyte do wygenerowania danych,
+- `true_bias` — prawdziwy wyraz wolny,
+- `noise` — losowy szum dodany do danych.
+
+Dane syntetyczne są użyte celowo, ponieważ pozwalają kontrolować trudność problemu.
+
+Można zmieniać:
+
+- poziom szumu,
+- seed generatora losowego,
+- liczbę próbek,
+- zakres wartości wejściowych.
+
+W aktualnym interfejsie Pygame student może zmieniać poziom szumu i seed.
+
+## 4. Funkcja straty
+
+Aby model mógł się uczyć, potrzebna jest miara błędu.
+
+W tym demo używany jest mean squared error, czyli średni błąd kwadratowy.
+
+Intuicyjnie:
+
+```text
+MSE = średnia wartość kwadratów różnic między y i y_pred
+```
+
+Jeżeli predykcja jest bardzo blisko wartości oczekiwanej, błąd jest mały.
+
+Jeżeli predykcja jest daleko od wartości oczekiwanej, błąd jest duży. Ponieważ różnica jest podnoszona do kwadratu, większe błędy są karane silniej.
+
+## 5. Gradient descent
+
+Gradient descent jest metodą optymalizacji.
+
+Jego zadaniem jest znalezienie takich parametrów modelu, które zmniejszają funkcję straty.
+
+W tym demo gradient descent zmienia dwa parametry:
+
+- `weight`,
+- `bias`.
+
+W każdym kroku algorytm:
+
+1. oblicza predykcje modelu,
+2. oblicza błędy predykcji,
+3. oblicza gradient względem `weight` i `bias`,
+4. aktualizuje parametry w kierunku zmniejszającym loss,
+5. zapisuje nową wartość loss.
+
+## 6. Intuicja gradientu
+
+Gradient wskazuje kierunek największego wzrostu funkcji.
+
+Ponieważ celem jest minimalizacja błędu, parametry aktualizowane są w przeciwnym kierunku niż gradient.
+
+W uproszczeniu:
+
+```text
+nowy_parametr = stary_parametr - learning_rate * gradient
+```
+
+To oznacza, że:
+
+- gradient mówi, w którą stronę zmienić parametr,
+- learning rate mówi, jak duży krok wykonać.
+
+## 7. Learning rate
+
+Learning rate jest jednym z najważniejszych parametrów gradient descent.
+
+Jeżeli learning rate jest zbyt mały:
+
+- model uczy się bardzo wolno,
+- loss maleje powoli,
+- potrzeba wielu kroków, aby osiągnąć dobry wynik.
+
+Jeżeli learning rate jest rozsądny:
+
+- loss maleje stabilnie,
+- model szybko dopasowuje prostą do danych.
+
+Jeżeli learning rate jest zbyt duży:
+
+- model może przeskakiwać minimum,
+- loss może oscylować,
+- uczenie może stać się niestabilne,
+- challenge może się nie udać :D
+
+W demo learning rate można zmieniać klawiszami `Up` i `Down`.
+
+## 8. Szum w danych
+
+Szum oznacza losowe odchylenie punktów od idealnej prostej.
+
+Mały szum oznacza, że dane są prawie idealnie liniowe.
+
+Duży szum oznacza, że punkty są bardziej rozrzucone i trudniej dopasować prostą.
+
+Ważna obserwacja:
+
+> Im większy szum, tym trudniej osiągnąć bardzo niski loss.
+
+Nie oznacza to jednak, że model działa źle. W danych zaszumionych pewien poziom błędu jest naturalny.
+
+W demo poziom szumu można zmieniać klawiszami `Left` i `Right`.
+
+## 9. Challenge mode
+
+Challenge mode zamienia obserwację algorytmu w małą grę edukacyjną.
+
+Aktualny cel:
+
+```text
+osiągnij loss <= 1.0 przed upływem 80 kroków
+```
+
+Student może zmieniać:
+
+- learning rate,
+- poziom szumu,
+- seed danych.
+
+Dzięki temu można eksperymentować i sprawdzać, kiedy algorytm uczy się szybko, stabilnie i skutecznie.
+
+## 10. Typowe błędy interpretacyjne
+
+### Błąd 1: większy learning rate zawsze jest lepszy
+
+Nie zawsze. Większy learning rate może przyspieszyć uczenie, ale po przekroczeniu pewnego poziomu może spowodować niestabilność.
+
+### Błąd 2: jeżeli loss maleje, model na pewno jest dobry
+
+Loss mierzony na danych treningowych nie mówi wszystkiego o generalizacji. W bardziej zaawansowanych demo zostanie pokazany podział na dane treningowe i testowe.
+
+### Błąd 3: gradient descent zawsze znajduje najlepsze rozwiązanie
+
+W prostej regresji liniowej problem jest łatwy, ale w bardziej złożonych modelach optymalizacja może być trudniejsza.
+
+### Błąd 4: niski loss zawsze jest możliwy
+
+Nie zawsze. Jeżeli dane są bardzo zaszumione, idealne dopasowanie może być nierealistyczne lub oznaczać przeuczenie.
+
+## 11. Co warto obserwować w demo?
+
+Podczas pracy z demo warto zwrócić uwagę na:
+
+- czy loss maleje stabilnie,
+- jak szybko czerwona linia zbliża się do punktów,
+- jak zmienia się `weight`,
+- jak zmienia się `bias`,
+- kiedy challenge kończy się sukcesem,
+- kiedy challenge kończy się porażką,
+- jak szum wpływa na końcowy loss,
+- jak learning rate wpływa na stabilność uczenia.
+
