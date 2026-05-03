@@ -5,7 +5,17 @@
 - `Space` — uruchom lub zatrzymaj automatyczne uczenie,
 - `N` — wykonaj jeden krok gradient descent,
 - `R` — zresetuj demo,
+- `Up` / `Down` — zwiększ lub zmniejsz learning rate,
+- `Left` / `Right` — zmniejsz lub zwiększ poziom szumu w danych,
+- `S` — wygeneruj nowy zbiór danych przez zmianę ziarna losowości,
 - `Esc` — zamknij okno.
+
+## Eksperymenty z parametrami
+
+1. Ustaw bardzo mały learning rate i obserwuj, jak wolno maleje loss.
+2. Ustaw większy learning rate i sprawdź, czy model uczy się szybciej.
+3. Zwiększ szum w danych i sprawdź, czy prosta nadal dobrze dopasowuje się do punktów.
+4. Zmień seed kilka razy i sprawdź, czy uczenie wygląda podobnie dla różnych zbiorów danych.
 
 ## Pierwsze obserwacje
 

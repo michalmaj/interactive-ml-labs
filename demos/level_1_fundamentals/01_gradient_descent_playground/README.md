@@ -20,12 +20,12 @@ Implemented:
 - stepwise linear regression trained with gradient descent.
 - basic Pygame visualization,
 - keyboard controls for run, pause, step, reset, and quit.
-- - separated Pygame application loop and renderer.
+- separated Pygame application loop and renderer.
+- keyboard controls for learning rate, noise level, and dataset seed.
 
 Not implemented yet:
 
 - loss history visualization,
-- parameter controls,
 - challenge mode,
 - explanation panel.
 
@@ -42,6 +42,16 @@ Run the Pygame visualization:
 ```bash
 uv run --package gradient-descent-playground gradient-descent-playground-ui
 ```
+
+## Controls
+
+- `Space` — run or pause automatic learning,
+- `N` — perform one gradient descent step,
+- `R` — reset the demo,
+- `Up` / `Down` — increase or decrease learning rate,
+- `Left` / `Right` — decrease or increase data noise,
+- `S` — generate a new dataset seed,
+- `Esc` — quit.
 
 ## Planned learning goals
 

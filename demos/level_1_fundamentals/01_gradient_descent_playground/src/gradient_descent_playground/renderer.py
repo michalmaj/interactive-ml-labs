@@ -65,12 +65,21 @@ class GradientDescentRenderer:
         self._small_font = pygame.font.Font(None, 22)
         self._title_font = pygame.font.Font(None, 36)
 
-    def draw(self, snapshot: AlgorithmSnapshot, *, running: bool) -> None:
+    def draw(
+        self,
+        snapshot: AlgorithmSnapshot,
+        *,
+        running: bool,
+        noise_std: float,
+        seed: int,
+    ) -> None:
         """Draw the full frame.
 
         Args:
             snapshot: Current algorithm state.
             running: Whether automatic stepping is active.
+            noise_std: Current synthetic data noise standard deviation.
+            seed: Current synthetic dataset seed.
         """
         self._screen.fill(BACKGROUND_COLOR)
 
@@ -79,7 +88,7 @@ class GradientDescentRenderer:
         self._draw_panel(BOTTOM_RECT)
 
         self._draw_main_plot(snapshot)
-        self._draw_side_panel(snapshot, running=running)
+        self._draw_side_panel(snapshot, running=running, noise_std=noise_std, seed=seed)
         self._draw_bottom_panel()
 
         pygame.display.flip()
@@ -156,8 +165,15 @@ class GradientDescentRenderer:
 
         pygame.draw.line(self._screen, LINE_COLOR, start, end, LINE_WIDTH)
 
-    def _draw_side_panel(self, snapshot: AlgorithmSnapshot, *, running: bool) -> None:
-        """Draw metrics and training status."""
+    def _draw_side_panel(
+        self,
+        snapshot: AlgorithmSnapshot,
+        *,
+        running: bool,
+        noise_std: float,
+        seed: int,
+    ) -> None:
+        """Draw metrics, parameters, and training status."""
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 22
 
@@ -172,6 +188,8 @@ class GradientDescentRenderer:
             ("Weight", f"{float(snapshot.metrics['weight']):.6f}"),
             ("Bias", f"{float(snapshot.metrics['bias']):.6f}"),
             ("Learning rate", f"{float(snapshot.metrics['learning_rate']):.4f}"),
+            ("Noise std", f"{noise_std:.2f}"),
+            ("Seed", str(seed)),
         ]
 
         for label, value in rows:
@@ -217,13 +235,16 @@ class GradientDescentRenderer:
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 18
 
-        controls = "Space: run/pause   N: one step   R: reset   Esc: quit"
+        controls = (
+            "Space: run/pause   N: step   R: reset   "
+            "Up/Down: learning rate   Left/Right: noise   S: seed   Esc: quit"
+        )
         explanation = (
-            "One step performs one gradient descent update of weight and bias. "
-            "The red line should gradually fit the blue points."
+            "Changing learning rate, noise, or seed resets the demo. "
+            "Observe how parameters affect convergence and loss."
         )
 
-        self._draw_text(controls, x, y, self._font, TEXT_COLOR)
+        self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
         self._draw_text(explanation, x, y + TEXT_LINE_HEIGHT, self._small_font, MUTED_TEXT_COLOR)
 
     def _draw_text(
