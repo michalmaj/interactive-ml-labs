@@ -49,7 +49,8 @@ Implemented:
 - live loss history,
 - challenge mode,
 - tests,
-- CI support.
+- CI support,
+- explanation panel based on algorithm state and challenge result.
 
 Not implemented yet:
 

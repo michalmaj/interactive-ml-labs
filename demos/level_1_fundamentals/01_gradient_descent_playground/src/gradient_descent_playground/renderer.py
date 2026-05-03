@@ -11,6 +11,7 @@ from ml_lab_core import AlgorithmSnapshot
 from numpy.typing import NDArray
 
 from gradient_descent_playground.challenge import ChallengeResult
+from gradient_descent_playground.explanation import build_explanation_lines
 
 type FloatArray = NDArray[np.float64]
 
@@ -99,7 +100,7 @@ class GradientDescentRenderer:
             seed=seed,
             challenge_result=challenge_result,
         )
-        self._draw_bottom_panel(challenge_result)
+        self._draw_bottom_panel(snapshot, challenge_result)
 
         pygame.display.flip()
 
@@ -256,10 +257,14 @@ class GradientDescentRenderer:
 
         pygame.draw.lines(self._screen, LOSS_COLOR, False, points, 2)
 
-    def _draw_bottom_panel(self, challenge_result: ChallengeResult) -> None:
-        """Draw keyboard controls and challenge feedback."""
+    def _draw_bottom_panel(
+        self,
+        snapshot: AlgorithmSnapshot,
+        challenge_result: ChallengeResult,
+    ) -> None:
+        """Draw keyboard controls and explanation feedback."""
         x = BOTTOM_RECT.left + 24
-        y = BOTTOM_RECT.top + 18
+        y = BOTTOM_RECT.top + 14
 
         controls = (
             "Space: run/pause   N: step   R: reset   "
@@ -267,13 +272,18 @@ class GradientDescentRenderer:
         )
 
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
-        self._draw_text(
-            challenge_result.message,
-            x,
-            y + TEXT_LINE_HEIGHT,
-            self._small_font,
-            MUTED_TEXT_COLOR,
-        )
+
+        explanation_lines = build_explanation_lines(snapshot, challenge_result)
+        explanation_y = y + TEXT_LINE_HEIGHT
+
+        for index, line in enumerate(explanation_lines):
+            self._draw_text(
+                line,
+                x,
+                explanation_y + index * SMALL_TEXT_LINE_HEIGHT,
+                self._small_font,
+                MUTED_TEXT_COLOR,
+            )
 
     def _draw_text(
         self,
