@@ -22,11 +22,11 @@ Implemented:
 - keyboard controls for run, pause, step, reset, and quit.
 - separated Pygame application loop and renderer.
 - keyboard controls for learning rate, noise level, and dataset seed.
+- basic challenge mode based on target loss and step limit.
 
 Not implemented yet:
 
 - loss history visualization,
-- challenge mode,
 - explanation panel.
 
 ## How to run

@@ -47,7 +47,7 @@ Planned pull requests:
 - [x] Add Pygame renderer
 - [x] Add controls
 - [ ] Add live metrics panel
-- [ ] Add challenge mode
+- [x] Add challenge mode
 - [ ] Add explanation panel
 - [ ] Add README, theory, and challenges documents
 
