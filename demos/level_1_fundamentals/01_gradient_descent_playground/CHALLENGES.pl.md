@@ -220,3 +220,15 @@ Opisz:
 - sposób punktacji,
 - czego student może się z niego nauczyć.
 
+## Panel wyjaśnień
+
+Na dole ekranu znajduje się krótki panel wyjaśnień.
+
+Panel informuje między innymi:
+
+- co zmieniło się po ostatnim kroku,
+- czy challenge zakończył się sukcesem,
+- czy challenge zakończył się porażką,
+- co można spróbować zmienić w parametrach.
+
+Podczas wykonywania ćwiczeń zwracaj uwagę nie tylko na wykres, ale także na ten komunikat.

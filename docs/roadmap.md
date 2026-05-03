@@ -52,7 +52,7 @@ Planned pull requests:
 - [x] Polish demo documentation
 - [ ] Add screenshots or GIF
 - [ ] Add graphical parameter controls
-- [ ] Add explanation panel
+- [x] Add explanation panel
 
 ## Phase 3 — First three demos
 
