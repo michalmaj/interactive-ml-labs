@@ -20,6 +20,7 @@ Implemented:
 - stepwise linear regression trained with gradient descent.
 - basic Pygame visualization,
 - keyboard controls for run, pause, step, reset, and quit.
+- - separated Pygame application loop and renderer.
 
 Not implemented yet:
 
