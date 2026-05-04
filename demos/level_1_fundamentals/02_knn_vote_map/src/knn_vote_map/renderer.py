@@ -75,6 +75,7 @@ class KNNVoteMapRenderer:
         self._font = pygame.font.Font(None, 28)
         self._small_font = pygame.font.Font(None, 22)
         self._title_font = pygame.font.Font(None, 36)
+        self._last_bounds: WorldBounds | None = None
 
     def draw(
         self,
@@ -102,6 +103,24 @@ class KNNVoteMapRenderer:
 
         pygame.display.flip()
 
+    def screen_to_world(self, position: tuple[int, int]) -> tuple[float, float] | None:
+        """Convert a screen position into world coordinates.
+
+        Args:
+            position: Mouse position in screen coordinates.
+
+        Returns:
+            World coordinate pair if the position is inside the plot area,
+            otherwise `None`.
+        """
+        if self._last_bounds is None:
+            return None
+
+        if not _drawable_rect(MAIN_RECT).collidepoint(position):
+            return None
+
+        return _screen_to_world(position, self._last_bounds, MAIN_RECT)
+
     def _draw_panel(self, rect: pygame.Rect) -> None:
         """Draw a rounded white panel."""
         pygame.draw.rect(
@@ -120,6 +139,7 @@ class KNNVoteMapRenderer:
         query_array = None if query_point is None else np.asarray(query_point, dtype=float)
 
         bounds = _compute_world_bounds(features, query_array)
+        self._last_bounds = bounds
 
         self._draw_axes(bounds)
         self._draw_training_points(features, targets, bounds)
@@ -286,11 +306,14 @@ class KNNVoteMapRenderer:
         self._draw_text(label, x + 24, y, self._small_font, TEXT_COLOR)
 
     def _draw_bottom_panel(self, snapshot: AlgorithmSnapshot) -> None:
-        """Draw keyboard controls and short explanation."""
+        """Draw keyboard and mouse controls with a short explanation."""
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
 
-        controls = "N: new query   R: reset   Up/Down: k   Left/Right: noise   S: seed   Esc: quit"
+        controls = (
+            "Click map: classify point   N: random query   R: reset   Up/Down: k   "
+            "Left/Right: noise   S: seed   Esc: quit"
+        )
 
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
 
@@ -319,7 +342,7 @@ class KNNVoteMapRenderer:
 def _build_explanation(snapshot: AlgorithmSnapshot) -> str:
     """Build a short explanation line for the current state."""
     if not snapshot.metrics.get("has_prediction"):
-        return "Press N to sample a query point and classify it using nearest neighbors."
+        return "Click on the map or press N to classify a query point."
 
     prediction = snapshot.metrics["predicted_label"]
     k = snapshot.metrics["k"]
@@ -373,3 +396,30 @@ def _world_to_screen(
     screen_y = rect.bottom - PADDING - int(y_ratio * drawable_height)
 
     return screen_x, screen_y
+
+
+def _screen_to_world(
+    position: tuple[int, int],
+    bounds: WorldBounds,
+    rect: pygame.Rect,
+) -> tuple[float, float]:
+    """Convert screen coordinates into numeric world coordinates."""
+    drawable = _drawable_rect(rect)
+
+    x_ratio = (position[0] - drawable.left) / drawable.width
+    y_ratio = (drawable.bottom - position[1]) / drawable.height
+
+    world_x = bounds.x_min + x_ratio * (bounds.x_max - bounds.x_min)
+    world_y = bounds.y_min + y_ratio * (bounds.y_max - bounds.y_min)
+
+    return world_x, world_y
+
+
+def _drawable_rect(rect: pygame.Rect) -> pygame.Rect:
+    """Return the inner drawable area of a plot panel."""
+    return pygame.Rect(
+        rect.left + PADDING,
+        rect.top + PADDING,
+        rect.width - 2 * PADDING,
+        rect.height - 2 * PADDING,
+    )
