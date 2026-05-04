@@ -27,10 +27,14 @@ Implemented:
 - connection to ml_lab_core,
 - synthetic binary classification dataset,
 - Euclidean distance metric,
-- vectorized distance computation from many points to one query point.
+- vectorized distance computation from many points to one query point,
 - k-nearest neighbors classifier,
 - nearest-neighbor voting for one query point,
-- command-line prediction prototype.
+- command-line prediction prototype,
+- basic Pygame visualization,
+- random query point classification,
+- nearest-neighbor link visualization,
+- keyboard controls for `k`, noise, seed, and reset.
 
 Not implemented yet:
 
@@ -45,6 +49,24 @@ Not implemented yet:
 ```bash
 uv run --package knn-vote-map knn-vote-map
 ```
+
+## How to run the UI
+
+```bash
+uv run --package knn-vote-map knn-vote-map-ui
+```
+
+| Key     | Action                                |
+| ------- | ------------------------------------- |
+| `N`     | Sample and classify a new query point |
+| `R`     | Reset the demo                        |
+| `Up`    | Increase `k`                          |
+| `Down`  | Decrease `k`                          |
+| `Left`  | Decrease data noise                   |
+| `Right` | Increase data noise                   |
+| `S`     | Generate a new dataset seed           |
+| `Esc`   | Quit                                  |
+
 
 ## Planned controls
 

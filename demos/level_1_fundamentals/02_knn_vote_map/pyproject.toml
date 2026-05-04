@@ -7,10 +7,12 @@ requires-python = ">=3.12"
 dependencies = [
     "ml-lab-core",
     "numpy>=2.4.4",
+    "pygame>=2.6.1",
 ]
 
 [project.scripts]
 knn-vote-map = "knn_vote_map.app:main"
+knn-vote-map-ui = "knn_vote_map.pygame_app:main"
 
 [tool.uv.sources]
 ml-lab-core = { workspace = true }
