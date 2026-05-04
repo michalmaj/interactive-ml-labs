@@ -141,3 +141,25 @@ Zadanie:
 Pytanie kontrolne:
 
 > Dlaczego większe `k` często wygładza granicę decyzyjną?
+
+## Challenge mode — accuracy na ukrytym zbiorze testowym
+
+Demo oblicza accuracy na osobnym syntetycznym zbiorze testowym.
+
+Aktualny cel:
+
+```text
+osiągnij accuracy >= 0.90
+```
+
+### Zadanie:
+
+1. Ustaw domyślne `k`.
+2. Sprawdź accuracy challenge.
+3. Zmieniaj `k` klawiszami `Up` i `Down`.
+4. Obserwuj, czy accuracy rośnie czy maleje.
+5. Zwiększ poziom szumu i sprawdź, czy challenge nadal jest możliwy.
+
+Pytanie kontrolne:
+
+> Dlaczego wynik na zbiorze testowym jest lepszym sygnałem niż obserwowanie tylko punktów treningowych?

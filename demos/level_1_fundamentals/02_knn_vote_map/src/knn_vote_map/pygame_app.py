@@ -7,6 +7,7 @@ from typing import Final
 import numpy as np
 import pygame
 
+from knn_vote_map.challenge import KNNAccuracyChallenge, KNNAccuracyChallengeResult
 from knn_vote_map.classifier import KNearestNeighborsClassifier, KNearestNeighborsConfig
 from knn_vote_map.dataset import (
     SyntheticClassificationConfig,
@@ -23,6 +24,7 @@ MAX_K: Final[int] = 21
 K_STEP: Final[int] = 2
 
 DEFAULT_UI_SAMPLES_PER_CLASS: Final[int] = 60
+DEFAULT_UI_TEST_SAMPLES_PER_CLASS: Final[int] = 40
 DEFAULT_UI_NOISE_STD: Final[float] = 0.9
 DEFAULT_UI_SEED: Final[int] = 42
 
@@ -30,6 +32,7 @@ NOISE_STEP: Final[float] = 0.2
 MIN_NOISE_STD: Final[float] = 0.0
 MAX_NOISE_STD: Final[float] = 4.0
 SEED_STEP: Final[int] = 1
+TEST_SEED_OFFSET: Final[int] = 50_000
 
 QUERY_MIN: Final[float] = -5.5
 QUERY_MAX: Final[float] = 5.5
@@ -48,6 +51,7 @@ class KNNVoteMapPygameApp:
 
         self._clock = pygame.time.Clock()
         self._renderer = KNNVoteMapRenderer(self._screen)
+        self._challenge = KNNAccuracyChallenge()
 
         self._should_quit = False
 
@@ -57,6 +61,7 @@ class KNNVoteMapPygameApp:
 
         self._classifier: KNearestNeighborsClassifier
         self._dataset_config: SyntheticClassificationConfig
+        self._challenge_result: KNNAccuracyChallengeResult
         self._rng = np.random.default_rng(self._seed)
 
         self._reset_demo()
@@ -72,7 +77,7 @@ class KNNVoteMapPygameApp:
         pygame.quit()
 
     def _reset_demo(self) -> None:
-        """Reset dataset and classifier state using current parameters."""
+        """Reset dataset, classifier, decision grid, and challenge state."""
         self._dataset_config = SyntheticClassificationConfig(
             samples_per_class=DEFAULT_UI_SAMPLES_PER_CLASS,
             noise_std=self._noise_std,
@@ -89,7 +94,27 @@ class KNNVoteMapPygameApp:
             k=self._k,
             resolution=DEFAULT_GRID_RESOLUTION,
         )
+        self._challenge_result = self._evaluate_challenge()
         self._rng = np.random.default_rng(self._seed + 10_000)
+
+    def _evaluate_challenge(self) -> KNNAccuracyChallengeResult:
+        """Evaluate current k-NN configuration on a hidden synthetic test set."""
+        test_config = SyntheticClassificationConfig(
+            samples_per_class=DEFAULT_UI_TEST_SAMPLES_PER_CLASS,
+            noise_std=self._noise_std,
+            seed=self._seed + TEST_SEED_OFFSET,
+        )
+        test_dataset = make_synthetic_classification_dataset(test_config)
+
+        evaluator = KNearestNeighborsClassifier(KNearestNeighborsConfig(k=self._k))
+        evaluator.fit(self._dataset)
+
+        predictions = evaluator.predict(test_dataset.features)
+
+        return self._challenge.evaluate(
+            y_true=test_dataset.targets,
+            y_pred=predictions,
+        )
 
     def _handle_events(self) -> None:
         """Handle Pygame input events."""
@@ -180,6 +205,7 @@ class KNNVoteMapPygameApp:
             noise_std=self._noise_std,
             seed=self._seed,
             decision_grid=self._decision_grid,
+            challenge_result=self._challenge_result,
         )
 
 

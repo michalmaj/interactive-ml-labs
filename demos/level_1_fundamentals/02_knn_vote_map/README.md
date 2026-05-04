@@ -36,7 +36,8 @@ Implemented:
 - nearest-neighbor link visualization,
 - keyboard controls for `k`, noise, seed, and reset,
 - mouse-based query point selection,
-- decision background grid showing predicted class regions.
+- decision background grid showing predicted class regions,
+- accuracy challenge mode using a hidden synthetic test set.
 
 Not implemented yet:
 
