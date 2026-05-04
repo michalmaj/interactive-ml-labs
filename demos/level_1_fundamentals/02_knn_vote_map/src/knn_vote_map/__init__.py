@@ -1,5 +1,11 @@
 """k-NN Vote Map demo package."""
 
+from knn_vote_map.challenge import (
+    KNNAccuracyChallenge,
+    KNNAccuracyChallengeConfig,
+    KNNAccuracyChallengeResult,
+    accuracy_score,
+)
 from knn_vote_map.classifier import (
     KNearestNeighborsClassifier,
     KNearestNeighborsConfig,
@@ -15,11 +21,15 @@ from knn_vote_map.metrics import euclidean_distance, euclidean_distances
 
 __all__ = [
     "DecisionGrid",
+    "KNNAccuracyChallenge",
+    "KNNAccuracyChallengeConfig",
+    "KNNAccuracyChallengeResult",
     "KNearestNeighborsClassifier",
     "KNearestNeighborsConfig",
     "Neighbor",
     "PredictionResult",
     "SyntheticClassificationConfig",
+    "accuracy_score",
     "compute_decision_grid",
     "euclidean_distance",
     "euclidean_distances",

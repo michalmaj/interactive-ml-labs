@@ -10,6 +10,7 @@ import pygame
 from ml_lab_core import AlgorithmSnapshot
 from numpy.typing import NDArray
 
+from knn_vote_map.challenge import KNNAccuracyChallengeResult
 from knn_vote_map.classifier import Neighbor
 from knn_vote_map.decision_grid import DecisionGrid
 
@@ -91,6 +92,7 @@ class KNNVoteMapRenderer:
         noise_std: float,
         seed: int,
         decision_grid: DecisionGrid,
+        challenge_result: KNNAccuracyChallengeResult,
     ) -> None:
         """Draw the full frame.
 
@@ -99,6 +101,7 @@ class KNNVoteMapRenderer:
             noise_std: Current synthetic data noise standard deviation.
             seed: Current synthetic dataset seed.
             decision_grid: Predicted labels over the background grid.
+            challenge_result: Current hidden-test challenge result.
         """
         self._screen.fill(BACKGROUND_COLOR)
 
@@ -107,8 +110,13 @@ class KNNVoteMapRenderer:
         self._draw_panel(BOTTOM_RECT)
 
         self._draw_main_plot(snapshot, decision_grid)
-        self._draw_side_panel(snapshot, noise_std=noise_std, seed=seed)
-        self._draw_bottom_panel(snapshot)
+        self._draw_side_panel(
+            snapshot,
+            noise_std=noise_std,
+            seed=seed,
+            challenge_result=challenge_result,
+        )
+        self._draw_bottom_panel(snapshot, challenge_result)
 
         pygame.display.flip()
 
@@ -289,8 +297,9 @@ class KNNVoteMapRenderer:
         *,
         noise_std: float,
         seed: int,
+        challenge_result: KNNAccuracyChallengeResult,
     ) -> None:
-        """Draw metrics, parameters, and prediction details."""
+        """Draw metrics, parameters, prediction details, and challenge status."""
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 22
 
@@ -301,7 +310,6 @@ class KNNVoteMapRenderer:
             ("Status", snapshot.status),
             ("k", str(snapshot.metrics["k"])),
             ("Samples", str(snapshot.metrics["sample_count"])),
-            ("Classes", str(snapshot.metrics["class_count"])),
             ("Noise std", f"{noise_std:.2f}"),
             ("Seed", str(seed)),
         ]
@@ -314,9 +322,25 @@ class KNNVoteMapRenderer:
             self._draw_text(str(value), x + 120, y, self._small_font, TEXT_COLOR)
             y += SMALL_TEXT_LINE_HEIGHT
 
-        y += 18
+        y += 16
+        self._draw_text("Challenge", x, y, self._font, TEXT_COLOR)
+        y += 28
+
+        challenge_rows = [
+            ("Status", challenge_result.status),
+            ("Accuracy", f"{challenge_result.accuracy:.2f}"),
+            ("Target", f"{challenge_result.target_accuracy:.2f}"),
+            ("Correct", f"{challenge_result.correct_count}/{challenge_result.sample_count}"),
+        ]
+
+        for label, value in challenge_rows:
+            self._draw_text(f"{label}:", x, y, self._small_font, MUTED_TEXT_COLOR)
+            self._draw_text(str(value), x + 120, y, self._small_font, TEXT_COLOR)
+            y += SMALL_TEXT_LINE_HEIGHT
+
+        y += 16
         self._draw_text("Votes", x, y, self._font, TEXT_COLOR)
-        y += 30
+        y += 28
 
         vote_counts = snapshot.visual_state.get("vote_counts", {})
         if isinstance(vote_counts, dict) and vote_counts:
@@ -333,28 +357,11 @@ class KNNVoteMapRenderer:
         else:
             self._draw_text("No query point yet.", x, y, self._small_font, MUTED_TEXT_COLOR)
 
-        y += 24
-        self._draw_text("Legend", x, y, self._font, TEXT_COLOR)
-        y += 30
-
-        self._draw_legend_item(x, y, CLASS_ZERO_COLOR, "class_0")
-        y += SMALL_TEXT_LINE_HEIGHT
-        self._draw_legend_item(x, y, CLASS_ONE_COLOR, "class_1")
-        y += SMALL_TEXT_LINE_HEIGHT
-        self._draw_legend_item(x, y, QUERY_COLOR, "query point")
-
-    def _draw_legend_item(
+    def _draw_bottom_panel(
         self,
-        x: int,
-        y: int,
-        color: tuple[int, int, int],
-        label: str,
+        snapshot: AlgorithmSnapshot,
+        challenge_result: KNNAccuracyChallengeResult,
     ) -> None:
-        """Draw one legend item."""
-        pygame.draw.circle(self._screen, color, (x + 8, y + 8), 6)
-        self._draw_text(label, x + 24, y, self._small_font, TEXT_COLOR)
-
-    def _draw_bottom_panel(self, snapshot: AlgorithmSnapshot) -> None:
         """Draw keyboard and mouse controls with a short explanation."""
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
@@ -366,7 +373,7 @@ class KNNVoteMapRenderer:
 
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
 
-        explanation = _build_explanation(snapshot)
+        explanation = _build_explanation(snapshot, challenge_result)
         self._draw_text(
             explanation,
             x,
@@ -388,15 +395,23 @@ class KNNVoteMapRenderer:
         self._screen.blit(surface, (x, y))
 
 
-def _build_explanation(snapshot: AlgorithmSnapshot) -> str:
+def _build_explanation(
+    snapshot: AlgorithmSnapshot,
+    challenge_result: KNNAccuracyChallengeResult,
+) -> str:
     """Build a short explanation line for the current state."""
+    if challenge_result.success:
+        prefix = "Challenge completed on hidden test data."
+    else:
+        prefix = "Challenge not completed on hidden test data."
+
     if not snapshot.metrics.get("has_prediction"):
-        return "Click on the map or press N to classify a query point."
+        return f"{prefix} Click the map or press N to classify a query point."
 
     prediction = snapshot.metrics["predicted_label"]
     k = snapshot.metrics["k"]
 
-    return f"The query point was classified as class_{prediction} by voting among {k} neighbors."
+    return f"{prefix} Query classified as class_{prediction} by voting among {k} neighbors."
 
 
 def _compute_world_bounds(

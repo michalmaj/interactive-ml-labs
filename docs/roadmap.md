@@ -69,7 +69,7 @@ Planned pull requests:
 - [x] Add keyboard controls
 - [x] Add mouse query point selection
 - [x] Add decision background grid
-- [ ] Add challenge mode
+- [x] Add challenge mode
 - [ ] Polish demo documentation
 
 
