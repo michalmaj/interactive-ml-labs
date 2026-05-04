@@ -1,0 +1,161 @@
+"""Pygame application loop for the k-NN Vote Map demo."""
+
+from __future__ import annotations
+
+from typing import Final
+
+import numpy as np
+import pygame
+
+from knn_vote_map.classifier import KNearestNeighborsClassifier, KNearestNeighborsConfig
+from knn_vote_map.dataset import (
+    SyntheticClassificationConfig,
+    make_synthetic_classification_dataset,
+)
+from knn_vote_map.renderer import WINDOW_SIZE, KNNVoteMapRenderer
+
+FPS: Final[int] = 60
+
+DEFAULT_UI_K: Final[int] = 5
+MIN_K: Final[int] = 1
+MAX_K: Final[int] = 21
+K_STEP: Final[int] = 2
+
+DEFAULT_UI_SAMPLES_PER_CLASS: Final[int] = 60
+DEFAULT_UI_NOISE_STD: Final[float] = 0.9
+DEFAULT_UI_SEED: Final[int] = 42
+
+NOISE_STEP: Final[float] = 0.2
+MIN_NOISE_STD: Final[float] = 0.0
+MAX_NOISE_STD: Final[float] = 4.0
+SEED_STEP: Final[int] = 1
+
+QUERY_MIN: Final[float] = -5.5
+QUERY_MAX: Final[float] = 5.5
+
+
+class KNNVoteMapPygameApp:
+    """Small Pygame application showing k-NN voting."""
+
+    def __init__(self) -> None:
+        """Initialize the application state."""
+        pygame.init()
+
+        self._screen = pygame.display.set_mode(WINDOW_SIZE)
+        pygame.display.set_caption("Interactive ML Labs — k-NN Vote Map")
+
+        self._clock = pygame.time.Clock()
+        self._renderer = KNNVoteMapRenderer(self._screen)
+
+        self._should_quit = False
+
+        self._k = DEFAULT_UI_K
+        self._noise_std = DEFAULT_UI_NOISE_STD
+        self._seed = DEFAULT_UI_SEED
+
+        self._classifier: KNearestNeighborsClassifier
+        self._dataset_config: SyntheticClassificationConfig
+        self._rng = np.random.default_rng(self._seed)
+
+        self._reset_demo()
+
+    def run(self) -> None:
+        """Run the Pygame event loop."""
+        while not self._should_quit:
+            self._clock.tick(FPS)
+
+            self._handle_events()
+            self._draw()
+
+        pygame.quit()
+
+    def _reset_demo(self) -> None:
+        """Reset dataset and classifier state using current parameters."""
+        self._dataset_config = SyntheticClassificationConfig(
+            samples_per_class=DEFAULT_UI_SAMPLES_PER_CLASS,
+            noise_std=self._noise_std,
+            seed=self._seed,
+        )
+        self._dataset = make_synthetic_classification_dataset(self._dataset_config)
+
+        self._classifier = KNearestNeighborsClassifier(KNearestNeighborsConfig(k=self._k))
+        self._classifier.fit(self._dataset)
+        self._snapshot = self._classifier.snapshot()
+        self._rng = np.random.default_rng(self._seed + 10_000)
+
+    def _handle_events(self) -> None:
+        """Handle Pygame input events."""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self._should_quit = True
+
+            if event.type == pygame.KEYDOWN:
+                self._handle_keydown(event)
+
+    def _handle_keydown(self, event: pygame.event.Event) -> None:
+        """Handle keyboard shortcuts."""
+        if event.key == pygame.K_ESCAPE:
+            self._should_quit = True
+        elif event.key == pygame.K_n:
+            self._classify_random_query_point()
+        elif event.key == pygame.K_r:
+            self._reset_demo()
+        elif event.key == pygame.K_UP:
+            self._increase_k()
+        elif event.key == pygame.K_DOWN:
+            self._decrease_k()
+        elif event.key == pygame.K_RIGHT:
+            self._increase_noise()
+        elif event.key == pygame.K_LEFT:
+            self._decrease_noise()
+        elif event.key == pygame.K_s:
+            self._next_seed()
+
+    def _classify_random_query_point(self) -> None:
+        """Sample and classify one random query point."""
+        query_point = self._rng.uniform(
+            low=QUERY_MIN,
+            high=QUERY_MAX,
+            size=2,
+        )
+        self._classifier.predict_one(query_point)
+        self._snapshot = self._classifier.snapshot()
+
+    def _increase_k(self) -> None:
+        """Increase k and reset classifier state."""
+        self._k = min(MAX_K, self._k + K_STEP)
+        self._reset_demo()
+
+    def _decrease_k(self) -> None:
+        """Decrease k and reset classifier state."""
+        self._k = max(MIN_K, self._k - K_STEP)
+        self._reset_demo()
+
+    def _increase_noise(self) -> None:
+        """Increase dataset noise and reset the demo."""
+        self._noise_std = min(MAX_NOISE_STD, self._noise_std + NOISE_STEP)
+        self._reset_demo()
+
+    def _decrease_noise(self) -> None:
+        """Decrease dataset noise and reset the demo."""
+        self._noise_std = max(MIN_NOISE_STD, self._noise_std - NOISE_STEP)
+        self._reset_demo()
+
+    def _next_seed(self) -> None:
+        """Generate another dataset by changing the random seed."""
+        self._seed += SEED_STEP
+        self._reset_demo()
+
+    def _draw(self) -> None:
+        """Draw the current application state."""
+        self._renderer.draw(
+            self._snapshot,
+            noise_std=self._noise_std,
+            seed=self._seed,
+        )
+
+
+def main() -> None:
+    """Run the Pygame visualization."""
+    app = KNNVoteMapPygameApp()
+    app.run()

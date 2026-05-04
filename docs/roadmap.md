@@ -65,8 +65,8 @@ Planned pull requests:
 - [x] Add distance metrics
 - [x] Add k-nearest neighbors classifier
 - [x] Add vote map CLI prototype
-- [ ] Add Pygame visualization
-- [ ] Add keyboard controls
+- [x] Add Pygame visualization
+- [x] Add keyboard controls
 - [ ] Add challenge mode
 - [ ] Polish demo documentation
 
