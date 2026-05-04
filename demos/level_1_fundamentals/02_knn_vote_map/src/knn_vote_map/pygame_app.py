@@ -32,6 +32,7 @@ SEED_STEP: Final[int] = 1
 
 QUERY_MIN: Final[float] = -5.5
 QUERY_MAX: Final[float] = 5.5
+LEFT_MOUSE_BUTTON: Final[int] = 1
 
 
 class KNNVoteMapPygameApp:
@@ -92,6 +93,9 @@ class KNNVoteMapPygameApp:
             if event.type == pygame.KEYDOWN:
                 self._handle_keydown(event)
 
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self._handle_mouse_button_down(event)
+
     def _handle_keydown(self, event: pygame.event.Event) -> None:
         """Handle keyboard shortcuts."""
         if event.key == pygame.K_ESCAPE:
@@ -111,6 +115,18 @@ class KNNVoteMapPygameApp:
         elif event.key == pygame.K_s:
             self._next_seed()
 
+    def _handle_mouse_button_down(self, event: pygame.event.Event) -> None:
+        """Handle mouse clicks on the vote map."""
+        if event.button != LEFT_MOUSE_BUTTON:
+            return
+
+        world_position = self._renderer.screen_to_world(event.pos)
+
+        if world_position is None:
+            return
+
+        self._classify_query_point(world_position)
+
     def _classify_random_query_point(self) -> None:
         """Sample and classify one random query point."""
         query_point = self._rng.uniform(
@@ -118,6 +134,10 @@ class KNNVoteMapPygameApp:
             high=QUERY_MAX,
             size=2,
         )
+        self._classify_query_point(query_point)
+
+    def _classify_query_point(self, query_point: tuple[float, float] | np.ndarray) -> None:
+        """Classify one query point and update the current snapshot."""
         self._classifier.predict_one(query_point)
         self._snapshot = self._classifier.snapshot()
 

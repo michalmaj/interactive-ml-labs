@@ -34,7 +34,8 @@ Implemented:
 - basic Pygame visualization,
 - random query point classification,
 - nearest-neighbor link visualization,
-- keyboard controls for `k`, noise, seed, and reset.
+- keyboard controls for `k`, noise, seed, and reset,
+- mouse-based query point selection.
 
 Not implemented yet:
 
@@ -56,16 +57,17 @@ uv run --package knn-vote-map knn-vote-map
 uv run --package knn-vote-map knn-vote-map-ui
 ```
 
-| Key     | Action                                |
-| ------- | ------------------------------------- |
-| `N`     | Sample and classify a new query point |
-| `R`     | Reset the demo                        |
-| `Up`    | Increase `k`                          |
-| `Down`  | Decrease `k`                          |
-| `Left`  | Decrease data noise                   |
-| `Right` | Increase data noise                   |
-| `S`     | Generate a new dataset seed           |
-| `Esc`   | Quit                                  |
+| Action | Description |
+| ------ | ----------- |
+| Click on map | Classify clicked point |
+| `N` | Sample and classify a random query point |
+| `R` | Reset the demo |
+| `Up` | Increase `k` |
+| `Down` | Decrease `k` |
+| `Left` | Decrease data noise |
+| `Right` | Increase data noise |
+| `S` | Generate a new dataset seed |
+| `Esc` | Quit |
 
 
 ## Planned controls

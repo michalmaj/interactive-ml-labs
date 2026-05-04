@@ -67,6 +67,7 @@ Planned pull requests:
 - [x] Add vote map CLI prototype
 - [x] Add Pygame visualization
 - [x] Add keyboard controls
+- [x] Add mouse query point selection
 - [ ] Add challenge mode
 - [ ] Polish demo documentation
 

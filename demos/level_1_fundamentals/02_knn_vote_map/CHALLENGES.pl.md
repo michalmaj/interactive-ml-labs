@@ -109,3 +109,19 @@ Ograniczenia:
 8. Kiedy k-NN może być dobrym wyborem?
 9. Kiedy k-NN może działać słabo?
 10. Jak można ocenić jakość klasyfikatora?
+
+## Klikany punkt testowy
+
+W wersji interaktywnej można kliknąć dowolne miejsce na mapie.
+
+Kliknięty punkt staje się punktem testowym, a algorytm k-NN:
+
+1. liczy odległości do punktów treningowych,
+2. wybiera `k` najbliższych sąsiadów,
+3. pokazuje linie do sąsiadów,
+4. wykonuje głosowanie,
+5. wyświetla przewidywaną klasę.
+
+Zadanie:
+
+Klikaj punkty blisko granicy między klasami i obserwuj, jak zmiana `k` wpływa na predykcję.
