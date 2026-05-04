@@ -68,6 +68,7 @@ Planned pull requests:
 - [x] Add Pygame visualization
 - [x] Add keyboard controls
 - [x] Add mouse query point selection
+- [x] Add decision background grid
 - [ ] Add challenge mode
 - [ ] Polish demo documentation
 

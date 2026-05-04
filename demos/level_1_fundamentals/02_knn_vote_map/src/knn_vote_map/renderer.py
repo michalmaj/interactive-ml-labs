@@ -11,6 +11,7 @@ from ml_lab_core import AlgorithmSnapshot
 from numpy.typing import NDArray
 
 from knn_vote_map.classifier import Neighbor
+from knn_vote_map.decision_grid import DecisionGrid
 
 type FloatArray = NDArray[np.float64]
 type IntArray = NDArray[np.int_]
@@ -25,6 +26,8 @@ TEXT_COLOR: Final[tuple[int, int, int]] = (30, 35, 40)
 MUTED_TEXT_COLOR: Final[tuple[int, int, int]] = (100, 110, 120)
 CLASS_ZERO_COLOR: Final[tuple[int, int, int]] = (60, 130, 230)
 CLASS_ONE_COLOR: Final[tuple[int, int, int]] = (235, 130, 60)
+CLASS_ZERO_BACKGROUND_COLOR: Final[tuple[int, int, int]] = (219, 233, 252)
+CLASS_ONE_BACKGROUND_COLOR: Final[tuple[int, int, int]] = (252, 230, 215)
 QUERY_COLOR: Final[tuple[int, int, int]] = (40, 40, 40)
 NEIGHBOR_LINE_COLOR: Final[tuple[int, int, int]] = (90, 90, 90)
 AXIS_COLOR: Final[tuple[int, int, int]] = (180, 185, 190)
@@ -49,6 +52,10 @@ WORLD_MARGIN_RATIO: Final[float] = 0.18
 CLASS_COLORS: Final[dict[int, tuple[int, int, int]]] = {
     0: CLASS_ZERO_COLOR,
     1: CLASS_ONE_COLOR,
+}
+BACKGROUND_CLASS_COLORS: Final[dict[int, tuple[int, int, int]]] = {
+    0: CLASS_ZERO_BACKGROUND_COLOR,
+    1: CLASS_ONE_BACKGROUND_COLOR,
 }
 
 
@@ -83,6 +90,7 @@ class KNNVoteMapRenderer:
         *,
         noise_std: float,
         seed: int,
+        decision_grid: DecisionGrid,
     ) -> None:
         """Draw the full frame.
 
@@ -90,6 +98,7 @@ class KNNVoteMapRenderer:
             snapshot: Current classifier state.
             noise_std: Current synthetic data noise standard deviation.
             seed: Current synthetic dataset seed.
+            decision_grid: Predicted labels over the background grid.
         """
         self._screen.fill(BACKGROUND_COLOR)
 
@@ -97,7 +106,7 @@ class KNNVoteMapRenderer:
         self._draw_panel(SIDE_RECT)
         self._draw_panel(BOTTOM_RECT)
 
-        self._draw_main_plot(snapshot)
+        self._draw_main_plot(snapshot, decision_grid)
         self._draw_side_panel(snapshot, noise_std=noise_std, seed=seed)
         self._draw_bottom_panel(snapshot)
 
@@ -130,8 +139,8 @@ class KNNVoteMapRenderer:
             border_radius=PANEL_RADIUS,
         )
 
-    def _draw_main_plot(self, snapshot: AlgorithmSnapshot) -> None:
-        """Draw training points, query point, and nearest neighbors."""
+    def _draw_main_plot(self, snapshot: AlgorithmSnapshot, decision_grid: DecisionGrid) -> None:
+        """Draw decision background, training points, query point, and neighbors."""
         features = np.asarray(snapshot.visual_state["features"], dtype=float)
         targets = np.asarray(snapshot.visual_state["targets"], dtype=int)
 
@@ -141,6 +150,7 @@ class KNNVoteMapRenderer:
         bounds = _compute_world_bounds(features, query_array)
         self._last_bounds = bounds
 
+        self._draw_decision_background(decision_grid, bounds)
         self._draw_axes(bounds)
         self._draw_training_points(features, targets, bounds)
 
@@ -156,6 +166,45 @@ class KNNVoteMapRenderer:
             self._font,
             TEXT_COLOR,
         )
+
+    def _draw_decision_background(
+        self,
+        decision_grid: DecisionGrid,
+        bounds: WorldBounds,
+    ) -> None:
+        """Draw predicted class regions as a colored background grid."""
+        x_values = decision_grid.x_values
+        y_values = decision_grid.y_values
+        labels = decision_grid.labels
+
+        x_step = _grid_step(x_values)
+        y_step = _grid_step(y_values)
+
+        for y_index, y_value in enumerate(y_values):
+            for x_index, x_value in enumerate(x_values):
+                label = int(labels[y_index, x_index])
+                color = BACKGROUND_CLASS_COLORS.get(label, BACKGROUND_COLOR)
+
+                top_left = _world_to_screen(
+                    float(x_value - x_step / 2.0),
+                    float(y_value + y_step / 2.0),
+                    bounds,
+                    MAIN_RECT,
+                )
+                bottom_right = _world_to_screen(
+                    float(x_value + x_step / 2.0),
+                    float(y_value - y_step / 2.0),
+                    bounds,
+                    MAIN_RECT,
+                )
+
+                rect = pygame.Rect(
+                    top_left[0],
+                    top_left[1],
+                    max(1, bottom_right[0] - top_left[0] + 1),
+                    max(1, bottom_right[1] - top_left[1] + 1),
+                )
+                pygame.draw.rect(self._screen, color, rect)
 
     def _draw_axes(self, bounds: WorldBounds) -> None:
         """Draw x=0 and y=0 axes when visible."""
@@ -423,3 +472,11 @@ def _drawable_rect(rect: pygame.Rect) -> pygame.Rect:
         rect.width - 2 * PADDING,
         rect.height - 2 * PADDING,
     )
+
+
+def _grid_step(values: FloatArray) -> float:
+    """Return spacing between grid values."""
+    if len(values) < 2:
+        return MIN_WORLD_SPAN
+
+    return float(values[1] - values[0])
