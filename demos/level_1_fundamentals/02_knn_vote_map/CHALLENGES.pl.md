@@ -125,3 +125,19 @@ Kliknięty punkt staje się punktem testowym, a algorytm k-NN:
 Zadanie:
 
 Klikaj punkty blisko granicy między klasami i obserwuj, jak zmiana `k` wpływa na predykcję.
+
+## Mapa decyzji
+
+Tło wykresu pokazuje, jaką klasę przewidziałby k-NN w różnych obszarach przestrzeni.
+
+Zadanie:
+
+1. Ustaw małe `k`, np. `k = 1`.
+2. Obserwuj, czy granica między klasami jest gładka czy poszarpana.
+3. Zwiększ `k`.
+4. Porównaj, jak zmienia się tło decyzji.
+5. Zwiększ poziom szumu i sprawdź, czy granica staje się mniej stabilna.
+
+Pytanie kontrolne:
+
+> Dlaczego większe `k` często wygładza granicę decyzyjną?

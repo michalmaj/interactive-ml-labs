@@ -12,6 +12,7 @@ from knn_vote_map.dataset import (
     SyntheticClassificationConfig,
     make_synthetic_classification_dataset,
 )
+from knn_vote_map.decision_grid import DEFAULT_GRID_RESOLUTION, compute_decision_grid
 from knn_vote_map.renderer import WINDOW_SIZE, KNNVoteMapRenderer
 
 FPS: Final[int] = 60
@@ -82,6 +83,12 @@ class KNNVoteMapPygameApp:
         self._classifier = KNearestNeighborsClassifier(KNearestNeighborsConfig(k=self._k))
         self._classifier.fit(self._dataset)
         self._snapshot = self._classifier.snapshot()
+        self._decision_grid = compute_decision_grid(
+            self._dataset.features,
+            self._dataset.targets,
+            k=self._k,
+            resolution=DEFAULT_GRID_RESOLUTION,
+        )
         self._rng = np.random.default_rng(self._seed + 10_000)
 
     def _handle_events(self) -> None:
@@ -172,6 +179,7 @@ class KNNVoteMapPygameApp:
             self._snapshot,
             noise_std=self._noise_std,
             seed=self._seed,
+            decision_grid=self._decision_grid,
         )
 
 

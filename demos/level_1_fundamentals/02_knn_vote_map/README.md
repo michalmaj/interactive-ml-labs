@@ -35,7 +35,8 @@ Implemented:
 - random query point classification,
 - nearest-neighbor link visualization,
 - keyboard controls for `k`, noise, seed, and reset,
-- mouse-based query point selection.
+- mouse-based query point selection,
+- decision background grid showing predicted class regions.
 
 Not implemented yet:
 
