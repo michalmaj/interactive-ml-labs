@@ -54,21 +54,22 @@ Planned pull requests:
 - [ ] Add graphical parameter controls
 - [x] Add explanation panel
 
-## Phase 3 — First three demos
+## Phase 3 — Second Level 1 demo: k-NN Vote Map
 
-Goal: validate the architecture on three different machine learning problem types.
+Goal: implement the second interactive demo focused on classification intuition.
 
-Planned demos:
+Planned pull requests:
 
-- Gradient Descent Playground
-- k-NN Vote Map
-- k-means Arena
+- [x] Add k-NN Vote Map package skeleton
+- [ ] Add synthetic classification dataset
+- [ ] Add distance metrics
+- [ ] Add k-nearest neighbors classifier
+- [ ] Add vote map CLI prototype
+- [ ] Add Pygame visualization
+- [ ] Add keyboard controls
+- [ ] Add challenge mode
+- [ ] Polish demo documentation
 
-These cover:
-
-- regression and optimization,
-- classification,
-- clustering.
 
 ## Phase 4 — Complete Level 1
 

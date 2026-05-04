@@ -39,3 +39,8 @@ jobs:
         run: >
           uv run --package gradient-descent-playground
           pytest demos/level_1_fundamentals/01_gradient_descent_playground/tests
+
+      - name: Run k-NN Vote Map tests
+        run: >
+          uv run --package knn-vote-map
+          pytest demos/level_1_fundamentals/02_knn_vote_map/tests
