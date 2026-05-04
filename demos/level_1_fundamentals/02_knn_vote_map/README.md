@@ -24,12 +24,13 @@ Implemented:
 - workspace configuration,
 - command-line placeholder,
 - smoke test,
-- connection to ml_lab_core.
-- synthetic binary classification dataset.
+- connection to ml_lab_core,
+- synthetic binary classification dataset,
+- Euclidean distance metric,
+- vectorized distance computation from many points to one query point.
 
 Not implemented yet:
 
-- distance metrics,
 - k-nearest neighbors classifier,
 - vote visualization,
 - Pygame UI,

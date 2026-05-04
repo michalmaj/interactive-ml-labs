@@ -54,13 +54,32 @@ Jeżeli `k` jest bardzo duże, model może zbyt mocno uśredniać decyzje.
 
 Może to prowadzić do underfittingu, czyli zbyt prostego modelu, który ignoruje lokalną strukturę danych.
 
-## 7. Metryka odległości
+## 7a. Metryka odległości
 
 k-NN wymaga sposobu mierzenia odległości między punktami.
 
 Najczęściej używana jest odległość euklidesowa.
 
 W przyszłych wersjach demo można porównać różne metryki odległości.
+
+## 7b. Odległość euklidesowa
+
+Pierwsza wersja demo wykorzystuje odległość euklidesową.
+
+Dla dwóch punktów 2D:
+
+```text
+A = (x1, y1)
+B = (x2, y2)
+```
+
+odległość euklidesowa oznacza długość prostej linii między tymi punktami.
+
+Intuicyjnie jest to zwykła odległość geometryczna znana z układu współrzędnych.
+
+W k-NN odległość euklidesowa pozwala odpowiedzieć na pytanie:
+
+> Które punkty treningowe znajdują się najbliżej nowego punktu?
 
 ## 8. Co będzie pokazywać demo?
 
