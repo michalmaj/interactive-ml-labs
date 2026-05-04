@@ -22,6 +22,7 @@ uv run --package knn-vote-map knn-vote-map
 ```
 
 Interaktywna wersja Pygame zostanie dodana w kolejnych PR-ach.
+Aktualna wersja generuje już syntetyczny zbiór danych klasyfikacyjnych, ale nie zawiera jeszcze klasyfikatora k-NN ani wizualizacji Pygame.
 
 ## 3. Planowane zadania podstawowe
 

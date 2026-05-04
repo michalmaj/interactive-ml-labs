@@ -61,7 +61,7 @@ Goal: implement the second interactive demo focused on classification intuition.
 Planned pull requests:
 
 - [x] Add k-NN Vote Map package skeleton
-- [ ] Add synthetic classification dataset
+- [x] Add synthetic classification dataset
 - [ ] Add distance metrics
 - [ ] Add k-nearest neighbors classifier
 - [ ] Add vote map CLI prototype

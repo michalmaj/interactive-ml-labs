@@ -93,3 +93,23 @@ Większe `k` może zmniejszyć wpływ szumu, ale zbyt duże `k` może rozmyć gr
 ### Błąd 4: odległość zawsze ma oczywiste znaczenie
 
 W danych wielowymiarowych odległość zależy od skali cech. Jeżeli jedna cecha ma dużo większy zakres wartości niż druga, może dominować wynik.
+
+## Dane syntetyczne w pierwszej wersji demo
+
+Pierwsza wersja demo wykorzystuje prosty syntetyczny zbiór danych 2D.
+
+Dane składają się z dwóch klas:
+
+- `class_0`,
+- `class_1`.
+
+Każda klasa jest generowana jako chmura punktów wokół własnego centrum.
+
+Parametry danych:
+
+- `samples_per_class` — liczba punktów w każdej klasie,
+- `class_distance` — odległość między centrami klas,
+- `noise_std` — poziom szumu, czyli rozrzut punktów wokół centrum,
+- `seed` — ziarno losowości umożliwiające odtwarzalność danych.
+
+Dane syntetyczne są użyte celowo, ponieważ pozwalają jasno pokazać wpływ szumu i odległości między klasami na działanie k-NN.
