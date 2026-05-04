@@ -34,13 +34,34 @@ k-NN opiera się na prostym założeniu:
 
 Jeżeli nowy punkt znajduje się blisko punktów należących do klasy A, to prawdopodobnie też należy do klasy A.
 
-## 4. Parametr k
+## 4a. Parametr k
 
 Parametr `k` określa, ilu sąsiadów bierze udział w głosowaniu.
 
 Dla `k = 1` algorytm patrzy tylko na najbliższy punkt.
 
 Dla większego `k` algorytm bierze pod uwagę większą grupę sąsiadów.
+
+## 4b. Głosowanie sąsiadów
+
+Po znalezieniu `k` najbliższych sąsiadów algorytm sprawdza ich etykiety klas.
+
+Każdy sąsiad oddaje jeden głos na swoją klasę.
+
+Predykcją zostaje klasa z największą liczbą głosów.
+
+Przykład:
+
+```text
+k = 5
+sąsiedzi: class_0, class_0, class_1, class_0, class_1
+głosy:
+class_0 -> 3
+class_1 -> 2
+predykcja -> class_0
+```
+
+W przypadku remisu aktualna implementacja wybiera klasę o mniejszej etykiecie liczbowej. Dzięki temu wynik jest deterministyczny i łatwiejszy do testowania.
 
 ## 5. Małe k i overfitting
 

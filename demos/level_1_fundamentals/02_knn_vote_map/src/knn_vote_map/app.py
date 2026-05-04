@@ -5,16 +5,17 @@ from __future__ import annotations
 import numpy as np
 from ml_lab_core import MetricsHistory
 
+from knn_vote_map.classifier import KNearestNeighborsClassifier, KNearestNeighborsConfig
 from knn_vote_map.dataset import make_synthetic_classification_dataset
-from knn_vote_map.metrics import euclidean_distances
 
 
 def main() -> None:
-    """Run a minimal placeholder version of the demo.
+    """Run a minimal command-line version of the demo.
 
-    The real interactive implementation will be added in later pull requests.
+    The interactive implementation will be added in later pull requests.
     This entry point currently verifies that the package can generate a dataset,
-    compute distances, and use shared utilities from `ml_lab_core`.
+    fit a k-NN classifier, classify one query point, and use shared utilities
+    from `ml_lab_core`.
     """
     dataset = make_synthetic_classification_dataset()
 
@@ -22,15 +23,17 @@ def main() -> None:
     targets = np.asarray(dataset.targets, dtype=int)
     class_counts = np.bincount(targets, minlength=2)
 
+    classifier = KNearestNeighborsClassifier(KNearestNeighborsConfig(k=5))
+    classifier.fit(dataset)
+
     query_point = np.array([0.0, 0.0])
-    distances = euclidean_distances(features, query_point)
-    nearest_index = int(np.argmin(distances))
+    prediction = classifier.predict_one(query_point)
 
     history = MetricsHistory()
     history.add("sample_count", float(features.shape[0]))
     history.add("class_0_count", float(class_counts[0]))
     history.add("class_1_count", float(class_counts[1]))
-    history.add("nearest_distance", float(distances[nearest_index]))
+    history.add("predicted_label", float(prediction.predicted_label))
 
     print("k-NN Vote Map")
     print("Synthetic classification dataset generated successfully.")
@@ -39,6 +42,12 @@ def main() -> None:
     print(f"Class 0 count: {history.latest('class_0_count'):.0f}")
     print(f"Class 1 count: {history.latest('class_1_count'):.0f}")
     print(f"Query point: {query_point.tolist()}")
-    print(f"Nearest point index: {nearest_index}")
-    print(f"Nearest point class: {int(targets[nearest_index])}")
-    print(f"Nearest distance: {history.latest('nearest_distance'):.4f}")
+    print(f"k: {classifier.k}")
+    print(f"Predicted class: {prediction.predicted_label}")
+    print(f"Vote counts: {prediction.vote_counts}")
+    print("Nearest neighbors:")
+
+    for neighbor in prediction.neighbors:
+        print(
+            f"  index={neighbor.index}, class={neighbor.label}, distance={neighbor.distance:.4f}",
+        )

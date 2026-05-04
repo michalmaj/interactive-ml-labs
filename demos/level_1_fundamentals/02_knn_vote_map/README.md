@@ -28,10 +28,12 @@ Implemented:
 - synthetic binary classification dataset,
 - Euclidean distance metric,
 - vectorized distance computation from many points to one query point.
+- k-nearest neighbors classifier,
+- nearest-neighbor voting for one query point,
+- command-line prediction prototype.
 
 Not implemented yet:
 
-- k-nearest neighbors classifier,
 - vote visualization,
 - Pygame UI,
 - keyboard controls,
