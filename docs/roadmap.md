@@ -62,7 +62,7 @@ Planned pull requests:
 
 - [x] Add k-NN Vote Map package skeleton
 - [x] Add synthetic classification dataset
-- [ ] Add distance metrics
+- [x] Add distance metrics
 - [ ] Add k-nearest neighbors classifier
 - [ ] Add vote map CLI prototype
 - [ ] Add Pygame visualization
