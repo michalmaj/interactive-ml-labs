@@ -1,3 +1,11 @@
 """k-NN Vote Map demo package."""
 
-__all__: list[str] = []
+from knn_vote_map.dataset import (
+    SyntheticClassificationConfig,
+    make_synthetic_classification_dataset,
+)
+
+__all__ = [
+    "SyntheticClassificationConfig",
+    "make_synthetic_classification_dataset",
+]

@@ -25,10 +25,10 @@ Implemented:
 - command-line placeholder,
 - smoke test,
 - connection to ml_lab_core.
+- synthetic binary classification dataset.
 
 Not implemented yet:
 
-- synthetic classification dataset,
 - distance metrics,
 - k-nearest neighbors classifier,
 - vote visualization,
