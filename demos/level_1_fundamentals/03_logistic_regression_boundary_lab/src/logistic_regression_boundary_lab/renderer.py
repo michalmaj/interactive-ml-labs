@@ -44,9 +44,9 @@ ERROR_MARK_WIDTH: Final[int] = 2
 PANEL_RADIUS: Final[int] = 14
 TEXT_LINE_HEIGHT: Final[int] = 28
 SMALL_TEXT_LINE_HEIGHT: Final[int] = 22
+LOSS_HISTORY_HEIGHT: Final[int] = 42
 
 MIN_WORLD_SPAN: Final[float] = 1.0
-WORLD_MARGIN_RATIO: Final[float] = 0.18
 MIN_BOUNDARY_WEIGHT_NORM: Final[float] = 1.0e-8
 
 CLASS_COLORS: Final[dict[int, tuple[int, int, int]]] = {
@@ -283,7 +283,7 @@ class LogisticRegressionRenderer:
         noise_std: float,
         seed: int,
     ) -> None:
-        """Draw metrics, parameters, and loss history."""
+        """Draw metrics, confusion matrix, parameters, and loss history."""
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 22
 
@@ -309,12 +309,31 @@ class LogisticRegressionRenderer:
             self._draw_text(str(value), x + 124, y, self._small_font, TEXT_COLOR)
             y += SMALL_TEXT_LINE_HEIGHT
 
-        y += 12
+        y += 8
+        self._draw_text("Confusion matrix", x, y, self._font, TEXT_COLOR)
+        y += 26
+
+        confusion_rows = [
+            ("TP", int(snapshot.metrics["true_positive"])),
+            ("TN", int(snapshot.metrics["true_negative"])),
+            ("FP", int(snapshot.metrics["false_positive"])),
+            ("FN", int(snapshot.metrics["false_negative"])),
+        ]
+
+        for label, value in confusion_rows:
+            self._draw_text(f"{label}:", x, y, self._small_font, MUTED_TEXT_COLOR)
+            self._draw_text(str(value), x + 60, y, self._small_font, TEXT_COLOR)
+            y += SMALL_TEXT_LINE_HEIGHT
+
+        y += 6
         self._draw_text("Loss history", x, y, self._font, TEXT_COLOR)
-        y += 28
+        y += 24
 
         loss_history = tuple(float(value) for value in snapshot.visual_state["loss_history"])
-        self._draw_loss_history(loss_history, pygame.Rect(x, y, 220, 92))
+        self._draw_loss_history(
+            loss_history,
+            pygame.Rect(x, y, 220, LOSS_HISTORY_HEIGHT),
+        )
 
     def _draw_loss_history(
         self,
@@ -378,15 +397,20 @@ class LogisticRegressionRenderer:
 
 def _build_explanation(snapshot: AlgorithmSnapshot) -> str:
     """Build a short explanation for the current model state."""
-    if snapshot.iteration == 0:
-        return "The background shows probability of class_1. Press N or Space to train."
+    false_positive = int(snapshot.metrics["false_positive"])
+    false_negative = int(snapshot.metrics["false_negative"])
 
-    loss = float(snapshot.metrics["loss"])
-    accuracy = float(snapshot.metrics["accuracy"])
+    if snapshot.iteration == 0:
+        return (
+            "The background shows probability of class_1. Train the model and watch FP/FN change."
+        )
+
     threshold = float(snapshot.metrics["threshold"])
 
-    return f"Probability background changes as weights learn. Loss: {loss:.4f}, \
-        accuracy: {accuracy:.2f}, threshold: {threshold:.2f}."
+    return (
+        f"Threshold {threshold:.2f} gives FP={false_positive} and FN={false_negative}. "
+        "Changing threshold trades false positives against false negatives."
+    )
 
 
 def _bounds_from_probability_grid(probability_grid: ProbabilityGrid) -> WorldBounds:

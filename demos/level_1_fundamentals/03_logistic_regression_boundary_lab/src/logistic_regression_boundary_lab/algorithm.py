@@ -12,6 +12,7 @@ from numpy.typing import ArrayLike, NDArray
 from logistic_regression_boundary_lab.metrics import (
     binary_cross_entropy,
     classification_metrics,
+    confusion_matrix_counts,
     predict_labels_from_probabilities,
     sigmoid,
 )
@@ -169,11 +170,14 @@ class StepwiseLogisticRegression:
             or gradient_norm <= self._config.convergence_tolerance
         )
 
+        weight_update = -self._config.learning_rate * weight_gradients
+        bias_update = -self._config.learning_rate * bias_gradient
+
         return self._build_snapshot(
             status="finished" if self._done else "running",
             annotations=(
-                f"Updated weights by {-self._config.learning_rate * weight_gradients}.",
-                f"Updated bias by {-self._config.learning_rate * bias_gradient:.6f}.",
+                f"Updated weights by {weight_update}.",
+                f"Updated bias by {bias_update:.6f}.",
             ),
         )
 
@@ -233,6 +237,7 @@ class StepwiseLogisticRegression:
         )
         loss = binary_cross_entropy(self._targets, probabilities)
         metrics = classification_metrics(self._targets, predictions)
+        counts = confusion_matrix_counts(self._targets, predictions)
 
         return AlgorithmSnapshot(
             iteration=self._iteration,
@@ -252,6 +257,10 @@ class StepwiseLogisticRegression:
                 "accuracy": metrics.accuracy,
                 "precision": metrics.precision,
                 "recall": metrics.recall,
+                "true_positive": counts.true_positive,
+                "true_negative": counts.true_negative,
+                "false_positive": counts.false_positive,
+                "false_negative": counts.false_negative,
                 "weight_1": float(self._weights[0]),
                 "weight_2": float(self._weights[1]),
                 "bias": self._bias,
