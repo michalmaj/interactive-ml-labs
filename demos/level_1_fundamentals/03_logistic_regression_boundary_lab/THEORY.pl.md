@@ -213,3 +213,22 @@ Nie zawsze. W wielu problemach ważniejsze są precision, recall albo koszt fals
 
 Nie zawsze. Regresja logistyczna uczy liniową granicę. Jeżeli dane są nieliniowe, model może być zbyt prosty.
 
+## Dane syntetyczne w pierwszej wersji demo
+
+Pierwsza wersja demo wykorzystuje syntetyczny zbiór danych 2D.
+
+Dane składają się z dwóch klas:
+
+- `class_0`,
+- `class_1`.
+
+Każda klasa jest generowana jako chmura punktów wokół własnego centrum.
+
+Parametry danych:
+
+- `samples_per_class` — liczba punktów w każdej klasie,
+- `class_distance` — odległość między centrami klas,
+- `noise_std` — poziom szumu, czyli rozrzut punktów wokół centrum,
+- `seed` — ziarno losowości umożliwiające odtwarzalność danych.
+
+Dane syntetyczne są użyte celowo, ponieważ regresja logistyczna w pierwszej wersji demo będzie uczyć liniową granicę decyzyjną. Przy małym szumie klasy są dość łatwe do rozdzielenia linią, a przy większym szumie problem staje się trudniejszy.

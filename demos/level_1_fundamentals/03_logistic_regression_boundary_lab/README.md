@@ -37,10 +37,10 @@ This demo will show a different view of classification:
 - command-line placeholder,
 - smoke test,
 - connection to `ml_lab_core`.
+- synthetic binary classification dataset,
 
 ### Not implemented yet
 
-- synthetic binary classification dataset,
 - sigmoid function,
 - binary cross-entropy loss,
 - logistic regression model,
@@ -95,3 +95,12 @@ Students should learn:
 - Recall
 - False positives
 - False negatives
+
+## Dataset
+
+The first dataset version is synthetic and contains two 2D Gaussian-like point clouds:
+
+- `class_0`,
+- `class_1`.
+
+The dataset is intentionally simple because the first version of the demo should focus on probability, thresholding, and a linear decision boundary.
