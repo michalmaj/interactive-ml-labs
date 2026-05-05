@@ -87,7 +87,7 @@ Planned pull requests:
 - [x] Add CLI prototype
 - [x] Add Pygame visualization
 - [x] Add keyboard controls for learning rate and threshold
-- [ ] Add probability background
+- [x] Add probability background
 - [ ] Add confusion matrix metrics
 - [ ] Add challenge mode
 - [ ] Add explanation panel

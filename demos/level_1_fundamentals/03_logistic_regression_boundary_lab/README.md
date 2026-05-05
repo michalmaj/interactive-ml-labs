@@ -51,7 +51,8 @@ This demo will show a different view of classification:
 - basic Pygame visualization,
 - decision boundary rendering,
 - live loss history,
-- keyboard controls for learning rate, threshold, noise, and seed.
+- keyboard controls for learning rate, threshold, noise, and seed,
+- probability background grid for class `1`.
 
 ### Not implemented yet
 

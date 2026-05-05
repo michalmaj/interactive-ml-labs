@@ -20,16 +20,22 @@ from logistic_regression_boundary_lab.metrics import (
     recall_score,
     sigmoid,
 )
+from logistic_regression_boundary_lab.probability_grid import (
+    ProbabilityGrid,
+    compute_probability_grid,
+)
 
 __all__ = [
     "ClassificationMetrics",
     "ConfusionMatrixCounts",
     "LogisticRegressionConfig",
+    "ProbabilityGrid",
     "StepwiseLogisticRegression",
     "SyntheticBinaryClassificationConfig",
     "accuracy_score",
     "binary_cross_entropy",
     "classification_metrics",
+    "compute_probability_grid",
     "confusion_matrix_counts",
     "make_synthetic_binary_classification_dataset",
     "precision_score",

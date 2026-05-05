@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import numpy as np
 import pygame
 
 from logistic_regression_boundary_lab.algorithm import (
@@ -13,6 +14,10 @@ from logistic_regression_boundary_lab.algorithm import (
 from logistic_regression_boundary_lab.dataset import (
     SyntheticBinaryClassificationConfig,
     make_synthetic_binary_classification_dataset,
+)
+from logistic_regression_boundary_lab.probability_grid import (
+    DEFAULT_GRID_RESOLUTION,
+    compute_probability_grid,
 )
 from logistic_regression_boundary_lab.renderer import (
     WINDOW_SIZE,
@@ -99,9 +104,22 @@ class LogisticRegressionPygameApp:
         )
         self._model.reset(self._dataset)
         self._snapshot = self._model.snapshot()
+        self._refresh_probability_grid()
 
         self._running = False
         self._time_since_last_step = 0.0
+
+    def _refresh_probability_grid(self) -> None:
+        """Recompute probability background for the current model state."""
+        weights = np.asarray(self._snapshot.visual_state["weights"], dtype=float)
+        bias = float(self._snapshot.visual_state["bias"])
+
+        self._probability_grid = compute_probability_grid(
+            self._dataset.features,
+            weights=weights,
+            bias=bias,
+            resolution=DEFAULT_GRID_RESOLUTION,
+        )
 
     def _handle_events(self) -> None:
         """Handle Pygame input events."""
@@ -205,6 +223,7 @@ class LogisticRegressionPygameApp:
         """Perform one training step."""
         if not self._snapshot.done:
             self._snapshot = self._model.step()
+            self._refresh_probability_grid()
 
     def _draw(self) -> None:
         """Draw the current application state."""
@@ -213,6 +232,7 @@ class LogisticRegressionPygameApp:
             running=self._running,
             noise_std=self._noise_std,
             seed=self._seed,
+            probability_grid=self._probability_grid,
         )
 
 

@@ -146,3 +146,19 @@ Zadanie:
 4. Zmień threshold klawiszami `Q` i `E`.
 5. Sprawdź, jak threshold wpływa na accuracy, precision i recall.
 
+## Tło prawdopodobieństwa
+
+Tło wykresu pokazuje prawdopodobieństwo klasy `class_1`.
+
+Zadanie:
+
+1. Uruchom demo.
+2. Wykonaj kilka kroków uczenia.
+3. Obserwuj, jak tło zmienia się wraz z uczeniem modelu.
+4. Zmień threshold klawiszami `Q` i `E`.
+5. Sprawdź, czy zmienia się tło, czy tylko granica decyzyjna.
+
+Pytanie kontrolne:
+
+> Dlaczego zmiana threshold nie zmienia prawdopodobieństw modelu?
+
