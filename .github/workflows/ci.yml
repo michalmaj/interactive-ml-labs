@@ -49,3 +49,8 @@ jobs:
         run: >
           uv run --package logistic-regression-boundary-lab
           pytest demos/level_1_fundamentals/03_logistic_regression_boundary_lab/tests
+
+      - name: Run Decision Tree Splitter tests
+        run: >
+          uv run --package decision-tree-splitter
+          pytest demos/level_1_fundamentals/04_decision_tree_splitter/tests

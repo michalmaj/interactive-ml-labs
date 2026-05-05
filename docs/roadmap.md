@@ -93,20 +93,26 @@ Planned pull requests:
 - [x] Add explanation panel
 - [x] Polish demo documentation
 
-## Phase 5 — Level 2
+## Phase 5 — Fourth Level 1 demo: Decision Tree Splitter
 
-Goal: add practical machine learning demos.
+Goal: implement the fourth interactive demo focused on interpretable rule-based classification.
 
-Topics include:
+Planned pull requests:
 
-- ensemble learning,
-- boosting,
-- anomaly detection,
-- imbalanced learning,
-- calibration,
-- interpretability,
-- active learning,
-- semi-supervised learning.
+- [x] Add Decision Tree Splitter package skeleton
+- [ ] Add synthetic classification dataset
+- [ ] Add impurity metrics: Gini and entropy
+- [ ] Add split scoring with information gain
+- [ ] Add manual split prototype
+- [ ] Add decision stump model
+- [ ] Add recursive decision tree model
+- [ ] Add CLI prototype
+- [ ] Add Pygame visualization
+- [ ] Add manual split mode
+- [ ] Add tree depth controls
+- [ ] Add challenge mode
+- [ ] Add explanation panel
+- [ ] Polish demo documentation
 
 ## Phase 6 — Level 3
 
