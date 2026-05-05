@@ -54,12 +54,11 @@ This demo will show a different view of classification:
 - keyboard controls for learning rate, threshold, noise, and seed,
 - probability background grid for class `1`,
 - confusion matrix counts in model snapshots,
-- confusion matrix panel in the Pygame UI.
+- confusion matrix panel in the Pygame UI,
+- precision-recall challenge mode using a hidden synthetic test set.
 
 ### Not implemented yet
 
-- Pygame visualization,
-- challenge mode,
 - explanation panel.
 
 ## How to run

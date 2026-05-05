@@ -11,6 +11,10 @@ from logistic_regression_boundary_lab.algorithm import (
     LogisticRegressionConfig,
     StepwiseLogisticRegression,
 )
+from logistic_regression_boundary_lab.challenge import (
+    PrecisionRecallChallenge,
+    PrecisionRecallChallengeResult,
+)
 from logistic_regression_boundary_lab.dataset import (
     SyntheticBinaryClassificationConfig,
     make_synthetic_binary_classification_dataset,
@@ -39,6 +43,7 @@ THRESHOLD_STEP: Final[float] = 0.05
 
 DEFAULT_UI_MAX_STEPS: Final[int] = 200
 DEFAULT_UI_SAMPLES_PER_CLASS: Final[int] = 70
+DEFAULT_UI_TEST_SAMPLES_PER_CLASS: Final[int] = 50
 DEFAULT_UI_NOISE_STD: Final[float] = 1.0
 DEFAULT_UI_SEED: Final[int] = 42
 
@@ -46,6 +51,7 @@ NOISE_STEP: Final[float] = 0.2
 MIN_NOISE_STD: Final[float] = 0.0
 MAX_NOISE_STD: Final[float] = 4.0
 SEED_STEP: Final[int] = 1
+TEST_SEED_OFFSET: Final[int] = 70_000
 
 
 class LogisticRegressionPygameApp:
@@ -60,6 +66,7 @@ class LogisticRegressionPygameApp:
 
         self._clock = pygame.time.Clock()
         self._renderer = LogisticRegressionRenderer(self._screen)
+        self._challenge = PrecisionRecallChallenge()
 
         self._running = False
         self._should_quit = False
@@ -72,6 +79,7 @@ class LogisticRegressionPygameApp:
 
         self._model: StepwiseLogisticRegression
         self._dataset_config: SyntheticBinaryClassificationConfig
+        self._challenge_result: PrecisionRecallChallengeResult
 
         self._reset_demo()
 
@@ -87,7 +95,7 @@ class LogisticRegressionPygameApp:
         pygame.quit()
 
     def _reset_demo(self) -> None:
-        """Reset dataset and model state using current parameters."""
+        """Reset dataset, model, probability grid, and challenge state."""
         self._dataset_config = SyntheticBinaryClassificationConfig(
             samples_per_class=DEFAULT_UI_SAMPLES_PER_CLASS,
             noise_std=self._noise_std,
@@ -105,6 +113,7 @@ class LogisticRegressionPygameApp:
         self._model.reset(self._dataset)
         self._snapshot = self._model.snapshot()
         self._refresh_probability_grid()
+        self._refresh_challenge_result()
 
         self._running = False
         self._time_since_last_step = 0.0
@@ -119,6 +128,21 @@ class LogisticRegressionPygameApp:
             weights=weights,
             bias=bias,
             resolution=DEFAULT_GRID_RESOLUTION,
+        )
+
+    def _refresh_challenge_result(self) -> None:
+        """Evaluate current model on a hidden synthetic test set."""
+        test_config = SyntheticBinaryClassificationConfig(
+            samples_per_class=DEFAULT_UI_TEST_SAMPLES_PER_CLASS,
+            noise_std=self._noise_std,
+            seed=self._seed + TEST_SEED_OFFSET,
+        )
+        test_dataset = make_synthetic_binary_classification_dataset(test_config)
+        predictions = self._model.predict(test_dataset.features)
+
+        self._challenge_result = self._challenge.evaluate(
+            y_true=test_dataset.targets,
+            y_pred=predictions,
         )
 
     def _handle_events(self) -> None:
@@ -224,6 +248,7 @@ class LogisticRegressionPygameApp:
         if not self._snapshot.done:
             self._snapshot = self._model.step()
             self._refresh_probability_grid()
+            self._refresh_challenge_result()
 
     def _draw(self) -> None:
         """Draw the current application state."""
@@ -233,6 +258,7 @@ class LogisticRegressionPygameApp:
             noise_std=self._noise_std,
             seed=self._seed,
             probability_grid=self._probability_grid,
+            challenge_result=self._challenge_result,
         )
 
 

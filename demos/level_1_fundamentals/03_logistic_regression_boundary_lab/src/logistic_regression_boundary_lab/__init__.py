@@ -4,6 +4,11 @@ from logistic_regression_boundary_lab.algorithm import (
     LogisticRegressionConfig,
     StepwiseLogisticRegression,
 )
+from logistic_regression_boundary_lab.challenge import (
+    PrecisionRecallChallenge,
+    PrecisionRecallChallengeConfig,
+    PrecisionRecallChallengeResult,
+)
 from logistic_regression_boundary_lab.dataset import (
     SyntheticBinaryClassificationConfig,
     make_synthetic_binary_classification_dataset,
@@ -29,6 +34,9 @@ __all__ = [
     "ClassificationMetrics",
     "ConfusionMatrixCounts",
     "LogisticRegressionConfig",
+    "PrecisionRecallChallenge",
+    "PrecisionRecallChallengeConfig",
+    "PrecisionRecallChallengeResult",
     "ProbabilityGrid",
     "StepwiseLogisticRegression",
     "SyntheticBinaryClassificationConfig",
