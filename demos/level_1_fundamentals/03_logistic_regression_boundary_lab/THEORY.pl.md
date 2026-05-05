@@ -4,7 +4,7 @@
 
 Celem demo jest pokazanie, jak działa regresja logistyczna w problemie klasyfikacji binarnej.
 
-Regresja logistyczna, mimo nazwy, nie jest używana tutaj do regresji, ale do klasyfikacji.
+Regresja logistyczna, mimo nazwy, jest tutaj używana do klasyfikacji, a nie do klasycznej regresji.
 
 Model ma odpowiadać na pytanie:
 
@@ -12,13 +12,17 @@ Model ma odpowiadać na pytanie:
 Czy punkt należy do klasy 0 czy do klasy 1?
 ```
 
-## W demo student będzie obserwował:
+W demo student obserwuje:
 
 - punkty dwóch klas,
+- uczenie modelu krok po kroku,
 - granicę decyzyjną,
-- prawdopodobieństwa klasy pozytywnej,
+- tło prawdopodobieństwa klasy `class_1`,
 - wpływ progu decyzyjnego,
-- przypadki false positive i false negative.
+- loss,
+- accuracy, precision i recall,
+- false positives i false negatives,
+- challenge mode oparty na precision i recall.
 
 ## 2. Klasyfikacja binarna
 
@@ -31,12 +35,32 @@ Przykłady:
 - transakcja podejrzana albo normalna,
 - punkt należy do klasy 0 albo klasy 1.
 
-W tym demo klasy będą oznaczone jako:
+W tym demo klasy oznaczono jako:
 
 - `class_0`,
 - `class_1`.
 
-## 3. Różnica względem k-NN
+## 3. Dane syntetyczne w pierwszej wersji demo
+
+Demo wykorzystuje syntetyczny zbiór danych 2D.
+
+Dane składają się z dwóch klas:
+
+- `class_0`,
+- `class_1`.
+
+Każda klasa jest generowana jako chmura punktów wokół własnego centrum.
+
+Parametry danych:
+
+- `samples_per_class` — liczba punktów w każdej klasie,
+- `class_distance` — odległość między centrami klas,
+- `noise_std` — poziom szumu, czyli rozrzut punktów wokół centrum,
+- `seed` — ziarno losowości umożliwiające odtwarzalność danych.
+
+Dane syntetyczne są użyte celowo, ponieważ regresja logistyczna w tej wersji demo uczy liniową granicę decyzyjną. Przy małym szumie klasy są łatwiejsze do rozdzielenia linią. Przy większym szumie klasy zaczynają się nakładać i problem staje się trudniejszy.
+
+## 4. Różnica względem k-NN
 
 W k-NN decyzja zależy od najbliższych punktów treningowych.
 
@@ -56,7 +80,7 @@ k-NN działa lokalnie, ponieważ decyzja zależy od sąsiedztwa punktu.
 
 Regresja logistyczna uczy globalną granicę decyzyjną.
 
-## 4. Wynik liniowy
+## 5. Wynik liniowy
 
 Regresja logistyczna zaczyna od obliczenia wyniku liniowego.
 
@@ -75,21 +99,31 @@ gdzie:
 
 Sam `score` nie jest jeszcze prawdopodobieństwem.
 
-## 5. Sigmoid
+## 6. Sigmoid
 
 Funkcja sigmoid przekształca dowolną liczbę rzeczywistą na wartość z zakresu od 0 do 1.
 
 Intuicyjnie:
 
 ```text
-bardzo ujemny score  -> probability blisko 0
+bardzo ujemny score -> probability blisko 0
 score blisko 0       -> probability blisko 0.5
 bardzo dodatni score -> probability blisko 1
 ```
 
-Dzięki temu wynik modelu można interpretować jako prawdopodobieństwo klasy pozytywnej.
+Dzięki temu wynik modelu można interpretować jako prawdopodobieństwo klasy pozytywnej, czyli `class_1`.
 
-## 6. Prawdopodobieństwo a klasa
+## 7. Sigmoid w implementacji demo
+
+Implementacja zawiera funkcję `sigmoid`.
+
+Funkcja ta zamienia wynik liniowy modelu na wartość z przedziału od 0 do 1.
+
+Dzięki temu model regresji logistycznej może zwracać prawdopodobieństwo klasy pozytywnej.
+
+Wizualizacja wykorzystuje te prawdopodobieństwa do narysowania tła prawdopodobieństwa.
+
+## 8. Prawdopodobieństwo a klasa
 
 Regresja logistyczna najpierw zwraca prawdopodobieństwo.
 
@@ -119,7 +153,7 @@ model przewiduje `class_1`.
 
 W przeciwnym razie przewiduje `class_0`.
 
-## 7. Próg decyzyjny
+## 9. Próg decyzyjny
 
 Próg decyzyjny decyduje o tym, jak łatwo model przypisuje punkt do klasy pozytywnej.
 
@@ -137,7 +171,7 @@ Wyższy próg:
 
 To jest bardzo ważne w zastosowaniach praktycznych, np. w medycynie, detekcji spamu albo wykrywaniu fraudów.
 
-## 8. Granica decyzyjna
+## 10. Granica decyzyjna
 
 Granica decyzyjna to miejsce, w którym model jest na granicy decyzji między klasami.
 
@@ -153,7 +187,28 @@ Punkty po jednej stronie linii mają większe prawdopodobieństwo klasy 1.
 
 Punkty po drugiej stronie mają większe prawdopodobieństwo klasy 0.
 
-## 9. Binary cross-entropy
+W demo zmiana threshold przesuwa granicę decyzyjną, ponieważ model stosuje inny poziom odcięcia dla prawdopodobieństw.
+
+## 11. Tło prawdopodobieństwa
+
+Wizualizacja pokazuje tło prawdopodobieństwa klasy `class_1`.
+
+Jasny kolor po stronie `class_0` oznacza niskie prawdopodobieństwo klasy pozytywnej.
+
+Kolor po stronie `class_1` oznacza wysokie prawdopodobieństwo klasy pozytywnej.
+
+To tło pokazuje wartość przed zastosowaniem progu decyzyjnego.
+
+Dlatego warto rozróżniać dwie rzeczy:
+
+```text
+probability -> wartość od 0 do 1
+predicted class -> klasa po zastosowaniu threshold
+```
+
+Zmiana threshold może przesunąć granicę decyzyjną, ale nie zmienia samych prawdopodobieństw. Uczenie modelu zmienia tło, ponieważ zmieniają się wagi i bias.
+
+## 12. Binary cross-entropy
 
 Regresja logistyczna jest zwykle trenowana przez minimalizację funkcji straty nazywanej binary cross-entropy.
 
@@ -164,7 +219,11 @@ Przykład:
 - jeżeli prawdziwa klasa to `1`, model powinien dać wysokie prawdopodobieństwo,
 - jeżeli prawdziwa klasa to `0`, model powinien dać niskie prawdopodobieństwo.
 
-## Uczenie modelu w aktualnej implementacji
+Jeżeli model jest pewny i ma rację, loss jest niski.
+
+Jeżeli model jest pewny i się myli, loss jest wysoki.
+
+## 13. Uczenie modelu w aktualnej implementacji
 
 Aktualna implementacja zawiera krokowy model regresji logistycznej.
 
@@ -182,13 +241,54 @@ W każdym kroku uczenia:
 4. gradient descent aktualizuje wagi i bias,
 5. zapisywane są aktualne metryki.
 
-Dzięki temu późniejsza wizualizacja będzie mogła pokazać, jak granica decyzyjna przesuwa się podczas uczenia.
+Dzięki temu wizualizacja może pokazać, jak granica decyzyjna i tło prawdopodobieństwa zmieniają się podczas uczenia.
 
-## 10. False positives i false negatives
+## 14. Gradient descent
+
+Gradient descent aktualizuje parametry modelu tak, aby zmniejszać funkcję straty.
+
+W tym demo gradient descent zmienia:
+
+- `weight_1`,
+- `weight_2`,
+- `bias`.
+
+Jeżeli learning rate jest zbyt mały, model uczy się wolno.
+
+Jeżeli learning rate jest zbyt duży, uczenie może być niestabilne.
+
+W demo learning rate można zmieniać klawiszami `Up` i `Down`.
+
+## 15. Metryki klasyfikacji
+
+Demo zawiera podstawowe metryki klasyfikacji binarnej:
+
+- accuracy,
+- precision,
+- recall,
+- confusion matrix counts.
+
+Accuracy mówi, jaki odsetek wszystkich predykcji jest poprawny.
+
+Precision odpowiada na pytanie:
+
+```text
+Spośród punktów przewidzianych jako class_1, ile naprawdę należy do class_1?
+```
+
+Recall odpowiada na pytanie:
+
+```text
+Spośród wszystkich punktów class_1, ile zostało poprawnie znalezionych?
+```
+
+Te metryki są potrzebne do pokazania, jak threshold wpływa na błędy typu false positive i false negative.
+
+## 16. False positives i false negatives
 
 W klasyfikacji binarnej istnieją różne typy decyzji.
 
-Dla klasy pozytywnej class_1:
+Dla klasy pozytywnej `class_1`:
 
 - true positive — model poprawnie przewidział `class_1`,
 - true negative — model poprawnie przewidział `class_0`,
@@ -197,7 +297,58 @@ Dla klasy pozytywnej class_1:
 
 Próg decyzyjny wpływa na liczbę false positives i false negatives.
 
-## 11. Dlaczego to demo jest ważne?
+## 17. Confusion matrix w wizualizacji
+
+Aktualna wersja demo pokazuje wartości:
+
+- `TP` — true positives,
+- `TN` — true negatives,
+- `FP` — false positives,
+- `FN` — false negatives.
+
+Te wartości pomagają zrozumieć, skąd biorą się precision i recall.
+
+Precision zależy od liczby false positives.
+
+Recall zależy od liczby false negatives.
+
+Zmiana threshold może zmienić liczbę FP i FN, nawet jeśli prawdopodobieństwa modelu pozostają takie same.
+
+## 18. Challenge mode — precision i recall
+
+Aktualna wersja demo zawiera challenge mode oparty na ukrytym zbiorze testowym.
+
+Cel challenge:
+
+```text
+recall >= 0.90
+precision >= 0.80
+```
+
+Ten cel jest bardziej dydaktyczny niż sama accuracy, ponieważ pokazuje kompromis między wykrywaniem klasy pozytywnej a liczbą fałszywych alarmów.
+
+Obniżenie threshold może zwiększyć recall, ale często zwiększa liczbę false positives.
+
+Podwyższenie threshold może zwiększyć precision, ale często zwiększa liczbę false negatives.
+
+Dlatego dobór threshold zależy od kosztów błędów.
+
+## 19. Panel wyjaśnień
+
+Demo zawiera panel wyjaśnień na dole ekranu.
+
+Panel pomaga interpretować:
+
+- tło prawdopodobieństwa,
+- aktualny loss,
+- accuracy, precision i recall,
+- próg decyzyjny,
+- false positives i false negatives,
+- status challenge mode.
+
+Dzięki temu student nie tylko widzi zmianę granicy decyzyjnej, ale także otrzymuje krótką interpretację tego, co oznaczają aktualne metryki.
+
+## 20. Dlaczego to demo jest ważne?
 
 Regresja logistyczna jest prostym modelem, ale pokazuje wiele kluczowych pojęć używanych także w bardziej zaawansowanych systemach ML:
 
@@ -207,11 +358,13 @@ Regresja logistyczna jest prostym modelem, ale pokazuje wiele kluczowych pojęć
 - precision,
 - recall,
 - interpretacja wyniku modelu,
-- granica decyzyjna.
+- granica decyzyjna,
+- gradient descent,
+- funkcja straty.
 
 Dlatego jest bardzo dobrym krokiem po k-NN.
 
-## 12. Typowe błędy interpretacyjne
+## 21. Typowe błędy interpretacyjne
 
 ### Błąd 1: regresja logistyczna służy do regresji
 
@@ -233,125 +386,23 @@ Nie zawsze. W wielu problemach ważniejsze są precision, recall albo koszt fals
 
 Nie zawsze. Regresja logistyczna uczy liniową granicę. Jeżeli dane są nieliniowe, model może być zbyt prosty.
 
-## Dane syntetyczne w pierwszej wersji demo
+### Błąd 6: zmiana threshold oznacza ponowne uczenie modelu
 
-Pierwsza wersja demo wykorzystuje syntetyczny zbiór danych 2D.
+Nie. Threshold zmienia sposób zamiany prawdopodobieństwa na klasę. Nie zmienia wag modelu.
 
-Dane składają się z dwóch klas:
+### Błąd 7: wysoka precision i wysoki recall zawsze są łatwe do uzyskania jednocześnie
 
-- `class_0`,
-- `class_1`.
+Nie. W trudnych danych często istnieje kompromis między precision i recall.
 
-Każda klasa jest generowana jako chmura punktów wokół własnego centrum.
+## 22. Co warto obserwować w demo?
 
-Parametry danych:
+Podczas pracy z demo warto zwrócić uwagę na:
 
-- `samples_per_class` — liczba punktów w każdej klasie,
-- `class_distance` — odległość między centrami klas,
-- `noise_std` — poziom szumu, czyli rozrzut punktów wokół centrum,
-- `seed` — ziarno losowości umożliwiające odtwarzalność danych.
-
-Dane syntetyczne są użyte celowo, ponieważ regresja logistyczna w pierwszej wersji demo będzie uczyć liniową granicę decyzyjną. Przy małym szumie klasy są dość łatwe do rozdzielenia linią, a przy większym szumie problem staje się trudniejszy.
-
-## Sigmoid w implementacji demo
-
-Pierwsza wersja implementacji zawiera funkcję `sigmoid`.
-
-Funkcja ta zamienia wynik liniowy modelu na wartość z przedziału od 0 do 1.
-
-Dzięki temu późniejszy model regresji logistycznej będzie mógł zwracać prawdopodobieństwo klasy pozytywnej.
-
-## Metryki klasyfikacji
-
-Demo zawiera już podstawowe metryki klasyfikacji binarnej:
-
-- accuracy,
-- precision,
-- recall,
-- confusion matrix counts.
-
-Accuracy mówi, jaki odsetek wszystkich predykcji jest poprawny.
-
-Precision odpowiada na pytanie:
-
-```text
-Spośród punktów przewidzianych jako class_1, ile naprawdę należy do class_1?
-```
-
-Recall odpowiada na pytanie:
-
-```text
-Spośród wszystkich punktów class_1, ile zostało poprawnie znalezionych?
-```
-
-Te metryki będą potrzebne do pokazania, jak threshold wpływa na błędy typu false positive i false negative.
-
-## Tło prawdopodobieństwa
-
-Wizualizacja pokazuje tło prawdopodobieństwa klasy `class_1`.
-
-Jasny kolor po stronie `class_0` oznacza niskie prawdopodobieństwo klasy pozytywnej.
-
-Kolor po stronie `class_1` oznacza wysokie prawdopodobieństwo klasy pozytywnej.
-
-To tło pokazuje wartość przed zastosowaniem progu decyzyjnego.
-
-Dlatego warto rozróżniać dwie rzeczy:
-
-```text
-probability -> wartość od 0 do 1
-predicted class -> klasa po zastosowaniu threshold
-```
-
-Zmiana threshold może przesunąć granicę decyzyjną, ale nie zmienia samych prawdopodobieństw. Uczenie modelu zmienia tło, ponieważ zmieniają się wagi i bias.
-
-## Confusion matrix w wizualizacji
-
-Aktualna wersja demo pokazuje wartości:
-
-- `TP` — true positives,
-- `TN` — true negatives,
-- `FP` — false positives,
-- `FN` — false negatives.
-
-Te wartości pomagają zrozumieć, skąd biorą się precision i recall.
-
-Precision zależy od liczby false positives.
-
-Recall zależy od liczby false negatives.
-
-Zmiana threshold może zmienić liczbę FP i FN, nawet jeśli prawdopodobieństwa modelu pozostają takie same.
-
-## Challenge mode — precision i recall
-
-Aktualna wersja demo zawiera challenge mode oparty na ukrytym zbiorze testowym.
-
-Cel challenge:
-
-```text
-recall >= 0.90
-precision >= 0.80
-```
-
-Ten cel jest bardziej dydaktyczny niż sama accuracy, ponieważ pokazuje kompromis między wykrywaniem klasy pozytywnej a liczbą fałszywych alarmów.
-
-Obniżenie threshold może zwiększyć recall, ale często zwiększa liczbę false positives.
-
-Podwyższenie threshold może zwiększyć precision, ale często zwiększa liczbę false negatives.
-
-Dlatego dobór threshold zależy od kosztów błędów.
-
-## Panel wyjaśnień
-
-Aktualna wersja demo zawiera panel wyjaśnień na dole ekranu.
-
-Panel pomaga interpretować:
-
-- tło prawdopodobieństwa,
-- aktualny loss,
-- accuracy, precision i recall,
-- próg decyzyjny,
-- false positives i false negatives,
-- status challenge mode.
-
-Dzięki temu student nie tylko widzi zmianę granicy decyzyjnej, ale także otrzymuje krótką interpretację tego, co oznaczają aktualne metryki.
+- jak loss zmienia się podczas uczenia,
+- jak przesuwa się granica decyzyjna,
+- jak zmienia się tło prawdopodobieństwa,
+- jak threshold wpływa na granicę decyzyjną,
+- jak threshold wpływa na FP i FN,
+- jak precision i recall zmieniają się po zmianie threshold,
+- czy challenge mode jest spełniony,
+- jak szum utrudnia klasyfikację.

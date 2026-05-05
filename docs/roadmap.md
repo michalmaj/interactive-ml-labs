@@ -91,7 +91,7 @@ Planned pull requests:
 - [x] Add confusion matrix metrics
 - [x] Add challenge mode
 - [x] Add explanation panel
-- [ ] Polish demo documentation
+- [x] Polish demo documentation
 
 ## Phase 5 — Level 2
 
