@@ -83,8 +83,8 @@ Planned pull requests:
 - [x] Add Logistic Regression Boundary Lab package skeleton
 - [x] Add synthetic binary classification dataset
 - [x] Add sigmoid and classification metrics
-- [ ] Add logistic regression model
-- [ ] Add CLI prototype
+- [x] Add logistic regression model
+- [x] Add CLI prototype
 - [ ] Add Pygame visualization
 - [ ] Add keyboard controls for learning rate and threshold
 - [ ] Add probability background

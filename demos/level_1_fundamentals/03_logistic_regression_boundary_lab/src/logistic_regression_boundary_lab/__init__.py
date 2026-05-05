@@ -1,5 +1,9 @@
 """Logistic Regression Boundary Lab demo package."""
 
+from logistic_regression_boundary_lab.algorithm import (
+    LogisticRegressionConfig,
+    StepwiseLogisticRegression,
+)
 from logistic_regression_boundary_lab.dataset import (
     SyntheticBinaryClassificationConfig,
     make_synthetic_binary_classification_dataset,
@@ -20,6 +24,8 @@ from logistic_regression_boundary_lab.metrics import (
 __all__ = [
     "ClassificationMetrics",
     "ConfusionMatrixCounts",
+    "LogisticRegressionConfig",
+    "StepwiseLogisticRegression",
     "SyntheticBinaryClassificationConfig",
     "accuracy_score",
     "binary_cross_entropy",
