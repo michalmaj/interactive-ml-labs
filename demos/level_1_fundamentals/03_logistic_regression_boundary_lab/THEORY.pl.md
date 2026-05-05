@@ -340,3 +340,18 @@ Obniżenie threshold może zwiększyć recall, ale często zwiększa liczbę fal
 Podwyższenie threshold może zwiększyć precision, ale często zwiększa liczbę false negatives.
 
 Dlatego dobór threshold zależy od kosztów błędów.
+
+## Panel wyjaśnień
+
+Aktualna wersja demo zawiera panel wyjaśnień na dole ekranu.
+
+Panel pomaga interpretować:
+
+- tło prawdopodobieństwa,
+- aktualny loss,
+- accuracy, precision i recall,
+- próg decyzyjny,
+- false positives i false negatives,
+- status challenge mode.
+
+Dzięki temu student nie tylko widzi zmianę granicy decyzyjnej, ale także otrzymuje krótką interpretację tego, co oznaczają aktualne metryki.

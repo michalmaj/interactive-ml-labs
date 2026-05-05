@@ -55,11 +55,11 @@ This demo will show a different view of classification:
 - probability background grid for class `1`,
 - confusion matrix counts in model snapshots,
 - confusion matrix panel in the Pygame UI,
-- precision-recall challenge mode using a hidden synthetic test set.
+- precision-recall challenge mode using a hidden synthetic test set,
+- explanation panel helper for model, threshold, and challenge feedback.
 
 ### Not implemented yet
 
-- explanation panel.
 
 ## How to run
 
