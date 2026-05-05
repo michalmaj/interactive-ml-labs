@@ -71,7 +71,7 @@ Planned pull requests:
 - [x] Add decision background grid
 - [x] Add challenge mode
 - [x] Add explanation panel
-- [ ] Polish demo documentation
+- [x] Polish demo documentation
 
 
 ## Phase 4 — Complete Level 1
