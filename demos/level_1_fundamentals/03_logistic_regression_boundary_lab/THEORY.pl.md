@@ -285,3 +285,22 @@ Spośród wszystkich punktów class_1, ile zostało poprawnie znalezionych?
 ```
 
 Te metryki będą potrzebne do pokazania, jak threshold wpływa na błędy typu false positive i false negative.
+
+## Tło prawdopodobieństwa
+
+Wizualizacja pokazuje tło prawdopodobieństwa klasy `class_1`.
+
+Jasny kolor po stronie `class_0` oznacza niskie prawdopodobieństwo klasy pozytywnej.
+
+Kolor po stronie `class_1` oznacza wysokie prawdopodobieństwo klasy pozytywnej.
+
+To tło pokazuje wartość przed zastosowaniem progu decyzyjnego.
+
+Dlatego warto rozróżniać dwie rzeczy:
+
+```text
+probability -> wartość od 0 do 1
+predicted class -> klasa po zastosowaniu threshold
+```
+
+Zmiana threshold może przesunąć granicę decyzyjną, ale nie zmienia samych prawdopodobieństw. Uczenie modelu zmienia tło, ponieważ zmieniają się wagi i bias.

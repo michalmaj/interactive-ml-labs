@@ -10,6 +10,8 @@ import pygame
 from ml_lab_core import AlgorithmSnapshot
 from numpy.typing import NDArray
 
+from logistic_regression_boundary_lab.probability_grid import ProbabilityGrid
+
 type FloatArray = NDArray[np.float64]
 type IntArray = NDArray[np.int_]
 
@@ -23,6 +25,8 @@ TEXT_COLOR: Final[tuple[int, int, int]] = (30, 35, 40)
 MUTED_TEXT_COLOR: Final[tuple[int, int, int]] = (100, 110, 120)
 CLASS_ZERO_COLOR: Final[tuple[int, int, int]] = (60, 130, 230)
 CLASS_ONE_COLOR: Final[tuple[int, int, int]] = (235, 130, 60)
+PROBABILITY_LOW_COLOR: Final[tuple[int, int, int]] = (219, 233, 252)
+PROBABILITY_HIGH_COLOR: Final[tuple[int, int, int]] = (252, 230, 215)
 BOUNDARY_COLOR: Final[tuple[int, int, int]] = (40, 40, 40)
 AXIS_COLOR: Final[tuple[int, int, int]] = (180, 185, 190)
 LOSS_COLOR: Final[tuple[int, int, int]] = (70, 160, 90)
@@ -82,6 +86,7 @@ class LogisticRegressionRenderer:
         running: bool,
         noise_std: float,
         seed: int,
+        probability_grid: ProbabilityGrid,
     ) -> None:
         """Draw the full frame.
 
@@ -90,6 +95,7 @@ class LogisticRegressionRenderer:
             running: Whether automatic training is active.
             noise_std: Current synthetic data noise standard deviation.
             seed: Current synthetic dataset seed.
+            probability_grid: Positive-class probabilities over the background grid.
         """
         self._screen.fill(BACKGROUND_COLOR)
 
@@ -97,7 +103,7 @@ class LogisticRegressionRenderer:
         self._draw_panel(SIDE_RECT)
         self._draw_panel(BOTTOM_RECT)
 
-        self._draw_main_plot(snapshot)
+        self._draw_main_plot(snapshot, probability_grid)
         self._draw_side_panel(snapshot, running=running, noise_std=noise_std, seed=seed)
         self._draw_bottom_panel(snapshot)
 
@@ -112,8 +118,12 @@ class LogisticRegressionRenderer:
             border_radius=PANEL_RADIUS,
         )
 
-    def _draw_main_plot(self, snapshot: AlgorithmSnapshot) -> None:
-        """Draw data points and the current decision boundary."""
+    def _draw_main_plot(
+        self,
+        snapshot: AlgorithmSnapshot,
+        probability_grid: ProbabilityGrid,
+    ) -> None:
+        """Draw probability background, data points, and decision boundary."""
         features = np.asarray(snapshot.visual_state["features"], dtype=float)
         targets = np.asarray(snapshot.visual_state["targets"], dtype=int)
         predictions = np.asarray(snapshot.visual_state["predictions"], dtype=int)
@@ -121,8 +131,9 @@ class LogisticRegressionRenderer:
         bias = float(snapshot.visual_state["bias"])
         threshold = float(snapshot.visual_state["threshold"])
 
-        bounds = _compute_world_bounds(features)
+        bounds = _bounds_from_probability_grid(probability_grid)
 
+        self._draw_probability_background(probability_grid, bounds)
         self._draw_axes(bounds)
         self._draw_decision_boundary(
             weights=weights,
@@ -133,12 +144,51 @@ class LogisticRegressionRenderer:
         self._draw_points(features, targets, predictions, bounds)
 
         self._draw_text(
-            "Decision boundary",
+            "Probability background",
             MAIN_RECT.left + PADDING,
             MAIN_RECT.top + 18,
             self._font,
             TEXT_COLOR,
         )
+
+    def _draw_probability_background(
+        self,
+        probability_grid: ProbabilityGrid,
+        bounds: WorldBounds,
+    ) -> None:
+        """Draw positive-class probability as a soft colored background."""
+        x_values = probability_grid.x_values
+        y_values = probability_grid.y_values
+        probabilities = probability_grid.probabilities
+
+        x_step = _grid_step(x_values)
+        y_step = _grid_step(y_values)
+
+        for y_index, y_value in enumerate(y_values):
+            for x_index, x_value in enumerate(x_values):
+                probability = float(probabilities[y_index, x_index])
+                color = _probability_to_color(probability)
+
+                top_left = _world_to_screen(
+                    float(x_value - x_step / 2.0),
+                    float(y_value + y_step / 2.0),
+                    bounds,
+                    MAIN_RECT,
+                )
+                bottom_right = _world_to_screen(
+                    float(x_value + x_step / 2.0),
+                    float(y_value - y_step / 2.0),
+                    bounds,
+                    MAIN_RECT,
+                )
+
+                rect = pygame.Rect(
+                    top_left[0],
+                    top_left[1],
+                    max(1, bottom_right[0] - top_left[0] + 1),
+                    max(1, bottom_right[1] - top_left[1] + 1),
+                )
+                pygame.draw.rect(self._screen, color, rect)
 
     def _draw_axes(self, bounds: WorldBounds) -> None:
         """Draw x=0 and y=0 axes when visible."""
@@ -329,33 +379,23 @@ class LogisticRegressionRenderer:
 def _build_explanation(snapshot: AlgorithmSnapshot) -> str:
     """Build a short explanation for the current model state."""
     if snapshot.iteration == 0:
-        return "Press N for one training step or Space to run gradient descent."
+        return "The background shows probability of class_1. Press N or Space to train."
 
     loss = float(snapshot.metrics["loss"])
     accuracy = float(snapshot.metrics["accuracy"])
     threshold = float(snapshot.metrics["threshold"])
 
-    return f"Loss is {loss:.4f}, accuracy is {accuracy:.2f}, threshold is {threshold:.2f}."
+    return f"Probability background changes as weights learn. Loss: {loss:.4f}, \
+        accuracy: {accuracy:.2f}, threshold: {threshold:.2f}."
 
 
-def _compute_world_bounds(features: FloatArray) -> WorldBounds:
-    """Compute plot bounds with a small visual margin."""
-    x_min = float(np.min(features[:, 0]))
-    x_max = float(np.max(features[:, 0]))
-    y_min = float(np.min(features[:, 1]))
-    y_max = float(np.max(features[:, 1]))
-
-    x_span = max(x_max - x_min, MIN_WORLD_SPAN)
-    y_span = max(y_max - y_min, MIN_WORLD_SPAN)
-
-    x_margin = x_span * WORLD_MARGIN_RATIO
-    y_margin = y_span * WORLD_MARGIN_RATIO
-
+def _bounds_from_probability_grid(probability_grid: ProbabilityGrid) -> WorldBounds:
+    """Build world bounds from a probability grid."""
     return WorldBounds(
-        x_min=x_min - x_margin,
-        x_max=x_max + x_margin,
-        y_min=y_min - y_margin,
-        y_max=y_max + y_margin,
+        x_min=float(np.min(probability_grid.x_values)),
+        x_max=float(np.max(probability_grid.x_values)),
+        y_min=float(np.min(probability_grid.y_values)),
+        y_max=float(np.max(probability_grid.y_values)),
     )
 
 
@@ -381,3 +421,21 @@ def _world_to_screen(
 def _logit(probability: float) -> float:
     """Convert probability into log-odds."""
     return float(np.log(probability / (1.0 - probability)))
+
+
+def _grid_step(values: FloatArray) -> float:
+    """Return spacing between grid values."""
+    if len(values) < 2:
+        return MIN_WORLD_SPAN
+
+    return float(values[1] - values[0])
+
+
+def _probability_to_color(probability: float) -> tuple[int, int, int]:
+    """Convert probability into an interpolated background color."""
+    clipped_probability = min(1.0, max(0.0, probability))
+
+    return tuple(
+        round(low + (high - low) * clipped_probability)
+        for low, high in zip(PROBABILITY_LOW_COLOR, PROBABILITY_HIGH_COLOR, strict=True)
+    )
