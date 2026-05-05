@@ -70,6 +70,7 @@ Planned pull requests:
 - [x] Add mouse query point selection
 - [x] Add decision background grid
 - [x] Add challenge mode
+- [x] Add explanation panel
 - [ ] Polish demo documentation
 
 

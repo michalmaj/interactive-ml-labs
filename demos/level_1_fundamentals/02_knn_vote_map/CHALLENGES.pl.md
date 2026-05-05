@@ -163,3 +163,19 @@ osiągnij accuracy >= 0.90
 Pytanie kontrolne:
 
 > Dlaczego wynik na zbiorze testowym jest lepszym sygnałem niż obserwowanie tylko punktów treningowych?
+
+## Panel wyjaśnień
+
+Na dole ekranu znajduje się panel wyjaśnień.
+
+Panel pokazuje między innymi:
+
+- wynik głosowania sąsiadów,
+- przewidywaną klasę klikniętego punktu,
+- informację o challenge mode,
+- sugestię zmiany `k`, poziomu szumu albo seeda.
+
+Zadanie:
+
+Kliknij kilka punktów w pobliżu granicy decyzyjnej i obserwuj, jak zmieniają się głosy sąsiadów.
+

@@ -13,6 +13,7 @@ from numpy.typing import NDArray
 from knn_vote_map.challenge import KNNAccuracyChallengeResult
 from knn_vote_map.classifier import Neighbor
 from knn_vote_map.decision_grid import DecisionGrid
+from knn_vote_map.explanation import build_explanation_lines
 
 type FloatArray = NDArray[np.float64]
 type IntArray = NDArray[np.int_]
@@ -362,7 +363,7 @@ class KNNVoteMapRenderer:
         snapshot: AlgorithmSnapshot,
         challenge_result: KNNAccuracyChallengeResult,
     ) -> None:
-        """Draw keyboard and mouse controls with a short explanation."""
+        """Draw keyboard and mouse controls with explanation lines."""
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
 
@@ -373,14 +374,17 @@ class KNNVoteMapRenderer:
 
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
 
-        explanation = _build_explanation(snapshot, challenge_result)
-        self._draw_text(
-            explanation,
-            x,
-            y + TEXT_LINE_HEIGHT,
-            self._small_font,
-            MUTED_TEXT_COLOR,
-        )
+        explanation_lines = build_explanation_lines(snapshot, challenge_result)
+        explanation_y = y + TEXT_LINE_HEIGHT
+
+        for index, line in enumerate(explanation_lines):
+            self._draw_text(
+                line,
+                x,
+                explanation_y + index * SMALL_TEXT_LINE_HEIGHT,
+                self._small_font,
+                MUTED_TEXT_COLOR,
+            )
 
     def _draw_text(
         self,
@@ -393,25 +397,6 @@ class KNNVoteMapRenderer:
         """Draw text at a fixed screen position."""
         surface = font.render(text, True, color)
         self._screen.blit(surface, (x, y))
-
-
-def _build_explanation(
-    snapshot: AlgorithmSnapshot,
-    challenge_result: KNNAccuracyChallengeResult,
-) -> str:
-    """Build a short explanation line for the current state."""
-    if challenge_result.success:
-        prefix = "Challenge completed on hidden test data."
-    else:
-        prefix = "Challenge not completed on hidden test data."
-
-    if not snapshot.metrics.get("has_prediction"):
-        return f"{prefix} Click the map or press N to classify a query point."
-
-    prediction = snapshot.metrics["predicted_label"]
-    k = snapshot.metrics["k"]
-
-    return f"{prefix} Query classified as class_{prediction} by voting among {k} neighbors."
 
 
 def _compute_world_bounds(
