@@ -7,6 +7,7 @@ members = [
     "gradient-descent-playground",
     "interactive-ml-labs-workspace",
     "knn-vote-map",
+    "logistic-regression-boundary-lab",
     "ml-lab-core",
 ]
 
@@ -80,6 +81,17 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.4.4" },
     { name = "pygame", specifier = ">=2.6.1" },
 ]
+
+[[package]]
+name = "logistic-regression-boundary-lab"
+version = "0.1.0"
+source = { editable = "demos/level_1_fundamentals/03_logistic_regression_boundary_lab" }
+dependencies = [
+    { name = "ml-lab-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "ml-lab-core", editable = "packages/ml_lab_core" }]
 
 [[package]]
 name = "ml-lab-core"

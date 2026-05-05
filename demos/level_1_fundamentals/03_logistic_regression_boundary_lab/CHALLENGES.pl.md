@@ -1,0 +1,125 @@
+# Logistic Regression Boundary Lab — zadania
+
+## 1. Cel ćwiczenia
+
+Celem ćwiczenia będzie zrozumienie, jak regresja logistyczna podejmuje decyzję klasyfikacyjną.
+
+Po wykonaniu zadań student powinien umieć odpowiedzieć na pytania:
+
+- czym jest klasyfikacja binarna,
+- czym różni się prawdopodobieństwo od klasy,
+- jak działa próg decyzyjny,
+- czym jest granica decyzyjna,
+- czym są false positives i false negatives,
+- dlaczego accuracy nie zawsze wystarcza.
+
+## 2. Uruchomienie
+
+Aktualna wersja zawiera tylko placeholder:
+
+```bash
+uv run --package logistic-regression-boundary-lab logistic-regression-boundary-lab
+```
+
+Interaktywna wersja Pygame zostanie dodana w kolejnych PR-ach.
+
+## 3. Planowane zadania podstawowe
+
+### Zadanie 1 — prawdopodobieństwo a klasa
+
+1. Wybierz punkt testowy.
+2. Odczytaj prawdopodobieństwo klasy `class_1`.
+3. Zastosuj próg `0.5`.
+4. Sprawdź przewidywaną klasę.
+
+**Odpowiedz:**
+
+- Czy prawdopodobieństwo jest tym samym co klasa?
+- Co oznacza `probability = 0.8`?
+- Co oznacza `probability = 0.4`?
+
+### Zadanie 2 — zmiana progu decyzyjnego
+
+1. Ustaw `threshold = 0.5`.
+2. Sprawdź predykcje.
+3. Zwiększ `threshold`.
+4. Zmniejsz `threshold`.
+
+**Odpowiedz:**
+
+- Czy liczba punktów przewidzianych jako `class_1` się zmienia?
+- Co dzieje się przy bardzo niskim progu?
+- Co dzieje się przy bardzo wysokim progu?
+
+### Zadanie 3 — granica decyzyjna
+
+1. Obserwuj linię granicy decyzyjnej.
+2. Klikaj punkty po obu stronach granicy.
+3. Sprawdzaj prawdopodobieństwa.
+
+**Odpowiedz:**
+
+- Po której stronie granicy model przewiduje `class_1`?
+- Czy punkty blisko granicy mają `probability` blisko `0.5`?
+- Czy punkty daleko od granicy mają bardziej pewne predykcje?
+
+## 4. Planowane eksperymenty
+
+### Eksperyment 1 — learning rate
+
+Sprawdź działanie modelu dla różnych wartości `learning rate`.
+
+**Odpowiedz:**
+
+- Czy model uczy się szybciej przy większym `learning rate`?
+- Czy zbyt duży `learning rate` może pogorszyć uczenie?
+- Czy `loss` maleje stabilnie?
+
+### Eksperyment 2 — threshold i błędy
+
+Sprawdź, jak `threshold` wpływa na `false positives` i `false negatives`.
+
+**Odpowiedz:**
+
+- Kiedy rośnie liczba `false positives`?
+- Kiedy rośnie liczba `false negatives`?
+- Czy `threshold = 0.5` zawsze jest najlepszy?
+
+### Eksperyment 3 — szum w danych
+
+Dodaj więcej szumu do danych.
+
+**Odpowiedz:**
+
+- Czy klasy trudniej rozdzielić linią?
+- Czy model częściej popełnia błędy?
+- Czy zmiana `threshold` pomaga?
+
+## 5. Planowany challenge mode
+
+Przykładowy challenge:
+
+```text
+Osiągnij recall >= 0.90 przy precision >= 0.80.
+```
+
+Alternatywny challenge:
+
+```text
+Znajdź threshold minimalizujący koszt false positives i false negatives.
+```
+
+## 6. Pytania kontrolne
+
+1. Do czego służy regresja logistyczna?
+2. Dlaczego nazwa „regresja” może być myląca?
+3. Co oznacza sigmoid?
+4. Co oznacza probability?
+5. Jak probability zamienia się na klasę?
+6. Co robi threshold?
+7. Czym jest false positive?
+8. Czym jest false negative?
+9. Kiedy warto obniżyć threshold?
+10. Kiedy warto podwyższyć threshold?
+11. Czy accuracy zawsze wystarcza?
+12. Czym regresja logistyczna różni się od k-NN?

@@ -74,19 +74,24 @@ Planned pull requests:
 - [x] Polish demo documentation
 
 
-## Phase 4 — Complete Level 1
+## Phase 4 — Third Level 1 demo: Logistic Regression Boundary Lab
 
-Goal: implement all Level 1 fundamental demos.
+Goal: implement the third interactive demo focused on probabilistic binary classification.
 
-Planned demos:
+Planned pull requests:
 
-- Logistic Regression Boundary Lab
-- Decision Tree Splitter
-- SVM Kernel Duel
-- XOR Neural Playground
-- DBSCAN Density Radar
-- PCA Projector
-- RL Gridworld
+- [x] Add Logistic Regression Boundary Lab package skeleton
+- [ ] Add synthetic binary classification dataset
+- [ ] Add sigmoid and classification metrics
+- [ ] Add logistic regression model
+- [ ] Add CLI prototype
+- [ ] Add Pygame visualization
+- [ ] Add keyboard controls for learning rate and threshold
+- [ ] Add probability background
+- [ ] Add confusion matrix metrics
+- [ ] Add challenge mode
+- [ ] Add explanation panel
+- [ ] Polish demo documentation
 
 ## Phase 5 — Level 2
 

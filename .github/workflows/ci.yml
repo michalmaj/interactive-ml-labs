@@ -44,3 +44,8 @@ jobs:
         run: >
           uv run --package knn-vote-map
           pytest demos/level_1_fundamentals/02_knn_vote_map/tests
+      
+      - name: Run Logistic Regression Boundary Lab tests
+        run: >
+          uv run --package logistic-regression-boundary-lab
+          pytest demos/level_1_fundamentals/03_logistic_regression_boundary_lab/tests
