@@ -85,8 +85,8 @@ Planned pull requests:
 - [x] Add sigmoid and classification metrics
 - [x] Add logistic regression model
 - [x] Add CLI prototype
-- [ ] Add Pygame visualization
-- [ ] Add keyboard controls for learning rate and threshold
+- [x] Add Pygame visualization
+- [x] Add keyboard controls for learning rate and threshold
 - [ ] Add probability background
 - [ ] Add confusion matrix metrics
 - [ ] Add challenge mode

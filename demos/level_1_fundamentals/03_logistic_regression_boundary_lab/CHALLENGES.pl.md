@@ -123,3 +123,26 @@ Znajdź threshold minimalizujący koszt false positives i false negatives.
 10. Kiedy warto podwyższyć threshold?
 11. Czy accuracy zawsze wystarcza?
 12. Czym regresja logistyczna różni się od k-NN?
+
+
+W `CHALLENGES.pl.md` dopisz:
+
+```md
+## Pierwsza wizualizacja Pygame
+
+Wersja interaktywna pokazuje:
+
+- punkty dwóch klas,
+- aktualną granicę decyzyjną,
+- punkty błędnie sklasyfikowane oznaczone znakiem `X`,
+- loss history,
+- accuracy, precision i recall.
+
+Zadanie:
+
+1. Uruchom demo.
+2. Wykonuj kroki uczenia klawiszem `N`.
+3. Obserwuj, jak granica decyzyjna przesuwa się po kolejnych krokach.
+4. Zmień threshold klawiszami `Q` i `E`.
+5. Sprawdź, jak threshold wpływa na accuracy, precision i recall.
+
