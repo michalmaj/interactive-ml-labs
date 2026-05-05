@@ -304,3 +304,20 @@ predicted class -> klasa po zastosowaniu threshold
 ```
 
 Zmiana threshold może przesunąć granicę decyzyjną, ale nie zmienia samych prawdopodobieństw. Uczenie modelu zmienia tło, ponieważ zmieniają się wagi i bias.
+
+## Confusion matrix w wizualizacji
+
+Aktualna wersja demo pokazuje wartości:
+
+- `TP` — true positives,
+- `TN` — true negatives,
+- `FP` — false positives,
+- `FN` — false negatives.
+
+Te wartości pomagają zrozumieć, skąd biorą się precision i recall.
+
+Precision zależy od liczby false positives.
+
+Recall zależy od liczby false negatives.
+
+Zmiana threshold może zmienić liczbę FP i FN, nawet jeśli prawdopodobieństwa modelu pozostają takie same.

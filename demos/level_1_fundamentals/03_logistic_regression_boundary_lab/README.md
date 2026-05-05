@@ -52,14 +52,13 @@ This demo will show a different view of classification:
 - decision boundary rendering,
 - live loss history,
 - keyboard controls for learning rate, threshold, noise, and seed,
-- probability background grid for class `1`.
+- probability background grid for class `1`,
+- confusion matrix counts in model snapshots,
+- confusion matrix panel in the Pygame UI.
 
 ### Not implemented yet
 
-- decision threshold control,
-- confusion matrix metrics,
 - Pygame visualization,
-- keyboard controls,
 - challenge mode,
 - explanation panel.
 

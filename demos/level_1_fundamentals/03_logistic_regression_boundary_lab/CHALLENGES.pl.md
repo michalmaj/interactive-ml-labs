@@ -162,3 +162,18 @@ Pytanie kontrolne:
 
 > Dlaczego zmiana threshold nie zmienia prawdopodobieństw modelu?
 
+## Confusion matrix
+
+Panel boczny pokazuje wartości `TP`, `TN`, `FP` i `FN`.
+
+Zadanie:
+
+1. Uruchom demo.
+2. Wykonaj kilkanaście kroków uczenia.
+3. Zmień threshold klawiszami `Q` i `E`.
+4. Obserwuj, jak zmieniają się `FP` i `FN`.
+5. Porównaj te zmiany z precision i recall.
+
+Pytanie kontrolne:
+
+> Dlaczego obniżenie threshold może zmniejszyć liczbę false negatives, ale zwiększyć liczbę false positives?
