@@ -88,10 +88,14 @@ version = "0.1.0"
 source = { editable = "demos/level_1_fundamentals/03_logistic_regression_boundary_lab" }
 dependencies = [
     { name = "ml-lab-core" },
+    { name = "numpy" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "ml-lab-core", editable = "packages/ml_lab_core" }]
+requires-dist = [
+    { name = "ml-lab-core", editable = "packages/ml_lab_core" },
+    { name = "numpy", specifier = ">=2.4.4" },
+]
 
 [[package]]
 name = "ml-lab-core"

@@ -81,7 +81,7 @@ Goal: implement the third interactive demo focused on probabilistic binary class
 Planned pull requests:
 
 - [x] Add Logistic Regression Boundary Lab package skeleton
-- [ ] Add synthetic binary classification dataset
+- [x] Add synthetic binary classification dataset
 - [ ] Add sigmoid and classification metrics
 - [ ] Add logistic regression model
 - [ ] Add CLI prototype
