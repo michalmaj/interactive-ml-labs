@@ -232,3 +232,36 @@ Parametry danych:
 - `seed` — ziarno losowości umożliwiające odtwarzalność danych.
 
 Dane syntetyczne są użyte celowo, ponieważ regresja logistyczna w pierwszej wersji demo będzie uczyć liniową granicę decyzyjną. Przy małym szumie klasy są dość łatwe do rozdzielenia linią, a przy większym szumie problem staje się trudniejszy.
+
+## Sigmoid w implementacji demo
+
+Pierwsza wersja implementacji zawiera funkcję `sigmoid`.
+
+Funkcja ta zamienia wynik liniowy modelu na wartość z przedziału od 0 do 1.
+
+Dzięki temu późniejszy model regresji logistycznej będzie mógł zwracać prawdopodobieństwo klasy pozytywnej.
+
+## Metryki klasyfikacji
+
+Demo zawiera już podstawowe metryki klasyfikacji binarnej:
+
+- accuracy,
+- precision,
+- recall,
+- confusion matrix counts.
+
+Accuracy mówi, jaki odsetek wszystkich predykcji jest poprawny.
+
+Precision odpowiada na pytanie:
+
+```text
+Spośród punktów przewidzianych jako class_1, ile naprawdę należy do class_1?
+```
+
+Recall odpowiada na pytanie:
+
+```text
+Spośród wszystkich punktów class_1, ile zostało poprawnie znalezionych?
+```
+
+Te metryki będą potrzebne do pokazania, jak threshold wpływa na błędy typu false positive i false negative.

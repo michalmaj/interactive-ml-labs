@@ -38,11 +38,14 @@ This demo will show a different view of classification:
 - smoke test,
 - connection to `ml_lab_core`.
 - synthetic binary classification dataset,
+- sigmoid helper,
+- binary cross-entropy loss,
+- probability thresholding,
+- confusion matrix counts,
+- accuracy, precision, and recall metrics.
 
 ### Not implemented yet
 
-- sigmoid function,
-- binary cross-entropy loss,
 - logistic regression model,
 - decision threshold control,
 - confusion matrix metrics,
