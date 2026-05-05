@@ -37,15 +37,12 @@ Implemented:
 - keyboard controls for `k`, noise, seed, and reset,
 - mouse-based query point selection,
 - decision background grid showing predicted class regions,
-- accuracy challenge mode using a hidden synthetic test set.
+- accuracy challenge mode using a hidden synthetic test set,
+- explanation panel for voting and challenge feedback.
 
 Not implemented yet:
 
-- vote visualization,
-- Pygame UI,
-- keyboard controls,
-- challenge mode,
-- explanation panel.
+- vote visualization.
 
 ## How to run
 
