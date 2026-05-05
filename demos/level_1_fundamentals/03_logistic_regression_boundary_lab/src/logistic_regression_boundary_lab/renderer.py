@@ -10,6 +10,7 @@ import pygame
 from ml_lab_core import AlgorithmSnapshot
 from numpy.typing import NDArray
 
+from logistic_regression_boundary_lab.challenge import PrecisionRecallChallengeResult
 from logistic_regression_boundary_lab.probability_grid import ProbabilityGrid
 
 type FloatArray = NDArray[np.float64]
@@ -43,8 +44,8 @@ BOUNDARY_WIDTH: Final[int] = 3
 ERROR_MARK_WIDTH: Final[int] = 2
 PANEL_RADIUS: Final[int] = 14
 TEXT_LINE_HEIGHT: Final[int] = 28
-SMALL_TEXT_LINE_HEIGHT: Final[int] = 22
-LOSS_HISTORY_HEIGHT: Final[int] = 42
+SMALL_TEXT_LINE_HEIGHT: Final[int] = 21
+LOSS_HISTORY_HEIGHT: Final[int] = 34
 
 MIN_WORLD_SPAN: Final[float] = 1.0
 MIN_BOUNDARY_WEIGHT_NORM: Final[float] = 1.0e-8
@@ -87,6 +88,7 @@ class LogisticRegressionRenderer:
         noise_std: float,
         seed: int,
         probability_grid: ProbabilityGrid,
+        challenge_result: PrecisionRecallChallengeResult,
     ) -> None:
         """Draw the full frame.
 
@@ -96,6 +98,7 @@ class LogisticRegressionRenderer:
             noise_std: Current synthetic data noise standard deviation.
             seed: Current synthetic dataset seed.
             probability_grid: Positive-class probabilities over the background grid.
+            challenge_result: Precision-recall challenge result.
         """
         self._screen.fill(BACKGROUND_COLOR)
 
@@ -104,8 +107,14 @@ class LogisticRegressionRenderer:
         self._draw_panel(BOTTOM_RECT)
 
         self._draw_main_plot(snapshot, probability_grid)
-        self._draw_side_panel(snapshot, running=running, noise_std=noise_std, seed=seed)
-        self._draw_bottom_panel(snapshot)
+        self._draw_side_panel(
+            snapshot,
+            running=running,
+            noise_std=noise_std,
+            seed=seed,
+            challenge_result=challenge_result,
+        )
+        self._draw_bottom_panel(snapshot, challenge_result)
 
         pygame.display.flip()
 
@@ -282,58 +291,92 @@ class LogisticRegressionRenderer:
         running: bool,
         noise_std: float,
         seed: int,
+        challenge_result: PrecisionRecallChallengeResult,
     ) -> None:
-        """Draw metrics, confusion matrix, parameters, and loss history."""
+        """Draw metrics, challenge, confusion matrix, and loss history."""
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 22
 
         self._draw_text("Logistic regression", x, y, self._title_font, TEXT_COLOR)
-        y += 46
+        y += 42
 
         rows = [
-            ("Status", snapshot.status),
             ("Running", "yes" if running else "no"),
             ("Step", str(snapshot.iteration)),
-            ("Loss", f"{float(snapshot.metrics['loss']):.6f}"),
+            ("Loss", f"{float(snapshot.metrics['loss']):.5f}"),
             ("Accuracy", f"{float(snapshot.metrics['accuracy']):.3f}"),
             ("Precision", f"{float(snapshot.metrics['precision']):.3f}"),
             ("Recall", f"{float(snapshot.metrics['recall']):.3f}"),
-            ("Learning rate", f"{float(snapshot.metrics['learning_rate']):.3f}"),
+            ("LR", f"{float(snapshot.metrics['learning_rate']):.3f}"),
             ("Threshold", f"{float(snapshot.metrics['threshold']):.2f}"),
-            ("Noise std", f"{noise_std:.2f}"),
+            ("Noise", f"{noise_std:.2f}"),
             ("Seed", str(seed)),
         ]
 
         for label, value in rows:
             self._draw_text(f"{label}:", x, y, self._small_font, MUTED_TEXT_COLOR)
-            self._draw_text(str(value), x + 124, y, self._small_font, TEXT_COLOR)
-            y += SMALL_TEXT_LINE_HEIGHT
-
-        y += 8
-        self._draw_text("Confusion matrix", x, y, self._font, TEXT_COLOR)
-        y += 26
-
-        confusion_rows = [
-            ("TP", int(snapshot.metrics["true_positive"])),
-            ("TN", int(snapshot.metrics["true_negative"])),
-            ("FP", int(snapshot.metrics["false_positive"])),
-            ("FN", int(snapshot.metrics["false_negative"])),
-        ]
-
-        for label, value in confusion_rows:
-            self._draw_text(f"{label}:", x, y, self._small_font, MUTED_TEXT_COLOR)
-            self._draw_text(str(value), x + 60, y, self._small_font, TEXT_COLOR)
+            self._draw_text(str(value), x + 116, y, self._small_font, TEXT_COLOR)
             y += SMALL_TEXT_LINE_HEIGHT
 
         y += 6
-        self._draw_text("Loss history", x, y, self._font, TEXT_COLOR)
+        self._draw_text("Challenge", x, y, self._font, TEXT_COLOR)
         y += 24
+
+        challenge_rows = [
+            ("Status", challenge_result.status),
+            (
+                "Precision",
+                f"{challenge_result.precision:.2f}/{challenge_result.target_precision:.2f}",
+            ),
+            ("Recall", f"{challenge_result.recall:.2f}/{challenge_result.target_recall:.2f}"),
+        ]
+
+        for label, value in challenge_rows:
+            self._draw_text(f"{label}:", x, y, self._small_font, MUTED_TEXT_COLOR)
+            self._draw_text(str(value), x + 116, y, self._small_font, TEXT_COLOR)
+            y += SMALL_TEXT_LINE_HEIGHT
+
+        y += 4
+        self._draw_text("Confusion matrix", x, y, self._font, TEXT_COLOR)
+        y += 23
+
+        self._draw_confusion_matrix(snapshot, x, y)
+        y += 48
+
+        self._draw_text("Loss history", x, y, self._font, TEXT_COLOR)
+        y += 23
 
         loss_history = tuple(float(value) for value in snapshot.visual_state["loss_history"])
         self._draw_loss_history(
             loss_history,
             pygame.Rect(x, y, 220, LOSS_HISTORY_HEIGHT),
         )
+
+    def _draw_confusion_matrix(
+        self,
+        snapshot: AlgorithmSnapshot,
+        x: int,
+        y: int,
+    ) -> None:
+        """Draw compact TP/TN/FP/FN counts in two columns."""
+        left_rows = [
+            ("TP", int(snapshot.metrics["true_positive"])),
+            ("TN", int(snapshot.metrics["true_negative"])),
+        ]
+        right_rows = [
+            ("FP", int(snapshot.metrics["false_positive"])),
+            ("FN", int(snapshot.metrics["false_negative"])),
+        ]
+
+        for index, (label, value) in enumerate(left_rows):
+            row_y = y + index * SMALL_TEXT_LINE_HEIGHT
+            self._draw_text(f"{label}:", x, row_y, self._small_font, MUTED_TEXT_COLOR)
+            self._draw_text(str(value), x + 42, row_y, self._small_font, TEXT_COLOR)
+
+        for index, (label, value) in enumerate(right_rows):
+            row_y = y + index * SMALL_TEXT_LINE_HEIGHT
+            self._draw_text(f"{label}:", x + 110, row_y, self._small_font, MUTED_TEXT_COLOR)
+            self._draw_text(str(value), x + 152, row_y, self._small_font, TEXT_COLOR)
 
     def _draw_loss_history(
         self,
@@ -361,7 +404,11 @@ class LogisticRegressionRenderer:
 
         pygame.draw.lines(self._screen, LOSS_COLOR, False, points, 2)
 
-    def _draw_bottom_panel(self, snapshot: AlgorithmSnapshot) -> None:
+    def _draw_bottom_panel(
+        self,
+        snapshot: AlgorithmSnapshot,
+        challenge_result: PrecisionRecallChallengeResult,
+    ) -> None:
         """Draw keyboard controls and short explanation."""
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
@@ -373,7 +420,7 @@ class LogisticRegressionRenderer:
 
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
 
-        explanation = _build_explanation(snapshot)
+        explanation = _build_explanation(snapshot, challenge_result)
         self._draw_text(
             explanation,
             x,
@@ -395,21 +442,27 @@ class LogisticRegressionRenderer:
         self._screen.blit(surface, (x, y))
 
 
-def _build_explanation(snapshot: AlgorithmSnapshot) -> str:
+def _build_explanation(
+    snapshot: AlgorithmSnapshot,
+    challenge_result: PrecisionRecallChallengeResult,
+) -> str:
     """Build a short explanation for the current model state."""
     false_positive = int(snapshot.metrics["false_positive"])
     false_negative = int(snapshot.metrics["false_negative"])
 
+    if challenge_result.success:
+        prefix = "Challenge completed on hidden test data."
+    else:
+        prefix = "Challenge not completed yet."
+
     if snapshot.iteration == 0:
-        return (
-            "The background shows probability of class_1. Train the model and watch FP/FN change."
-        )
+        return f"{prefix} Train the model and tune threshold to balance FP/FN."
 
     threshold = float(snapshot.metrics["threshold"])
 
     return (
-        f"Threshold {threshold:.2f} gives FP={false_positive} and FN={false_negative}. "
-        "Changing threshold trades false positives against false negatives."
+        f"{prefix} Threshold {threshold:.2f} gives FP={false_positive} "
+        f"and FN={false_negative} on training data."
     )
 
 

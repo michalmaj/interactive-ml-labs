@@ -89,7 +89,7 @@ Planned pull requests:
 - [x] Add keyboard controls for learning rate and threshold
 - [x] Add probability background
 - [x] Add confusion matrix metrics
-- [ ] Add challenge mode
+- [x] Add challenge mode
 - [ ] Add explanation panel
 - [ ] Polish demo documentation
 

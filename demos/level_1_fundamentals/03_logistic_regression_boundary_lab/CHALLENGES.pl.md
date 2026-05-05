@@ -177,3 +177,29 @@ Zadanie:
 Pytanie kontrolne:
 
 > Dlaczego obniżenie threshold może zmniejszyć liczbę false negatives, ale zwiększyć liczbę false positives?
+
+## Challenge mode — precision i recall
+
+Demo ocenia model na ukrytym syntetycznym zbiorze testowym.
+
+Aktualny cel:
+
+```text
+recall >= 0.90
+precision >= 0.80
+```
+
+## Zadanie
+
+1. Uruchom demo.
+2. Wykonaj uczenie modelu przez kilka lub kilkadziesiąt kroków.
+3. Zmieniaj `threshold` klawiszami `Q` i `E`.
+4. Obserwuj `precision`, `recall`, `FP` i `FN`.
+5. Spróbuj uzyskać status `success`.
+
+## Pytania kontrolne
+
+- Czy łatwiej uzyskać wysoki `recall` czy wysoką `precision`?
+- Co dzieje się z `FP` po obniżeniu `threshold`?
+- Co dzieje się z `FN` po podwyższeniu `threshold`?
+- Dlaczego sam wynik `accuracy` nie mówi wszystkiego?

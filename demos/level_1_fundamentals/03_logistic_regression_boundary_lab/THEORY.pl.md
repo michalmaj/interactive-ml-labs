@@ -321,3 +321,22 @@ Precision zależy od liczby false positives.
 Recall zależy od liczby false negatives.
 
 Zmiana threshold może zmienić liczbę FP i FN, nawet jeśli prawdopodobieństwa modelu pozostają takie same.
+
+## Challenge mode — precision i recall
+
+Aktualna wersja demo zawiera challenge mode oparty na ukrytym zbiorze testowym.
+
+Cel challenge:
+
+```text
+recall >= 0.90
+precision >= 0.80
+```
+
+Ten cel jest bardziej dydaktyczny niż sama accuracy, ponieważ pokazuje kompromis między wykrywaniem klasy pozytywnej a liczbą fałszywych alarmów.
+
+Obniżenie threshold może zwiększyć recall, ale często zwiększa liczbę false positives.
+
+Podwyższenie threshold może zwiększyć precision, ale często zwiększa liczbę false negatives.
+
+Dlatego dobór threshold zależy od kosztów błędów.
