@@ -89,12 +89,14 @@ source = { editable = "demos/level_1_fundamentals/03_logistic_regression_boundar
 dependencies = [
     { name = "ml-lab-core" },
     { name = "numpy" },
+    { name = "pygame" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "ml-lab-core", editable = "packages/ml_lab_core" },
     { name = "numpy", specifier = ">=2.4.4" },
+    { name = "pygame", specifier = ">=2.6.1" },
 ]
 
 [[package]]

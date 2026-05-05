@@ -7,10 +7,12 @@ requires-python = ">=3.12"
 dependencies = [
     "ml-lab-core",
     "numpy>=2.4.4",
+    "pygame>=2.6.1",
 ]
 
 [project.scripts]
 logistic-regression-boundary-lab = "logistic_regression_boundary_lab.app:main"
+logistic-regression-boundary-lab-ui = "logistic_regression_boundary_lab.pygame_app:main"
 
 [tool.uv.sources]
 ml-lab-core = { workspace = true }

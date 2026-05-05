@@ -42,12 +42,16 @@ This demo will show a different view of classification:
 - binary cross-entropy loss,
 - probability thresholding,
 - confusion matrix counts,
-- accuracy, precision, and recall metrics.
+- accuracy, precision, and recall metrics,
 - stepwise logistic regression model,
 - gradient descent training for logistic regression,
 - probability prediction,
 - threshold-based class prediction,
-- model snapshots with loss, metrics, weights, and probabilities.
+- model snapshots with loss, metrics, weights, and probabilities,
+- basic Pygame visualization,
+- decision boundary rendering,
+- live loss history,
+- keyboard controls for learning rate, threshold, noise, and seed.
 
 ### Not implemented yet
 
@@ -63,6 +67,27 @@ This demo will show a different view of classification:
 ```bash
 uv run --package logistic-regression-boundary-lab logistic-regression-boundary-lab
 ```
+
+## How to run the UI
+
+```bash
+uv run --package logistic-regression-boundary-lab logistic-regression-boundary-lab-ui
+```
+
+| Key     | Action                          |
+| ------- | ------------------------------- |
+| `Space` | Run or pause automatic training |
+| `N`     | Perform one training step       |
+| `R`     | Reset the demo                  |
+| `Up`    | Increase learning rate          |
+| `Down`  | Decrease learning rate          |
+| `Q`     | Decrease threshold              |
+| `E`     | Increase threshold              |
+| `Left`  | Decrease data noise             |
+| `Right` | Increase data noise             |
+| `S`     | Generate a new dataset seed     |
+| `Esc`   | Quit                            |
+
 
 ## Planned controls
 
@@ -111,3 +136,4 @@ The first dataset version is synthetic and contains two 2D Gaussian-like point c
 - `class_1`.
 
 The dataset is intentionally simple because the first version of the demo should focus on probability, thresholding, and a linear decision boundary.
+
