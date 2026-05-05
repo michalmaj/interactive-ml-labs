@@ -203,3 +203,19 @@ precision >= 0.80
 - Co dzieje się z `FP` po obniżeniu `threshold`?
 - Co dzieje się z `FN` po podwyższeniu `threshold`?
 - Dlaczego sam wynik `accuracy` nie mówi wszystkiego?
+
+## Panel wyjaśnień
+
+Na dole ekranu znajduje się panel wyjaśnień.
+
+Zadanie:
+
+1. Uruchom demo.
+2. Wykonaj kilka kroków uczenia.
+3. Zmieniaj threshold klawiszami `Q` i `E`.
+4. Obserwuj komunikat w panelu wyjaśnień.
+5. Porównaj komunikat z wartościami FP, FN, precision i recall.
+
+Pytanie kontrolne:
+
+> Czy panel wyjaśnień opisuje to, co faktycznie widać w metrykach?

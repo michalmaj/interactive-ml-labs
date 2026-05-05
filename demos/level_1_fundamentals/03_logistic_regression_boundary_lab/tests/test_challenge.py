@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from logistic_regression_boundary_lab import (
     PrecisionRecallChallenge,
     PrecisionRecallChallengeConfig,

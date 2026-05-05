@@ -11,6 +11,7 @@ from ml_lab_core import AlgorithmSnapshot
 from numpy.typing import NDArray
 
 from logistic_regression_boundary_lab.challenge import PrecisionRecallChallengeResult
+from logistic_regression_boundary_lab.explanation import build_explanation_lines
 from logistic_regression_boundary_lab.probability_grid import ProbabilityGrid
 
 type FloatArray = NDArray[np.float64]
@@ -328,7 +329,10 @@ class LogisticRegressionRenderer:
                 "Precision",
                 f"{challenge_result.precision:.2f}/{challenge_result.target_precision:.2f}",
             ),
-            ("Recall", f"{challenge_result.recall:.2f}/{challenge_result.target_recall:.2f}"),
+            (
+                "Recall",
+                f"{challenge_result.recall:.2f}/{challenge_result.target_recall:.2f}",
+            ),
         ]
 
         for label, value in challenge_rows:
@@ -409,7 +413,7 @@ class LogisticRegressionRenderer:
         snapshot: AlgorithmSnapshot,
         challenge_result: PrecisionRecallChallengeResult,
     ) -> None:
-        """Draw keyboard controls and short explanation."""
+        """Draw keyboard controls and explanation lines."""
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
 
@@ -420,14 +424,17 @@ class LogisticRegressionRenderer:
 
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
 
-        explanation = _build_explanation(snapshot, challenge_result)
-        self._draw_text(
-            explanation,
-            x,
-            y + TEXT_LINE_HEIGHT,
-            self._small_font,
-            MUTED_TEXT_COLOR,
-        )
+        explanation_lines = build_explanation_lines(snapshot, challenge_result)
+        explanation_y = y + TEXT_LINE_HEIGHT
+
+        for index, line in enumerate(explanation_lines):
+            self._draw_text(
+                line,
+                x,
+                explanation_y + index * SMALL_TEXT_LINE_HEIGHT,
+                self._small_font,
+                MUTED_TEXT_COLOR,
+            )
 
     def _draw_text(
         self,
@@ -440,30 +447,6 @@ class LogisticRegressionRenderer:
         """Draw text at a fixed screen position."""
         surface = font.render(text, True, color)
         self._screen.blit(surface, (x, y))
-
-
-def _build_explanation(
-    snapshot: AlgorithmSnapshot,
-    challenge_result: PrecisionRecallChallengeResult,
-) -> str:
-    """Build a short explanation for the current model state."""
-    false_positive = int(snapshot.metrics["false_positive"])
-    false_negative = int(snapshot.metrics["false_negative"])
-
-    if challenge_result.success:
-        prefix = "Challenge completed on hidden test data."
-    else:
-        prefix = "Challenge not completed yet."
-
-    if snapshot.iteration == 0:
-        return f"{prefix} Train the model and tune threshold to balance FP/FN."
-
-    threshold = float(snapshot.metrics["threshold"])
-
-    return (
-        f"{prefix} Threshold {threshold:.2f} gives FP={false_positive} "
-        f"and FN={false_negative} on training data."
-    )
 
 
 def _bounds_from_probability_grid(probability_grid: ProbabilityGrid) -> WorldBounds:

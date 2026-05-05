@@ -13,6 +13,7 @@ from logistic_regression_boundary_lab.dataset import (
     SyntheticBinaryClassificationConfig,
     make_synthetic_binary_classification_dataset,
 )
+from logistic_regression_boundary_lab.explanation import build_explanation_lines
 from logistic_regression_boundary_lab.metrics import (
     ClassificationMetrics,
     ConfusionMatrixCounts,
@@ -42,6 +43,7 @@ __all__ = [
     "SyntheticBinaryClassificationConfig",
     "accuracy_score",
     "binary_cross_entropy",
+    "build_explanation_lines",
     "classification_metrics",
     "compute_probability_grid",
     "confusion_matrix_counts",

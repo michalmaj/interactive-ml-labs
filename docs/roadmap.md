@@ -90,7 +90,7 @@ Planned pull requests:
 - [x] Add probability background
 - [x] Add confusion matrix metrics
 - [x] Add challenge mode
-- [ ] Add explanation panel
+- [x] Add explanation panel
 - [ ] Polish demo documentation
 
 ## Phase 5 — Level 2
