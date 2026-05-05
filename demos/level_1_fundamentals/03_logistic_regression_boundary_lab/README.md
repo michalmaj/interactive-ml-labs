@@ -43,10 +43,14 @@ This demo will show a different view of classification:
 - probability thresholding,
 - confusion matrix counts,
 - accuracy, precision, and recall metrics.
+- stepwise logistic regression model,
+- gradient descent training for logistic regression,
+- probability prediction,
+- threshold-based class prediction,
+- model snapshots with loss, metrics, weights, and probabilities.
 
 ### Not implemented yet
 
-- logistic regression model,
 - decision threshold control,
 - confusion matrix metrics,
 - Pygame visualization,

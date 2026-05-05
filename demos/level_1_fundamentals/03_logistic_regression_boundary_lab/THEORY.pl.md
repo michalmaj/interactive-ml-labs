@@ -164,7 +164,27 @@ Przykład:
 - jeżeli prawdziwa klasa to `1`, model powinien dać wysokie prawdopodobieństwo,
 - jeżeli prawdziwa klasa to `0`, model powinien dać niskie prawdopodobieństwo.
 
-## 0. False positives i false negatives
+## Uczenie modelu w aktualnej implementacji
+
+Aktualna implementacja zawiera krokowy model regresji logistycznej.
+
+Model uczy trzy parametry:
+
+- `weight_1`,
+- `weight_2`,
+- `bias`.
+
+W każdym kroku uczenia:
+
+1. obliczany jest wynik liniowy,
+2. sigmoid zamienia wynik na prawdopodobieństwo,
+3. binary cross-entropy mierzy błąd,
+4. gradient descent aktualizuje wagi i bias,
+5. zapisywane są aktualne metryki.
+
+Dzięki temu późniejsza wizualizacja będzie mogła pokazać, jak granica decyzyjna przesuwa się podczas uczenia.
+
+## 10. False positives i false negatives
 
 W klasyfikacji binarnej istnieją różne typy decyzji.
 
