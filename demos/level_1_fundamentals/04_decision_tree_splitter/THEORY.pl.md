@@ -123,6 +123,30 @@ Dobry split:
 
 Drzewo wybiera split, który daje największą poprawę jakości podziału.
 
+## Information gain w implementacji
+
+Aktualna implementacja potrafi ocenić kandydacki split.
+
+Dla każdego splitu obliczane są:
+
+- nieczystość węzła przed splitem,
+- nieczystość lewego dziecka,
+- nieczystość prawego dziecka,
+- ważona nieczystość dzieci,
+- information gain.
+
+Wzór intuicyjny:
+
+```text
+information_gain = parent_impurity - weighted_child_impurity
+```
+
+Jeżeli split poprawia jakość podziału, information gain jest dodatni.
+
+Jeżeli split tworzy dzieci podobnie wymieszane jak rodzic, information gain jest niski.
+
+Algorytm może teraz wyszukać najlepszy split, czyli taki, który daje największy information gain.
+
 ### 9. Głębokość drzewa
 
 **Głębokość drzewa** określa, ile kolejnych pytań może zadać model.
