@@ -188,3 +188,25 @@ Wariant `xor` zawiera klasy rozmieszczone po przekątnych.
 W tym przypadku jeden split zwykle nie wystarcza.
 
 Taki wariant dobrze pokazuje, po co drzewo wykonuje wiele kolejnych podziałów i dlaczego głębokość drzewa ma znaczenie.
+
+## Metryki nieczystości w implementacji
+
+Aktualna implementacja zawiera:
+
+- `class_counts`,
+- `class_probabilities`,
+- `gini_impurity`,
+- `entropy_impurity`.
+
+Dla czystego węzła, w którym wszystkie próbki należą do jednej klasy, zarówno Gini, jak i entropy wynoszą `0`.
+
+Dla zbalansowanego węzła binarnego, np.:
+
+```text
+class_0: 50%
+class_1: 50%
+```
+
+Gini wynosi `0.5`, a entropy wynosi `1.0`.
+
+Te metryki będą używane w kolejnym kroku do oceny, czy dany split poprawia jakość podziału.

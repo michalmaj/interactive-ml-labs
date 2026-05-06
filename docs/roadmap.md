@@ -101,7 +101,7 @@ Planned pull requests:
 
 - [x] Add Decision Tree Splitter package skeleton
 - [x] Add synthetic classification dataset
-- [ ] Add impurity metrics: Gini and entropy
+- [x] Add impurity metrics: Gini and entropy
 - [ ] Add split scoring with information gain
 - [ ] Add manual split prototype
 - [ ] Add decision stump model

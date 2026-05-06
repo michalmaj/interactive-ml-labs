@@ -44,12 +44,14 @@ This makes decision trees a strong next step in Level 1.
 - Connection to `ml_lab_core`
 - synthetic binary classification dataset,
 - axis-aligned dataset layout,
-- XOR dataset layout.
+- XOR dataset layout,
+- class count helper,
+- class probability helper,
+- Gini impurity,
+- entropy impurity.
 
 ### Not implemented yet
 
-- Gini impurity
-- Entropy
 - Information gain
 - Best split search
 - Decision tree model
@@ -123,3 +125,14 @@ This dataset is intentionally easy for a decision stump. A single vertical split
 Two classes occupy diagonal regions.
 
 This dataset is intentionally harder. A single split is not enough, which makes it useful for explaining tree depth and recursive splitting.
+
+## Impurity metrics
+
+The demo now includes two node impurity metrics:
+
+- Gini impurity,
+- entropy.
+
+Both metrics are low when a node is pure and higher when classes are mixed.
+
+These functions will be used in the next step to score candidate splits and compute information gain.
