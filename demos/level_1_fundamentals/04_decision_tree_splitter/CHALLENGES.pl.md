@@ -107,3 +107,23 @@ Demo będzie korzystać z dwóch wariantów danych:
 Pytanie kontrolne:
 
 > Dlaczego dataset XOR pokazuje ograniczenia pojedynczego splitu?
+
+## Metryki nieczystości
+
+Aktualna wersja zawiera już funkcje liczące Gini impurity i entropy.
+
+Zadanie koncepcyjne:
+
+Porównaj trzy węzły:
+
+```text
+A: [class_0, class_0, class_0, class_0]
+B: [class_0, class_0, class_1, class_1]
+C: [class_0, class_0, class_0, class_1]
+```
+
+Odpowiedz:
+
+- Który węzeł jest najczystszy?
+- Który węzeł jest najbardziej wymieszany?
+- Dlaczego split powinien zmniejszać nieczystość?

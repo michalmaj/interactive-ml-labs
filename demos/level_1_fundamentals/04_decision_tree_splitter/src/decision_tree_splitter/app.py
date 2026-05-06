@@ -11,14 +11,18 @@ from decision_tree_splitter.dataset import (
     SyntheticDecisionTreeDatasetConfig,
     make_synthetic_decision_tree_dataset,
 )
+from decision_tree_splitter.impurity import (
+    entropy_impurity,
+    gini_impurity,
+)
 
 
 def main() -> None:
     """Run a minimal command-line version of the demo.
 
     The interactive implementation will be added in later pull requests.
-    This entry point verifies that the package can generate datasets and use
-    shared utilities from `ml_lab_core`.
+    This entry point verifies that the package can generate datasets and compute
+    basic node impurity metrics.
     """
     axis_dataset = make_synthetic_decision_tree_dataset(
         SyntheticDecisionTreeDatasetConfig(dataset_kind=DATASET_KIND_AXIS_ALIGNED),
@@ -42,6 +46,10 @@ def main() -> None:
     history.add("axis_class_1_count", float(axis_class_counts[1]))
     history.add("xor_class_0_count", float(xor_class_counts[0]))
     history.add("xor_class_1_count", float(xor_class_counts[1]))
+    history.add("axis_gini", gini_impurity(axis_targets))
+    history.add("axis_entropy", entropy_impurity(axis_targets))
+    history.add("xor_gini", gini_impurity(xor_targets))
+    history.add("xor_entropy", entropy_impurity(xor_targets))
 
     print("Decision Tree Splitter")
     print("Synthetic classification datasets generated successfully.")
@@ -49,7 +57,11 @@ def main() -> None:
     print(f"Axis-aligned targets shape: {axis_targets.shape}")
     print(f"Axis-aligned class 0 count: {history.latest('axis_class_0_count'):.0f}")
     print(f"Axis-aligned class 1 count: {history.latest('axis_class_1_count'):.0f}")
+    print(f"Axis-aligned root Gini: {history.latest('axis_gini'):.3f}")
+    print(f"Axis-aligned root entropy: {history.latest('axis_entropy'):.3f}")
     print(f"XOR features shape: {xor_features.shape}")
     print(f"XOR targets shape: {xor_targets.shape}")
     print(f"XOR class 0 count: {history.latest('xor_class_0_count'):.0f}")
     print(f"XOR class 1 count: {history.latest('xor_class_1_count'):.0f}")
+    print(f"XOR root Gini: {history.latest('xor_gini'):.3f}")
+    print(f"XOR root entropy: {history.latest('xor_entropy'):.3f}")
