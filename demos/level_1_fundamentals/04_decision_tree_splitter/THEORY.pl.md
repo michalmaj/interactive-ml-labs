@@ -168,3 +168,23 @@ Nie dokładnie. Klasyczne drzewo tworzy podziały osiowe, czyli pionowe lub pozi
 #### Błąd 4: interpretowalność zawsze zostaje zachowana
 
 Nie zawsze. Małe drzewo jest czytelne, ale bardzo głębokie drzewo może być trudne do interpretacji.
+
+## Dane syntetyczne w demo
+
+Demo zawiera dwa warianty syntetycznych danych 2D.
+
+### Axis-aligned
+
+Wariant `axis_aligned` zawiera dwie klasy rozmieszczone głównie po lewej i prawej stronie przestrzeni.
+
+Przy małym szumie jeden pionowy split może dobrze rozdzielić klasy.
+
+Ten wariant jest dobry do pokazania pierwszego splitu i działania decision stump.
+
+### XOR
+
+Wariant `xor` zawiera klasy rozmieszczone po przekątnych.
+
+W tym przypadku jeden split zwykle nie wystarcza.
+
+Taki wariant dobrze pokazuje, po co drzewo wykonuje wiele kolejnych podziałów i dlaczego głębokość drzewa ma znaczenie.

@@ -94,3 +94,16 @@ Znajdź najmniejsze drzewo, które osiąga dobrą klasyfikację.
 8. Dlaczego ograniczenie `max depth` może pomagać?
 9. Czym **decision tree** różni się od **logistic regression**?
 10. Czym **decision tree** różni się od **k-NN**?
+
+Aktualna wersja generuje już syntetyczne zbiory danych dla drzewa decyzyjnego, ale nie zawiera jeszcze metryk splitu, modelu ani wizualizacji Pygame.
+
+## Planowane warianty danych
+
+Demo będzie korzystać z dwóch wariantów danych:
+
+- `axis_aligned` — łatwy wariant, w którym jeden pionowy split może dobrze działać,
+- `xor` — trudniejszy wariant, w którym potrzeba kilku splitów.
+
+Pytanie kontrolne:
+
+> Dlaczego dataset XOR pokazuje ograniczenia pojedynczego splitu?
