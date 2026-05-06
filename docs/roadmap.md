@@ -100,7 +100,7 @@ Goal: implement the fourth interactive demo focused on interpretable rule-based 
 Planned pull requests:
 
 - [x] Add Decision Tree Splitter package skeleton
-- [ ] Add synthetic classification dataset
+- [x] Add synthetic classification dataset
 - [ ] Add impurity metrics: Gini and entropy
 - [ ] Add split scoring with information gain
 - [ ] Add manual split prototype

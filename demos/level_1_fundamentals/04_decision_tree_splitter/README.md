@@ -42,10 +42,12 @@ This makes decision trees a strong next step in Level 1.
 - Command-line placeholder
 - Smoke test
 - Connection to `ml_lab_core`
+- synthetic binary classification dataset,
+- axis-aligned dataset layout,
+- XOR dataset layout.
 
 ### Not implemented yet
 
-- Synthetic classification dataset
 - Gini impurity
 - Entropy
 - Information gain
@@ -104,3 +106,20 @@ Students should learn:
 - Underfitting
 - Pruning
 - Interpretability
+
+
+## Dataset variants
+
+The demo starts with two synthetic dataset variants:
+
+### `axis_aligned`
+
+Two classes are placed mostly on opposite sides of the `x1` axis.
+
+This dataset is intentionally easy for a decision stump. A single vertical split can work well when noise is low.
+
+### `xor`
+
+Two classes occupy diagonal regions.
+
+This dataset is intentionally harder. A single split is not enough, which makes it useful for explaining tree depth and recursive splitting.

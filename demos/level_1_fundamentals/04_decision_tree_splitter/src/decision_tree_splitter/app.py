@@ -2,21 +2,54 @@
 
 from __future__ import annotations
 
+import numpy as np
 from ml_lab_core import MetricsHistory
+
+from decision_tree_splitter.dataset import (
+    DATASET_KIND_AXIS_ALIGNED,
+    DATASET_KIND_XOR,
+    SyntheticDecisionTreeDatasetConfig,
+    make_synthetic_decision_tree_dataset,
+)
 
 
 def main() -> None:
-    """Run a minimal placeholder version of the demo.
+    """Run a minimal command-line version of the demo.
 
-    The real interactive implementation will be added in later pull requests.
-    This entry point verifies that the package is correctly connected to the
-    workspace and can use shared utilities from `ml_lab_core`.
+    The interactive implementation will be added in later pull requests.
+    This entry point verifies that the package can generate datasets and use
+    shared utilities from `ml_lab_core`.
     """
+    axis_dataset = make_synthetic_decision_tree_dataset(
+        SyntheticDecisionTreeDatasetConfig(dataset_kind=DATASET_KIND_AXIS_ALIGNED),
+    )
+    xor_dataset = make_synthetic_decision_tree_dataset(
+        SyntheticDecisionTreeDatasetConfig(dataset_kind=DATASET_KIND_XOR),
+    )
+
+    axis_features = np.asarray(axis_dataset.features, dtype=float)
+    axis_targets = np.asarray(axis_dataset.targets, dtype=int)
+    xor_features = np.asarray(xor_dataset.features, dtype=float)
+    xor_targets = np.asarray(xor_dataset.targets, dtype=int)
+
+    axis_class_counts = np.bincount(axis_targets, minlength=2)
+    xor_class_counts = np.bincount(xor_targets, minlength=2)
+
     history = MetricsHistory()
-    history.add("placeholder_gini", 0.5)
-    history.add("placeholder_depth", 0.0)
+    history.add("axis_sample_count", float(axis_features.shape[0]))
+    history.add("xor_sample_count", float(xor_features.shape[0]))
+    history.add("axis_class_0_count", float(axis_class_counts[0]))
+    history.add("axis_class_1_count", float(axis_class_counts[1]))
+    history.add("xor_class_0_count", float(xor_class_counts[0]))
+    history.add("xor_class_1_count", float(xor_class_counts[1]))
 
     print("Decision Tree Splitter")
-    print("Package skeleton is configured correctly.")
-    print(f"Placeholder Gini impurity: {history.latest('placeholder_gini'):.2f}")
-    print(f"Placeholder tree depth: {history.latest('placeholder_depth'):.0f}")
+    print("Synthetic classification datasets generated successfully.")
+    print(f"Axis-aligned features shape: {axis_features.shape}")
+    print(f"Axis-aligned targets shape: {axis_targets.shape}")
+    print(f"Axis-aligned class 0 count: {history.latest('axis_class_0_count'):.0f}")
+    print(f"Axis-aligned class 1 count: {history.latest('axis_class_1_count'):.0f}")
+    print(f"XOR features shape: {xor_features.shape}")
+    print(f"XOR targets shape: {xor_targets.shape}")
+    print(f"XOR class 0 count: {history.latest('xor_class_0_count'):.0f}")
+    print(f"XOR class 1 count: {history.latest('xor_class_1_count'):.0f}")
