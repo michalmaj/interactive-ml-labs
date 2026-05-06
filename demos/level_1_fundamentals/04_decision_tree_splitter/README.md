@@ -48,12 +48,14 @@ This makes decision trees a strong next step in Level 1.
 - class count helper,
 - class probability helper,
 - Gini impurity,
-- entropy impurity.
+- entropy impurity,
+- split candidate representation,
+- split evaluation with weighted child impurity,
+- information gain,
+- best split search.
 
 ### Not implemented yet
 
-- Information gain
-- Best split search
 - Decision tree model
 - Manual split mode
 - Pygame visualization
