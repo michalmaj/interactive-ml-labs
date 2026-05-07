@@ -15,6 +15,10 @@ from decision_tree_splitter.impurity import (
     entropy_impurity,
     gini_impurity,
 )
+from decision_tree_splitter.manual_split import (
+    ManualSplitConfig,
+    ManualSplitPrototype,
+)
 from decision_tree_splitter.split import best_split
 
 
@@ -23,7 +27,7 @@ def main() -> None:
 
     The interactive implementation will be added in later pull requests.
     This entry point verifies that the package can generate datasets, compute
-    impurity metrics, and find the best first split.
+    impurity metrics, find the best first split, and evaluate a manual split.
     """
     axis_dataset = make_synthetic_decision_tree_dataset(
         SyntheticDecisionTreeDatasetConfig(dataset_kind=DATASET_KIND_AXIS_ALIGNED),
@@ -43,6 +47,24 @@ def main() -> None:
     axis_best_split = best_split(axis_features, axis_targets)
     xor_best_split = best_split(xor_features, xor_targets)
 
+    axis_manual = ManualSplitPrototype(
+        ManualSplitConfig(
+            feature_index=0,
+            threshold=0.0,
+            criterion="gini",
+        ),
+    )
+    xor_manual = ManualSplitPrototype(
+        ManualSplitConfig(
+            feature_index=0,
+            threshold=0.0,
+            criterion="gini",
+        ),
+    )
+
+    axis_manual_snapshot = axis_manual.reset(axis_dataset)
+    xor_manual_snapshot = xor_manual.reset(xor_dataset)
+
     history = MetricsHistory()
     history.add("axis_sample_count", float(axis_features.shape[0]))
     history.add("xor_sample_count", float(xor_features.shape[0]))
@@ -56,6 +78,8 @@ def main() -> None:
     history.add("xor_entropy", entropy_impurity(xor_targets))
     history.add("axis_best_gain", axis_best_split.information_gain)
     history.add("xor_best_gain", xor_best_split.information_gain)
+    history.add("axis_manual_gain", float(axis_manual_snapshot.metrics["information_gain"]))
+    history.add("xor_manual_gain", float(xor_manual_snapshot.metrics["information_gain"]))
 
     print("Decision Tree Splitter")
     print("Synthetic classification datasets generated successfully.")
@@ -66,6 +90,12 @@ def main() -> None:
     print(f"Axis-aligned class 1 count: {history.latest('axis_class_1_count'):.0f}")
     print(f"Axis-aligned root Gini: {history.latest('axis_gini'):.3f}")
     print(f"Axis-aligned root entropy: {history.latest('axis_entropy'):.3f}")
+    print(
+        "Axis-aligned manual split: "
+        f"x{int(axis_manual_snapshot.metrics['feature_index']) + 1} <= "
+        f"{float(axis_manual_snapshot.metrics['threshold']):.3f}, "
+        f"gain={history.latest('axis_manual_gain'):.3f}",
+    )
     print(
         "Axis-aligned best split: "
         f"x{axis_best_split.candidate.feature_index + 1} <= "
@@ -79,6 +109,12 @@ def main() -> None:
     print(f"XOR class 1 count: {history.latest('xor_class_1_count'):.0f}")
     print(f"XOR root Gini: {history.latest('xor_gini'):.3f}")
     print(f"XOR root entropy: {history.latest('xor_entropy'):.3f}")
+    print(
+        "XOR manual split: "
+        f"x{int(xor_manual_snapshot.metrics['feature_index']) + 1} <= "
+        f"{float(xor_manual_snapshot.metrics['threshold']):.3f}, "
+        f"gain={history.latest('xor_manual_gain'):.3f}",
+    )
     print(
         "XOR best split: "
         f"x{xor_best_split.candidate.feature_index + 1} <= "

@@ -52,12 +52,13 @@ This makes decision trees a strong next step in Level 1.
 - split candidate representation,
 - split evaluation with weighted child impurity,
 - information gain,
-- best split search.
+- best split search,
+- manual split prototype,
+- manual split snapshots with left/right masks,
+- manual split metrics and annotations.
 
 ### Not implemented yet
 
-- Decision tree model
-- Manual split mode
 - Pygame visualization
 - Keyboard controls
 - Challenge mode
@@ -138,3 +139,18 @@ The demo now includes two node impurity metrics:
 Both metrics are low when a node is pure and higher when classes are mixed.
 
 These functions will be used in the next step to score candidate splits and compute information gain.
+
+## Manual split prototype
+
+The demo now includes a manual split prototype.
+
+A selected split is evaluated with:
+
+- parent impurity,
+- left child impurity,
+- right child impurity,
+- weighted child impurity,
+- information gain,
+- left and right sample counts.
+
+This prototype will later be connected to the Pygame UI, where students will be able to move a split line and compare their split with the algorithm-selected best split.

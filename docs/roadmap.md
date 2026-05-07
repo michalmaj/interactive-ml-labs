@@ -103,7 +103,7 @@ Planned pull requests:
 - [x] Add synthetic classification dataset
 - [x] Add impurity metrics: Gini and entropy
 - [x] Add split scoring with information gain
-- [ ] Add manual split prototype
+- [x] Add manual split prototype
 - [ ] Add decision stump model
 - [ ] Add recursive decision tree model
 - [ ] Add CLI prototype
