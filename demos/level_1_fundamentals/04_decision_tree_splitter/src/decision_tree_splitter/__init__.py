@@ -12,6 +12,10 @@ from decision_tree_splitter.impurity import (
     entropy_impurity,
     gini_impurity,
 )
+from decision_tree_splitter.manual_split import (
+    ManualSplitConfig,
+    ManualSplitPrototype,
+)
 from decision_tree_splitter.split import (
     SplitCandidate,
     SplitEvaluation,
@@ -23,6 +27,8 @@ from decision_tree_splitter.split import (
 __all__ = [
     "DATASET_KIND_AXIS_ALIGNED",
     "DATASET_KIND_XOR",
+    "ManualSplitConfig",
+    "ManualSplitPrototype",
     "SplitCandidate",
     "SplitEvaluation",
     "SyntheticDecisionTreeDatasetConfig",
