@@ -104,8 +104,8 @@ Planned pull requests:
 - [x] Add impurity metrics: Gini and entropy
 - [x] Add split scoring with information gain
 - [x] Add manual split prototype
-- [ ] Add decision stump model
-- [ ] Add recursive decision tree model
+- [x] Add decision stump model
+- [x] Add recursive decision tree model
 - [ ] Add CLI prototype
 - [ ] Add Pygame visualization
 - [ ] Add manual split mode

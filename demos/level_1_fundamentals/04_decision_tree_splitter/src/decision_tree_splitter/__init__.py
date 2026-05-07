@@ -28,15 +28,23 @@ from decision_tree_splitter.stump import (
     DecisionStumpConfig,
     LeafPrediction,
 )
+from decision_tree_splitter.tree import (
+    DecisionTreeConfig,
+    DecisionTreeNode,
+    RecursiveDecisionTree,
+)
 
 __all__ = [
     "DATASET_KIND_AXIS_ALIGNED",
     "DATASET_KIND_XOR",
     "DecisionStump",
     "DecisionStumpConfig",
+    "DecisionTreeConfig",
+    "DecisionTreeNode",
     "LeafPrediction",
     "ManualSplitConfig",
     "ManualSplitPrototype",
+    "RecursiveDecisionTree",
     "SplitCandidate",
     "SplitEvaluation",
     "SyntheticDecisionTreeDatasetConfig",

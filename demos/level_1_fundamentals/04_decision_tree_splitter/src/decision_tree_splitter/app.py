@@ -21,6 +21,12 @@ from decision_tree_splitter.manual_split import (
 )
 from decision_tree_splitter.split import SplitEvaluation, best_split
 from decision_tree_splitter.stump import DecisionStump
+from decision_tree_splitter.tree import (
+    DecisionTreeConfig,
+    RecursiveDecisionTree,
+)
+
+DEMO_TREE_MAX_DEPTH: int = 2
 
 
 def main() -> None:
@@ -28,7 +34,8 @@ def main() -> None:
 
     The interactive implementation will be added in later pull requests.
     This entry point verifies that the package can generate datasets, compute
-    impurity metrics, evaluate manual splits, and fit a decision stump.
+    impurity metrics, evaluate manual splits, fit a stump, and fit a recursive
+    decision tree.
     """
     axis_report = _build_dataset_report(DATASET_KIND_AXIS_ALIGNED)
     xor_report = _build_dataset_report(DATASET_KIND_XOR)
@@ -51,6 +58,7 @@ def _build_dataset_report(dataset_kind: str) -> dict[str, object]:
 
     manual_snapshot = _make_manual_split_snapshot(dataset)
     stump_snapshot = _make_stump_snapshot(dataset)
+    tree_snapshot = _make_tree_snapshot(dataset)
     split_evaluation = best_split(features, targets)
 
     history = MetricsHistory()
@@ -61,6 +69,9 @@ def _build_dataset_report(dataset_kind: str) -> dict[str, object]:
     history.add("manual_gain", float(manual_snapshot.metrics["information_gain"]))
     history.add("best_gain", split_evaluation.information_gain)
     history.add("stump_accuracy", float(stump_snapshot.metrics["training_accuracy"]))
+    history.add("tree_accuracy", float(tree_snapshot.metrics["training_accuracy"]))
+    history.add("tree_node_count", float(tree_snapshot.metrics["node_count"]))
+    history.add("tree_leaf_count", float(tree_snapshot.metrics["leaf_count"]))
 
     return {
         "features_shape": features.shape,
@@ -74,13 +85,22 @@ def _build_dataset_report(dataset_kind: str) -> dict[str, object]:
         "manual_gain": history.latest("manual_gain"),
         "best_gain": history.latest("best_gain"),
         "stump_accuracy": history.latest("stump_accuracy"),
+        "tree_accuracy": history.latest("tree_accuracy"),
+        "tree_node_count": history.latest("tree_node_count"),
+        "tree_leaf_count": history.latest("tree_leaf_count"),
     }
 
 
 def _print_dataset_report(label: str, report: dict[str, object]) -> None:
     """Print one dataset report."""
-    manual_snapshot = _get_report_value(report, "manual_snapshot", AlgorithmSnapshot)
-    best = _get_report_value(report, "best_split", SplitEvaluation)
+    manual_snapshot = report["manual_snapshot"]
+    best = report["best_split"]
+
+    if not isinstance(manual_snapshot, AlgorithmSnapshot):
+        raise TypeError("manual_snapshot has unexpected type.")
+
+    if not isinstance(best, SplitEvaluation):
+        raise TypeError("best_split has unexpected type.")
 
     print(f"{label} features shape: {report['features_shape']}")
     print(f"{label} targets shape: {report['targets_shape']}")
@@ -101,17 +121,9 @@ def _print_dataset_report(label: str, report: dict[str, object]) -> None:
         f"gain={float(report['best_gain']):.3f}",
     )
     print(f"{label} stump training accuracy: {float(report['stump_accuracy']):.3f}")
-
-
-def _get_report_value[T](report: dict[str, object], key: str, expected_type: type[T]) -> T:
-    """Get and type-check a report value."""
-    value = report[key]
-
-    if not isinstance(value, expected_type):
-        msg = f"Report value {key!r} has unexpected type."
-        raise TypeError(msg)
-
-    return value
+    print(f"{label} tree training accuracy: {float(report['tree_accuracy']):.3f}")
+    print(f"{label} tree nodes: {float(report['tree_node_count']):.0f}")
+    print(f"{label} tree leaves: {float(report['tree_leaf_count']):.0f}")
 
 
 def _make_manual_split_snapshot(dataset: DatasetSnapshot) -> AlgorithmSnapshot:
@@ -132,3 +144,14 @@ def _make_stump_snapshot(dataset: DatasetSnapshot) -> AlgorithmSnapshot:
     stump = DecisionStump()
 
     return stump.reset(dataset)
+
+
+def _make_tree_snapshot(dataset: DatasetSnapshot) -> AlgorithmSnapshot:
+    """Create a recursive decision tree snapshot for CLI reporting."""
+    tree = RecursiveDecisionTree(
+        DecisionTreeConfig(
+            max_depth=DEMO_TREE_MAX_DEPTH,
+        ),
+    )
+
+    return tree.reset(dataset)
