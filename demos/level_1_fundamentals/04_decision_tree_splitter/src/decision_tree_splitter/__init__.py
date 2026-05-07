@@ -23,10 +23,18 @@ from decision_tree_splitter.split import (
     evaluate_split,
     generate_split_candidates,
 )
+from decision_tree_splitter.stump import (
+    DecisionStump,
+    DecisionStumpConfig,
+    LeafPrediction,
+)
 
 __all__ = [
     "DATASET_KIND_AXIS_ALIGNED",
     "DATASET_KIND_XOR",
+    "DecisionStump",
+    "DecisionStumpConfig",
+    "LeafPrediction",
     "ManualSplitConfig",
     "ManualSplitPrototype",
     "SplitCandidate",
