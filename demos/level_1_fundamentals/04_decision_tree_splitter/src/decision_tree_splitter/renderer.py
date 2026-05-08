@@ -15,10 +15,14 @@ from decision_tree_splitter.tree import DecisionTreeNode
 
 type FloatArray = NDArray[np.float64]
 type IntArray = NDArray[np.int_]
+type BoolArray = NDArray[np.bool_]
 
 WINDOW_WIDTH: Final[int] = 1120
 WINDOW_HEIGHT: Final[int] = 740
 WINDOW_SIZE: Final[tuple[int, int]] = (WINDOW_WIDTH, WINDOW_HEIGHT)
+
+MODE_AUTO_TREE: Final[str] = "auto_tree"
+MODE_MANUAL_SPLIT: Final[str] = "manual_split"
 
 BACKGROUND_COLOR: Final[tuple[int, int, int]] = (245, 247, 250)
 PANEL_COLOR: Final[tuple[int, int, int]] = (255, 255, 255)
@@ -29,6 +33,7 @@ CLASS_ONE_COLOR: Final[tuple[int, int, int]] = (235, 130, 60)
 CLASS_ZERO_REGION_COLOR: Final[tuple[int, int, int]] = (226, 238, 255)
 CLASS_ONE_REGION_COLOR: Final[tuple[int, int, int]] = (255, 235, 220)
 SPLIT_COLOR: Final[tuple[int, int, int]] = (35, 35, 35)
+MANUAL_SPLIT_COLOR: Final[tuple[int, int, int]] = (110, 70, 190)
 AXIS_COLOR: Final[tuple[int, int, int]] = (180, 185, 190)
 ERROR_COLOR: Final[tuple[int, int, int]] = (190, 60, 60)
 
@@ -93,14 +98,24 @@ class DecisionTreeRenderer:
         dataset_kind: str,
         noise_std: float,
         seed: int,
+        mode: str,
+        manual_snapshot: AlgorithmSnapshot | None,
+        manual_error: str | None,
+        manual_feature_index: int,
+        manual_threshold: float,
     ) -> None:
         """Draw the full frame.
 
         Args:
-            snapshot: Current decision tree snapshot.
+            snapshot: Current recursive decision tree snapshot.
             dataset_kind: Current synthetic dataset kind.
             noise_std: Current dataset noise standard deviation.
             seed: Current dataset seed.
+            mode: Current UI mode.
+            manual_snapshot: Manual split snapshot if valid.
+            manual_error: Manual split error if the selected split is invalid.
+            manual_feature_index: Current manual split feature.
+            manual_threshold: Current manual split threshold.
         """
         self._screen.fill(BACKGROUND_COLOR)
 
@@ -108,14 +123,23 @@ class DecisionTreeRenderer:
         self._draw_panel(SIDE_RECT)
         self._draw_panel(BOTTOM_RECT)
 
-        self._draw_main_plot(snapshot)
+        if mode == MODE_MANUAL_SPLIT:
+            self._draw_manual_plot(snapshot, manual_snapshot, manual_error)
+        else:
+            self._draw_tree_plot(snapshot)
+
         self._draw_side_panel(
             snapshot,
             dataset_kind=dataset_kind,
             noise_std=noise_std,
             seed=seed,
+            mode=mode,
+            manual_snapshot=manual_snapshot,
+            manual_error=manual_error,
+            manual_feature_index=manual_feature_index,
+            manual_threshold=manual_threshold,
         )
-        self._draw_bottom_panel(snapshot)
+        self._draw_bottom_panel(snapshot, mode=mode, manual_error=manual_error)
 
         pygame.display.flip()
 
@@ -128,16 +152,12 @@ class DecisionTreeRenderer:
             border_radius=PANEL_RADIUS,
         )
 
-    def _draw_main_plot(self, snapshot: AlgorithmSnapshot) -> None:
+    def _draw_tree_plot(self, snapshot: AlgorithmSnapshot) -> None:
         """Draw tree regions, split lines, and data points."""
         features = np.asarray(snapshot.visual_state["features"], dtype=float)
         targets = np.asarray(snapshot.visual_state["targets"], dtype=int)
         predictions = np.asarray(snapshot.visual_state["predictions"], dtype=int)
-        root = snapshot.visual_state["root"]
-
-        if not isinstance(root, DecisionTreeNode):
-            msg = "snapshot.visual_state['root'] must be a DecisionTreeNode."
-            raise TypeError(msg)
+        root = _extract_root(snapshot)
 
         bounds = _compute_world_bounds(features)
 
@@ -147,7 +167,70 @@ class DecisionTreeRenderer:
         self._draw_points(features, targets, predictions, bounds)
 
         self._draw_text(
-            "Decision regions and splits",
+            "Automatic recursive tree",
+            MAIN_RECT.left + PADDING,
+            MAIN_RECT.top + 18,
+            self._font,
+            TEXT_COLOR,
+        )
+
+    def _draw_manual_plot(
+        self,
+        tree_snapshot: AlgorithmSnapshot,
+        manual_snapshot: AlgorithmSnapshot | None,
+        manual_error: str | None,
+    ) -> None:
+        """Draw manual split regions and data points."""
+        features = np.asarray(tree_snapshot.visual_state["features"], dtype=float)
+        targets = np.asarray(tree_snapshot.visual_state["targets"], dtype=int)
+        bounds = _compute_world_bounds(features)
+
+        if manual_snapshot is None:
+            self._draw_axes(bounds)
+            predictions = np.asarray(tree_snapshot.visual_state["predictions"], dtype=int)
+            self._draw_points(features, targets, predictions, bounds)
+            self._draw_manual_title(manual_error)
+            return
+
+        candidate = manual_snapshot.visual_state["candidate"]
+        if not isinstance(candidate, SplitCandidate):
+            msg = "manual_snapshot.visual_state['candidate'] must be a SplitCandidate."
+            raise TypeError(msg)
+
+        left_mask = np.asarray(manual_snapshot.visual_state["left_mask"], dtype=bool)
+        right_mask = np.asarray(manual_snapshot.visual_state["right_mask"], dtype=bool)
+
+        left_prediction = _majority_prediction(targets[left_mask])
+        right_prediction = _majority_prediction(targets[right_mask])
+        predictions = _manual_predictions(
+            targets=targets,
+            left_mask=left_mask,
+            right_mask=right_mask,
+            left_prediction=left_prediction,
+            right_prediction=right_prediction,
+        )
+
+        left_bounds, right_bounds = _split_bounds(bounds, candidate)
+        self._draw_region(left_bounds, bounds, left_prediction)
+        self._draw_region(right_bounds, bounds, right_prediction)
+        self._draw_axes(bounds)
+        self._draw_one_split_line(
+            candidate,
+            bounds,
+            bounds,
+            color=MANUAL_SPLIT_COLOR,
+        )
+        self._draw_points(features, targets, predictions, bounds)
+        self._draw_manual_title(manual_error)
+
+    def _draw_manual_title(self, manual_error: str | None) -> None:
+        """Draw manual split plot title."""
+        title = "Manual split mode"
+        if manual_error is not None:
+            title = "Manual split mode — invalid split"
+
+        self._draw_text(
+            title,
             MAIN_RECT.left + PADDING,
             MAIN_RECT.top + 18,
             self._font,
@@ -162,9 +245,7 @@ class DecisionTreeRenderer:
     ) -> None:
         """Draw colored rectangular regions for leaf predictions."""
         if node.is_leaf:
-            color = REGION_COLORS.get(node.prediction, BACKGROUND_COLOR)
-            rect = _world_bounds_to_screen_rect(node_bounds, global_bounds, MAIN_RECT)
-            pygame.draw.rect(self._screen, color, rect)
+            self._draw_region(node_bounds, global_bounds, node.prediction)
             return
 
         assert node.split_evaluation is not None
@@ -178,6 +259,17 @@ class DecisionTreeRenderer:
 
         self._draw_leaf_regions(node.left, left_bounds, global_bounds)
         self._draw_leaf_regions(node.right, right_bounds, global_bounds)
+
+    def _draw_region(
+        self,
+        region_bounds: WorldBounds,
+        global_bounds: WorldBounds,
+        prediction: int,
+    ) -> None:
+        """Draw one colored decision region."""
+        color = REGION_COLORS.get(prediction, BACKGROUND_COLOR)
+        rect = _world_bounds_to_screen_rect(region_bounds, global_bounds, MAIN_RECT)
+        pygame.draw.rect(self._screen, color, rect)
 
     def _draw_split_lines(
         self,
@@ -194,7 +286,7 @@ class DecisionTreeRenderer:
         assert node.right is not None
 
         candidate = node.split_evaluation.candidate
-        self._draw_one_split_line(candidate, node_bounds, global_bounds)
+        self._draw_one_split_line(candidate, node_bounds, global_bounds, color=SPLIT_COLOR)
 
         left_bounds, right_bounds = _split_bounds(node_bounds, candidate)
         self._draw_split_lines(node.left, left_bounds, global_bounds)
@@ -205,6 +297,8 @@ class DecisionTreeRenderer:
         candidate: SplitCandidate,
         node_bounds: WorldBounds,
         global_bounds: WorldBounds,
+        *,
+        color: tuple[int, int, int],
     ) -> None:
         """Draw one vertical or horizontal split line."""
         threshold = candidate.threshold
@@ -216,7 +310,7 @@ class DecisionTreeRenderer:
             start = _world_to_screen(node_bounds.x_min, threshold, global_bounds, MAIN_RECT)
             end = _world_to_screen(node_bounds.x_max, threshold, global_bounds, MAIN_RECT)
 
-        pygame.draw.line(self._screen, SPLIT_COLOR, start, end, SPLIT_WIDTH)
+        pygame.draw.line(self._screen, color, start, end, SPLIT_WIDTH)
 
     def _draw_axes(self, bounds: WorldBounds) -> None:
         """Draw x=0 and y=0 axes when visible."""
@@ -274,15 +368,21 @@ class DecisionTreeRenderer:
         dataset_kind: str,
         noise_std: float,
         seed: int,
+        mode: str,
+        manual_snapshot: AlgorithmSnapshot | None,
+        manual_error: str | None,
+        manual_feature_index: int,
+        manual_threshold: float,
     ) -> None:
         """Draw metrics and current controls."""
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 22
 
         self._draw_text("Decision tree", x, y, self._title_font, TEXT_COLOR)
-        y += 46
+        y += 44
 
         rows = [
+            ("Mode", mode),
             ("Dataset", dataset_kind),
             ("Criterion", str(snapshot.metrics["criterion"])),
             ("Max depth", f"{float(snapshot.metrics['max_depth']):.0f}"),
@@ -290,7 +390,6 @@ class DecisionTreeRenderer:
             ("Accuracy", f"{float(snapshot.metrics['training_accuracy']):.3f}"),
             ("Nodes", f"{float(snapshot.metrics['node_count']):.0f}"),
             ("Leaves", f"{float(snapshot.metrics['leaf_count']):.0f}"),
-            ("Root impurity", f"{float(snapshot.metrics['root_impurity']):.3f}"),
             ("Noise", f"{noise_std:.2f}"),
             ("Seed", str(seed)),
         ]
@@ -300,15 +399,68 @@ class DecisionTreeRenderer:
             self._draw_text(str(value), x + 130, y, self._small_font, TEXT_COLOR)
             y += SMALL_TEXT_LINE_HEIGHT
 
-        y += 12
-        self._draw_root_split(snapshot, x, y)
+        y += 10
+
+        if mode == MODE_MANUAL_SPLIT:
+            self._draw_manual_split_panel(
+                manual_snapshot,
+                manual_error=manual_error,
+                feature_index=manual_feature_index,
+                threshold=manual_threshold,
+                x=x,
+                y=y,
+            )
+        else:
+            self._draw_root_split(snapshot, x, y)
+
+    def _draw_manual_split_panel(
+        self,
+        manual_snapshot: AlgorithmSnapshot | None,
+        *,
+        manual_error: str | None,
+        feature_index: int,
+        threshold: float,
+        x: int,
+        y: int,
+    ) -> None:
+        """Draw manual split metrics."""
+        self._draw_text("Manual split", x, y, self._font, TEXT_COLOR)
+        y += 28
+
+        rows = [
+            ("Rule", f"x{feature_index + 1} <= {threshold:.3f}"),
+        ]
+
+        if manual_snapshot is None:
+            rows.append(("Status", "invalid"))
+        else:
+            rows.extend(
+                [
+                    ("Status", "valid"),
+                    ("Gain", f"{float(manual_snapshot.metrics['information_gain']):.4f}"),
+                    ("Parent imp.", f"{float(manual_snapshot.metrics['parent_impurity']):.3f}"),
+                    ("Left imp.", f"{float(manual_snapshot.metrics['left_impurity']):.3f}"),
+                    ("Right imp.", f"{float(manual_snapshot.metrics['right_impurity']):.3f}"),
+                ],
+            )
+
+        for label, value in rows:
+            self._draw_text(f"{label}:", x, y, self._small_font, MUTED_TEXT_COLOR)
+            self._draw_text(value, x + 100, y, self._small_font, TEXT_COLOR)
+            y += SMALL_TEXT_LINE_HEIGHT
+
+        if manual_error is not None:
+            self._draw_text(
+                manual_error[:32],
+                x,
+                y,
+                self._small_font,
+                ERROR_COLOR,
+            )
 
     def _draw_root_split(self, snapshot: AlgorithmSnapshot, x: int, y: int) -> None:
         """Draw root split summary."""
-        root = snapshot.visual_state["root"]
-
-        if not isinstance(root, DecisionTreeNode):
-            return
+        root = _extract_root(snapshot)
 
         self._draw_text("Root split", x, y, self._font, TEXT_COLOR)
         y += 28
@@ -330,18 +482,24 @@ class DecisionTreeRenderer:
             self._draw_text(value, x + 100, y, self._small_font, TEXT_COLOR)
             y += SMALL_TEXT_LINE_HEIGHT
 
-    def _draw_bottom_panel(self, snapshot: AlgorithmSnapshot) -> None:
+    def _draw_bottom_panel(
+        self,
+        snapshot: AlgorithmSnapshot,
+        *,
+        mode: str,
+        manual_error: str | None,
+    ) -> None:
         """Draw keyboard controls and explanation."""
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
 
         controls = (
-            "D: dataset   G: criterion   Up/Down: max depth   "
-            "Left/Right: noise   S: seed   R: reset   Esc: quit"
+            "M: mode   D: dataset   G: criterion   F: manual feature   "
+            "Q/E: threshold   Up/Down: depth   Left/Right: noise   S: seed"
         )
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
 
-        explanation = _build_explanation(snapshot)
+        explanation = _build_explanation(snapshot, mode=mode, manual_error=manual_error)
         self._draw_text(
             explanation,
             x,
@@ -363,15 +521,37 @@ class DecisionTreeRenderer:
         self._screen.blit(surface, (x, y))
 
 
-def _build_explanation(snapshot: AlgorithmSnapshot) -> str:
-    """Build short explanation for the current tree."""
+def _extract_root(snapshot: AlgorithmSnapshot) -> DecisionTreeNode:
+    """Extract and validate root node from a snapshot."""
+    root = snapshot.visual_state["root"]
+
+    if not isinstance(root, DecisionTreeNode):
+        msg = "snapshot.visual_state['root'] must be a DecisionTreeNode."
+        raise TypeError(msg)
+
+    return root
+
+
+def _build_explanation(
+    snapshot: AlgorithmSnapshot,
+    *,
+    mode: str,
+    manual_error: str | None,
+) -> str:
+    """Build short explanation for the current state."""
+    if mode == MODE_MANUAL_SPLIT:
+        if manual_error is not None:
+            return "Manual split is invalid because it does not create two useful children."
+
+        return "Manual mode: move the split and compare impurity/gain with your intuition."
+
     accuracy = float(snapshot.metrics["training_accuracy"])
     max_depth = int(snapshot.metrics["max_depth"])
     leaf_count = int(snapshot.metrics["leaf_count"])
 
     return (
-        f"The tree uses recursive axis-aligned splits. "
-        f"max_depth={max_depth}, leaves={leaf_count}, training accuracy={accuracy:.2f}."
+        f"Auto mode: recursive axis-aligned splits. "
+        f"max_depth={max_depth}, leaves={leaf_count}, accuracy={accuracy:.2f}."
     )
 
 
@@ -478,3 +658,26 @@ def _world_bounds_to_screen_rect(
         max(1, bottom_right[0] - top_left[0]),
         max(1, bottom_right[1] - top_left[1]),
     )
+
+
+def _majority_prediction(labels: IntArray) -> int:
+    """Return majority class prediction for labels."""
+    counts = np.bincount(labels)
+
+    return int(np.argmax(counts))
+
+
+def _manual_predictions(
+    *,
+    targets: IntArray,
+    left_mask: BoolArray,
+    right_mask: BoolArray,
+    left_prediction: int,
+    right_prediction: int,
+) -> IntArray:
+    """Build manual split predictions."""
+    predictions = np.empty_like(targets)
+    predictions[left_mask] = left_prediction
+    predictions[right_mask] = right_prediction
+
+    return predictions

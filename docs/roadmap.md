@@ -106,10 +106,10 @@ Planned pull requests:
 - [x] Add manual split prototype
 - [x] Add decision stump model
 - [x] Add recursive decision tree model
-- [ ] Add CLI prototype
-- [ ] Add Pygame visualization
-- [ ] Add manual split mode
-- [ ] Add tree depth controls
+- [x] Add CLI prototype
+- [x] Add Pygame visualization
+- [x] Add manual split mode
+- [x] Add tree depth controls
 - [ ] Add challenge mode
 - [ ] Add explanation panel
 - [ ] Polish demo documentation
