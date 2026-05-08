@@ -10,6 +10,7 @@ import pygame
 from ml_lab_core import AlgorithmSnapshot
 from numpy.typing import NDArray
 
+from decision_tree_splitter.challenge import DecisionTreeChallengeResult
 from decision_tree_splitter.split import SplitCandidate
 from decision_tree_splitter.tree import DecisionTreeNode
 
@@ -103,6 +104,7 @@ class DecisionTreeRenderer:
         manual_error: str | None,
         manual_feature_index: int,
         manual_threshold: float,
+        challenge_result: DecisionTreeChallengeResult,
     ) -> None:
         """Draw the full frame.
 
@@ -116,6 +118,7 @@ class DecisionTreeRenderer:
             manual_error: Manual split error if the selected split is invalid.
             manual_feature_index: Current manual split feature.
             manual_threshold: Current manual split threshold.
+            challenge_result: Current challenge status.
         """
         self._screen.fill(BACKGROUND_COLOR)
 
@@ -138,8 +141,14 @@ class DecisionTreeRenderer:
             manual_error=manual_error,
             manual_feature_index=manual_feature_index,
             manual_threshold=manual_threshold,
+            challenge_result=challenge_result,
         )
-        self._draw_bottom_panel(snapshot, mode=mode, manual_error=manual_error)
+        self._draw_bottom_panel(
+            snapshot,
+            mode=mode,
+            manual_error=manual_error,
+            challenge_result=challenge_result,
+        )
 
         pygame.display.flip()
 
@@ -186,13 +195,15 @@ class DecisionTreeRenderer:
         bounds = _compute_world_bounds(features)
 
         if manual_snapshot is None:
-            self._draw_axes(bounds)
             predictions = np.asarray(tree_snapshot.visual_state["predictions"], dtype=int)
+
+            self._draw_axes(bounds)
             self._draw_points(features, targets, predictions, bounds)
             self._draw_manual_title(manual_error)
             return
 
         candidate = manual_snapshot.visual_state["candidate"]
+
         if not isinstance(candidate, SplitCandidate):
             msg = "manual_snapshot.visual_state['candidate'] must be a SplitCandidate."
             raise TypeError(msg)
@@ -211,6 +222,7 @@ class DecisionTreeRenderer:
         )
 
         left_bounds, right_bounds = _split_bounds(bounds, candidate)
+
         self._draw_region(left_bounds, bounds, left_prediction)
         self._draw_region(right_bounds, bounds, right_prediction)
         self._draw_axes(bounds)
@@ -226,6 +238,7 @@ class DecisionTreeRenderer:
     def _draw_manual_title(self, manual_error: str | None) -> None:
         """Draw manual split plot title."""
         title = "Manual split mode"
+
         if manual_error is not None:
             title = "Manual split mode — invalid split"
 
@@ -269,6 +282,7 @@ class DecisionTreeRenderer:
         """Draw one colored decision region."""
         color = REGION_COLORS.get(prediction, BACKGROUND_COLOR)
         rect = _world_bounds_to_screen_rect(region_bounds, global_bounds, MAIN_RECT)
+
         pygame.draw.rect(self._screen, color, rect)
 
     def _draw_split_lines(
@@ -289,6 +303,7 @@ class DecisionTreeRenderer:
         self._draw_one_split_line(candidate, node_bounds, global_bounds, color=SPLIT_COLOR)
 
         left_bounds, right_bounds = _split_bounds(node_bounds, candidate)
+
         self._draw_split_lines(node.left, left_bounds, global_bounds)
         self._draw_split_lines(node.right, right_bounds, global_bounds)
 
@@ -373,6 +388,7 @@ class DecisionTreeRenderer:
         manual_error: str | None,
         manual_feature_index: int,
         manual_threshold: float,
+        challenge_result: DecisionTreeChallengeResult,
     ) -> None:
         """Draw metrics and current controls."""
         x = SIDE_RECT.left + 24
@@ -399,7 +415,9 @@ class DecisionTreeRenderer:
             self._draw_text(str(value), x + 130, y, self._small_font, TEXT_COLOR)
             y += SMALL_TEXT_LINE_HEIGHT
 
-        y += 10
+        y += 8
+        self._draw_challenge_panel(challenge_result, x, y)
+        y += 94
 
         if mode == MODE_MANUAL_SPLIT:
             self._draw_manual_split_panel(
@@ -412,6 +430,33 @@ class DecisionTreeRenderer:
             )
         else:
             self._draw_root_split(snapshot, x, y)
+
+    def _draw_challenge_panel(
+        self,
+        challenge_result: DecisionTreeChallengeResult,
+        x: int,
+        y: int,
+    ) -> None:
+        """Draw challenge status and targets."""
+        self._draw_text("Challenge", x, y, self._font, TEXT_COLOR)
+        y += 26
+
+        rows = [
+            ("Status", challenge_result.status),
+            (
+                "Accuracy",
+                f"{challenge_result.accuracy:.2f}/{challenge_result.target_accuracy:.2f}",
+            ),
+            (
+                "Depth",
+                f"{challenge_result.max_depth}/{challenge_result.max_allowed_depth}",
+            ),
+        ]
+
+        for label, value in rows:
+            self._draw_text(f"{label}:", x, y, self._small_font, MUTED_TEXT_COLOR)
+            self._draw_text(value, x + 100, y, self._small_font, TEXT_COLOR)
+            y += SMALL_TEXT_LINE_HEIGHT
 
     def _draw_manual_split_panel(
         self,
@@ -488,6 +533,7 @@ class DecisionTreeRenderer:
         *,
         mode: str,
         manual_error: str | None,
+        challenge_result: DecisionTreeChallengeResult,
     ) -> None:
         """Draw keyboard controls and explanation."""
         x = BOTTOM_RECT.left + 24
@@ -499,7 +545,12 @@ class DecisionTreeRenderer:
         )
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
 
-        explanation = _build_explanation(snapshot, mode=mode, manual_error=manual_error)
+        explanation = _build_explanation(
+            snapshot,
+            mode=mode,
+            manual_error=manual_error,
+            challenge_result=challenge_result,
+        )
         self._draw_text(
             explanation,
             x,
@@ -537,8 +588,12 @@ def _build_explanation(
     *,
     mode: str,
     manual_error: str | None,
+    challenge_result: DecisionTreeChallengeResult,
 ) -> str:
     """Build short explanation for the current state."""
+    if challenge_result.success and mode == MODE_AUTO_TREE:
+        return challenge_result.message
+
     if mode == MODE_MANUAL_SPLIT:
         if manual_error is not None:
             return "Manual split is invalid because it does not create two useful children."
@@ -551,7 +606,8 @@ def _build_explanation(
 
     return (
         f"Auto mode: recursive axis-aligned splits. "
-        f"max_depth={max_depth}, leaves={leaf_count}, accuracy={accuracy:.2f}."
+        f"max_depth={max_depth}, leaves={leaf_count}, accuracy={accuracy:.2f}. "
+        f"{challenge_result.status}: target accuracy={challenge_result.target_accuracy:.2f}."
     )
 
 

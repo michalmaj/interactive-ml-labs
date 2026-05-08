@@ -1,5 +1,10 @@
 """Decision Tree Splitter demo package."""
 
+from decision_tree_splitter.challenge import (
+    DecisionTreeChallenge,
+    DecisionTreeChallengeConfig,
+    DecisionTreeChallengeResult,
+)
 from decision_tree_splitter.dataset import (
     DATASET_KIND_AXIS_ALIGNED,
     DATASET_KIND_XOR,
@@ -39,6 +44,9 @@ __all__ = [
     "DATASET_KIND_XOR",
     "DecisionStump",
     "DecisionStumpConfig",
+    "DecisionTreeChallenge",
+    "DecisionTreeChallengeConfig",
+    "DecisionTreeChallengeResult",
     "DecisionTreeConfig",
     "DecisionTreeNode",
     "LeafPrediction",

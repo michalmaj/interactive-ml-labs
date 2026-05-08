@@ -8,6 +8,10 @@ from typing import Final
 import pygame
 from ml_lab_core import AlgorithmSnapshot, DatasetSnapshot
 
+from decision_tree_splitter.challenge import (
+    DecisionTreeChallenge,
+    DecisionTreeChallengeResult,
+)
 from decision_tree_splitter.dataset import (
     DATASET_KIND_AXIS_ALIGNED,
     DATASET_KIND_XOR,
@@ -64,6 +68,7 @@ class DecisionTreePygameApp:
 
         self._clock = pygame.time.Clock()
         self._renderer = DecisionTreeRenderer(self._screen)
+        self._challenge = DecisionTreeChallenge()
 
         self._should_quit = False
         self._mode = MODE_AUTO_TREE
@@ -79,6 +84,7 @@ class DecisionTreePygameApp:
         self._tree_snapshot: AlgorithmSnapshot
         self._manual_snapshot: AlgorithmSnapshot | None
         self._manual_error: str | None
+        self._challenge_result: DecisionTreeChallengeResult
 
         self._reset_demo()
 
@@ -93,7 +99,7 @@ class DecisionTreePygameApp:
         pygame.quit()
 
     def _reset_demo(self) -> None:
-        """Reset dataset, tree, and manual split state."""
+        """Reset dataset, tree, manual split state, and challenge state."""
         dataset_config = SyntheticDecisionTreeDatasetConfig(
             samples_per_class=DEFAULT_UI_SAMPLES_PER_CLASS,
             class_distance=DEFAULT_UI_CLASS_DISTANCE,
@@ -114,6 +120,14 @@ class DecisionTreePygameApp:
             ),
         )
         self._tree_snapshot = tree.reset(self._dataset)
+        self._refresh_challenge_result()
+
+    def _refresh_challenge_result(self) -> None:
+        """Evaluate current tree against the active challenge."""
+        self._challenge_result = self._challenge.evaluate(
+            snapshot=self._tree_snapshot,
+            dataset_kind=self._dataset_kind,
+        )
 
     def _refresh_manual_snapshot(self) -> None:
         """Evaluate the current manual split."""
@@ -252,6 +266,7 @@ class DecisionTreePygameApp:
             manual_error=self._manual_error,
             manual_feature_index=self._manual_feature_index,
             manual_threshold=self._manual_threshold,
+            challenge_result=self._challenge_result,
         )
 
 
