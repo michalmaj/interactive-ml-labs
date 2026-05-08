@@ -70,6 +70,25 @@ This makes decision trees a strong next step in Level 1.
 uv run --package decision-tree-splitter decision-tree-splitter
 ```
 
+## How to run the UI
+
+```bash
+uv run --package decision-tree-splitter decision-tree-splitter-ui
+```
+
+| Key     | Action                                        |
+| ------- | --------------------------------------------- |
+| `D`     | Toggle dataset kind: `axis_aligned` / `xor`   |
+| `G`     | Toggle impurity criterion: `gini` / `entropy` |
+| `Up`    | Increase max tree depth                       |
+| `Down`  | Decrease max tree depth                       |
+| `Left`  | Decrease data noise                           |
+| `Right` | Increase data noise                           |
+| `S`     | Generate a new dataset seed                   |
+| `R`     | Reset the demo                                |
+| `Esc`   | Quit                                          |
+
+
 ## Planned interactions
 
 The interactive version will likely support:
