@@ -1,4 +1,5 @@
 """Smoke tests for the Random Forest Bagging Lab package."""
+
 import random_forest_bagging_lab
 
 

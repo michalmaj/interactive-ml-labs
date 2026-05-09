@@ -114,18 +114,22 @@ Planned pull requests:
 - [x] Add explanation panel
 - [x] Polish demo documentation
 
-## Phase 6 — Level 3
+## Phase 6 — First Level 2 demo: Random Forest Bagging Lab
 
-Goal: add advanced and showcase demos.
+Goal: implement the first Level 2 demo focused on ensemble learning, bagging, and model stability.
 
-Topics include:
+Planned pull requests:
 
-- text classification,
-- CNNs,
-- embeddings,
-- recommender systems,
-- time series,
-- HMMs,
-- hyperparameter optimization,
-- autoencoders,
-- graph machine learning.
+- [x] Add Random Forest Bagging Lab package skeleton
+- [ ] Add synthetic train/test classification dataset
+- [ ] Add bootstrap sampling utilities
+- [ ] Add majority voting and vote confidence
+- [ ] Add single-tree baseline
+- [ ] Add random forest model
+- [ ] Add CLI prototype
+- [ ] Add Pygame visualization
+- [ ] Add controls for tree count and max depth
+- [ ] Add train/test accuracy comparison
+- [ ] Add challenge mode
+- [ ] Add explanation panel
+- [ ] Polish demo documentation
