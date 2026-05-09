@@ -110,9 +110,9 @@ Planned pull requests:
 - [x] Add Pygame visualization
 - [x] Add manual split mode
 - [x] Add tree depth controls
-- [ ] Add challenge mode
-- [ ] Add explanation panel
-- [ ] Polish demo documentation
+- [x] Add challenge mode
+- [x] Add explanation panel
+- [x] Polish demo documentation
 
 ## Phase 6 — Level 3
 
