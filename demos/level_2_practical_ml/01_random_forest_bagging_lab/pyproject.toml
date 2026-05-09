@@ -1,0 +1,19 @@
+[project]
+name = "random-forest-bagging-lab"
+version = "0.1.0"
+description = "Interactive random forest and bagging demo for machine learning education."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ml-lab-core",
+]
+
+[project.scripts]
+random-forest-bagging-lab = "random_forest_bagging_lab.app:main"
+
+[tool.uv.sources]
+ml-lab-core = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
