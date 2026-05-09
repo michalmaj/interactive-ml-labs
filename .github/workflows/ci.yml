@@ -54,3 +54,8 @@ jobs:
         run: >
           uv run --package decision-tree-splitter
           pytest demos/level_1_fundamentals/04_decision_tree_splitter/tests
+
+      - name: Run Random Forest Bagging Lab tests
+        run: >
+          uv run --package random-forest-bagging-lab
+          pytest demos/level_2_practical_ml/01_random_forest_bagging_lab/tests
