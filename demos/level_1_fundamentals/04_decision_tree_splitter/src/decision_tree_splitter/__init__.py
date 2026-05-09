@@ -11,6 +11,7 @@ from decision_tree_splitter.dataset import (
     SyntheticDecisionTreeDatasetConfig,
     make_synthetic_decision_tree_dataset,
 )
+from decision_tree_splitter.explanation import build_explanation_text
 from decision_tree_splitter.impurity import (
     class_counts,
     class_probabilities,
@@ -57,6 +58,7 @@ __all__ = [
     "SplitEvaluation",
     "SyntheticDecisionTreeDatasetConfig",
     "best_split",
+    "build_explanation_text",
     "class_counts",
     "class_probabilities",
     "entropy_impurity",

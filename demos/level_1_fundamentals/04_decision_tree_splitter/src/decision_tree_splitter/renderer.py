@@ -11,6 +11,7 @@ from ml_lab_core import AlgorithmSnapshot
 from numpy.typing import NDArray
 
 from decision_tree_splitter.challenge import DecisionTreeChallengeResult
+from decision_tree_splitter.explanation import build_explanation_text
 from decision_tree_splitter.split import SplitCandidate
 from decision_tree_splitter.tree import DecisionTreeNode
 
@@ -545,7 +546,7 @@ class DecisionTreeRenderer:
         )
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
 
-        explanation = _build_explanation(
+        explanation = build_explanation_text(
             snapshot,
             mode=mode,
             manual_error=manual_error,
@@ -581,34 +582,6 @@ def _extract_root(snapshot: AlgorithmSnapshot) -> DecisionTreeNode:
         raise TypeError(msg)
 
     return root
-
-
-def _build_explanation(
-    snapshot: AlgorithmSnapshot,
-    *,
-    mode: str,
-    manual_error: str | None,
-    challenge_result: DecisionTreeChallengeResult,
-) -> str:
-    """Build short explanation for the current state."""
-    if challenge_result.success and mode == MODE_AUTO_TREE:
-        return challenge_result.message
-
-    if mode == MODE_MANUAL_SPLIT:
-        if manual_error is not None:
-            return "Manual split is invalid because it does not create two useful children."
-
-        return "Manual mode: move the split and compare impurity/gain with your intuition."
-
-    accuracy = float(snapshot.metrics["training_accuracy"])
-    max_depth = int(snapshot.metrics["max_depth"])
-    leaf_count = int(snapshot.metrics["leaf_count"])
-
-    return (
-        f"Auto mode: recursive axis-aligned splits. "
-        f"max_depth={max_depth}, leaves={leaf_count}, accuracy={accuracy:.2f}. "
-        f"{challenge_result.status}: target accuracy={challenge_result.target_accuracy:.2f}."
-    )
 
 
 def _compute_world_bounds(features: FloatArray) -> WorldBounds:
