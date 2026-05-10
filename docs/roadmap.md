@@ -121,7 +121,7 @@ Goal: implement the first Level 2 demo focused on ensemble learning, bagging, an
 Planned pull requests:
 
 - [x] Add Random Forest Bagging Lab package skeleton
-- [ ] Add synthetic train/test classification dataset
+- [x] Add synthetic train/test classification dataset
 - [ ] Add bootstrap sampling utilities
 - [ ] Add majority voting and vote confidence
 - [ ] Add single-tree baseline
