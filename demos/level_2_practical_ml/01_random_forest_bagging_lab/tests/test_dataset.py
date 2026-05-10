@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from random_forest_bagging_lab import (
     DATASET_KIND_AXIS_ALIGNED,
     DATASET_KIND_XOR,

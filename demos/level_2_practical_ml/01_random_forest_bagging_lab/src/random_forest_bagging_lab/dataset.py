@@ -289,10 +289,7 @@ def _split_count_across_blobs(*, total_sample_count: int, blob_count: int) -> tu
     base_count = total_sample_count // blob_count
     remainder = total_sample_count % blob_count
 
-    return tuple(
-        base_count + (1 if index < remainder else 0)
-        for index in range(blob_count)
-    )
+    return tuple(base_count + (1 if index < remainder else 0) for index in range(blob_count))
 
 
 def _make_balanced_targets(samples_per_class: int) -> IntArray:
@@ -324,8 +321,5 @@ def _validate_config(config: SyntheticTrainTestDatasetConfig) -> None:
         raise ValueError(msg)
 
     if config.dataset_kind not in VALID_DATASET_KINDS:
-        msg = (
-            "dataset_kind must be one of: "
-            f"{', '.join(sorted(VALID_DATASET_KINDS))}."
-        )
+        msg = f"dataset_kind must be one of: {', '.join(sorted(VALID_DATASET_KINDS))}."
         raise ValueError(msg)
