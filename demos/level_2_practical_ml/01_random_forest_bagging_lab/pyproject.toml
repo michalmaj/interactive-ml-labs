@@ -8,10 +8,12 @@ dependencies = [
     "decision-tree-splitter",
     "ml-lab-core",
     "numpy>=2.4.4",
+    "pygame>=2.6.1",
 ]
 
 [project.scripts]
 random-forest-bagging-lab = "random_forest_bagging_lab.app:main"
+random-forest-bagging-lab-ui = "random_forest_bagging_lab.pygame_app:main"
 
 [tool.uv.sources]
 decision-tree-splitter = { workspace = true }
