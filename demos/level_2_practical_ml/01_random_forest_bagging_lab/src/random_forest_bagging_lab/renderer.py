@@ -12,7 +12,7 @@ from numpy.typing import NDArray
 
 from random_forest_bagging_lab.baseline import SingleTreeBaseline
 from random_forest_bagging_lab.forest import RandomForestModel
-from random_forest_bagging_lab.report import ModelComparisonReport
+from random_forest_bagging_lab.report import ModelComparisonReport, ModelReportMetrics
 
 type FloatArray = NDArray[np.float64]
 type IntArray = NDArray[np.int_]
@@ -45,7 +45,7 @@ POINT_RADIUS: Final[int] = 5
 TEST_POINT_SIZE: Final[int] = 9
 AXIS_WIDTH: Final[int] = 1
 ERROR_MARK_WIDTH: Final[int] = 2
-GRID_CELL_SIZE: Final[int] = 14
+GRID_CELL_SIZE: Final[int] = 16
 TEXT_LINE_HEIGHT: Final[int] = 28
 SMALL_TEXT_LINE_HEIGHT: Final[int] = 22
 
@@ -56,6 +56,9 @@ CLASS_ONE_LABEL: Final[int] = 1
 
 MIN_WORLD_SPAN: Final[float] = 1.0
 WORLD_MARGIN_RATIO: Final[float] = 0.18
+LOW_CONFIDENCE_BASELINE: Final[float] = 0.50
+LOW_CONFIDENCE_ALPHA: Final[float] = 0.30
+HIGH_CONFIDENCE_ALPHA: Final[float] = 0.95
 
 CLASS_COLORS: Final[dict[int, tuple[int, int, int]]] = {
     CLASS_ZERO_LABEL: CLASS_ZERO_COLOR,
@@ -100,6 +103,8 @@ class RandomForestRenderer:
         seed: int,
         tree_count: int,
         max_depth: int,
+        bootstrap_sample_ratio: float,
+        confidence_view_enabled: bool,
     ) -> None:
         """Draw the full UI frame."""
         self._screen.fill(BACKGROUND_COLOR)
@@ -120,7 +125,7 @@ class RandomForestRenderer:
             model=baseline_model,
             snapshot=baseline_snapshot,
             bounds=bounds,
-            use_forest_confidence=False,
+            confidence_view_enabled=False,
         )
         self._draw_model_panel(
             title="Random forest",
@@ -128,7 +133,7 @@ class RandomForestRenderer:
             model=forest_model,
             snapshot=forest_snapshot,
             bounds=bounds,
-            use_forest_confidence=True,
+            confidence_view_enabled=confidence_view_enabled,
         )
         self._draw_side_panel(
             comparison_report=comparison_report,
@@ -137,8 +142,10 @@ class RandomForestRenderer:
             seed=seed,
             tree_count=tree_count,
             max_depth=max_depth,
+            bootstrap_sample_ratio=bootstrap_sample_ratio,
+            confidence_view_enabled=confidence_view_enabled,
         )
-        self._draw_bottom_panel()
+        self._draw_bottom_panel(confidence_view_enabled=confidence_view_enabled)
 
         pygame.display.flip()
 
@@ -154,7 +161,7 @@ class RandomForestRenderer:
         model: SingleTreeBaseline | RandomForestModel,
         snapshot: AlgorithmSnapshot,
         bounds: WorldBounds,
-        use_forest_confidence: bool,
+        confidence_view_enabled: bool,
     ) -> None:
         """Draw one model visualization panel."""
         train_features = np.asarray(snapshot.visual_state["train_features"], dtype=float)
@@ -167,7 +174,7 @@ class RandomForestRenderer:
             rect=rect,
             model=model,
             bounds=bounds,
-            use_forest_confidence=use_forest_confidence,
+            confidence_view_enabled=confidence_view_enabled,
         )
         self._draw_axes(rect, bounds)
         self._draw_train_points(rect, train_features, train_targets, bounds)
@@ -187,7 +194,7 @@ class RandomForestRenderer:
         rect: pygame.Rect,
         model: SingleTreeBaseline | RandomForestModel,
         bounds: WorldBounds,
-        use_forest_confidence: bool,
+        confidence_view_enabled: bool,
     ) -> None:
         """Draw approximate decision regions using a coarse grid."""
         drawable = _drawable_rect(rect)
@@ -196,13 +203,13 @@ class RandomForestRenderer:
             for screen_y in range(drawable.top, drawable.bottom, GRID_CELL_SIZE):
                 world_x, world_y = _screen_to_world(screen_x, screen_y, bounds, rect)
                 point = np.array([[world_x, world_y]], dtype=float)
+                prediction, confidence = _predict_one(model=model, point=point)
 
-                prediction = _predict_one(
-                    model=model,
-                    point=point,
-                    use_forest_confidence=use_forest_confidence,
+                color = _region_color(
+                    prediction=prediction,
+                    confidence=confidence,
+                    confidence_view_enabled=confidence_view_enabled,
                 )
-                color = REGION_COLORS.get(prediction, BACKGROUND_COLOR)
                 cell = pygame.Rect(screen_x, screen_y, GRID_CELL_SIZE, GRID_CELL_SIZE)
 
                 pygame.draw.rect(self._screen, color, cell)
@@ -284,13 +291,15 @@ class RandomForestRenderer:
         seed: int,
         tree_count: int,
         max_depth: int,
+        bootstrap_sample_ratio: float,
+        confidence_view_enabled: bool,
     ) -> None:
         """Draw metrics and current configuration."""
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 22
 
         self._draw_text("Random Forest", x, y, self._title_font, TEXT_COLOR)
-        y += 44
+        y += 42
 
         rows = [
             ("Dataset", dataset_kind),
@@ -298,24 +307,26 @@ class RandomForestRenderer:
             ("Seed", str(seed)),
             ("Trees", str(tree_count)),
             ("Max depth", str(max_depth)),
+            ("Bootstrap", f"{bootstrap_sample_ratio:.2f}"),
+            ("Conf. view", _enabled_text(confidence_view_enabled)),
             ("Winner", comparison_report.winner),
             ("Test delta", f"{comparison_report.test_accuracy_delta:+.3f}"),
         ]
 
         for label, value in rows:
             self._draw_text(f"{label}:", x, y, self._small_font, MUTED_TEXT_COLOR)
-            self._draw_text(value, x + 116, y, self._small_font, TEXT_COLOR)
+            self._draw_text(value, x + 126, y, self._small_font, TEXT_COLOR)
             y += SMALL_TEXT_LINE_HEIGHT
 
-        y += 12
+        y += 8
         self._draw_model_metrics("Single tree", comparison_report.single_tree, x, y)
-        y += 112
+        y += 104
         self._draw_model_metrics("Forest", comparison_report.forest, x, y)
 
     def _draw_model_metrics(
         self,
         title: str,
-        metrics: object,
+        metrics: ModelReportMetrics,
         x: int,
         y: int,
     ) -> None:
@@ -337,25 +348,31 @@ class RandomForestRenderer:
             self._draw_text(value, x + 72, y, self._small_font, TEXT_COLOR)
             y += SMALL_TEXT_LINE_HEIGHT
 
-    def _draw_bottom_panel(self) -> None:
+    def _draw_bottom_panel(self, *, confidence_view_enabled: bool) -> None:
         """Draw controls and legend."""
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
 
         controls = (
             "D: dataset   Up/Down: trees   W/S: max depth   "
-            "Left/Right: noise   N: seed   R: reset   Esc: quit"
+            "B/V: bootstrap ratio   C: confidence view   Left/Right: noise   N: seed"
         )
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
 
         legend = (
-            "Circles = train samples, squares = test samples, X = misclassified test sample. "
-            "Left panel shows one tree; right panel shows ensemble voting."
+            "Circles = train, squares = test, X = misclassified test. "
+            "Left = one tree, right = forest voting."
         )
         self._draw_text(legend, x, y + TEXT_LINE_HEIGHT, self._small_font, MUTED_TEXT_COLOR)
 
-        note = "Use test accuracy and generalization gap to compare models."
-        self._draw_text(note, x, y + 2 * TEXT_LINE_HEIGHT, self._small_font, MUTED_TEXT_COLOR)
+        confidence_text = _confidence_view_explanation(confidence_view_enabled)
+        self._draw_text(
+            confidence_text,
+            x,
+            y + 2 * TEXT_LINE_HEIGHT,
+            self._small_font,
+            MUTED_TEXT_COLOR,
+        )
 
     def _draw_text(
         self,
@@ -374,13 +391,67 @@ def _predict_one(
     *,
     model: SingleTreeBaseline | RandomForestModel,
     point: FloatArray,
-    use_forest_confidence: bool,
-) -> int:
-    """Predict one grid point."""
-    if use_forest_confidence and isinstance(model, RandomForestModel):
-        return int(model.predict_with_confidence(point).predictions[0])
+) -> tuple[int, float]:
+    """Predict one grid point and return prediction with confidence."""
+    if isinstance(model, RandomForestModel):
+        result = model.predict_with_confidence(point)
 
-    return int(model.predict(point)[0])
+        return int(result.predictions[0]), float(result.confidence[0])
+
+    return int(model.predict(point)[0]), 1.0
+
+
+def _region_color(
+    *,
+    prediction: int,
+    confidence: float,
+    confidence_view_enabled: bool,
+) -> tuple[int, int, int]:
+    """Return region color, optionally faded according to confidence."""
+    base_color = REGION_COLORS.get(prediction, BACKGROUND_COLOR)
+
+    if not confidence_view_enabled:
+        return base_color
+
+    alpha = _confidence_to_alpha(confidence)
+
+    return _blend_colors(PANEL_COLOR, base_color, alpha)
+
+
+def _confidence_to_alpha(confidence: float) -> float:
+    """Convert vote confidence into color intensity."""
+    clamped_confidence = min(1.0, max(LOW_CONFIDENCE_BASELINE, confidence))
+    normalized = (clamped_confidence - LOW_CONFIDENCE_BASELINE) / (1.0 - LOW_CONFIDENCE_BASELINE)
+
+    return LOW_CONFIDENCE_ALPHA + normalized * (HIGH_CONFIDENCE_ALPHA - LOW_CONFIDENCE_ALPHA)
+
+
+def _blend_colors(
+    background: tuple[int, int, int],
+    foreground: tuple[int, int, int],
+    alpha: float,
+) -> tuple[int, int, int]:
+    """Blend foreground color over background color."""
+    return tuple(
+        round(background_channel * (1.0 - alpha) + foreground_channel * alpha)
+        for background_channel, foreground_channel in zip(background, foreground, strict=True)
+    )
+
+
+def _enabled_text(value: bool) -> str:
+    """Return short enabled/disabled text."""
+    if value:
+        return "on"
+
+    return "off"
+
+
+def _confidence_view_explanation(confidence_view_enabled: bool) -> str:
+    """Return explanation for confidence view state."""
+    if confidence_view_enabled:
+        return "Confidence view is on: pale forest regions mean weaker agreement between trees."
+
+    return "Confidence view is off: forest regions show only final class, not voting strength."
 
 
 def _compute_world_bounds(train_features: FloatArray, test_features: FloatArray) -> WorldBounds:
