@@ -36,6 +36,8 @@ DEFAULT_SEED: Final[int] = 42
 DEFAULT_DATASET_KIND: Final[str] = DATASET_KIND_XOR
 DEFAULT_TREE_COUNT: Final[int] = 25
 DEFAULT_MAX_DEPTH: Final[int] = 2
+DEFAULT_BOOTSTRAP_SAMPLE_RATIO: Final[float] = 1.0
+DEFAULT_CONFIDENCE_VIEW_ENABLED: Final[bool] = False
 
 MIN_TREE_COUNT: Final[int] = 1
 MAX_TREE_COUNT: Final[int] = 75
@@ -48,6 +50,11 @@ MAX_DEPTH_STEP: Final[int] = 1
 MIN_NOISE_STD: Final[float] = 0.0
 MAX_NOISE_STD: Final[float] = 3.0
 NOISE_STEP: Final[float] = 0.15
+
+MIN_BOOTSTRAP_SAMPLE_RATIO: Final[float] = 0.20
+MAX_BOOTSTRAP_SAMPLE_RATIO: Final[float] = 1.00
+BOOTSTRAP_SAMPLE_RATIO_STEP: Final[float] = 0.10
+
 SEED_STEP: Final[int] = 1
 
 
@@ -70,6 +77,8 @@ class RandomForestPygameApp:
         self._seed = DEFAULT_SEED
         self._tree_count = DEFAULT_TREE_COUNT
         self._max_depth = DEFAULT_MAX_DEPTH
+        self._bootstrap_sample_ratio = DEFAULT_BOOTSTRAP_SAMPLE_RATIO
+        self._confidence_view_enabled = DEFAULT_CONFIDENCE_VIEW_ENABLED
 
         self._dataset: TrainTestDataset
         self._baseline_model: SingleTreeBaseline
@@ -112,6 +121,7 @@ class RandomForestPygameApp:
             RandomForestConfig(
                 tree_count=self._tree_count,
                 max_depth=self._max_depth,
+                bootstrap_sample_ratio=self._bootstrap_sample_ratio,
                 seed=self._seed,
             ),
         )
@@ -145,6 +155,9 @@ class RandomForestPygameApp:
             pygame.K_RIGHT: self._increase_noise,
             pygame.K_LEFT: self._decrease_noise,
             pygame.K_n: self._next_seed,
+            pygame.K_b: self._increase_bootstrap_sample_ratio,
+            pygame.K_v: self._decrease_bootstrap_sample_ratio,
+            pygame.K_c: self._toggle_confidence_view,
         }
 
         action = key_actions.get(event.key)
@@ -195,6 +208,28 @@ class RandomForestPygameApp:
         self._noise_std = max(MIN_NOISE_STD, self._noise_std - NOISE_STEP)
         self._reset_demo()
 
+    def _increase_bootstrap_sample_ratio(self) -> None:
+        """Increase bootstrap sample ratio used by the forest."""
+        self._bootstrap_sample_ratio = min(
+            MAX_BOOTSTRAP_SAMPLE_RATIO,
+            self._bootstrap_sample_ratio + BOOTSTRAP_SAMPLE_RATIO_STEP,
+        )
+        self._bootstrap_sample_ratio = round(self._bootstrap_sample_ratio, 2)
+        self._fit_models()
+
+    def _decrease_bootstrap_sample_ratio(self) -> None:
+        """Decrease bootstrap sample ratio used by the forest."""
+        self._bootstrap_sample_ratio = max(
+            MIN_BOOTSTRAP_SAMPLE_RATIO,
+            self._bootstrap_sample_ratio - BOOTSTRAP_SAMPLE_RATIO_STEP,
+        )
+        self._bootstrap_sample_ratio = round(self._bootstrap_sample_ratio, 2)
+        self._fit_models()
+
+    def _toggle_confidence_view(self) -> None:
+        """Toggle forest confidence-based region coloring."""
+        self._confidence_view_enabled = not self._confidence_view_enabled
+
     def _next_seed(self) -> None:
         """Generate another dataset seed."""
         self._seed += SEED_STEP
@@ -213,6 +248,8 @@ class RandomForestPygameApp:
             seed=self._seed,
             tree_count=self._tree_count,
             max_depth=self._max_depth,
+            bootstrap_sample_ratio=self._bootstrap_sample_ratio,
+            confidence_view_enabled=self._confidence_view_enabled,
         )
 
 

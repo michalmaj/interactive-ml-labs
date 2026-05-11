@@ -128,7 +128,7 @@ Planned pull requests:
 - [x] Add random forest model
 - [x] Add CLI prototype
 - [x] Add Pygame visualization
-- [ ] Add controls for tree count and max depth
+- [x] Add controls for tree count and max depth
 - [ ] Add train/test accuracy comparison
 - [ ] Add challenge mode
 - [ ] Add explanation panel
