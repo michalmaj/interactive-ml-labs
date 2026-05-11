@@ -12,6 +12,10 @@ from random_forest_bagging_lab.baseline import (
     SingleTreeBaseline,
     SingleTreeBaselineConfig,
 )
+from random_forest_bagging_lab.challenge import (
+    RandomForestChallenge,
+    RandomForestChallengeResult,
+)
 from random_forest_bagging_lab.dataset import (
     DATASET_KIND_AXIS_ALIGNED,
     DATASET_KIND_XOR,
@@ -70,6 +74,7 @@ class RandomForestPygameApp:
 
         self._clock = pygame.time.Clock()
         self._renderer = RandomForestRenderer(self._screen)
+        self._challenge = RandomForestChallenge()
 
         self._should_quit = False
         self._dataset_kind = DEFAULT_DATASET_KIND
@@ -86,6 +91,7 @@ class RandomForestPygameApp:
         self._baseline_snapshot: AlgorithmSnapshot
         self._forest_snapshot: AlgorithmSnapshot
         self._comparison_report: ModelComparisonReport
+        self._challenge_result: RandomForestChallengeResult
 
         self._reset_demo()
 
@@ -113,7 +119,7 @@ class RandomForestPygameApp:
         self._fit_models()
 
     def _fit_models(self) -> None:
-        """Fit baseline tree and random forest."""
+        """Fit baseline tree, random forest, and evaluate challenge status."""
         self._baseline_model = SingleTreeBaseline(
             SingleTreeBaselineConfig(max_depth=self._max_depth),
         )
@@ -132,6 +138,7 @@ class RandomForestPygameApp:
             single_tree_snapshot=self._baseline_snapshot,
             forest_snapshot=self._forest_snapshot,
         )
+        self._challenge_result = self._challenge.evaluate(self._comparison_report)
 
     def _handle_events(self) -> None:
         """Handle Pygame events."""
@@ -243,6 +250,7 @@ class RandomForestPygameApp:
             baseline_snapshot=self._baseline_snapshot,
             forest_snapshot=self._forest_snapshot,
             comparison_report=self._comparison_report,
+            challenge_result=self._challenge_result,
             dataset_kind=self._dataset_kind,
             noise_std=self._noise_std,
             seed=self._seed,

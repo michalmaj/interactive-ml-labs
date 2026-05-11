@@ -10,6 +10,11 @@ from random_forest_bagging_lab.bootstrap import (
     make_bootstrap_indices,
     make_bootstrap_sample,
 )
+from random_forest_bagging_lab.challenge import (
+    RandomForestChallenge,
+    RandomForestChallengeConfig,
+    RandomForestChallengeResult,
+)
 from random_forest_bagging_lab.dataset import (
     DATASET_KIND_AXIS_ALIGNED,
     DATASET_KIND_XOR,
@@ -41,6 +46,9 @@ __all__ = [
     "ForestTreeMember",
     "ModelComparisonReport",
     "ModelReportMetrics",
+    "RandomForestChallenge",
+    "RandomForestChallengeConfig",
+    "RandomForestChallengeResult",
     "RandomForestConfig",
     "RandomForestModel",
     "SingleTreeBaseline",
