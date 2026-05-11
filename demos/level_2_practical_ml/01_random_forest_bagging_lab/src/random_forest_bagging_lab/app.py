@@ -16,6 +16,7 @@ from random_forest_bagging_lab.dataset import (
     TrainTestDataset,
     make_synthetic_train_test_dataset,
 )
+from random_forest_bagging_lab.voting import majority_vote
 
 CLASS_COUNT: int = 2
 BOOTSTRAP_SEED: int = 7
@@ -25,8 +26,8 @@ def main() -> None:
     """Run a minimal command-line version of the demo.
 
     The random forest implementation will be added in later pull requests.
-    This entry point verifies that the package can generate train/test datasets
-    and draw bootstrap samples from training data.
+    This entry point verifies that the package can generate train/test datasets,
+    draw bootstrap samples, and combine example predictions through voting.
     """
     axis_dataset = make_synthetic_train_test_dataset(
         SyntheticTrainTestDatasetConfig(dataset_kind=DATASET_KIND_AXIS_ALIGNED),
@@ -35,11 +36,24 @@ def main() -> None:
         SyntheticTrainTestDatasetConfig(dataset_kind=DATASET_KIND_XOR),
     )
 
+    voting_result = majority_vote(
+        np.array(
+            [
+                [0, 1, 1, 0],
+                [0, 1, 0, 0],
+                [1, 1, 1, 0],
+            ],
+            dtype=int,
+        ),
+        class_count=CLASS_COUNT,
+    )
+
     print("Random Forest Bagging Lab")
-    print("Synthetic train/test datasets and bootstrap samples generated successfully.")
+    print("Synthetic train/test datasets, bootstrap samples, and voting generated successfully.")
 
     _print_dataset_report("Axis-aligned", axis_dataset)
     _print_dataset_report("XOR", xor_dataset)
+    _print_voting_report(voting_result.predictions, voting_result.confidence)
 
 
 def _print_dataset_report(label: str, dataset: TrainTestDataset) -> None:
@@ -62,6 +76,15 @@ def _print_dataset_report(label: str, dataset: TrainTestDataset) -> None:
     print(f"{label} bootstrap draw count: {bootstrap.sample_indices.shape[0]}")
     print(f"{label} bootstrap unique samples: {bootstrap.unique_sample_count}")
     print(f"{label} bootstrap OOB samples: {bootstrap.oob_indices.shape[0]}")
+
+
+def _print_voting_report(predictions: np.ndarray, confidence: np.ndarray) -> None:
+    """Print a short voting summary."""
+    mean_confidence = float(np.mean(confidence))
+
+    print(f"Example vote predictions: {predictions.tolist()}")
+    print(f"Example vote confidence: {confidence.round(3).tolist()}")
+    print(f"Example mean vote confidence: {mean_confidence:.3f}")
 
 
 def _build_dataset_history(dataset: TrainTestDataset) -> MetricsHistory:
