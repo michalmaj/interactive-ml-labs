@@ -127,9 +127,11 @@ Planned pull requests:
 - [x] Add single-tree baseline
 - [x] Add random forest model
 - [x] Add CLI prototype
+- [x] Add CLI comparison report
 - [x] Add Pygame visualization
 - [x] Add controls for tree count and max depth
 - [x] Add train/test accuracy comparison
+- [x] Add controls for bootstrap ratio and confidence view
 - [x] Add challenge mode
 - [x] Add explanation panel
-- [ ] Polish demo documentation
+- [x] Polish demo documentation
