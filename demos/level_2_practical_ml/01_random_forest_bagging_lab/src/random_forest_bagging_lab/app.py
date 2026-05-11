@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
-from ml_lab_core import MetricsHistory
+from ml_lab_core import AlgorithmSnapshot, MetricsHistory
 
 from random_forest_bagging_lab.baseline import (
     SingleTreeBaseline,
@@ -20,20 +20,22 @@ from random_forest_bagging_lab.dataset import (
     TrainTestDataset,
     make_synthetic_train_test_dataset,
 )
+from random_forest_bagging_lab.forest import RandomForestConfig, RandomForestModel
 from random_forest_bagging_lab.voting import majority_vote
 
 CLASS_COUNT: int = 2
 BOOTSTRAP_SEED: int = 7
 BASELINE_MAX_DEPTH: int = 2
+FOREST_TREE_COUNT: int = 25
+FOREST_MAX_DEPTH: int = 2
 
 
 def main() -> None:
     """Run a minimal command-line version of the demo.
 
-    The random forest implementation will be added in later pull requests.
     This entry point verifies that the package can generate train/test datasets,
-    draw bootstrap samples, combine example predictions through voting, and
-    evaluate a single-tree baseline.
+    draw bootstrap samples, combine example predictions through voting, evaluate
+    a single-tree baseline, and fit a random forest model.
     """
     axis_dataset = make_synthetic_train_test_dataset(
         SyntheticTrainTestDatasetConfig(dataset_kind=DATASET_KIND_AXIS_ALIGNED),
@@ -56,8 +58,8 @@ def main() -> None:
 
     print("Random Forest Bagging Lab")
     print(
-        "Synthetic train/test datasets, bootstrap samples, voting, "
-        "and baseline tree generated successfully.",
+        "Synthetic train/test datasets, bootstrap samples, voting, baseline tree, "
+        "and random forest generated successfully.",
     )
 
     _print_dataset_report("Axis-aligned", axis_dataset)
@@ -73,6 +75,7 @@ def _print_dataset_report(label: str, dataset: TrainTestDataset) -> None:
         BootstrapSampleConfig(seed=BOOTSTRAP_SEED),
     )
     baseline_snapshot = _fit_single_tree_baseline(dataset)
+    forest_snapshot = _fit_random_forest(dataset)
 
     train_features = np.asarray(dataset.train.features, dtype=float)
     test_features = np.asarray(dataset.test.features, dtype=float)
@@ -88,15 +91,33 @@ def _print_dataset_report(label: str, dataset: TrainTestDataset) -> None:
     print(f"{label} bootstrap OOB samples: {bootstrap.oob_indices.shape[0]}")
     print(f"{label} single-tree train accuracy: {baseline_snapshot.metrics['train_accuracy']:.3f}")
     print(f"{label} single-tree test accuracy: {baseline_snapshot.metrics['test_accuracy']:.3f}")
+    print(f"{label} forest train accuracy: {forest_snapshot.metrics['train_accuracy']:.3f}")
+    print(f"{label} forest test accuracy: {forest_snapshot.metrics['test_accuracy']:.3f}")
+    print(
+        f"{label} forest mean test confidence: "
+        f"{forest_snapshot.metrics['mean_test_confidence']:.3f}",
+    )
 
 
-def _fit_single_tree_baseline(dataset: TrainTestDataset) -> object:
+def _fit_single_tree_baseline(dataset: TrainTestDataset) -> AlgorithmSnapshot:
     """Fit a single-tree baseline and return its snapshot."""
     baseline = SingleTreeBaseline(
         SingleTreeBaselineConfig(max_depth=BASELINE_MAX_DEPTH),
     )
 
     return baseline.reset(dataset)
+
+
+def _fit_random_forest(dataset: TrainTestDataset) -> AlgorithmSnapshot:
+    """Fit a random forest and return its snapshot."""
+    forest = RandomForestModel(
+        RandomForestConfig(
+            tree_count=FOREST_TREE_COUNT,
+            max_depth=FOREST_MAX_DEPTH,
+        ),
+    )
+
+    return forest.reset(dataset)
 
 
 def _print_voting_report(predictions: np.ndarray, confidence: np.ndarray) -> None:
