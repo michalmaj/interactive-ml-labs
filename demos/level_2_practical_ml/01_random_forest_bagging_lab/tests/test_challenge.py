@@ -101,7 +101,9 @@ def test_random_forest_challenge_fails_when_too_many_trees_are_used() -> None:
 
 def test_random_forest_challenge_fails_when_gap_is_too_high() -> None:
     """Challenge should fail when generalization gap is too high."""
-    challenge = RandomForestChallenge()
+    challenge = RandomForestChallenge(
+        RandomForestChallengeConfig(max_generalization_gap=0.05),
+    )
 
     result = challenge.evaluate(
         _report(
