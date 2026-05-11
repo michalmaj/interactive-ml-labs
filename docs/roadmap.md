@@ -122,7 +122,7 @@ Planned pull requests:
 
 - [x] Add Random Forest Bagging Lab package skeleton
 - [x] Add synthetic train/test classification dataset
-- [ ] Add bootstrap sampling utilities
+- [x] Add bootstrap sampling utilities
 - [ ] Add majority voting and vote confidence
 - [ ] Add single-tree baseline
 - [ ] Add random forest model

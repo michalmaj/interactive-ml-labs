@@ -5,21 +5,28 @@ from __future__ import annotations
 import numpy as np
 from ml_lab_core import MetricsHistory
 
+from random_forest_bagging_lab.bootstrap import (
+    BootstrapSampleConfig,
+    make_bootstrap_sample,
+)
 from random_forest_bagging_lab.dataset import (
     DATASET_KIND_AXIS_ALIGNED,
     DATASET_KIND_XOR,
     SyntheticTrainTestDatasetConfig,
+    TrainTestDataset,
     make_synthetic_train_test_dataset,
 )
 
 CLASS_COUNT: int = 2
+BOOTSTRAP_SEED: int = 7
 
 
 def main() -> None:
     """Run a minimal command-line version of the demo.
 
     The random forest implementation will be added in later pull requests.
-    This entry point verifies that the package can generate train/test datasets.
+    This entry point verifies that the package can generate train/test datasets
+    and draw bootstrap samples from training data.
     """
     axis_dataset = make_synthetic_train_test_dataset(
         SyntheticTrainTestDatasetConfig(dataset_kind=DATASET_KIND_AXIS_ALIGNED),
@@ -28,34 +35,43 @@ def main() -> None:
         SyntheticTrainTestDatasetConfig(dataset_kind=DATASET_KIND_XOR),
     )
 
-    axis_history = _build_dataset_history(axis_dataset.train.targets, axis_dataset.test.targets)
-    xor_history = _build_dataset_history(xor_dataset.train.targets, xor_dataset.test.targets)
-
     print("Random Forest Bagging Lab")
-    print("Synthetic train/test datasets generated successfully.")
+    print("Synthetic train/test datasets and bootstrap samples generated successfully.")
 
-    _print_dataset_summary(
-        label="Axis-aligned",
-        train_features=np.asarray(axis_dataset.train.features, dtype=float),
-        test_features=np.asarray(axis_dataset.test.features, dtype=float),
-        history=axis_history,
+    _print_dataset_report("Axis-aligned", axis_dataset)
+    _print_dataset_report("XOR", xor_dataset)
+
+
+def _print_dataset_report(label: str, dataset: TrainTestDataset) -> None:
+    """Print a short CLI report for one train/test dataset."""
+    history = _build_dataset_history(dataset)
+    bootstrap = make_bootstrap_sample(
+        dataset.train,
+        BootstrapSampleConfig(seed=BOOTSTRAP_SEED),
     )
-    _print_dataset_summary(
-        label="XOR",
-        train_features=np.asarray(xor_dataset.train.features, dtype=float),
-        test_features=np.asarray(xor_dataset.test.features, dtype=float),
-        history=xor_history,
-    )
+
+    train_features = np.asarray(dataset.train.features, dtype=float)
+    test_features = np.asarray(dataset.test.features, dtype=float)
+
+    print(f"{label} train features shape: {train_features.shape}")
+    print(f"{label} test features shape: {test_features.shape}")
+    print(f"{label} train class 0 count: {history.latest('train_class_0_count'):.0f}")
+    print(f"{label} train class 1 count: {history.latest('train_class_1_count'):.0f}")
+    print(f"{label} test class 0 count: {history.latest('test_class_0_count'):.0f}")
+    print(f"{label} test class 1 count: {history.latest('test_class_1_count'):.0f}")
+    print(f"{label} bootstrap draw count: {bootstrap.sample_indices.shape[0]}")
+    print(f"{label} bootstrap unique samples: {bootstrap.unique_sample_count}")
+    print(f"{label} bootstrap OOB samples: {bootstrap.oob_indices.shape[0]}")
 
 
-def _build_dataset_history(train_targets: object, test_targets: object) -> MetricsHistory:
+def _build_dataset_history(dataset: TrainTestDataset) -> MetricsHistory:
     """Build simple class-count metrics for one train/test dataset."""
     train_class_counts = np.bincount(
-        np.asarray(train_targets, dtype=int),
+        np.asarray(dataset.train.targets, dtype=int),
         minlength=CLASS_COUNT,
     )
     test_class_counts = np.bincount(
-        np.asarray(test_targets, dtype=int),
+        np.asarray(dataset.test.targets, dtype=int),
         minlength=CLASS_COUNT,
     )
 
@@ -66,19 +82,3 @@ def _build_dataset_history(train_targets: object, test_targets: object) -> Metri
     history.add("test_class_1_count", float(test_class_counts[1]))
 
     return history
-
-
-def _print_dataset_summary(
-    *,
-    label: str,
-    train_features: np.ndarray,
-    test_features: np.ndarray,
-    history: MetricsHistory,
-) -> None:
-    """Print a short CLI summary for one dataset."""
-    print(f"{label} train features shape: {train_features.shape}")
-    print(f"{label} test features shape: {test_features.shape}")
-    print(f"{label} train class 0 count: {history.latest('train_class_0_count'):.0f}")
-    print(f"{label} train class 1 count: {history.latest('train_class_1_count'):.0f}")
-    print(f"{label} test class 0 count: {history.latest('test_class_0_count'):.0f}")
-    print(f"{label} test class 1 count: {history.latest('test_class_1_count'):.0f}")
