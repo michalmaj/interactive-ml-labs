@@ -11,6 +11,7 @@ from ml_lab_core import AlgorithmSnapshot
 from numpy.typing import NDArray
 
 from random_forest_bagging_lab.baseline import SingleTreeBaseline
+from random_forest_bagging_lab.challenge import RandomForestChallengeResult
 from random_forest_bagging_lab.forest import RandomForestModel
 from random_forest_bagging_lab.report import ModelComparisonReport, ModelReportMetrics
 
@@ -33,10 +34,11 @@ TRAIN_POINT_BORDER_COLOR: Final[tuple[int, int, int]] = (255, 255, 255)
 TEST_POINT_BORDER_COLOR: Final[tuple[int, int, int]] = (35, 35, 35)
 AXIS_COLOR: Final[tuple[int, int, int]] = (180, 185, 190)
 ERROR_COLOR: Final[tuple[int, int, int]] = (190, 60, 60)
+SUCCESS_COLOR: Final[tuple[int, int, int]] = (35, 135, 85)
 
 LEFT_PLOT_RECT: Final[pygame.Rect] = pygame.Rect(40, 40, 430, 520)
 RIGHT_PLOT_RECT: Final[pygame.Rect] = pygame.Rect(500, 40, 430, 520)
-SIDE_RECT: Final[pygame.Rect] = pygame.Rect(960, 40, 320, 520)
+SIDE_RECT: Final[pygame.Rect] = pygame.Rect(960, 40, 320, 540)
 BOTTOM_RECT: Final[pygame.Rect] = pygame.Rect(40, 600, 1240, 120)
 
 PADDING: Final[int] = 34
@@ -47,7 +49,7 @@ AXIS_WIDTH: Final[int] = 1
 ERROR_MARK_WIDTH: Final[int] = 2
 GRID_CELL_SIZE: Final[int] = 16
 TEXT_LINE_HEIGHT: Final[int] = 28
-SMALL_TEXT_LINE_HEIGHT: Final[int] = 22
+SMALL_TEXT_LINE_HEIGHT: Final[int] = 21
 
 FEATURE_X_INDEX: Final[int] = 0
 FEATURE_Y_INDEX: Final[int] = 1
@@ -98,6 +100,7 @@ class RandomForestRenderer:
         baseline_snapshot: AlgorithmSnapshot,
         forest_snapshot: AlgorithmSnapshot,
         comparison_report: ModelComparisonReport,
+        challenge_result: RandomForestChallengeResult,
         dataset_kind: str,
         noise_std: float,
         seed: int,
@@ -137,6 +140,7 @@ class RandomForestRenderer:
         )
         self._draw_side_panel(
             comparison_report=comparison_report,
+            challenge_result=challenge_result,
             dataset_kind=dataset_kind,
             noise_std=noise_std,
             seed=seed,
@@ -145,7 +149,10 @@ class RandomForestRenderer:
             bootstrap_sample_ratio=bootstrap_sample_ratio,
             confidence_view_enabled=confidence_view_enabled,
         )
-        self._draw_bottom_panel(confidence_view_enabled=confidence_view_enabled)
+        self._draw_bottom_panel(
+            confidence_view_enabled=confidence_view_enabled,
+            challenge_result=challenge_result,
+        )
 
         pygame.display.flip()
 
@@ -286,6 +293,7 @@ class RandomForestRenderer:
         self,
         *,
         comparison_report: ModelComparisonReport,
+        challenge_result: RandomForestChallengeResult,
         dataset_kind: str,
         noise_std: float,
         seed: int,
@@ -296,10 +304,10 @@ class RandomForestRenderer:
     ) -> None:
         """Draw metrics and current configuration."""
         x = SIDE_RECT.left + 24
-        y = SIDE_RECT.top + 22
+        y = SIDE_RECT.top + 20
 
         self._draw_text("Random Forest", x, y, self._title_font, TEXT_COLOR)
-        y += 42
+        y += 38
 
         rows = [
             ("Dataset", dataset_kind),
@@ -309,18 +317,20 @@ class RandomForestRenderer:
             ("Max depth", str(max_depth)),
             ("Bootstrap", f"{bootstrap_sample_ratio:.2f}"),
             ("Conf. view", _enabled_text(confidence_view_enabled)),
-            ("Winner", comparison_report.winner),
-            ("Test delta", f"{comparison_report.test_accuracy_delta:+.3f}"),
+            ("Challenge", challenge_result.status),
+            ("Target", f"{challenge_result.forest_test_accuracy:.2f}/0.90"),
+            ("Tree limit", f"{tree_count}/{challenge_result.max_tree_count}"),
         ]
 
         for label, value in rows:
+            color = _challenge_color(value) if label == "Challenge" else TEXT_COLOR
             self._draw_text(f"{label}:", x, y, self._small_font, MUTED_TEXT_COLOR)
-            self._draw_text(value, x + 126, y, self._small_font, TEXT_COLOR)
+            self._draw_text(value, x + 126, y, self._small_font, color)
             y += SMALL_TEXT_LINE_HEIGHT
 
-        y += 8
+        y += 6
         self._draw_model_metrics("Single tree", comparison_report.single_tree, x, y)
-        y += 104
+        y += 92
         self._draw_model_metrics("Forest", comparison_report.forest, x, y)
 
     def _draw_model_metrics(
@@ -332,7 +342,7 @@ class RandomForestRenderer:
     ) -> None:
         """Draw compact model metrics."""
         self._draw_text(title, x, y, self._font, TEXT_COLOR)
-        y += 26
+        y += 24
 
         rows = [
             ("Train", f"{metrics.train_accuracy:.3f}"),
@@ -348,7 +358,12 @@ class RandomForestRenderer:
             self._draw_text(value, x + 72, y, self._small_font, TEXT_COLOR)
             y += SMALL_TEXT_LINE_HEIGHT
 
-    def _draw_bottom_panel(self, *, confidence_view_enabled: bool) -> None:
+    def _draw_bottom_panel(
+        self,
+        *,
+        confidence_view_enabled: bool,
+        challenge_result: RandomForestChallengeResult,
+    ) -> None:
         """Draw controls and legend."""
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
@@ -365,9 +380,12 @@ class RandomForestRenderer:
         )
         self._draw_text(legend, x, y + TEXT_LINE_HEIGHT, self._small_font, MUTED_TEXT_COLOR)
 
-        confidence_text = _confidence_view_explanation(confidence_view_enabled)
+        bottom_message = _bottom_message(
+            confidence_view_enabled=confidence_view_enabled,
+            challenge_result=challenge_result,
+        )
         self._draw_text(
-            confidence_text,
+            bottom_message,
             x,
             y + 2 * TEXT_LINE_HEIGHT,
             self._small_font,
@@ -438,6 +456,14 @@ def _blend_colors(
     )
 
 
+def _challenge_color(value: str) -> tuple[int, int, int]:
+    """Return color for challenge status text."""
+    if value == "success":
+        return SUCCESS_COLOR
+
+    return ERROR_COLOR
+
+
 def _enabled_text(value: bool) -> str:
     """Return short enabled/disabled text."""
     if value:
@@ -446,12 +472,26 @@ def _enabled_text(value: bool) -> str:
     return "off"
 
 
+def _bottom_message(
+    *,
+    confidence_view_enabled: bool,
+    challenge_result: RandomForestChallengeResult,
+) -> str:
+    """Return bottom-panel explanation."""
+    if challenge_result.success:
+        return challenge_result.message
+
+    confidence_text = _confidence_view_explanation(confidence_view_enabled)
+
+    return f"{challenge_result.message} {confidence_text}"
+
+
 def _confidence_view_explanation(confidence_view_enabled: bool) -> str:
     """Return explanation for confidence view state."""
     if confidence_view_enabled:
-        return "Confidence view is on: pale forest regions mean weaker agreement between trees."
+        return "Confidence view: pale forest regions mean weaker agreement between trees."
 
-    return "Confidence view is off: forest regions show only final class, not voting strength."
+    return "Confidence view is off: forest regions show final class only."
 
 
 def _compute_world_bounds(train_features: FloatArray, test_features: FloatArray) -> WorldBounds:

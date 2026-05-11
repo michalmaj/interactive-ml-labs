@@ -129,7 +129,7 @@ Planned pull requests:
 - [x] Add CLI prototype
 - [x] Add Pygame visualization
 - [x] Add controls for tree count and max depth
-- [ ] Add train/test accuracy comparison
-- [ ] Add challenge mode
+- [x] Add train/test accuracy comparison
+- [x] Add challenge mode
 - [ ] Add explanation panel
 - [ ] Polish demo documentation
