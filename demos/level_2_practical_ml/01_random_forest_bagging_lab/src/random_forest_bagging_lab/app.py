@@ -5,6 +5,10 @@ from __future__ import annotations
 import numpy as np
 from ml_lab_core import MetricsHistory
 
+from random_forest_bagging_lab.baseline import (
+    SingleTreeBaseline,
+    SingleTreeBaselineConfig,
+)
 from random_forest_bagging_lab.bootstrap import (
     BootstrapSampleConfig,
     make_bootstrap_sample,
@@ -20,6 +24,7 @@ from random_forest_bagging_lab.voting import majority_vote
 
 CLASS_COUNT: int = 2
 BOOTSTRAP_SEED: int = 7
+BASELINE_MAX_DEPTH: int = 2
 
 
 def main() -> None:
@@ -27,7 +32,8 @@ def main() -> None:
 
     The random forest implementation will be added in later pull requests.
     This entry point verifies that the package can generate train/test datasets,
-    draw bootstrap samples, and combine example predictions through voting.
+    draw bootstrap samples, combine example predictions through voting, and
+    evaluate a single-tree baseline.
     """
     axis_dataset = make_synthetic_train_test_dataset(
         SyntheticTrainTestDatasetConfig(dataset_kind=DATASET_KIND_AXIS_ALIGNED),
@@ -49,7 +55,10 @@ def main() -> None:
     )
 
     print("Random Forest Bagging Lab")
-    print("Synthetic train/test datasets, bootstrap samples, and voting generated successfully.")
+    print(
+        "Synthetic train/test datasets, bootstrap samples, voting, "
+        "and baseline tree generated successfully.",
+    )
 
     _print_dataset_report("Axis-aligned", axis_dataset)
     _print_dataset_report("XOR", xor_dataset)
@@ -63,6 +72,7 @@ def _print_dataset_report(label: str, dataset: TrainTestDataset) -> None:
         dataset.train,
         BootstrapSampleConfig(seed=BOOTSTRAP_SEED),
     )
+    baseline_snapshot = _fit_single_tree_baseline(dataset)
 
     train_features = np.asarray(dataset.train.features, dtype=float)
     test_features = np.asarray(dataset.test.features, dtype=float)
@@ -76,6 +86,17 @@ def _print_dataset_report(label: str, dataset: TrainTestDataset) -> None:
     print(f"{label} bootstrap draw count: {bootstrap.sample_indices.shape[0]}")
     print(f"{label} bootstrap unique samples: {bootstrap.unique_sample_count}")
     print(f"{label} bootstrap OOB samples: {bootstrap.oob_indices.shape[0]}")
+    print(f"{label} single-tree train accuracy: {baseline_snapshot.metrics['train_accuracy']:.3f}")
+    print(f"{label} single-tree test accuracy: {baseline_snapshot.metrics['test_accuracy']:.3f}")
+
+
+def _fit_single_tree_baseline(dataset: TrainTestDataset) -> object:
+    """Fit a single-tree baseline and return its snapshot."""
+    baseline = SingleTreeBaseline(
+        SingleTreeBaselineConfig(max_depth=BASELINE_MAX_DEPTH),
+    )
+
+    return baseline.reset(dataset)
 
 
 def _print_voting_report(predictions: np.ndarray, confidence: np.ndarray) -> None:

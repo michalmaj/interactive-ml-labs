@@ -254,12 +254,14 @@ name = "random-forest-bagging-lab"
 version = "0.1.0"
 source = { editable = "demos/level_2_practical_ml/01_random_forest_bagging_lab" }
 dependencies = [
+    { name = "decision-tree-splitter" },
     { name = "ml-lab-core" },
     { name = "numpy" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "decision-tree-splitter", editable = "demos/level_1_fundamentals/04_decision_tree_splitter" },
     { name = "ml-lab-core", editable = "packages/ml_lab_core" },
     { name = "numpy", specifier = ">=2.4.4" },
 ]

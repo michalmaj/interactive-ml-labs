@@ -5,6 +5,7 @@ description = "Interactive random forest and bagging demo for machine learning e
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "decision-tree-splitter",
     "ml-lab-core",
     "numpy>=2.4.4",
 ]
@@ -13,6 +14,7 @@ dependencies = [
 random-forest-bagging-lab = "random_forest_bagging_lab.app:main"
 
 [tool.uv.sources]
+decision-tree-splitter = { workspace = true }
 ml-lab-core = { workspace = true }
 
 [build-system]

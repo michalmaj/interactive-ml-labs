@@ -124,7 +124,7 @@ Planned pull requests:
 - [x] Add synthetic train/test classification dataset
 - [x] Add bootstrap sampling utilities
 - [x] Add majority voting and vote confidence
-- [ ] Add single-tree baseline
+- [x] Add single-tree baseline
 - [ ] Add random forest model
 - [ ] Add CLI prototype
 - [ ] Add Pygame visualization
