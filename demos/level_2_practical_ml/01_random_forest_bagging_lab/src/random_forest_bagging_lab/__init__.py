@@ -1,5 +1,9 @@
 """Random Forest Bagging Lab demo package."""
 
+from random_forest_bagging_lab.baseline import (
+    SingleTreeBaseline,
+    SingleTreeBaselineConfig,
+)
 from random_forest_bagging_lab.bootstrap import (
     BootstrapSample,
     BootstrapSampleConfig,
@@ -23,6 +27,8 @@ __all__ = [
     "DATASET_KIND_XOR",
     "BootstrapSample",
     "BootstrapSampleConfig",
+    "SingleTreeBaseline",
+    "SingleTreeBaselineConfig",
     "SyntheticTrainTestDatasetConfig",
     "TrainTestDataset",
     "VotingResult",
