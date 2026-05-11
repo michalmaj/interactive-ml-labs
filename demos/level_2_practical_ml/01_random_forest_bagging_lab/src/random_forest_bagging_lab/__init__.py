@@ -22,6 +22,13 @@ from random_forest_bagging_lab.dataset import (
     TrainTestDataset,
     make_synthetic_train_test_dataset,
 )
+from random_forest_bagging_lab.explanation import (
+    build_bottom_panel_explanation,
+    build_challenge_target_text,
+    build_confidence_view_explanation,
+    build_gap_limit_text,
+    build_tree_limit_text,
+)
 from random_forest_bagging_lab.forest import (
     ForestTreeMember,
     RandomForestConfig,
@@ -56,7 +63,12 @@ __all__ = [
     "SyntheticTrainTestDatasetConfig",
     "TrainTestDataset",
     "VotingResult",
+    "build_bottom_panel_explanation",
+    "build_challenge_target_text",
+    "build_confidence_view_explanation",
+    "build_gap_limit_text",
     "build_model_comparison_report",
+    "build_tree_limit_text",
     "format_model_comparison_report",
     "majority_vote",
     "make_bootstrap_indices",
