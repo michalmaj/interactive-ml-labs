@@ -12,6 +12,12 @@ from numpy.typing import NDArray
 
 from random_forest_bagging_lab.baseline import SingleTreeBaseline
 from random_forest_bagging_lab.challenge import RandomForestChallengeResult
+from random_forest_bagging_lab.explanation import (
+    build_bottom_panel_explanation,
+    build_challenge_target_text,
+    build_gap_limit_text,
+    build_tree_limit_text,
+)
 from random_forest_bagging_lab.forest import RandomForestModel
 from random_forest_bagging_lab.report import ModelComparisonReport, ModelReportMetrics
 
@@ -318,8 +324,9 @@ class RandomForestRenderer:
             ("Bootstrap", f"{bootstrap_sample_ratio:.2f}"),
             ("Conf. view", _enabled_text(confidence_view_enabled)),
             ("Challenge", challenge_result.status),
-            ("Target", f"{challenge_result.forest_test_accuracy:.2f}/0.90"),
-            ("Tree limit", f"{tree_count}/{challenge_result.max_tree_count}"),
+            ("Target", build_challenge_target_text(challenge_result)),
+            ("Tree limit", build_tree_limit_text(challenge_result)),
+            ("Gap limit", build_gap_limit_text(challenge_result)),
         ]
 
         for label, value in rows:
@@ -328,9 +335,9 @@ class RandomForestRenderer:
             self._draw_text(value, x + 126, y, self._small_font, color)
             y += SMALL_TEXT_LINE_HEIGHT
 
-        y += 6
+        y += 4
         self._draw_model_metrics("Single tree", comparison_report.single_tree, x, y)
-        y += 92
+        y += 88
         self._draw_model_metrics("Forest", comparison_report.forest, x, y)
 
     def _draw_model_metrics(
@@ -380,7 +387,7 @@ class RandomForestRenderer:
         )
         self._draw_text(legend, x, y + TEXT_LINE_HEIGHT, self._small_font, MUTED_TEXT_COLOR)
 
-        bottom_message = _bottom_message(
+        bottom_message = build_bottom_panel_explanation(
             confidence_view_enabled=confidence_view_enabled,
             challenge_result=challenge_result,
         )
@@ -470,28 +477,6 @@ def _enabled_text(value: bool) -> str:
         return "on"
 
     return "off"
-
-
-def _bottom_message(
-    *,
-    confidence_view_enabled: bool,
-    challenge_result: RandomForestChallengeResult,
-) -> str:
-    """Return bottom-panel explanation."""
-    if challenge_result.success:
-        return challenge_result.message
-
-    confidence_text = _confidence_view_explanation(confidence_view_enabled)
-
-    return f"{challenge_result.message} {confidence_text}"
-
-
-def _confidence_view_explanation(confidence_view_enabled: bool) -> str:
-    """Return explanation for confidence view state."""
-    if confidence_view_enabled:
-        return "Confidence view: pale forest regions mean weaker agreement between trees."
-
-    return "Confidence view is off: forest regions show final class only."
 
 
 def _compute_world_bounds(train_features: FloatArray, test_features: FloatArray) -> WorldBounds:

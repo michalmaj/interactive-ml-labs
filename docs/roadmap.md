@@ -131,5 +131,5 @@ Planned pull requests:
 - [x] Add controls for tree count and max depth
 - [x] Add train/test accuracy comparison
 - [x] Add challenge mode
-- [ ] Add explanation panel
+- [x] Add explanation panel
 - [ ] Polish demo documentation
