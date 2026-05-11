@@ -22,6 +22,12 @@ from random_forest_bagging_lab.forest import (
     RandomForestConfig,
     RandomForestModel,
 )
+from random_forest_bagging_lab.report import (
+    ModelComparisonReport,
+    ModelReportMetrics,
+    build_model_comparison_report,
+    format_model_comparison_report,
+)
 from random_forest_bagging_lab.voting import (
     VotingResult,
     majority_vote,
@@ -33,6 +39,8 @@ __all__ = [
     "BootstrapSample",
     "BootstrapSampleConfig",
     "ForestTreeMember",
+    "ModelComparisonReport",
+    "ModelReportMetrics",
     "RandomForestConfig",
     "RandomForestModel",
     "SingleTreeBaseline",
@@ -40,6 +48,8 @@ __all__ = [
     "SyntheticTrainTestDatasetConfig",
     "TrainTestDataset",
     "VotingResult",
+    "build_model_comparison_report",
+    "format_model_comparison_report",
     "majority_vote",
     "make_bootstrap_indices",
     "make_bootstrap_sample",
