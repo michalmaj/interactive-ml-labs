@@ -17,6 +17,11 @@ from random_forest_bagging_lab.dataset import (
     TrainTestDataset,
     make_synthetic_train_test_dataset,
 )
+from random_forest_bagging_lab.forest import (
+    ForestTreeMember,
+    RandomForestConfig,
+    RandomForestModel,
+)
 from random_forest_bagging_lab.voting import (
     VotingResult,
     majority_vote,
@@ -27,6 +32,9 @@ __all__ = [
     "DATASET_KIND_XOR",
     "BootstrapSample",
     "BootstrapSampleConfig",
+    "ForestTreeMember",
+    "RandomForestConfig",
+    "RandomForestModel",
     "SingleTreeBaseline",
     "SingleTreeBaselineConfig",
     "SyntheticTrainTestDatasetConfig",
