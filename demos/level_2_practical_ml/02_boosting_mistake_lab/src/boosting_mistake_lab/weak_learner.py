@@ -10,6 +10,7 @@ from ml_lab_core import AlgorithmSnapshot
 from numpy.typing import ArrayLike, NDArray
 
 from boosting_mistake_lab.dataset import WeightedTrainTestDataset
+from boosting_mistake_lab.weighted_error import evaluate_weighted_predictions
 
 type FloatArray = NDArray[np.float64]
 type IntArray = NDArray[np.int_]
@@ -54,8 +55,9 @@ class WeakLearnerSplit:
 class WeakLearnerBaseline:
     """A simple decision-stump weak learner baseline.
 
-    This baseline intentionally ignores sample weights for now. The next PR will
-    add weighted error computation and connect this learner to boosting logic.
+    The split is still selected using unweighted training error. Weighted error
+    is computed after fitting, which prepares the project for the next boosting
+    steps: learner weight and sample weight update.
     """
 
     name: str = "weak_learner_baseline"
@@ -106,6 +108,11 @@ class WeakLearnerBaseline:
             sample_count=train_targets.shape[0],
             split_name="train",
         )
+        _validate_sample_weights(
+            sample_weights=dataset.test.sample_weights,
+            sample_count=test_targets.shape[0],
+            split_name="test",
+        )
 
         split = _find_best_stump_split(
             features=train_features,
@@ -117,8 +124,17 @@ class WeakLearnerBaseline:
 
         train_accuracy = _accuracy_score(train_targets, train_predictions)
         test_accuracy = _accuracy_score(test_targets, test_predictions)
-        train_mistakes = train_predictions != train_targets
-        test_mistakes = test_predictions != test_targets
+
+        train_weighted_result = evaluate_weighted_predictions(
+            y_true=train_targets,
+            y_pred=train_predictions,
+            sample_weights=dataset.train.sample_weights,
+        )
+        test_weighted_result = evaluate_weighted_predictions(
+            y_true=test_targets,
+            y_pred=test_predictions,
+            sample_weights=dataset.test.sample_weights,
+        )
 
         snapshot = AlgorithmSnapshot(
             iteration=1,
@@ -128,6 +144,10 @@ class WeakLearnerBaseline:
                 "test_accuracy": test_accuracy,
                 "train_error": 1.0 - train_accuracy,
                 "test_error": 1.0 - test_accuracy,
+                "weighted_train_accuracy": train_weighted_result.weighted_accuracy,
+                "weighted_train_error": train_weighted_result.weighted_error,
+                "weighted_test_accuracy": test_weighted_result.weighted_accuracy,
+                "weighted_test_error": test_weighted_result.weighted_error,
                 "feature_index": split.feature_index,
                 "threshold": split.threshold,
                 "left_prediction": split.left_prediction,
@@ -138,17 +158,21 @@ class WeakLearnerBaseline:
                 "train_features": train_features,
                 "train_targets": train_targets,
                 "train_predictions": train_predictions,
-                "train_mistakes": train_mistakes,
+                "train_mistakes": train_weighted_result.mistake_mask,
+                "train_correct": train_weighted_result.correct_mask,
                 "train_sample_weights": dataset.train.sample_weights,
                 "test_features": test_features,
                 "test_targets": test_targets,
                 "test_predictions": test_predictions,
-                "test_mistakes": test_mistakes,
+                "test_mistakes": test_weighted_result.mistake_mask,
+                "test_correct": test_weighted_result.correct_mask,
+                "test_sample_weights": dataset.test.sample_weights,
                 "split": split,
             },
             annotations=(
                 "Weak learner baseline fitted as a decision stump.",
                 f"Train accuracy: {train_accuracy:.3f}; test accuracy: {test_accuracy:.3f}.",
+                f"Weighted train error: {train_weighted_result.weighted_error:.3f}.",
             ),
             done=True,
         )
