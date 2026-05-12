@@ -14,6 +14,12 @@ from boosting_mistake_lab.weak_learner import (
     WeakLearnerConfig,
     WeakLearnerSplit,
 )
+from boosting_mistake_lab.weighted_error import (
+    WeightedErrorResult,
+    evaluate_weighted_predictions,
+    weighted_accuracy_score,
+    weighted_error_score,
+)
 
 __all__ = [
     "DATASET_KIND_AXIS_ALIGNED",
@@ -23,7 +29,11 @@ __all__ = [
     "WeakLearnerConfig",
     "WeakLearnerSplit",
     "WeightedDatasetSplit",
+    "WeightedErrorResult",
     "WeightedTrainTestDataset",
+    "evaluate_weighted_predictions",
     "make_synthetic_weighted_dataset",
     "make_uniform_sample_weights",
+    "weighted_accuracy_score",
+    "weighted_error_score",
 ]

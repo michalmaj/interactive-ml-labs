@@ -251,3 +251,42 @@ def test_weak_learner_rejects_dataset_without_valid_split() -> None:
 
     with pytest.raises(ValueError, match="No valid weak learner split"):
         learner.reset(dataset)
+
+
+def test_weak_learner_snapshot_contains_weighted_metrics() -> None:
+    """Snapshot should contain weighted error metrics."""
+    learner = WeakLearnerBaseline()
+
+    snapshot = learner.reset(_dataset(DATASET_KIND_XOR))
+
+    assert "weighted_train_accuracy" in snapshot.metrics
+    assert "weighted_train_error" in snapshot.metrics
+    assert "weighted_test_accuracy" in snapshot.metrics
+    assert "weighted_test_error" in snapshot.metrics
+    assert 0.0 <= float(snapshot.metrics["weighted_train_error"]) <= 1.0
+    assert 0.0 <= float(snapshot.metrics["weighted_test_error"]) <= 1.0
+
+
+def test_weak_learner_weighted_error_matches_unweighted_error_for_uniform_weights() -> None:
+    """With uniform weights, weighted error should match regular error."""
+    learner = WeakLearnerBaseline()
+
+    snapshot = learner.reset(_dataset(DATASET_KIND_XOR))
+
+    assert snapshot.metrics["weighted_train_error"] == pytest.approx(
+        snapshot.metrics["train_error"],
+    )
+    assert snapshot.metrics["weighted_test_error"] == pytest.approx(
+        snapshot.metrics["test_error"],
+    )
+
+
+def test_weak_learner_snapshot_contains_test_sample_weights() -> None:
+    """Snapshot should expose test sample weights."""
+    learner = WeakLearnerBaseline()
+
+    snapshot = learner.reset(_dataset(DATASET_KIND_XOR))
+
+    assert "test_sample_weights" in snapshot.visual_state
+    assert "train_correct" in snapshot.visual_state
+    assert "test_correct" in snapshot.visual_state
