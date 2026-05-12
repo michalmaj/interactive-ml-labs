@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
-from ml_lab_core import MetricsHistory
+from ml_lab_core import AlgorithmSnapshot, MetricsHistory
 
 from boosting_mistake_lab.dataset import (
     DATASET_KIND_AXIS_ALIGNED,
@@ -12,6 +12,7 @@ from boosting_mistake_lab.dataset import (
     WeightedTrainTestDataset,
     make_synthetic_weighted_dataset,
 )
+from boosting_mistake_lab.weak_learner import WeakLearnerBaseline
 
 CLASS_COUNT: int = 2
 
@@ -19,9 +20,9 @@ CLASS_COUNT: int = 2
 def main() -> None:
     """Run a minimal command-line version of the demo.
 
-    The real boosting implementation will be added in later pull requests.
+    The full boosting implementation will be added in later pull requests.
     This entry point verifies that the package can generate weighted train/test
-    datasets and expose normalized initial sample weights.
+    datasets and train a simple weak learner baseline.
     """
     axis_dataset = make_synthetic_weighted_dataset(
         SyntheticWeightedDatasetConfig(dataset_kind=DATASET_KIND_AXIS_ALIGNED),
@@ -31,7 +32,7 @@ def main() -> None:
     )
 
     print("Boosting Mistake Lab")
-    print("Synthetic weighted train/test datasets generated successfully.")
+    print("Weighted datasets and weak learner baselines generated successfully.")
 
     _print_dataset_report("Axis-aligned", axis_dataset)
     _print_dataset_report("XOR", xor_dataset)
@@ -40,6 +41,7 @@ def main() -> None:
 def _print_dataset_report(label: str, dataset: WeightedTrainTestDataset) -> None:
     """Print a short CLI report for one weighted dataset."""
     history = _build_dataset_history(dataset)
+    weak_snapshot = _fit_weak_learner(dataset)
 
     train_features = np.asarray(dataset.train.snapshot.features, dtype=float)
     test_features = np.asarray(dataset.test.snapshot.features, dtype=float)
@@ -54,6 +56,20 @@ def _print_dataset_report(label: str, dataset: WeightedTrainTestDataset) -> None
     print(f"{label} test weight sum: {history.latest('test_weight_sum'):.2f}")
     print(f"{label} max train weight: {history.latest('max_train_weight'):.4f}")
     print(f"{label} min train weight: {history.latest('min_train_weight'):.4f}")
+    print(f"{label} weak learner train accuracy: {weak_snapshot.metrics['train_accuracy']:.3f}")
+    print(f"{label} weak learner test accuracy: {weak_snapshot.metrics['test_accuracy']:.3f}")
+    print(
+        f"{label} weak learner split: "
+        f"x{int(weak_snapshot.metrics['feature_index']) + 1} "
+        f"<= {weak_snapshot.metrics['threshold']:.3f}",
+    )
+
+
+def _fit_weak_learner(dataset: WeightedTrainTestDataset) -> AlgorithmSnapshot:
+    """Fit a weak learner baseline and return its snapshot."""
+    weak_learner = WeakLearnerBaseline()
+
+    return weak_learner.reset(dataset)
 
 
 def _build_dataset_history(dataset: WeightedTrainTestDataset) -> MetricsHistory:
