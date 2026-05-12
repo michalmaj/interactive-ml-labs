@@ -10,6 +10,7 @@ from ml_lab_core import AlgorithmSnapshot
 from numpy.typing import ArrayLike, NDArray
 
 from boosting_mistake_lab.dataset import WeightedTrainTestDataset
+from boosting_mistake_lab.learner_weight import compute_learner_weight
 from boosting_mistake_lab.weighted_error import evaluate_weighted_predictions
 
 type FloatArray = NDArray[np.float64]
@@ -56,8 +57,8 @@ class WeakLearnerBaseline:
     """A simple decision-stump weak learner baseline.
 
     The split is still selected using unweighted training error. Weighted error
-    is computed after fitting, which prepares the project for the next boosting
-    steps: learner weight and sample weight update.
+    and learner weight are computed after fitting, which prepares the project
+    for the next boosting step: sample weight update.
     """
 
     name: str = "weak_learner_baseline"
@@ -135,6 +136,9 @@ class WeakLearnerBaseline:
             y_pred=test_predictions,
             sample_weights=dataset.test.sample_weights,
         )
+        learner_weight_result = compute_learner_weight(
+            weighted_error=train_weighted_result.weighted_error,
+        )
 
         snapshot = AlgorithmSnapshot(
             iteration=1,
@@ -148,6 +152,8 @@ class WeakLearnerBaseline:
                 "weighted_train_error": train_weighted_result.weighted_error,
                 "weighted_test_accuracy": test_weighted_result.weighted_accuracy,
                 "weighted_test_error": test_weighted_result.weighted_error,
+                "learner_weight": learner_weight_result.learner_weight,
+                "clipped_weighted_train_error": (learner_weight_result.clipped_weighted_error),
                 "feature_index": split.feature_index,
                 "threshold": split.threshold,
                 "left_prediction": split.left_prediction,
@@ -168,11 +174,13 @@ class WeakLearnerBaseline:
                 "test_correct": test_weighted_result.correct_mask,
                 "test_sample_weights": dataset.test.sample_weights,
                 "split": split,
+                "learner_weight_result": learner_weight_result,
             },
             annotations=(
                 "Weak learner baseline fitted as a decision stump.",
                 f"Train accuracy: {train_accuracy:.3f}; test accuracy: {test_accuracy:.3f}.",
                 f"Weighted train error: {train_weighted_result.weighted_error:.3f}.",
+                f"Learner weight: {learner_weight_result.learner_weight:.3f}.",
             ),
             done=True,
         )
