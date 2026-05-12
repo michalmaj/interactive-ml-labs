@@ -59,3 +59,8 @@ jobs:
         run: >
           uv run --package random-forest-bagging-lab
           pytest demos/level_2_practical_ml/01_random_forest_bagging_lab/tests
+
+      - name: Run Boosting Mistake Lab tests
+        run: >
+          uv run --package boosting-mistake-lab
+          pytest demos/level_2_practical_ml/02_boosting_mistake_lab/tests
