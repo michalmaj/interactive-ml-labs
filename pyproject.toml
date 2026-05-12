@@ -17,6 +17,7 @@ members = [
     "demos/level_1_fundamentals/03_logistic_regression_boundary_lab",
     "demos/level_1_fundamentals/04_decision_tree_splitter",
     "demos/level_2_practical_ml/01_random_forest_bagging_lab",
+    "demos/level_2_practical_ml/02_boosting_mistake_lab",
 ]
 
 [dependency-groups]
