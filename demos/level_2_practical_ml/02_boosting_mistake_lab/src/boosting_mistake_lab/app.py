@@ -22,7 +22,8 @@ def main() -> None:
 
     The full boosting implementation will be added in later pull requests.
     This entry point verifies that the package can generate weighted train/test
-    datasets, train a weak learner, and compute weighted error.
+    datasets, train a weak learner, compute weighted error, and compute learner
+    weight.
     """
     axis_dataset = make_synthetic_weighted_dataset(
         SyntheticWeightedDatasetConfig(dataset_kind=DATASET_KIND_AXIS_ALIGNED),
@@ -32,7 +33,10 @@ def main() -> None:
     )
 
     print("Boosting Mistake Lab")
-    print("Weighted datasets, weak learners, and weighted errors generated successfully.")
+    print(
+        "Weighted datasets, weak learners, weighted errors, "
+        "and learner weights generated successfully.",
+    )
 
     _print_dataset_report("Axis-aligned", axis_dataset)
     _print_dataset_report("XOR", xor_dataset)
@@ -65,6 +69,9 @@ def _print_dataset_report(label: str, dataset: WeightedTrainTestDataset) -> None
     print(
         f"{label} weak learner weighted test error: "
         f"{weak_snapshot.metrics['weighted_test_error']:.3f}",
+    )
+    print(
+        f"{label} weak learner weight alpha: {weak_snapshot.metrics['learner_weight']:.3f}",
     )
     print(
         f"{label} weak learner split: "

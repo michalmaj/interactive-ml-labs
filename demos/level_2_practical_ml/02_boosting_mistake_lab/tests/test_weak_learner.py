@@ -290,3 +290,32 @@ def test_weak_learner_snapshot_contains_test_sample_weights() -> None:
     assert "test_sample_weights" in snapshot.visual_state
     assert "train_correct" in snapshot.visual_state
     assert "test_correct" in snapshot.visual_state
+
+
+def test_weak_learner_snapshot_contains_learner_weight_metrics() -> None:
+    """Snapshot should contain learner weight metrics."""
+    learner = WeakLearnerBaseline()
+
+    snapshot = learner.reset(_dataset(DATASET_KIND_XOR))
+
+    assert "learner_weight" in snapshot.metrics
+    assert "clipped_weighted_train_error" in snapshot.metrics
+    assert "learner_weight_result" in snapshot.visual_state
+
+
+def test_weak_learner_axis_aligned_has_positive_learner_weight() -> None:
+    """A perfect axis-aligned stump should get a positive clipped learner weight."""
+    learner = WeakLearnerBaseline()
+
+    snapshot = learner.reset(_dataset(DATASET_KIND_AXIS_ALIGNED))
+
+    assert float(snapshot.metrics["learner_weight"]) > 0.0
+
+
+def test_weak_learner_xor_has_near_zero_learner_weight() -> None:
+    """A weak XOR stump should have near-zero learner weight."""
+    learner = WeakLearnerBaseline()
+
+    snapshot = learner.reset(_dataset(DATASET_KIND_XOR))
+
+    assert snapshot.metrics["learner_weight"] == pytest.approx(0.0)
