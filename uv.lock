@@ -4,6 +4,7 @@ requires-python = ">=3.12"
 
 [manifest]
 members = [
+    "boosting-mistake-lab",
     "decision-tree-splitter",
     "gradient-descent-playground",
     "interactive-ml-labs-workspace",
@@ -12,6 +13,17 @@ members = [
     "ml-lab-core",
     "random-forest-bagging-lab",
 ]
+
+[[package]]
+name = "boosting-mistake-lab"
+version = "0.1.0"
+source = { editable = "demos/level_2_practical_ml/02_boosting_mistake_lab" }
+dependencies = [
+    { name = "ml-lab-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "ml-lab-core", editable = "packages/ml_lab_core" }]
 
 [[package]]
 name = "colorama"
