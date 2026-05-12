@@ -20,10 +20,14 @@ version = "0.1.0"
 source = { editable = "demos/level_2_practical_ml/02_boosting_mistake_lab" }
 dependencies = [
     { name = "ml-lab-core" },
+    { name = "numpy" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "ml-lab-core", editable = "packages/ml_lab_core" }]
+requires-dist = [
+    { name = "ml-lab-core", editable = "packages/ml_lab_core" },
+    { name = "numpy", specifier = ">=2.4.4" },
+]
 
 [[package]]
 name = "colorama"
