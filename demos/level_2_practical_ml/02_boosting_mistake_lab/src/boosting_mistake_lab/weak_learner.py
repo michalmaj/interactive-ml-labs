@@ -11,6 +11,7 @@ from numpy.typing import ArrayLike, NDArray
 
 from boosting_mistake_lab.dataset import WeightedTrainTestDataset
 from boosting_mistake_lab.learner_weight import compute_learner_weight
+from boosting_mistake_lab.sample_weight_update import update_sample_weights
 from boosting_mistake_lab.weighted_error import evaluate_weighted_predictions
 
 type FloatArray = NDArray[np.float64]
@@ -56,9 +57,9 @@ class WeakLearnerSplit:
 class WeakLearnerBaseline:
     """A simple decision-stump weak learner baseline.
 
-    The split is still selected using unweighted training error. Weighted error
-    and learner weight are computed after fitting, which prepares the project
-    for the next boosting step: sample weight update.
+    The split is still selected using unweighted training error. Weighted error,
+    learner weight, and next sample weights are computed after fitting, which
+    prepares the project for multi-round boosting.
     """
 
     name: str = "weak_learner_baseline"
@@ -139,6 +140,12 @@ class WeakLearnerBaseline:
         learner_weight_result = compute_learner_weight(
             weighted_error=train_weighted_result.weighted_error,
         )
+        weight_update_result = update_sample_weights(
+            y_true=train_targets,
+            y_pred=train_predictions,
+            sample_weights=dataset.train.sample_weights,
+            learner_weight=learner_weight_result.learner_weight,
+        )
 
         snapshot = AlgorithmSnapshot(
             iteration=1,
@@ -154,6 +161,16 @@ class WeakLearnerBaseline:
                 "weighted_test_error": test_weighted_result.weighted_error,
                 "learner_weight": learner_weight_result.learner_weight,
                 "clipped_weighted_train_error": (learner_weight_result.clipped_weighted_error),
+                "old_mistake_weight_sum": weight_update_result.old_mistake_weight_sum,
+                "updated_mistake_weight_sum": (weight_update_result.updated_mistake_weight_sum),
+                "old_correct_weight_sum": weight_update_result.old_correct_weight_sum,
+                "updated_correct_weight_sum": (weight_update_result.updated_correct_weight_sum),
+                "max_updated_train_weight": float(
+                    np.max(weight_update_result.updated_weights),
+                ),
+                "min_updated_train_weight": float(
+                    np.min(weight_update_result.updated_weights),
+                ),
                 "feature_index": split.feature_index,
                 "threshold": split.threshold,
                 "left_prediction": split.left_prediction,
@@ -167,6 +184,7 @@ class WeakLearnerBaseline:
                 "train_mistakes": train_weighted_result.mistake_mask,
                 "train_correct": train_weighted_result.correct_mask,
                 "train_sample_weights": dataset.train.sample_weights,
+                "updated_train_sample_weights": weight_update_result.updated_weights,
                 "test_features": test_features,
                 "test_targets": test_targets,
                 "test_predictions": test_predictions,
@@ -175,12 +193,14 @@ class WeakLearnerBaseline:
                 "test_sample_weights": dataset.test.sample_weights,
                 "split": split,
                 "learner_weight_result": learner_weight_result,
+                "weight_update_result": weight_update_result,
             },
             annotations=(
                 "Weak learner baseline fitted as a decision stump.",
                 f"Train accuracy: {train_accuracy:.3f}; test accuracy: {test_accuracy:.3f}.",
                 f"Weighted train error: {train_weighted_result.weighted_error:.3f}.",
                 f"Learner weight: {learner_weight_result.learner_weight:.3f}.",
+                "Next training sample weights computed for the following boosting round.",
             ),
             done=True,
         )

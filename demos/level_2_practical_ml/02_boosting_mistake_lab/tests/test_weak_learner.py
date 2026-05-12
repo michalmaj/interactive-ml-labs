@@ -319,3 +319,58 @@ def test_weak_learner_xor_has_near_zero_learner_weight() -> None:
     snapshot = learner.reset(_dataset(DATASET_KIND_XOR))
 
     assert snapshot.metrics["learner_weight"] == pytest.approx(0.0)
+
+
+def test_weak_learner_snapshot_contains_sample_weight_update_metrics() -> None:
+    """Snapshot should contain sample weight update metrics."""
+    learner = WeakLearnerBaseline()
+
+    snapshot = learner.reset(_dataset(DATASET_KIND_XOR))
+
+    assert "old_mistake_weight_sum" in snapshot.metrics
+    assert "updated_mistake_weight_sum" in snapshot.metrics
+    assert "old_correct_weight_sum" in snapshot.metrics
+    assert "updated_correct_weight_sum" in snapshot.metrics
+    assert "max_updated_train_weight" in snapshot.metrics
+    assert "min_updated_train_weight" in snapshot.metrics
+
+
+def test_weak_learner_snapshot_contains_updated_train_weights() -> None:
+    """Snapshot should expose updated train sample weights."""
+    learner = WeakLearnerBaseline()
+
+    snapshot = learner.reset(_dataset(DATASET_KIND_XOR))
+    updated_weights = np.asarray(snapshot.visual_state["updated_train_sample_weights"])
+
+    assert "updated_train_sample_weights" in snapshot.visual_state
+    assert "weight_update_result" in snapshot.visual_state
+    assert np.sum(updated_weights) == pytest.approx(1.0)
+
+
+def test_weak_learner_updates_mistake_weights_when_alpha_is_positive() -> None:
+    """Mistake weights should increase when the learner has positive alpha."""
+    source = make_synthetic_weighted_dataset(
+        SyntheticWeightedDatasetConfig(
+            train_samples_per_class=SAMPLES_PER_CLASS,
+            test_samples_per_class=SAMPLES_PER_CLASS,
+            class_distance=CLASS_DISTANCE,
+            noise_std=0.4,
+            seed=1,
+            dataset_kind=DATASET_KIND_AXIS_ALIGNED,
+        ),
+    )
+    learner = WeakLearnerBaseline()
+
+    snapshot = learner.reset(source)
+
+    if float(snapshot.metrics["learner_weight"]) <= 0.0:
+        pytest.skip("This deterministic dataset did not produce a positive alpha.")
+
+    old_weights = np.asarray(snapshot.visual_state["train_sample_weights"])
+    updated_weights = np.asarray(snapshot.visual_state["updated_train_sample_weights"])
+    mistakes = np.asarray(snapshot.visual_state["train_mistakes"], dtype=bool)
+
+    if not np.any(mistakes):
+        pytest.skip("This deterministic dataset did not produce train mistakes.")
+
+    assert np.mean(updated_weights[mistakes]) > np.mean(old_weights[mistakes])
