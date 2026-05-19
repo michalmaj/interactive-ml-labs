@@ -24,6 +24,15 @@ from boosting_mistake_lab.learner_weight import (
     LearnerWeightResult,
     compute_learner_weight,
 )
+from boosting_mistake_lab.report import (
+    BOOSTED_ENSEMBLE_NAME,
+    WEAK_LEARNER_NAME,
+    BoostedEnsembleReportMetrics,
+    BoostingComparisonReport,
+    WeakLearnerReportMetrics,
+    build_boosting_comparison_report,
+    format_boosting_comparison_report,
+)
 from boosting_mistake_lab.sample_weight_update import (
     SampleWeightUpdateResult,
     update_sample_weights,
@@ -50,9 +59,13 @@ from boosting_mistake_lab.weighted_error import (
 )
 
 __all__ = [
+    "BOOSTED_ENSEMBLE_NAME",
     "DATASET_KIND_AXIS_ALIGNED",
     "DATASET_KIND_XOR",
+    "WEAK_LEARNER_NAME",
+    "BoostedEnsembleReportMetrics",
     "BoostedPredictionResult",
+    "BoostingComparisonReport",
     "BoostingRoundConfig",
     "BoostingRoundResult",
     "BoostingTrainer",
@@ -64,14 +77,17 @@ __all__ = [
     "SyntheticWeightedDatasetConfig",
     "WeakLearnerBaseline",
     "WeakLearnerConfig",
+    "WeakLearnerReportMetrics",
     "WeakLearnerSplit",
     "WeightedDatasetSplit",
     "WeightedErrorResult",
     "WeightedTrainTestDataset",
     "boosted_accuracy_score",
+    "build_boosting_comparison_report",
     "build_staged_boosting_history",
     "compute_learner_weight",
     "evaluate_weighted_predictions",
+    "format_boosting_comparison_report",
     "make_next_round_dataset",
     "make_synthetic_weighted_dataset",
     "make_uniform_sample_weights",
