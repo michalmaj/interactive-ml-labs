@@ -10,7 +10,6 @@ from ml_lab_core import AlgorithmSnapshot
 from numpy.typing import NDArray
 
 from boosting_mistake_lab.boosted_prediction import (
-    boosted_accuracy_score,
     predict_boosted_ensemble,
 )
 from boosting_mistake_lab.boosting_round import (
@@ -19,6 +18,10 @@ from boosting_mistake_lab.boosting_round import (
     run_boosting_round,
 )
 from boosting_mistake_lab.dataset import WeightedTrainTestDataset
+from boosting_mistake_lab.staged_history import (
+    StagedBoostingHistory,
+    build_staged_boosting_history,
+)
 
 type FloatArray = NDArray[np.float64]
 
@@ -50,6 +53,7 @@ class BoostingTrainerResult:
         round_results: Results of all boosting rounds.
         initial_dataset: Dataset used at the beginning of training.
         final_dataset: Dataset with weights after the last boosting round.
+        staged_history: Staged boosted metrics after each round.
         snapshot: Trainer-level snapshot.
     """
 
@@ -57,6 +61,7 @@ class BoostingTrainerResult:
     round_results: tuple[BoostingRoundResult, ...]
     initial_dataset: WeightedTrainTestDataset
     final_dataset: WeightedTrainTestDataset
+    staged_history: StagedBoostingHistory
     snapshot: AlgorithmSnapshot
 
     @property
@@ -67,18 +72,22 @@ class BoostingTrainerResult:
     @property
     def learner_weights(self) -> FloatArray:
         """Return learner weights for all completed rounds."""
-        return np.asarray(
-            [round_result.learner_weight for round_result in self.round_results],
-            dtype=float,
-        )
+        return self.staged_history.learner_weights
 
     @property
     def weighted_train_errors(self) -> FloatArray:
         """Return weighted training errors for all completed rounds."""
-        return np.asarray(
-            [round_result.weighted_train_error for round_result in self.round_results],
-            dtype=float,
-        )
+        return self.staged_history.weighted_train_errors
+
+    @property
+    def boosted_train_accuracies(self) -> FloatArray:
+        """Return staged boosted train accuracies."""
+        return self.staged_history.boosted_train_accuracies
+
+    @property
+    def boosted_test_accuracies(self) -> FloatArray:
+        """Return staged boosted test accuracies."""
+        return self.staged_history.boosted_test_accuracies
 
     @property
     def final_train_weights(self) -> FloatArray:
@@ -131,11 +140,16 @@ class BoostingTrainer:
             current_dataset = round_result.next_dataset
 
         completed_rounds = tuple(round_results)
+        staged_history = _build_staged_history(
+            dataset=dataset,
+            round_results=completed_rounds,
+        )
         snapshot = _build_trainer_snapshot(
             config=self._config,
             initial_dataset=dataset,
             final_dataset=current_dataset,
             round_results=completed_rounds,
+            staged_history=staged_history,
         )
 
         self._result = BoostingTrainerResult(
@@ -143,6 +157,7 @@ class BoostingTrainer:
             round_results=completed_rounds,
             initial_dataset=dataset,
             final_dataset=current_dataset,
+            staged_history=staged_history,
             snapshot=snapshot,
         )
 
@@ -175,24 +190,34 @@ class BoostingTrainer:
             raise RuntimeError(msg)
 
 
+def _build_staged_history(
+    *,
+    dataset: WeightedTrainTestDataset,
+    round_results: tuple[BoostingRoundResult, ...],
+) -> StagedBoostingHistory:
+    """Build staged boosted accuracy history."""
+    return build_staged_boosting_history(
+        round_results=round_results,
+        train_features=dataset.train.snapshot.features,
+        train_targets=dataset.train.snapshot.targets,
+        test_features=dataset.test.snapshot.features,
+        test_targets=dataset.test.snapshot.targets,
+    )
+
+
 def _build_trainer_snapshot(
     *,
     config: BoostingTrainerConfig,
     initial_dataset: WeightedTrainTestDataset,
     final_dataset: WeightedTrainTestDataset,
     round_results: tuple[BoostingRoundResult, ...],
+    staged_history: StagedBoostingHistory,
 ) -> AlgorithmSnapshot:
     """Build a trainer-level snapshot."""
-    learner_weights = np.asarray(
-        [round_result.learner_weight for round_result in round_results],
-        dtype=float,
-    )
+    learner_weights = staged_history.learner_weights
     weak_learners = tuple(round_result.weak_learner for round_result in round_results)
 
-    weighted_train_errors = _round_metric_array(
-        round_results=round_results,
-        metric_name="weighted_train_error",
-    )
+    weighted_train_errors = staged_history.weighted_train_errors
     weight_l1_changes = _round_metric_array(
         round_results=round_results,
         metric_name="weight_l1_change",
@@ -207,9 +232,7 @@ def _build_trainer_snapshot(
     )
 
     train_features = np.asarray(initial_dataset.train.snapshot.features, dtype=float)
-    train_targets = np.asarray(initial_dataset.train.snapshot.targets, dtype=int)
     test_features = np.asarray(initial_dataset.test.snapshot.features, dtype=float)
-    test_targets = np.asarray(initial_dataset.test.snapshot.targets, dtype=int)
 
     boosted_train_result = predict_boosted_ensemble(
         weak_learners=weak_learners,
@@ -220,15 +243,6 @@ def _build_trainer_snapshot(
         weak_learners=weak_learners,
         learner_weights=learner_weights,
         features=test_features,
-    )
-
-    boosted_train_accuracy = boosted_accuracy_score(
-        y_true=train_targets,
-        y_pred=boosted_train_result.predictions,
-    )
-    boosted_test_accuracy = boosted_accuracy_score(
-        y_true=test_targets,
-        y_pred=boosted_test_result.predictions,
     )
 
     initial_train_weights = np.asarray(initial_dataset.train.sample_weights, dtype=float)
@@ -250,15 +264,27 @@ def _build_trainer_snapshot(
             "final_test_accuracy": float(
                 final_round.round_snapshot.metrics["test_accuracy"],
             ),
-            "boosted_train_accuracy": boosted_train_accuracy,
-            "boosted_test_accuracy": boosted_test_accuracy,
-            "boosted_generalization_gap": boosted_train_accuracy - boosted_test_accuracy,
-            "mean_boosted_train_confidence": float(np.mean(boosted_train_result.confidence)),
-            "mean_boosted_test_confidence": float(np.mean(boosted_test_result.confidence)),
+            "boosted_train_accuracy": staged_history.final_train_accuracy,
+            "boosted_test_accuracy": staged_history.final_test_accuracy,
+            "boosted_generalization_gap": staged_history.final_generalization_gap,
+            "mean_boosted_train_confidence": float(
+                staged_history.mean_train_confidences[-1],
+            ),
+            "mean_boosted_test_confidence": float(
+                staged_history.mean_test_confidences[-1],
+            ),
             "mean_weighted_train_error": float(np.mean(weighted_train_errors)),
             "mean_learner_weight": float(np.mean(learner_weights)),
             "min_learner_weight": float(np.min(learner_weights)),
             "max_learner_weight": float(np.max(learner_weights)),
+            "best_staged_boosted_test_accuracy": float(
+                np.max(staged_history.boosted_test_accuracies),
+            ),
+            "best_staged_round_index": int(
+                staged_history.round_indices[
+                    int(np.argmax(staged_history.boosted_test_accuracies))
+                ],
+            ),
             "cumulative_weight_l1_change": float(np.sum(weight_l1_changes)),
             "min_initial_train_weight": float(np.min(initial_train_weights)),
             "max_initial_train_weight": float(np.max(initial_train_weights)),
@@ -269,11 +295,17 @@ def _build_trainer_snapshot(
         visual_state={
             "round_snapshots": tuple(round_result.round_snapshot for round_result in round_results),
             "weak_snapshots": tuple(round_result.weak_snapshot for round_result in round_results),
+            "staged_history": staged_history,
             "staged_learner_weights": learner_weights,
             "staged_weighted_train_errors": weighted_train_errors,
             "staged_weight_l1_changes": weight_l1_changes,
             "staged_train_accuracies": train_accuracies,
             "staged_test_accuracies": test_accuracies,
+            "staged_boosted_train_accuracies": staged_history.boosted_train_accuracies,
+            "staged_boosted_test_accuracies": staged_history.boosted_test_accuracies,
+            "staged_boosted_generalization_gaps": (staged_history.boosted_generalization_gaps),
+            "staged_mean_train_confidences": staged_history.mean_train_confidences,
+            "staged_mean_test_confidences": staged_history.mean_test_confidences,
             "boosted_train_predictions": boosted_train_result.predictions,
             "boosted_test_predictions": boosted_test_result.predictions,
             "boosted_train_confidence": boosted_train_result.confidence,
@@ -290,8 +322,9 @@ def _build_trainer_snapshot(
             f"Boosting trainer completed {config.round_count} rounds.",
             "Each round fitted a weighted stump and updated train sample weights.",
             "Final boosted ensemble predictions computed.",
-            f"Boosted train accuracy: {boosted_train_accuracy:.3f}.",
-            f"Boosted test accuracy: {boosted_test_accuracy:.3f}.",
+            "Staged boosted accuracy history computed.",
+            f"Boosted train accuracy: {staged_history.final_train_accuracy:.3f}.",
+            f"Boosted test accuracy: {staged_history.final_test_accuracy:.3f}.",
         ),
         done=True,
     )

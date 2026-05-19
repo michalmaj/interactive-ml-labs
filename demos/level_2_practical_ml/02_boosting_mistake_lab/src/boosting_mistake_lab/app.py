@@ -24,8 +24,8 @@ def main() -> None:
     """Run a minimal command-line version of the demo.
 
     This entry point verifies that the package can generate weighted train/test
-    datasets, run boosting rounds, train a multi-round ensemble, and compute
-    final boosted predictions.
+    datasets, run boosting rounds, train a multi-round ensemble, compute final
+    boosted predictions, and report staged boosted accuracy history.
     """
     axis_dataset = make_synthetic_weighted_dataset(
         SyntheticWeightedDatasetConfig(dataset_kind=DATASET_KIND_AXIS_ALIGNED),
@@ -35,7 +35,10 @@ def main() -> None:
     )
 
     print("Boosting Mistake Lab")
-    print("Weighted datasets, boosting trainer, and boosted predictions generated successfully.")
+    print(
+        "Weighted datasets, boosting trainer, boosted predictions, "
+        "and staged history generated successfully.",
+    )
 
     _print_dataset_report("Axis-aligned", axis_dataset)
     _print_dataset_report("XOR", xor_dataset)
@@ -117,6 +120,11 @@ def _print_dataset_report(label: str, dataset: WeightedTrainTestDataset) -> None
     print(
         f"{label} boosted mean test confidence: "
         f"{trainer_snapshot.metrics['mean_boosted_test_confidence']:.3f}",
+    )
+    print(
+        f"{label} best staged boosted test accuracy: "
+        f"{trainer_snapshot.metrics['best_staged_boosted_test_accuracy']:.3f} "
+        f"at round {trainer_snapshot.metrics['best_staged_round_index']:.0f}",
     )
     print(
         f"{label} weak learner split: "

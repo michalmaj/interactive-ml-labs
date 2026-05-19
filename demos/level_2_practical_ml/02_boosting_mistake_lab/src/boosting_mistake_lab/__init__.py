@@ -28,6 +28,10 @@ from boosting_mistake_lab.sample_weight_update import (
     SampleWeightUpdateResult,
     update_sample_weights,
 )
+from boosting_mistake_lab.staged_history import (
+    StagedBoostingHistory,
+    build_staged_boosting_history,
+)
 from boosting_mistake_lab.trainer import (
     BoostingTrainer,
     BoostingTrainerConfig,
@@ -56,6 +60,7 @@ __all__ = [
     "BoostingTrainerResult",
     "LearnerWeightResult",
     "SampleWeightUpdateResult",
+    "StagedBoostingHistory",
     "SyntheticWeightedDatasetConfig",
     "WeakLearnerBaseline",
     "WeakLearnerConfig",
@@ -64,6 +69,7 @@ __all__ = [
     "WeightedErrorResult",
     "WeightedTrainTestDataset",
     "boosted_accuracy_score",
+    "build_staged_boosting_history",
     "compute_learner_weight",
     "evaluate_weighted_predictions",
     "make_next_round_dataset",
