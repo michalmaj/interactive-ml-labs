@@ -7,10 +7,12 @@ requires-python = ">=3.12"
 dependencies = [
     "ml-lab-core",
     "numpy>=2.4.4",
+    "pygame>=2.6.1",
 ]
 
 [project.scripts]
 boosting-mistake-lab = "boosting_mistake_lab.app:main"
+boosting-mistake-lab-ui = "boosting_mistake_lab.pygame_app:main"
 
 [tool.uv.sources]
 ml-lab-core = { workspace = true }
