@@ -67,6 +67,10 @@ def _print_dataset_report(label: str, dataset: WeightedTrainTestDataset) -> None
         f"{weak_snapshot.metrics['weighted_train_error']:.3f}",
     )
     print(
+        f"{label} weighted split error: "
+        f"{weak_snapshot.metrics['split_weighted_training_error']:.3f}",
+    )
+    print(
         f"{label} weak learner weighted test error: "
         f"{weak_snapshot.metrics['weighted_test_error']:.3f}",
     )
