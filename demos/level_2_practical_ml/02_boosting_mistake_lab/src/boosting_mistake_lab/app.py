@@ -23,9 +23,9 @@ TRAINER_ROUND_COUNT: int = 5
 def main() -> None:
     """Run a minimal command-line version of the demo.
 
-    The final boosted ensemble prediction will be added in later pull requests.
     This entry point verifies that the package can generate weighted train/test
-    datasets, run one boosting round, and run a multi-round boosting trainer.
+    datasets, run boosting rounds, train a multi-round ensemble, and compute
+    final boosted predictions.
     """
     axis_dataset = make_synthetic_weighted_dataset(
         SyntheticWeightedDatasetConfig(dataset_kind=DATASET_KIND_AXIS_ALIGNED),
@@ -35,7 +35,7 @@ def main() -> None:
     )
 
     print("Boosting Mistake Lab")
-    print("Weighted datasets, boosting rounds, and trainer diagnostics generated successfully.")
+    print("Weighted datasets, boosting trainer, and boosted predictions generated successfully.")
 
     _print_dataset_report("Axis-aligned", axis_dataset)
     _print_dataset_report("XOR", xor_dataset)
@@ -107,6 +107,16 @@ def _print_dataset_report(label: str, dataset: WeightedTrainTestDataset) -> None
         f"{label} final train weight range: "
         f"{trainer_snapshot.metrics['min_final_train_weight']:.4f} - "
         f"{trainer_snapshot.metrics['max_final_train_weight']:.4f}",
+    )
+    print(
+        f"{label} boosted train accuracy: {trainer_snapshot.metrics['boosted_train_accuracy']:.3f}",
+    )
+    print(
+        f"{label} boosted test accuracy: {trainer_snapshot.metrics['boosted_test_accuracy']:.3f}",
+    )
+    print(
+        f"{label} boosted mean test confidence: "
+        f"{trainer_snapshot.metrics['mean_boosted_test_confidence']:.3f}",
     )
     print(
         f"{label} weak learner split: "

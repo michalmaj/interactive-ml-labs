@@ -9,6 +9,10 @@ import numpy as np
 from ml_lab_core import AlgorithmSnapshot
 from numpy.typing import NDArray
 
+from boosting_mistake_lab.boosted_prediction import (
+    boosted_accuracy_score,
+    predict_boosted_ensemble,
+)
 from boosting_mistake_lab.boosting_round import (
     BoostingRoundConfig,
     BoostingRoundResult,
@@ -183,30 +187,48 @@ def _build_trainer_snapshot(
         [round_result.learner_weight for round_result in round_results],
         dtype=float,
     )
-    weighted_train_errors = np.asarray(
-        [round_result.weighted_train_error for round_result in round_results],
-        dtype=float,
+    weak_learners = tuple(round_result.weak_learner for round_result in round_results)
+
+    weighted_train_errors = _round_metric_array(
+        round_results=round_results,
+        metric_name="weighted_train_error",
     )
-    weight_l1_changes = np.asarray(
-        [
-            float(round_result.round_snapshot.metrics["weight_l1_change"])
-            for round_result in round_results
-        ],
-        dtype=float,
+    weight_l1_changes = _round_metric_array(
+        round_results=round_results,
+        metric_name="weight_l1_change",
     )
-    train_accuracies = np.asarray(
-        [
-            float(round_result.round_snapshot.metrics["train_accuracy"])
-            for round_result in round_results
-        ],
-        dtype=float,
+    train_accuracies = _round_metric_array(
+        round_results=round_results,
+        metric_name="train_accuracy",
     )
-    test_accuracies = np.asarray(
-        [
-            float(round_result.round_snapshot.metrics["test_accuracy"])
-            for round_result in round_results
-        ],
-        dtype=float,
+    test_accuracies = _round_metric_array(
+        round_results=round_results,
+        metric_name="test_accuracy",
+    )
+
+    train_features = np.asarray(initial_dataset.train.snapshot.features, dtype=float)
+    train_targets = np.asarray(initial_dataset.train.snapshot.targets, dtype=int)
+    test_features = np.asarray(initial_dataset.test.snapshot.features, dtype=float)
+    test_targets = np.asarray(initial_dataset.test.snapshot.targets, dtype=int)
+
+    boosted_train_result = predict_boosted_ensemble(
+        weak_learners=weak_learners,
+        learner_weights=learner_weights,
+        features=train_features,
+    )
+    boosted_test_result = predict_boosted_ensemble(
+        weak_learners=weak_learners,
+        learner_weights=learner_weights,
+        features=test_features,
+    )
+
+    boosted_train_accuracy = boosted_accuracy_score(
+        y_true=train_targets,
+        y_pred=boosted_train_result.predictions,
+    )
+    boosted_test_accuracy = boosted_accuracy_score(
+        y_true=test_targets,
+        y_pred=boosted_test_result.predictions,
     )
 
     initial_train_weights = np.asarray(initial_dataset.train.sample_weights, dtype=float)
@@ -228,6 +250,11 @@ def _build_trainer_snapshot(
             "final_test_accuracy": float(
                 final_round.round_snapshot.metrics["test_accuracy"],
             ),
+            "boosted_train_accuracy": boosted_train_accuracy,
+            "boosted_test_accuracy": boosted_test_accuracy,
+            "boosted_generalization_gap": boosted_train_accuracy - boosted_test_accuracy,
+            "mean_boosted_train_confidence": float(np.mean(boosted_train_result.confidence)),
+            "mean_boosted_test_confidence": float(np.mean(boosted_test_result.confidence)),
             "mean_weighted_train_error": float(np.mean(weighted_train_errors)),
             "mean_learner_weight": float(np.mean(learner_weights)),
             "min_learner_weight": float(np.min(learner_weights)),
@@ -247,6 +274,14 @@ def _build_trainer_snapshot(
             "staged_weight_l1_changes": weight_l1_changes,
             "staged_train_accuracies": train_accuracies,
             "staged_test_accuracies": test_accuracies,
+            "boosted_train_predictions": boosted_train_result.predictions,
+            "boosted_test_predictions": boosted_test_result.predictions,
+            "boosted_train_confidence": boosted_train_result.confidence,
+            "boosted_test_confidence": boosted_test_result.confidence,
+            "boosted_train_scores": boosted_train_result.raw_scores,
+            "boosted_test_scores": boosted_test_result.raw_scores,
+            "boosted_train_result": boosted_train_result,
+            "boosted_test_result": boosted_test_result,
             "initial_train_sample_weights": initial_train_weights,
             "final_train_sample_weights": final_train_weights,
             "final_dataset": final_dataset,
@@ -254,10 +289,23 @@ def _build_trainer_snapshot(
         annotations=(
             f"Boosting trainer completed {config.round_count} rounds.",
             "Each round fitted a weighted stump and updated train sample weights.",
-            f"Final weighted train error: {final_round.weighted_train_error:.3f}.",
-            f"Final learner weight: {final_round.learner_weight:.3f}.",
+            "Final boosted ensemble predictions computed.",
+            f"Boosted train accuracy: {boosted_train_accuracy:.3f}.",
+            f"Boosted test accuracy: {boosted_test_accuracy:.3f}.",
         ),
         done=True,
+    )
+
+
+def _round_metric_array(
+    *,
+    round_results: tuple[BoostingRoundResult, ...],
+    metric_name: str,
+) -> FloatArray:
+    """Collect one metric across all boosting rounds."""
+    return np.asarray(
+        [float(round_result.round_snapshot.metrics[metric_name]) for round_result in round_results],
+        dtype=float,
     )
 
 
