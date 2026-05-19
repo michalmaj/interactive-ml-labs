@@ -192,3 +192,36 @@ def test_boosting_trainer_rejects_invalid_config(
     """Invalid trainer config should fail clearly."""
     with pytest.raises(ValueError, match=expected_message):
         BoostingTrainer(config)
+
+
+def test_boosting_trainer_snapshot_contains_boosted_prediction_metrics() -> None:
+    """Trainer snapshot should expose final boosted prediction metrics."""
+    trainer = BoostingTrainer(BoostingTrainerConfig(round_count=ROUND_COUNT))
+
+    result = trainer.reset(_dataset(DATASET_KIND_XOR))
+    metrics = result.snapshot.metrics
+
+    assert "boosted_train_accuracy" in metrics
+    assert "boosted_test_accuracy" in metrics
+    assert "boosted_generalization_gap" in metrics
+    assert "mean_boosted_train_confidence" in metrics
+    assert "mean_boosted_test_confidence" in metrics
+    assert 0.0 <= float(metrics["boosted_train_accuracy"]) <= 1.0
+    assert 0.0 <= float(metrics["boosted_test_accuracy"]) <= 1.0
+
+
+def test_boosting_trainer_snapshot_contains_boosted_prediction_visual_state() -> None:
+    """Trainer snapshot should expose boosted predictions for future UI."""
+    trainer = BoostingTrainer(BoostingTrainerConfig(round_count=ROUND_COUNT))
+
+    result = trainer.reset(_dataset(DATASET_KIND_XOR))
+    visual_state = result.snapshot.visual_state
+
+    assert "boosted_train_predictions" in visual_state
+    assert "boosted_test_predictions" in visual_state
+    assert "boosted_train_confidence" in visual_state
+    assert "boosted_test_confidence" in visual_state
+    assert "boosted_train_scores" in visual_state
+    assert "boosted_test_scores" in visual_state
+    assert "boosted_train_result" in visual_state
+    assert "boosted_test_result" in visual_state
