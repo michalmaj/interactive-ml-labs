@@ -45,6 +45,7 @@ class WeakLearnerSplit:
         left_prediction: Prediction for samples where feature <= threshold.
         right_prediction: Prediction for samples where feature > threshold.
         training_error: Unweighted training error of the split.
+        weighted_training_error: Weighted training error of the split.
     """
 
     feature_index: int
@@ -52,14 +53,15 @@ class WeakLearnerSplit:
     left_prediction: int
     right_prediction: int
     training_error: float
+    weighted_training_error: float
 
 
 class WeakLearnerBaseline:
     """A simple decision-stump weak learner baseline.
 
-    The split is still selected using unweighted training error. Weighted error,
-    learner weight, and next sample weights are computed after fitting, which
-    prepares the project for multi-round boosting.
+    The split is selected using weighted training error. This makes the weak
+    learner react to sample weights and prepares the project for multi-round
+    boosting.
     """
 
     name: str = "weak_learner_baseline"
@@ -105,12 +107,12 @@ class WeakLearnerBaseline:
             split_name="test",
         )
 
-        _validate_sample_weights(
+        train_weights = _validate_sample_weights(
             sample_weights=dataset.train.sample_weights,
             sample_count=train_targets.shape[0],
             split_name="train",
         )
-        _validate_sample_weights(
+        test_weights = _validate_sample_weights(
             sample_weights=dataset.test.sample_weights,
             sample_count=test_targets.shape[0],
             split_name="test",
@@ -119,6 +121,7 @@ class WeakLearnerBaseline:
         split = _find_best_stump_split(
             features=train_features,
             targets=train_targets,
+            sample_weights=train_weights,
             min_samples_leaf=self._config.min_samples_leaf,
         )
         train_predictions = _predict_with_split(train_features, split)
@@ -130,12 +133,12 @@ class WeakLearnerBaseline:
         train_weighted_result = evaluate_weighted_predictions(
             y_true=train_targets,
             y_pred=train_predictions,
-            sample_weights=dataset.train.sample_weights,
+            sample_weights=train_weights,
         )
         test_weighted_result = evaluate_weighted_predictions(
             y_true=test_targets,
             y_pred=test_predictions,
-            sample_weights=dataset.test.sample_weights,
+            sample_weights=test_weights,
         )
         learner_weight_result = compute_learner_weight(
             weighted_error=train_weighted_result.weighted_error,
@@ -143,7 +146,7 @@ class WeakLearnerBaseline:
         weight_update_result = update_sample_weights(
             y_true=train_targets,
             y_pred=train_predictions,
-            sample_weights=dataset.train.sample_weights,
+            sample_weights=train_weights,
             learner_weight=learner_weight_result.learner_weight,
         )
 
@@ -175,6 +178,8 @@ class WeakLearnerBaseline:
                 "threshold": split.threshold,
                 "left_prediction": split.left_prediction,
                 "right_prediction": split.right_prediction,
+                "split_training_error": split.training_error,
+                "split_weighted_training_error": split.weighted_training_error,
                 "min_samples_leaf": self._config.min_samples_leaf,
             },
             visual_state={
@@ -183,20 +188,20 @@ class WeakLearnerBaseline:
                 "train_predictions": train_predictions,
                 "train_mistakes": train_weighted_result.mistake_mask,
                 "train_correct": train_weighted_result.correct_mask,
-                "train_sample_weights": dataset.train.sample_weights,
+                "train_sample_weights": train_weights,
                 "updated_train_sample_weights": weight_update_result.updated_weights,
                 "test_features": test_features,
                 "test_targets": test_targets,
                 "test_predictions": test_predictions,
                 "test_mistakes": test_weighted_result.mistake_mask,
                 "test_correct": test_weighted_result.correct_mask,
-                "test_sample_weights": dataset.test.sample_weights,
+                "test_sample_weights": test_weights,
                 "split": split,
                 "learner_weight_result": learner_weight_result,
                 "weight_update_result": weight_update_result,
             },
             annotations=(
-                "Weak learner baseline fitted as a decision stump.",
+                "Weak learner baseline fitted as a weighted decision stump.",
                 f"Train accuracy: {train_accuracy:.3f}; test accuracy: {test_accuracy:.3f}.",
                 f"Weighted train error: {train_weighted_result.weighted_error:.3f}.",
                 f"Learner weight: {learner_weight_result.learner_weight:.3f}.",
@@ -253,9 +258,10 @@ def _find_best_stump_split(
     *,
     features: FloatArray,
     targets: IntArray,
+    sample_weights: FloatArray,
     min_samples_leaf: int,
 ) -> WeakLearnerSplit:
-    """Find the best unweighted decision-stump split."""
+    """Find the best weighted decision-stump split."""
     best_split: WeakLearnerSplit | None = None
 
     for feature_index in range(features.shape[1]):
@@ -265,6 +271,7 @@ def _find_best_stump_split(
             candidate = _evaluate_candidate(
                 features=features,
                 targets=targets,
+                sample_weights=sample_weights,
                 feature_index=feature_index,
                 threshold=float(threshold),
                 min_samples_leaf=min_samples_leaf,
@@ -273,7 +280,10 @@ def _find_best_stump_split(
             if candidate is None:
                 continue
 
-            if best_split is None or candidate.training_error < best_split.training_error:
+            if (
+                best_split is None
+                or candidate.weighted_training_error < best_split.weighted_training_error
+            ):
                 best_split = candidate
 
     if best_split is None:
@@ -287,11 +297,12 @@ def _evaluate_candidate(
     *,
     features: FloatArray,
     targets: IntArray,
+    sample_weights: FloatArray,
     feature_index: int,
     threshold: float,
     min_samples_leaf: int,
 ) -> WeakLearnerSplit | None:
-    """Evaluate one decision-stump candidate."""
+    """Evaluate one weighted decision-stump candidate."""
     left_mask = features[:, feature_index] <= threshold
     right_mask = ~left_mask
 
@@ -301,14 +312,21 @@ def _evaluate_candidate(
     if left_count < min_samples_leaf or right_count < min_samples_leaf:
         return None
 
-    left_prediction = _majority_class(targets[left_mask])
-    right_prediction = _majority_class(targets[right_mask])
+    left_prediction = _weighted_majority_class(
+        targets=targets[left_mask],
+        sample_weights=sample_weights[left_mask],
+    )
+    right_prediction = _weighted_majority_class(
+        targets=targets[right_mask],
+        sample_weights=sample_weights[right_mask],
+    )
 
     predictions = np.empty_like(targets)
     predictions[left_mask] = left_prediction
     predictions[right_mask] = right_prediction
 
     training_error = float(np.mean(predictions != targets))
+    weighted_training_error = float(np.sum(sample_weights[predictions != targets]))
 
     return WeakLearnerSplit(
         feature_index=feature_index,
@@ -316,6 +334,7 @@ def _evaluate_candidate(
         left_prediction=left_prediction,
         right_prediction=right_prediction,
         training_error=training_error,
+        weighted_training_error=weighted_training_error,
     )
 
 
@@ -329,11 +348,11 @@ def _candidate_thresholds(values: FloatArray) -> FloatArray:
     return (unique_values[:-1] + unique_values[1:]) / 2.0
 
 
-def _majority_class(targets: IntArray) -> int:
-    """Return majority class label with deterministic tie-breaking."""
-    counts = np.bincount(targets)
+def _weighted_majority_class(*, targets: IntArray, sample_weights: FloatArray) -> int:
+    """Return weighted majority class label with deterministic tie-breaking."""
+    weighted_counts = np.bincount(targets, weights=sample_weights)
 
-    return int(np.argmax(counts))
+    return int(np.argmax(weighted_counts))
 
 
 def _predict_with_split(features: FloatArray, split: WeakLearnerSplit) -> IntArray:
@@ -409,8 +428,8 @@ def _validate_sample_weights(
     sample_weights: FloatArray,
     sample_count: int,
     split_name: str,
-) -> None:
-    """Validate sample weights for future boosting steps."""
+) -> FloatArray:
+    """Validate sample weights for boosting steps."""
     weights = np.asarray(sample_weights, dtype=float)
 
     if weights.ndim != 1:
@@ -431,6 +450,8 @@ def _validate_sample_weights(
     if not np.isclose(np.sum(weights), 1.0):
         msg = f"{split_name} sample weights must sum to 1.0."
         raise ValueError(msg)
+
+    return weights
 
 
 def _accuracy_score(y_true: IntArray, y_pred: IntArray) -> float:

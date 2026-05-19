@@ -374,3 +374,15 @@ def test_weak_learner_updates_mistake_weights_when_alpha_is_positive() -> None:
         pytest.skip("This deterministic dataset did not produce train mistakes.")
 
     assert np.mean(updated_weights[mistakes]) > np.mean(old_weights[mistakes])
+
+
+def test_weak_learner_split_exposes_weighted_training_error() -> None:
+    """Fitted split should expose weighted training error."""
+    learner = WeakLearnerBaseline()
+
+    snapshot = learner.reset(_dataset(DATASET_KIND_XOR))
+
+    assert "split_weighted_training_error" in snapshot.metrics
+    assert learner.split.weighted_training_error == pytest.approx(
+        snapshot.metrics["split_weighted_training_error"],
+    )
