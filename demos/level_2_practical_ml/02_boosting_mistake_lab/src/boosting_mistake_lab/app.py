@@ -5,6 +5,7 @@ from __future__ import annotations
 import numpy as np
 from ml_lab_core import AlgorithmSnapshot, MetricsHistory
 
+from boosting_mistake_lab.boosting_round import run_boosting_round
 from boosting_mistake_lab.dataset import (
     DATASET_KIND_AXIS_ALIGNED,
     DATASET_KIND_XOR,
@@ -20,10 +21,10 @@ CLASS_COUNT: int = 2
 def main() -> None:
     """Run a minimal command-line version of the demo.
 
-    The full boosting implementation will be added in later pull requests.
-    This entry point verifies that the package can generate weighted train/test
-    datasets, train a weak learner, compute weighted error, compute learner
-    weight, and update sample weights for the next boosting round.
+    The full multi-round boosting implementation will be added in later pull
+    requests. This entry point verifies that the package can generate weighted
+    train/test datasets, train a weighted stump, compute learner weight, update
+    sample weights, and expose one complete boosting round.
     """
     axis_dataset = make_synthetic_weighted_dataset(
         SyntheticWeightedDatasetConfig(dataset_kind=DATASET_KIND_AXIS_ALIGNED),
@@ -33,10 +34,7 @@ def main() -> None:
     )
 
     print("Boosting Mistake Lab")
-    print(
-        "Weighted datasets, weak learners, weighted errors, learner weights, "
-        "and updated sample weights generated successfully.",
-    )
+    print("Weighted datasets, weak learners, and one boosting round generated successfully.")
 
     _print_dataset_report("Axis-aligned", axis_dataset)
     _print_dataset_report("XOR", xor_dataset)
@@ -46,6 +44,7 @@ def _print_dataset_report(label: str, dataset: WeightedTrainTestDataset) -> None
     """Print a short CLI report for one weighted dataset."""
     history = _build_dataset_history(dataset)
     weak_snapshot = _fit_weak_learner(dataset)
+    round_snapshot = run_boosting_round(dataset).round_snapshot
 
     train_features = np.asarray(dataset.train.snapshot.features, dtype=float)
     test_features = np.asarray(dataset.test.snapshot.features, dtype=float)
@@ -85,6 +84,10 @@ def _print_dataset_report(label: str, dataset: WeightedTrainTestDataset) -> None
         f"{label} updated train weight range: "
         f"{weak_snapshot.metrics['min_updated_train_weight']:.4f} - "
         f"{weak_snapshot.metrics['max_updated_train_weight']:.4f}",
+    )
+    print(
+        f"{label} boosting round weight L1 change: "
+        f"{round_snapshot.metrics['weight_l1_change']:.3f}",
     )
     print(
         f"{label} weak learner split: "

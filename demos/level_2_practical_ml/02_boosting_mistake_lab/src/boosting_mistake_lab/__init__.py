@@ -1,5 +1,11 @@
 """Boosting Mistake Lab demo package."""
 
+from boosting_mistake_lab.boosting_round import (
+    BoostingRoundConfig,
+    BoostingRoundResult,
+    make_next_round_dataset,
+    run_boosting_round,
+)
 from boosting_mistake_lab.dataset import (
     DATASET_KIND_AXIS_ALIGNED,
     DATASET_KIND_XOR,
@@ -32,6 +38,8 @@ from boosting_mistake_lab.weighted_error import (
 __all__ = [
     "DATASET_KIND_AXIS_ALIGNED",
     "DATASET_KIND_XOR",
+    "BoostingRoundConfig",
+    "BoostingRoundResult",
     "LearnerWeightResult",
     "SampleWeightUpdateResult",
     "SyntheticWeightedDatasetConfig",
@@ -43,8 +51,10 @@ __all__ = [
     "WeightedTrainTestDataset",
     "compute_learner_weight",
     "evaluate_weighted_predictions",
+    "make_next_round_dataset",
     "make_synthetic_weighted_dataset",
     "make_uniform_sample_weights",
+    "run_boosting_round",
     "update_sample_weights",
     "weighted_accuracy_score",
     "weighted_error_score",
