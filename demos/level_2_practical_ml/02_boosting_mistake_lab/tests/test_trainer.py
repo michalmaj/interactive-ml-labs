@@ -225,3 +225,40 @@ def test_boosting_trainer_snapshot_contains_boosted_prediction_visual_state() ->
     assert "boosted_test_scores" in visual_state
     assert "boosted_train_result" in visual_state
     assert "boosted_test_result" in visual_state
+
+
+def test_boosting_trainer_result_exposes_staged_boosted_accuracies() -> None:
+    """Trainer result should expose staged boosted accuracy arrays."""
+    trainer = BoostingTrainer(BoostingTrainerConfig(round_count=ROUND_COUNT))
+
+    result = trainer.reset(_dataset(DATASET_KIND_XOR))
+
+    assert result.boosted_train_accuracies.shape == (ROUND_COUNT,)
+    assert result.boosted_test_accuracies.shape == (ROUND_COUNT,)
+
+
+def test_boosting_trainer_snapshot_contains_staged_boosted_history() -> None:
+    """Trainer snapshot should expose staged boosted history for future plots."""
+    trainer = BoostingTrainer(BoostingTrainerConfig(round_count=ROUND_COUNT))
+
+    result = trainer.reset(_dataset(DATASET_KIND_XOR))
+    visual_state = result.snapshot.visual_state
+
+    assert "staged_history" in visual_state
+    assert "staged_boosted_train_accuracies" in visual_state
+    assert "staged_boosted_test_accuracies" in visual_state
+    assert "staged_boosted_generalization_gaps" in visual_state
+    assert "staged_mean_train_confidences" in visual_state
+    assert "staged_mean_test_confidences" in visual_state
+
+
+def test_boosting_trainer_snapshot_contains_best_staged_metrics() -> None:
+    """Trainer snapshot should expose best staged boosted test accuracy."""
+    trainer = BoostingTrainer(BoostingTrainerConfig(round_count=ROUND_COUNT))
+
+    result = trainer.reset(_dataset(DATASET_KIND_XOR))
+    metrics = result.snapshot.metrics
+
+    assert "best_staged_boosted_test_accuracy" in metrics
+    assert "best_staged_round_index" in metrics
+    assert 1 <= int(metrics["best_staged_round_index"]) <= ROUND_COUNT
