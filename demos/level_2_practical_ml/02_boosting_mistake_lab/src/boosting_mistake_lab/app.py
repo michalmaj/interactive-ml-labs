@@ -13,18 +13,19 @@ from boosting_mistake_lab.dataset import (
     WeightedTrainTestDataset,
     make_synthetic_weighted_dataset,
 )
+from boosting_mistake_lab.trainer import BoostingTrainer, BoostingTrainerConfig
 from boosting_mistake_lab.weak_learner import WeakLearnerBaseline
 
 CLASS_COUNT: int = 2
+TRAINER_ROUND_COUNT: int = 5
 
 
 def main() -> None:
     """Run a minimal command-line version of the demo.
 
-    The full multi-round boosting implementation will be added in later pull
-    requests. This entry point verifies that the package can generate weighted
-    train/test datasets, train a weighted stump, compute learner weight, update
-    sample weights, and expose one complete boosting round.
+    The final boosted ensemble prediction will be added in later pull requests.
+    This entry point verifies that the package can generate weighted train/test
+    datasets, run one boosting round, and run a multi-round boosting trainer.
     """
     axis_dataset = make_synthetic_weighted_dataset(
         SyntheticWeightedDatasetConfig(dataset_kind=DATASET_KIND_AXIS_ALIGNED),
@@ -34,7 +35,7 @@ def main() -> None:
     )
 
     print("Boosting Mistake Lab")
-    print("Weighted datasets, weak learners, and one boosting round generated successfully.")
+    print("Weighted datasets, boosting rounds, and trainer diagnostics generated successfully.")
 
     _print_dataset_report("Axis-aligned", axis_dataset)
     _print_dataset_report("XOR", xor_dataset)
@@ -45,6 +46,7 @@ def _print_dataset_report(label: str, dataset: WeightedTrainTestDataset) -> None
     history = _build_dataset_history(dataset)
     weak_snapshot = _fit_weak_learner(dataset)
     round_snapshot = run_boosting_round(dataset).round_snapshot
+    trainer_snapshot = _fit_boosting_trainer(dataset)
 
     train_features = np.asarray(dataset.train.snapshot.features, dtype=float)
     test_features = np.asarray(dataset.test.snapshot.features, dtype=float)
@@ -90,6 +92,23 @@ def _print_dataset_report(label: str, dataset: WeightedTrainTestDataset) -> None
         f"{round_snapshot.metrics['weight_l1_change']:.3f}",
     )
     print(
+        f"{label} trainer completed rounds: "
+        f"{trainer_snapshot.metrics['completed_round_count']:.0f}",
+    )
+    print(
+        f"{label} trainer mean weighted train error: "
+        f"{trainer_snapshot.metrics['mean_weighted_train_error']:.3f}",
+    )
+    print(
+        f"{label} trainer cumulative weight L1 change: "
+        f"{trainer_snapshot.metrics['cumulative_weight_l1_change']:.3f}",
+    )
+    print(
+        f"{label} final train weight range: "
+        f"{trainer_snapshot.metrics['min_final_train_weight']:.4f} - "
+        f"{trainer_snapshot.metrics['max_final_train_weight']:.4f}",
+    )
+    print(
         f"{label} weak learner split: "
         f"x{int(weak_snapshot.metrics['feature_index']) + 1} "
         f"<= {weak_snapshot.metrics['threshold']:.3f}",
@@ -101,6 +120,16 @@ def _fit_weak_learner(dataset: WeightedTrainTestDataset) -> AlgorithmSnapshot:
     weak_learner = WeakLearnerBaseline()
 
     return weak_learner.reset(dataset)
+
+
+def _fit_boosting_trainer(dataset: WeightedTrainTestDataset) -> AlgorithmSnapshot:
+    """Fit the multi-round boosting trainer and return its snapshot."""
+    trainer = BoostingTrainer(
+        BoostingTrainerConfig(round_count=TRAINER_ROUND_COUNT),
+    )
+    result = trainer.reset(dataset)
+
+    return result.snapshot
 
 
 def _build_dataset_history(dataset: WeightedTrainTestDataset) -> MetricsHistory:

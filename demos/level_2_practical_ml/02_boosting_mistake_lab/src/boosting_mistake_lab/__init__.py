@@ -23,6 +23,11 @@ from boosting_mistake_lab.sample_weight_update import (
     SampleWeightUpdateResult,
     update_sample_weights,
 )
+from boosting_mistake_lab.trainer import (
+    BoostingTrainer,
+    BoostingTrainerConfig,
+    BoostingTrainerResult,
+)
 from boosting_mistake_lab.weak_learner import (
     WeakLearnerBaseline,
     WeakLearnerConfig,
@@ -40,6 +45,9 @@ __all__ = [
     "DATASET_KIND_XOR",
     "BoostingRoundConfig",
     "BoostingRoundResult",
+    "BoostingTrainer",
+    "BoostingTrainerConfig",
+    "BoostingTrainerResult",
     "LearnerWeightResult",
     "SampleWeightUpdateResult",
     "SyntheticWeightedDatasetConfig",
