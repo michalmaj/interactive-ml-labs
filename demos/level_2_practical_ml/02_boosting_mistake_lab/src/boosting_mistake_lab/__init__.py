@@ -27,6 +27,10 @@ from boosting_mistake_lab.dataset import (
     make_synthetic_weighted_dataset,
     make_uniform_sample_weights,
 )
+from boosting_mistake_lab.explanation import (
+    BoostingExplanation,
+    build_boosting_explanation,
+)
 from boosting_mistake_lab.learner_weight import (
     LearnerWeightResult,
     compute_learner_weight,
@@ -77,6 +81,7 @@ __all__ = [
     "BoostingChallengeConfig",
     "BoostingChallengeResult",
     "BoostingComparisonReport",
+    "BoostingExplanation",
     "BoostingRoundConfig",
     "BoostingRoundResult",
     "BoostingTrainer",
@@ -95,6 +100,7 @@ __all__ = [
     "WeightedTrainTestDataset",
     "boosted_accuracy_score",
     "build_boosting_comparison_report",
+    "build_boosting_explanation",
     "build_staged_boosting_history",
     "compute_learner_weight",
     "evaluate_boosting_challenge",

@@ -14,6 +14,7 @@ from boosting_mistake_lab.boosted_prediction import predict_boosted_ensemble
 from boosting_mistake_lab.boosting_round import BoostingRoundResult
 from boosting_mistake_lab.challenge import evaluate_boosting_challenge
 from boosting_mistake_lab.dataset import WeightedTrainTestDataset
+from boosting_mistake_lab.explanation import build_boosting_explanation
 from boosting_mistake_lab.trainer import BoostingTrainerResult
 from boosting_mistake_lab.weak_learner import WeakLearnerBaseline
 
@@ -143,7 +144,7 @@ class BoostingRenderer:
             bounds=bounds,
         )
         self._draw_side_panel(state, selected_stage)
-        self._draw_bottom_panel()
+        self._draw_bottom_panel(state, selected_stage)
 
         pygame.display.flip()
 
@@ -395,15 +396,6 @@ class BoostingRenderer:
             self._draw_text(str(value), x + 126, y, self._small_font, TEXT_COLOR)
             y += SMALL_TEXT_LINE_HEIGHT
 
-        challenge_color = SUCCESS_COLOR if challenge.passed else ERROR_COLOR
-        self._draw_text(
-            challenge.summary,
-            x,
-            y + 4,
-            self._small_font,
-            challenge_color,
-        )
-
         self._draw_staged_accuracy_plot(state, selected_stage)
 
     def _draw_staged_accuracy_plot(
@@ -487,31 +479,51 @@ class BoostingRenderer:
             width=1,
         )
 
-    def _draw_bottom_panel(self) -> None:
-        """Draw controls and legend."""
+    def _draw_bottom_panel(
+        self,
+        state: BoostingRenderState,
+        selected_stage: int,
+    ) -> None:
+        """Draw controls, legend, and explanation panel."""
+        challenge = evaluate_boosting_challenge(state.trainer_result.snapshot)
+        explanation = build_boosting_explanation(
+            trainer_snapshot=state.trainer_result.snapshot,
+            selected_stage=selected_stage,
+            confidence_view_enabled=state.confidence_view_enabled,
+            challenge_result=challenge,
+        )
+
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
 
         controls = (
             "Up/Down: selected stage   PageUp/PageDown: total rounds   "
-            "D: dataset   W/S: min leaf   C: confidence view   Left/Right: noise   N: seed"
+            "D: dataset   W/S: min leaf   C: confidence   Left/Right: noise   N: seed"
         )
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
 
-        legend = (
-            "Circles = train samples, size = sample weight. "
-            "Squares = test samples, X = misclassified test samples."
-        )
-        self._draw_text(legend, x, y + TEXT_LINE_HEIGHT, self._small_font, MUTED_TEXT_COLOR)
+        status_color = SUCCESS_COLOR if challenge.passed else ERROR_COLOR
 
-        explanation = (
-            "Left panel shows the weak learner from selected stage. Right panel shows "
-            "the boosted ensemble built from stages 1..selected stage."
+        self._draw_text(
+            explanation.title,
+            x,
+            y + TEXT_LINE_HEIGHT,
+            self._font,
+            status_color,
         )
         self._draw_text(
-            explanation,
+            explanation.summary,
             x,
             y + 2 * TEXT_LINE_HEIGHT,
+            self._small_font,
+            TEXT_COLOR,
+        )
+
+        hint = explanation.hints[0]
+        self._draw_text(
+            f"Hint: {hint}",
+            x,
+            y + 3 * TEXT_LINE_HEIGHT,
             self._small_font,
             MUTED_TEXT_COLOR,
         )
