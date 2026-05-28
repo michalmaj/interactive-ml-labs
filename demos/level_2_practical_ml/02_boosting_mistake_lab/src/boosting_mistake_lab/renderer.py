@@ -11,13 +11,13 @@ import pygame
 from numpy.typing import NDArray
 
 from boosting_mistake_lab.boosted_prediction import predict_boosted_ensemble
+from boosting_mistake_lab.boosting_round import BoostingRoundResult
 from boosting_mistake_lab.dataset import WeightedTrainTestDataset
 from boosting_mistake_lab.trainer import BoostingTrainerResult
 from boosting_mistake_lab.weak_learner import WeakLearnerBaseline
 
 type FloatArray = NDArray[np.float64]
 type IntArray = NDArray[np.int_]
-type BoolArray = NDArray[np.bool_]
 type Predictor = Callable[[FloatArray], tuple[int, float]]
 
 WINDOW_WIDTH: Final[int] = 1320
@@ -37,11 +37,13 @@ TEST_POINT_BORDER_COLOR: Final[tuple[int, int, int]] = (35, 35, 35)
 AXIS_COLOR: Final[tuple[int, int, int]] = (180, 185, 190)
 ERROR_COLOR: Final[tuple[int, int, int]] = (190, 60, 60)
 SUCCESS_COLOR: Final[tuple[int, int, int]] = (35, 135, 85)
+PLOT_GRID_COLOR: Final[tuple[int, int, int]] = (225, 229, 235)
 
 LEFT_PLOT_RECT: Final[pygame.Rect] = pygame.Rect(40, 40, 430, 520)
 RIGHT_PLOT_RECT: Final[pygame.Rect] = pygame.Rect(500, 40, 430, 520)
 SIDE_RECT: Final[pygame.Rect] = pygame.Rect(960, 40, 320, 540)
 BOTTOM_RECT: Final[pygame.Rect] = pygame.Rect(40, 600, 1240, 120)
+STAGED_PLOT_RECT: Final[pygame.Rect] = pygame.Rect(984, 402, 270, 112)
 
 PADDING: Final[int] = 34
 PANEL_RADIUS: Final[int] = 14
@@ -52,6 +54,7 @@ ERROR_MARK_WIDTH: Final[int] = 2
 GRID_CELL_SIZE: Final[int] = 16
 TEXT_LINE_HEIGHT: Final[int] = 28
 SMALL_TEXT_LINE_HEIGHT: Final[int] = 21
+PLOT_MARKER_RADIUS: Final[int] = 4
 
 FEATURE_X_INDEX: Final[int] = 0
 FEATURE_Y_INDEX: Final[int] = 1
@@ -63,6 +66,8 @@ WORLD_MARGIN_RATIO: Final[float] = 0.18
 LOW_CONFIDENCE_BASELINE: Final[float] = 0.50
 LOW_CONFIDENCE_ALPHA: Final[float] = 0.30
 HIGH_CONFIDENCE_ALPHA: Final[float] = 0.95
+PLOT_MIN_ACCURACY: Final[float] = 0.0
+PLOT_MAX_ACCURACY: Final[float] = 1.0
 
 CLASS_COLORS: Final[dict[int, tuple[int, int, int]]] = {
     CLASS_ZERO_LABEL: CLASS_ZERO_COLOR,
@@ -94,6 +99,7 @@ class BoostingRenderState:
     noise_std: float
     seed: int
     round_count: int
+    selected_stage: int
     min_samples_leaf: int
     confidence_view_enabled: bool
 
@@ -121,20 +127,21 @@ class BoostingRenderer:
         test_features = np.asarray(state.dataset.test.snapshot.features, dtype=float)
         bounds = _compute_world_bounds(train_features, test_features)
 
-        final_round = state.trainer_result.round_results[-1]
+        selected_stage = _bounded_stage(state)
 
         self._draw_weak_learner_panel(
             state=state,
+            selected_stage=selected_stage,
             rect=LEFT_PLOT_RECT,
             bounds=bounds,
-            weak_learner=final_round.weak_learner,
         )
         self._draw_boosted_panel(
             state=state,
+            selected_stage=selected_stage,
             rect=RIGHT_PLOT_RECT,
             bounds=bounds,
         )
-        self._draw_side_panel(state)
+        self._draw_side_panel(state, selected_stage)
         self._draw_bottom_panel()
 
         pygame.display.flip()
@@ -147,12 +154,15 @@ class BoostingRenderer:
         self,
         *,
         state: BoostingRenderState,
+        selected_stage: int,
         rect: pygame.Rect,
         bounds: WorldBounds,
-        weak_learner: WeakLearnerBaseline,
     ) -> None:
-        """Draw the last weak learner from the trainer."""
-        weak_snapshot = state.trainer_result.round_results[-1].weak_snapshot
+        """Draw the weak learner from the selected boosting stage."""
+        selected_round = state.trainer_result.round_results[selected_stage - 1]
+        weak_learner = selected_round.weak_learner
+        weak_snapshot = selected_round.weak_snapshot
+
         train_features = np.asarray(weak_snapshot.visual_state["train_features"], dtype=float)
         train_targets = np.asarray(weak_snapshot.visual_state["train_targets"], dtype=int)
         train_weights = np.asarray(
@@ -188,7 +198,7 @@ class BoostingRenderer:
             bounds=bounds,
         )
         self._draw_text(
-            f"Weak learner — round {state.round_count}",
+            f"Weak learner — stage {selected_stage}",
             rect.left + PADDING,
             rect.top + 16,
             self._font,
@@ -199,24 +209,29 @@ class BoostingRenderer:
         self,
         *,
         state: BoostingRenderState,
+        selected_stage: int,
         rect: pygame.Rect,
         bounds: WorldBounds,
     ) -> None:
-        """Draw the boosted ensemble."""
+        """Draw the boosted ensemble up to selected stage."""
         train_features = np.asarray(state.dataset.train.snapshot.features, dtype=float)
         train_targets = np.asarray(state.dataset.train.snapshot.targets, dtype=int)
-        train_weights = np.asarray(state.trainer_result.final_train_weights, dtype=float)
+        train_weights = np.asarray(
+            state.trainer_result.round_results[selected_stage - 1].updated_train_weights,
+            dtype=float,
+        )
         test_features = np.asarray(state.dataset.test.snapshot.features, dtype=float)
         test_targets = np.asarray(state.dataset.test.snapshot.targets, dtype=int)
-        test_predictions = np.asarray(
-            state.trainer_result.snapshot.visual_state["boosted_test_predictions"],
-            dtype=int,
+        test_prediction = _predict_boosted_for_features(
+            state=state,
+            selected_stage=selected_stage,
+            features=test_features,
         )
 
         self._draw_decision_regions(
             rect=rect,
             bounds=bounds,
-            predictor=lambda point: _predict_boosted(state, point),
+            predictor=lambda point: _predict_boosted(state, selected_stage, point),
             confidence_view_enabled=state.confidence_view_enabled,
         )
         self._draw_axes(rect, bounds)
@@ -231,11 +246,11 @@ class BoostingRenderer:
             rect=rect,
             features=test_features,
             targets=test_targets,
-            predictions=test_predictions,
+            predictions=test_prediction.predictions,
             bounds=bounds,
         )
         self._draw_text(
-            f"Boosted ensemble — {state.round_count} rounds",
+            f"Boosted ensemble — stage {selected_stage}/{state.round_count}",
             rect.left + PADDING,
             rect.top + 16,
             self._font,
@@ -340,9 +355,10 @@ class BoostingRenderer:
             ERROR_MARK_WIDTH,
         )
 
-    def _draw_side_panel(self, state: BoostingRenderState) -> None:
+    def _draw_side_panel(self, state: BoostingRenderState, selected_stage: int) -> None:
         """Draw metrics and current configuration."""
-        metrics = state.trainer_result.snapshot.metrics
+        history = state.trainer_result.staged_history
+        selected_index = selected_stage - 1
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 20
 
@@ -351,19 +367,24 @@ class BoostingRenderer:
 
         rows = [
             ("Dataset", state.dataset_kind),
-            ("Rounds", str(state.round_count)),
+            ("Stage", f"{selected_stage}/{state.round_count}"),
             ("Min leaf", str(state.min_samples_leaf)),
             ("Noise", f"{state.noise_std:.2f}"),
             ("Seed", str(state.seed)),
             ("Conf. view", _enabled_text(state.confidence_view_enabled)),
-            ("Weak train", f"{metrics['final_train_accuracy']:.3f}"),
-            ("Weak test", f"{metrics['final_test_accuracy']:.3f}"),
-            ("Boost train", f"{metrics['boosted_train_accuracy']:.3f}"),
-            ("Boost test", f"{metrics['boosted_test_accuracy']:.3f}"),
-            ("Gap", f"{metrics['boosted_generalization_gap']:.3f}"),
-            ("Confidence", f"{metrics['mean_boosted_test_confidence']:.3f}"),
-            ("Best round", str(int(metrics["best_staged_round_index"]))),
-            ("Best test", f"{metrics['best_staged_boosted_test_accuracy']:.3f}"),
+            ("Stage train", f"{history.boosted_train_accuracies[selected_index]:.3f}"),
+            ("Stage test", f"{history.boosted_test_accuracies[selected_index]:.3f}"),
+            ("Stage gap", f"{history.boosted_generalization_gaps[selected_index]:.3f}"),
+            ("Stage conf.", f"{history.mean_test_confidences[selected_index]:.3f}"),
+            ("Stage alpha", f"{history.learner_weights[selected_index]:.3f}"),
+            (
+                "Best round",
+                str(int(state.trainer_result.snapshot.metrics["best_staged_round_index"])),
+            ),
+            (
+                "Best test",
+                f"{state.trainer_result.snapshot.metrics['best_staged_boosted_test_accuracy']:.3f}",
+            ),
         ]
 
         for label, value in rows:
@@ -371,31 +392,88 @@ class BoostingRenderer:
             self._draw_text(str(value), x + 126, y, self._small_font, TEXT_COLOR)
             y += SMALL_TEXT_LINE_HEIGHT
 
-        y += 8
-        self._draw_staged_accuracy_summary(state, x, y)
+        self._draw_staged_accuracy_plot(state, selected_stage)
 
-    def _draw_staged_accuracy_summary(
+    def _draw_staged_accuracy_plot(
         self,
         state: BoostingRenderState,
-        x: int,
-        y: int,
+        selected_stage: int,
     ) -> None:
-        """Draw compact staged boosted accuracy summary."""
+        """Draw staged train/test accuracy mini-plot."""
         history = state.trainer_result.staged_history
+        rect = STAGED_PLOT_RECT
 
-        self._draw_text("Staged boosted test acc", x, y, self._font, TEXT_COLOR)
-        y += 28
+        pygame.draw.rect(self._screen, PLOT_GRID_COLOR, rect, width=1, border_radius=6)
 
-        for round_index, test_accuracy in zip(
-            history.round_indices,
-            history.boosted_test_accuracies,
-            strict=True,
-        ):
-            label = f"r{int(round_index)}"
-            value = f"{float(test_accuracy):.3f}"
-            self._draw_text(label, x, y, self._small_font, MUTED_TEXT_COLOR)
-            self._draw_text(value, x + 48, y, self._small_font, TEXT_COLOR)
-            y += SMALL_TEXT_LINE_HEIGHT
+        self._draw_text(
+            "Staged accuracy",
+            rect.left,
+            rect.top - 24,
+            self._small_font,
+            TEXT_COLOR,
+        )
+        self._draw_accuracy_curve(
+            rect=rect,
+            values=history.boosted_train_accuracies,
+            color=CLASS_ZERO_COLOR,
+        )
+        self._draw_accuracy_curve(
+            rect=rect,
+            values=history.boosted_test_accuracies,
+            color=CLASS_ONE_COLOR,
+        )
+        self._draw_stage_marker(
+            rect=rect, selected_stage=selected_stage, stage_count=state.round_count
+        )
+
+        legend_y = rect.bottom + 8
+        self._draw_text("blue=train", rect.left, legend_y, self._small_font, MUTED_TEXT_COLOR)
+        self._draw_text(
+            "orange=test", rect.left + 112, legend_y, self._small_font, MUTED_TEXT_COLOR
+        )
+
+    def _draw_accuracy_curve(
+        self,
+        *,
+        rect: pygame.Rect,
+        values: FloatArray,
+        color: tuple[int, int, int],
+    ) -> None:
+        """Draw one staged accuracy curve."""
+        if values.shape[0] == 1:
+            point = _plot_point(rect=rect, index=0, count=1, value=float(values[0]))
+            pygame.draw.circle(self._screen, color, point, PLOT_MARKER_RADIUS)
+            return
+
+        points = [
+            _plot_point(rect=rect, index=index, count=values.shape[0], value=float(value))
+            for index, value in enumerate(values)
+        ]
+
+        pygame.draw.lines(self._screen, color, False, points, width=2)
+
+        for point in points:
+            pygame.draw.circle(self._screen, color, point, PLOT_MARKER_RADIUS)
+
+    def _draw_stage_marker(
+        self,
+        *,
+        rect: pygame.Rect,
+        selected_stage: int,
+        stage_count: int,
+    ) -> None:
+        """Draw selected-stage marker on staged plot."""
+        denominator = max(stage_count - 1, 1)
+        ratio = (selected_stage - 1) / denominator
+        x = rect.left + round(ratio * rect.width)
+
+        pygame.draw.line(
+            self._screen,
+            TEXT_COLOR,
+            (x, rect.top),
+            (x, rect.bottom),
+            width=1,
+        )
 
     def _draw_bottom_panel(self) -> None:
         """Draw controls and legend."""
@@ -403,20 +481,20 @@ class BoostingRenderer:
         y = BOTTOM_RECT.top + 14
 
         controls = (
-            "D: dataset   Up/Down: rounds   W/S: min leaf   "
-            "C: confidence view   Left/Right: noise   N: seed   R: reset"
+            "Up/Down: selected stage   PageUp/PageDown: total rounds   "
+            "D: dataset   W/S: min leaf   C: confidence view   Left/Right: noise   N: seed"
         )
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
 
         legend = (
-            "Circles = train samples, size = current/final sample weight. "
+            "Circles = train samples, size = sample weight. "
             "Squares = test samples, X = misclassified test samples."
         )
         self._draw_text(legend, x, y + TEXT_LINE_HEIGHT, self._small_font, MUTED_TEXT_COLOR)
 
         explanation = (
-            "Left panel shows the last weak learner. Right panel shows alpha-weighted "
-            "boosted ensemble predictions after the selected number of rounds."
+            "Left panel shows the weak learner from selected stage. Right panel shows "
+            "the boosted ensemble built from stages 1..selected stage."
         )
         self._draw_text(
             explanation,
@@ -449,18 +527,46 @@ def _predict_weak(
 
 def _predict_boosted(
     state: BoostingRenderState,
+    selected_stage: int,
     point: FloatArray,
 ) -> tuple[int, float]:
-    """Predict one point using the boosted ensemble."""
-    result = predict_boosted_ensemble(
-        weak_learners=[
-            round_result.weak_learner for round_result in state.trainer_result.round_results
-        ],
-        learner_weights=state.trainer_result.learner_weights,
+    """Predict one point using the staged boosted ensemble."""
+    result = _predict_boosted_for_features(
+        state=state,
+        selected_stage=selected_stage,
         features=point,
     )
 
     return int(result.predictions[0]), float(result.confidence[0])
+
+
+def _predict_boosted_for_features(
+    *,
+    state: BoostingRenderState,
+    selected_stage: int,
+    features: FloatArray,
+):
+    """Predict features using boosted ensemble up to selected stage."""
+    stage_rounds = _selected_rounds(state, selected_stage)
+
+    return predict_boosted_ensemble(
+        weak_learners=[round_result.weak_learner for round_result in stage_rounds],
+        learner_weights=state.trainer_result.learner_weights[:selected_stage],
+        features=features,
+    )
+
+
+def _selected_rounds(
+    state: BoostingRenderState,
+    selected_stage: int,
+) -> tuple[BoostingRoundResult, ...]:
+    """Return boosting rounds up to selected stage."""
+    return state.trainer_result.round_results[:selected_stage]
+
+
+def _bounded_stage(state: BoostingRenderState) -> int:
+    """Clamp selected stage to the available round range."""
+    return max(1, min(state.selected_stage, state.round_count))
 
 
 def _region_color(
@@ -513,6 +619,24 @@ def _weight_to_radius(weight: float, sample_count: int) -> int:
     relative_weight = max(0.0, weight * sample_count)
 
     return round(4.0 + min(10.0, 3.0 * np.sqrt(relative_weight)))
+
+
+def _plot_point(
+    *,
+    rect: pygame.Rect,
+    index: int,
+    count: int,
+    value: float,
+) -> tuple[int, int]:
+    """Convert staged metric value to plot coordinates."""
+    denominator = max(count - 1, 1)
+    x_ratio = index / denominator
+    y_ratio = (value - PLOT_MIN_ACCURACY) / (PLOT_MAX_ACCURACY - PLOT_MIN_ACCURACY)
+
+    x = rect.left + round(x_ratio * rect.width)
+    y = rect.bottom - round(y_ratio * rect.height)
+
+    return x, y
 
 
 def _compute_world_bounds(train_features: FloatArray, test_features: FloatArray) -> WorldBounds:
