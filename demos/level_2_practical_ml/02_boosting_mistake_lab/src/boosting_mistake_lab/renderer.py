@@ -12,6 +12,7 @@ from numpy.typing import NDArray
 
 from boosting_mistake_lab.boosted_prediction import predict_boosted_ensemble
 from boosting_mistake_lab.boosting_round import BoostingRoundResult
+from boosting_mistake_lab.challenge import evaluate_boosting_challenge
 from boosting_mistake_lab.dataset import WeightedTrainTestDataset
 from boosting_mistake_lab.trainer import BoostingTrainerResult
 from boosting_mistake_lab.weak_learner import WeakLearnerBaseline
@@ -359,6 +360,7 @@ class BoostingRenderer:
         """Draw metrics and current configuration."""
         history = state.trainer_result.staged_history
         selected_index = selected_stage - 1
+        challenge = evaluate_boosting_challenge(state.trainer_result.snapshot)
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 20
 
@@ -385,12 +387,22 @@ class BoostingRenderer:
                 "Best test",
                 f"{state.trainer_result.snapshot.metrics['best_staged_boosted_test_accuracy']:.3f}",
             ),
+            ("Challenge", challenge.status),
         ]
 
         for label, value in rows:
             self._draw_text(f"{label}:", x, y, self._small_font, MUTED_TEXT_COLOR)
             self._draw_text(str(value), x + 126, y, self._small_font, TEXT_COLOR)
             y += SMALL_TEXT_LINE_HEIGHT
+
+        challenge_color = SUCCESS_COLOR if challenge.passed else ERROR_COLOR
+        self._draw_text(
+            challenge.summary,
+            x,
+            y + 4,
+            self._small_font,
+            challenge_color,
+        )
 
         self._draw_staged_accuracy_plot(state, selected_stage)
 
