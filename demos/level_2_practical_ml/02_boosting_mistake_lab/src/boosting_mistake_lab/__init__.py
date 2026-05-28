@@ -11,6 +11,13 @@ from boosting_mistake_lab.boosting_round import (
     make_next_round_dataset,
     run_boosting_round,
 )
+from boosting_mistake_lab.challenge import (
+    STATUS_FAILED,
+    STATUS_SUCCESS,
+    BoostingChallengeConfig,
+    BoostingChallengeResult,
+    evaluate_boosting_challenge,
+)
 from boosting_mistake_lab.dataset import (
     DATASET_KIND_AXIS_ALIGNED,
     DATASET_KIND_XOR,
@@ -62,9 +69,13 @@ __all__ = [
     "BOOSTED_ENSEMBLE_NAME",
     "DATASET_KIND_AXIS_ALIGNED",
     "DATASET_KIND_XOR",
+    "STATUS_FAILED",
+    "STATUS_SUCCESS",
     "WEAK_LEARNER_NAME",
     "BoostedEnsembleReportMetrics",
     "BoostedPredictionResult",
+    "BoostingChallengeConfig",
+    "BoostingChallengeResult",
     "BoostingComparisonReport",
     "BoostingRoundConfig",
     "BoostingRoundResult",
@@ -86,6 +97,7 @@ __all__ = [
     "build_boosting_comparison_report",
     "build_staged_boosting_history",
     "compute_learner_weight",
+    "evaluate_boosting_challenge",
     "evaluate_weighted_predictions",
     "format_boosting_comparison_report",
     "make_next_round_dataset",
