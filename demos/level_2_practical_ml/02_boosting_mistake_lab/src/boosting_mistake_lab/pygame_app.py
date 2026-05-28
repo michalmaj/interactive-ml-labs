@@ -32,6 +32,8 @@ DEFAULT_ROUND_COUNT: Final[int] = 5
 MIN_ROUND_COUNT: Final[int] = 1
 MAX_ROUND_COUNT: Final[int] = 12
 
+DEFAULT_SELECTED_STAGE: Final[int] = 5
+
 DEFAULT_MIN_SAMPLES_LEAF: Final[int] = 1
 MIN_MIN_SAMPLES_LEAF: Final[int] = 1
 MAX_MIN_SAMPLES_LEAF: Final[int] = 8
@@ -51,6 +53,7 @@ class BoostingPygameState:
 
     dataset_kind: str = DEFAULT_DATASET_KIND
     round_count: int = DEFAULT_ROUND_COUNT
+    selected_stage: int = DEFAULT_SELECTED_STAGE
     min_samples_leaf: int = DEFAULT_MIN_SAMPLES_LEAF
     noise_std: float = DEFAULT_NOISE_STD
     seed: int = DEFAULT_SEED
@@ -73,6 +76,7 @@ class BoostingPygameApp:
         self._dataset: WeightedTrainTestDataset
         self._trainer_result: BoostingTrainerResult
 
+        self._clamp_selected_stage()
         self._rebuild_demo()
 
     def run(self) -> None:
@@ -98,8 +102,12 @@ class BoostingPygameApp:
         handlers: dict[int, Callable[[], None]] = {
             pygame.K_ESCAPE: self._quit,
             pygame.K_d: self._toggle_dataset,
-            pygame.K_UP: self._increase_round_count,
-            pygame.K_DOWN: self._decrease_round_count,
+            pygame.K_UP: self._increase_selected_stage,
+            pygame.K_DOWN: self._decrease_selected_stage,
+            pygame.K_PAGEUP: self._increase_round_count,
+            pygame.K_PAGEDOWN: self._decrease_round_count,
+            pygame.K_EQUALS: self._increase_round_count,
+            pygame.K_MINUS: self._decrease_round_count,
             pygame.K_w: self._increase_min_samples_leaf,
             pygame.K_s: self._decrease_min_samples_leaf,
             pygame.K_RIGHT: self._increase_noise,
@@ -122,6 +130,7 @@ class BoostingPygameApp:
             noise_std=self._state.noise_std,
             seed=self._state.seed,
             round_count=self._state.round_count,
+            selected_stage=self._state.selected_stage,
             min_samples_leaf=self._state.min_samples_leaf,
             confidence_view_enabled=self._state.confidence_view_enabled,
         )
@@ -142,6 +151,7 @@ class BoostingPygameApp:
             ),
         )
         self._trainer_result = trainer.reset(self._dataset)
+        self._clamp_selected_stage()
 
     def _quit(self) -> None:
         """Stop the app."""
@@ -156,14 +166,30 @@ class BoostingPygameApp:
 
         self._rebuild_demo()
 
+    def _increase_selected_stage(self) -> None:
+        """Increase selected boosting stage."""
+        self._state.selected_stage = min(
+            self._state.round_count,
+            self._state.selected_stage + 1,
+        )
+
+    def _decrease_selected_stage(self) -> None:
+        """Decrease selected boosting stage."""
+        self._state.selected_stage = max(
+            MIN_ROUND_COUNT,
+            self._state.selected_stage - 1,
+        )
+
     def _increase_round_count(self) -> None:
-        """Increase number of boosting rounds."""
+        """Increase total number of boosting rounds."""
         self._state.round_count = min(MAX_ROUND_COUNT, self._state.round_count + 1)
+        self._state.selected_stage = self._state.round_count
         self._rebuild_demo()
 
     def _decrease_round_count(self) -> None:
-        """Decrease number of boosting rounds."""
+        """Decrease total number of boosting rounds."""
         self._state.round_count = max(MIN_ROUND_COUNT, self._state.round_count - 1)
+        self._clamp_selected_stage()
         self._rebuild_demo()
 
     def _increase_min_samples_leaf(self) -> None:
@@ -210,7 +236,15 @@ class BoostingPygameApp:
     def _reset_defaults(self) -> None:
         """Reset demo controls to defaults."""
         self._state = BoostingPygameState()
+        self._clamp_selected_stage()
         self._rebuild_demo()
+
+    def _clamp_selected_stage(self) -> None:
+        """Keep selected stage in the valid range."""
+        self._state.selected_stage = max(
+            MIN_ROUND_COUNT,
+            min(self._state.selected_stage, self._state.round_count),
+        )
 
 
 def main() -> None:
