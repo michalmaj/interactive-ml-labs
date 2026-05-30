@@ -14,7 +14,7 @@ WINDOWED_RESOLUTIONS: Final[tuple[Size, ...]] = (
     (1920, 1080),
 )
 
-DEFAULT_RESOLUTION: Final[Size] = (1600, 900)
+DEFAULT_RESOLUTION: Final[Size] = (1280, 720)
 BOOSTING_FIXED_SCENE_SIZE: Final[Size] = (1320, 780)
 
 

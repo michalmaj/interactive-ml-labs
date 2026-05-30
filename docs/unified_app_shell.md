@@ -237,7 +237,7 @@ Resolution should be represented in settings from the beginning.
 Current default:
 
 ```text
-1600x900
+1280x720
 ```
 
 Supported windowed presets:
@@ -249,9 +249,15 @@ Supported windowed presets:
 1920x1080
 ```
 
-Fullscreen should remain optional rather than the default. A later settings menu can expose windowed presets and fullscreen selection.
+Fullscreen should remain optional rather than the default.
 
-Fixed-size demo scenes, such as Boosting Mistake Lab's `1320x780` renderer, should initially be centered inside the larger app window instead of forcing a renderer rewrite.
+A later settings menu should expose these on/off choices:
+
+- adaptive window size,
+- fullscreen,
+- fixed-scene scaling.
+
+Fixed-size demo scenes, such as Boosting Mistake Lab's `1320x780` renderer, should initially be centered or scaled inside the available app window instead of forcing a renderer rewrite.
 
 Sound should not be implemented in the first slice. A `sound_enabled` placeholder may exist in settings if it helps the architecture, but no audio assets or mixer behavior are required yet.
 
@@ -328,7 +334,7 @@ The following are accepted as initial direction, unless later implementation wor
 - Language is global.
 - Localization starts with simple Python data structures.
 - Settings are in memory at first.
-- Default app resolution is `1600x900`; fullscreen remains opt-in.
+- Default app resolution is `1280x720`; adaptive sizing, fullscreen, and fixed-scene scaling remain opt-in settings.
 - Sound is deferred.
 - Existing renderers remain standalone.
 - Level selection is dynamic from manifests.
