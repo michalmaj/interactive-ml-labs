@@ -11,6 +11,7 @@ package = false
 
 [tool.uv.workspace]
 members = [
+    "apps/interactive_ml_labs",
     "packages/ml_lab_core",
     "demos/level_1_fundamentals/01_gradient_descent_playground",
     "demos/level_1_fundamentals/02_knn_vote_map",
