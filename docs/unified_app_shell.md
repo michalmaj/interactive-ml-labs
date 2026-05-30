@@ -232,15 +232,26 @@ The shell should own the overlay behavior. Demos should provide content through 
 
 ## Resolution And Sound
 
-Resolution should be represented in settings from the beginning, but the first implementation can support only one fixed resolution.
+Resolution should be represented in settings from the beginning.
 
-Initial direction:
+Current default:
+
+```text
+1600x900
+```
+
+Supported windowed presets:
 
 ```text
 1280x720
+1320x780
+1600x900
+1920x1080
 ```
 
-Fullscreen and multiple resolutions can come later.
+Fullscreen should remain optional rather than the default. A later settings menu can expose windowed presets and fullscreen selection.
+
+Fixed-size demo scenes, such as Boosting Mistake Lab's `1320x780` renderer, should initially be centered inside the larger app window instead of forcing a renderer rewrite.
 
 Sound should not be implemented in the first slice. A `sound_enabled` placeholder may exist in settings if it helps the architecture, but no audio assets or mixer behavior are required yet.
 
@@ -317,7 +328,7 @@ The following are accepted as initial direction, unless later implementation wor
 - Language is global.
 - Localization starts with simple Python data structures.
 - Settings are in memory at first.
-- One fixed resolution is enough for the first slice.
+- Default app resolution is `1600x900`; fullscreen remains opt-in.
 - Sound is deferred.
 - Existing renderers remain standalone.
 - Level selection is dynamic from manifests.
