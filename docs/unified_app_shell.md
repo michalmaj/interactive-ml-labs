@@ -150,6 +150,17 @@ Current direction:
 - language chosen in the shell,
 - runtime language switching can be added if it stays simple.
 
+## Polish Copy Style
+
+Polish UI copy should sound natural rather than literal.
+
+Current style rules:
+
+- keep algorithm names in English when they are recognizable names, such as `k-NN`, `Random Forest`, or `Boosting`,
+- keep common ML terms in English when Polish versions sound forced, such as `learning rate`, `loss`, `split`, or `decision boundary`,
+- translate surrounding explanations into natural Polish,
+- prefer short UI phrases over exact sentence-by-sentence translation.
+
 ## Demo Manifest
 
 Each demo should be described by a manifest.

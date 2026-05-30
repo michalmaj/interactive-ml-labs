@@ -176,7 +176,7 @@ class UnifiedAppShell:
         self._draw_footer(
             self._text(
                 "Enter: demos | Esc/Backspace: language | L: language",
-                "Enter: dema | Esc/Backspace: język | L: język",
+                "Enter: dema | Esc/Backspace: wybór języka | L: zmień język",
             ),
         )
 
@@ -192,7 +192,7 @@ class UnifiedAppShell:
         self._draw_footer(
             self._text(
                 "Enter: intro | Esc/Backspace: levels | L: language",
-                "Enter: intro | Esc/Backspace: poziomy | L: język",
+                "Enter: intro | Esc/Backspace: poziomy | L: zmień język",
             ),
         )
 
@@ -236,7 +236,7 @@ class UnifiedAppShell:
         self._draw_footer(
             self._text(
                 "Enter: start | Esc/Backspace: demos | L: language",
-                "Enter: start | Esc/Backspace: dema | L: język",
+                "Enter: start | Esc/Backspace: lista dem | L: zmień język",
             ),
         )
 
@@ -245,12 +245,12 @@ class UnifiedAppShell:
         language = self.context.settings.language
         self._draw_title(
             demo.title.for_language(language),
-            self._text("Demo integration placeholder", "Placeholder integracji demo"),
+            self._text("Demo integration placeholder", "Tu wkrótce pojawi się demo"),
         )
         self._draw_wrapped(
             self._text(
                 "This shell is ready. The real demo scene will be connected in a later slice.",
-                "Shell jest gotowy. Prawdziwa scena demo zostanie podpięta w kolejnym kroku.",
+                "Shell już działa. W kolejnym kroku podepniemy tutaj właściwą scenę demo.",
             ),
             (120, 280),
             900,
@@ -263,7 +263,7 @@ class UnifiedAppShell:
         self._draw_footer(
             self._text(
                 "Esc: pause | H: help | L: language",
-                "Esc: pauza | H: pomoc | L: język",
+                "Esc: pauza | H: pomoc | L: zmień język",
             ),
         )
 
@@ -272,14 +272,14 @@ class UnifiedAppShell:
         labels = [
             self._text("Resume", "Wróć"),
             self._text("Help", "Pomoc"),
-            self._text("Back to demos", "Wróć do dem"),
+            self._text("Back to demos", "Lista dem"),
             self._text("Quit", "Zamknij"),
         ]
         self._draw_menu(labels, top=220)
         self._draw_footer(
             self._text(
                 "Esc: resume | Enter: select | L: language",
-                "Esc: wróć | Enter: wybierz | L: język",
+                "Esc: wróć | Enter: wybierz | L: zmień język",
             ),
         )
 
@@ -356,7 +356,7 @@ class UnifiedAppShell:
                 "Use arrow keys, Enter, Esc, H, or the mouse. "
                 "Demo-specific help will come from manifests.",
                 "Używaj strzałek, Enter, Esc, H albo myszy. "
-                "Pomoc dla dem będzie pochodzić z manifestów.",
+                "Treść pomocy będzie zależeć od wybranego demo.",
             ),
             (rect.x + 32, rect.y + 82),
             rect.width - 64,
