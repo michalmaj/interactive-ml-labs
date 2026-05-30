@@ -11,6 +11,7 @@ import pygame
 from interactive_ml_labs.display import Size, choose_adaptive_window_size, scale_rect_to_fit
 from interactive_ml_labs.fonts import make_ui_font
 from interactive_ml_labs.manifest import DemoManifest, LocalizedText
+from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.registry import LEVEL_NAMES, demos_for_level, levels_from_manifests
 from interactive_ml_labs.scene import (
     FixedSizeScene,
@@ -37,7 +38,7 @@ class ScreenName(StrEnum):
     LEVELS = "levels"
     DEMOS = "demos"
     INTRO = "intro"
-    PLACEHOLDER_DEMO = "placeholder_demo"
+    DEMO = "demo"
     PAUSE = "pause"
 
 
@@ -113,7 +114,7 @@ class UnifiedAppShell:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            elif self.screen_name == ScreenName.PLACEHOLDER_DEMO and self._is_demo_event(event):
+            elif self.screen_name == ScreenName.DEMO and self._is_demo_event(event):
                 self._handle_active_demo_event(event)
             elif event.type == pygame.KEYDOWN:
                 self._handle_keydown(event.key)
@@ -165,7 +166,7 @@ class UnifiedAppShell:
         return False
 
     def _update(self, dt: float) -> None:
-        if self.screen_name != ScreenName.PLACEHOLDER_DEMO:
+        if self.screen_name != ScreenName.DEMO:
             return
 
         scene = self.scene_manager.current
@@ -182,7 +183,7 @@ class UnifiedAppShell:
             ScreenName.LEVELS: self._render_levels,
             ScreenName.DEMOS: self._render_demos,
             ScreenName.INTRO: self._render_intro,
-            ScreenName.PLACEHOLDER_DEMO: self._render_placeholder_demo,
+            ScreenName.DEMO: self._render_demo,
             ScreenName.PAUSE: self._render_pause,
         }
         renderers[self.screen_name]()
@@ -269,7 +270,12 @@ class UnifiedAppShell:
             ),
         )
 
-    def _render_placeholder_demo(self) -> None:
+    def _render_demo(self) -> None:
+        scene = self.scene_manager.current
+        if scene is not None and not isinstance(scene, PlaceholderDemoScene):
+            self._render_scene(scene)
+            return
+
         demo = self._require_demo()
         language = self.context.settings.language
         self._draw_title(
@@ -286,7 +292,6 @@ class UnifiedAppShell:
             self.font_body,
             TEXT,
         )
-        scene = self.scene_manager.current
         if scene is not None:
             self._render_scene(scene)
         self._draw_footer(
@@ -444,7 +449,7 @@ class UnifiedAppShell:
             ScreenName.LEVELS: self._select_level,
             ScreenName.DEMOS: self._select_demo,
             ScreenName.INTRO: self._start_demo,
-            ScreenName.PLACEHOLDER_DEMO: self._open_pause,
+            ScreenName.DEMO: self._open_pause,
             ScreenName.PAUSE: self._select_pause_item,
         }
         actions[self.screen_name]()
@@ -468,7 +473,7 @@ class UnifiedAppShell:
         demo = self._require_demo()
         if demo.create_scene is not None:
             self.scene_manager.replace(demo.create_scene(self.context))
-        self._go_to(ScreenName.PLACEHOLDER_DEMO)
+        self._go_to(ScreenName.DEMO)
 
     def _select_pause_item(self) -> None:
         if self.selected_index == 0:
@@ -491,7 +496,7 @@ class UnifiedAppShell:
             self._go_to(ScreenName.LEVELS)
         elif self.screen_name == ScreenName.INTRO:
             self._go_to(ScreenName.DEMOS)
-        elif self.screen_name == ScreenName.PLACEHOLDER_DEMO:
+        elif self.screen_name == ScreenName.DEMO:
             self._open_pause()
         elif self.screen_name == ScreenName.PAUSE:
             self._resume()
@@ -543,7 +548,7 @@ class UnifiedAppShell:
             ScreenName.LEVELS: len(levels_from_manifests()),
             ScreenName.DEMOS: len(self._current_level_demos()),
             ScreenName.INTRO: 1,
-            ScreenName.PLACEHOLDER_DEMO: 1,
+            ScreenName.DEMO: 1,
             ScreenName.PAUSE: 4,
         }
         return max(1, counts[self.screen_name])

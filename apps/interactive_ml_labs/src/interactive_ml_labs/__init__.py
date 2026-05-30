@@ -1,5 +1,9 @@
 """Unified app shell for Interactive ML Labs."""
 
+from interactive_ml_labs.boosting_scene import (
+    BoostingMistakeLabSceneAdapter,
+    create_boosting_mistake_lab_scene,
+)
 from interactive_ml_labs.display import (
     BOOSTING_FIXED_SCENE_SIZE,
     DEFAULT_RESOLUTION,
@@ -44,6 +48,7 @@ __all__ = [
     "WINDOWED_RESOLUTIONS",
     "AppContext",
     "AppSettings",
+    "BoostingMistakeLabSceneAdapter",
     "ControlBinding",
     "DemoManifest",
     "FixedSizeScene",
@@ -57,6 +62,7 @@ __all__ = [
     "Size",
     "center_rect",
     "choose_adaptive_window_size",
+    "create_boosting_mistake_lab_scene",
     "demos_for_level",
     "levels_from_manifests",
     "make_ui_font",

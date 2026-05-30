@@ -12,6 +12,7 @@ from interactive_ml_labs import (
     levels_from_manifests,
     validate_demo_registry,
 )
+from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
 
 
 def test_registry_contains_current_demo_levels() -> None:
@@ -65,6 +66,7 @@ def test_boosting_manifest_has_demo_specific_teaching_content() -> None:
     assert "decision boundary" in polish_text
     assert len(manifest.objectives) == 3
     assert len(manifest.controls) >= 5
+    assert manifest.create_scene is create_boosting_mistake_lab_scene
 
 
 def test_registry_contains_polish_diacritics() -> None:
