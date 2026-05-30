@@ -59,7 +59,7 @@ def _placeholder_demo(
         objectives=(
             LocalizedText(
                 en="Explore the main intuition behind the algorithm.",
-                pl="Złap najważniejszą intuicję stojącą za algorytmem.",
+                pl="Zrozum, co jest najważniejsze w działaniu algorytmu.",
             ),
             LocalizedText(
                 en="Observe how parameter changes affect model behavior.",
