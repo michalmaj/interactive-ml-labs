@@ -100,6 +100,14 @@ The ml_lab_core package should contain reusable infrastructure, such as:
 
 It should not contain demo-specific algorithms.
 
+## Unified application shell
+
+The project is expected to grow from separately launched demos into one guided Pygame application.
+
+The shell should live outside `ml_lab_core` at first, because it is a concrete application rather than a small reusable primitive. Existing demo entry points should remain available while the shell becomes the recommended guided experience.
+
+See [Unified App Shell](unified_app_shell.md) for the current architecture direction.
+
 ## Demo packages
 
 Each demo should be self-contained and documented.
@@ -133,4 +141,3 @@ A demo is considered complete when it has:
 - passing Ruff checks,
 - passing tests,
 - passing CI.
-
