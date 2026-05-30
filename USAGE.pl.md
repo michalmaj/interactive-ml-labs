@@ -21,7 +21,7 @@ Unified Pygame app to zalecany sposób przechodzenia przez laboratoria:
 uv run --package interactive-ml-labs-app interactive-ml-labs
 ```
 
-Domyślnie aplikacja otwiera okno `1280x720`. Adaptacyjny rozmiar okna i skalowanie scen o stałym rozmiarze są już dostępne jako opcje w kodzie, a fullscreen dodamy później jako przełącznik w menu.
+Domyślnie aplikacja otwiera okno `1280x720`. Skalowanie scen o stałym rozmiarze jest włączone, żeby większe dema mieściły się bezpiecznie w oknie; adaptacyjny rozmiar okna jest dostępny jako opcja w kodzie, a fullscreen dodamy później jako przełącznik w menu.
 
 Obecny przepływ aplikacji:
 
@@ -34,7 +34,7 @@ wybór języka
 -> pauza / pomoc
 ```
 
-Kolejne dema będą podpinane stopniowo. Każde demo nadal można uruchomić osobno.
+Kolejne dema będą podpinane stopniowo. Boosting Mistake Lab działa już w unified app, a każde demo nadal można uruchomić osobno.
 
 Podstawowe sterowanie:
 
