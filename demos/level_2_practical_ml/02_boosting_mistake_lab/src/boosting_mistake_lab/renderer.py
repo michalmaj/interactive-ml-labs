@@ -104,6 +104,7 @@ class BoostingRenderState:
     selected_stage: int
     min_samples_leaf: int
     confidence_view_enabled: bool
+    preset_name: str
 
 
 class BoostingRenderer:
@@ -370,6 +371,7 @@ class BoostingRenderer:
 
         rows = [
             ("Dataset", state.dataset_kind),
+            ("Preset", state.preset_name),
             ("Stage", f"{selected_stage}/{state.round_count}"),
             ("Min leaf", str(state.min_samples_leaf)),
             ("Noise", f"{state.noise_std:.2f}"),
@@ -497,8 +499,8 @@ class BoostingRenderer:
         y = BOTTOM_RECT.top + 14
 
         controls = (
-            "Up/Down: selected stage   PageUp/PageDown: total rounds   "
-            "D: dataset   W/S: min leaf   C: confidence   Left/Right: noise   N: seed"
+            "1-4: presets   P: next preset   Up/Down: stage   "
+            "PageUp/PageDown: rounds   C: confidence   N: seed   R: reset"
         )
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
 
