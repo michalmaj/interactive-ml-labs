@@ -247,7 +247,7 @@ class UnifiedAppShell:
         font: pygame.font.Font,
         color: tuple[int, int, int],
     ) -> None:
-        rendered = font.render(text, antialias=True, color=color)
+        rendered = font.render(text, True, color)
         self.screen.blit(rendered, position)
 
     def _draw_wrapped(
