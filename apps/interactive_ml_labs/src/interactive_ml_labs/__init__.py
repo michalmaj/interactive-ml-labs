@@ -1,5 +1,13 @@
 """Unified app shell for Interactive ML Labs."""
 
+from interactive_ml_labs.display import (
+    BOOSTING_FIXED_SCENE_SIZE,
+    DEFAULT_RESOLUTION,
+    WINDOWED_RESOLUTIONS,
+    RectTuple,
+    Size,
+    center_rect,
+)
 from interactive_ml_labs.fonts import POLISH_FONT_CANDIDATES, POLISH_SAMPLE_TEXT, make_ui_font
 from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
 from interactive_ml_labs.registry import (
@@ -15,22 +23,28 @@ from interactive_ml_labs.scene import Scene, SceneCommand, SceneCommandKind, Sce
 from interactive_ml_labs.settings import AppContext, AppSettings
 
 __all__ = [
+    "BOOSTING_FIXED_SCENE_SIZE",
+    "DEFAULT_RESOLUTION",
     "DEMO_BY_ID",
     "DEMO_MANIFESTS",
     "LEVEL_MANIFESTS",
     "LEVEL_NAMES",
     "POLISH_FONT_CANDIDATES",
     "POLISH_SAMPLE_TEXT",
+    "WINDOWED_RESOLUTIONS",
     "AppContext",
     "AppSettings",
     "ControlBinding",
     "DemoManifest",
     "LevelManifest",
     "LocalizedText",
+    "RectTuple",
     "Scene",
     "SceneCommand",
     "SceneCommandKind",
     "SceneManager",
+    "Size",
+    "center_rect",
     "demos_for_level",
     "levels_from_manifests",
     "make_ui_font",

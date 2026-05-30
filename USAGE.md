@@ -21,6 +21,8 @@ The unified Pygame app is the recommended entry point for browsing demos:
 uv run --package interactive-ml-labs-app interactive-ml-labs
 ```
 
+The app opens as a `1600x900` window by default. Fullscreen is planned as an opt-in setting, not the default launch mode.
+
 Current app shell flow:
 
 ```text

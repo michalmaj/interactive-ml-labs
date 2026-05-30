@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 
-DEFAULT_RESOLUTION: tuple[int, int] = (1280, 720)
+from interactive_ml_labs.display import DEFAULT_RESOLUTION, Size
 
 
 @dataclass(slots=True)
@@ -10,7 +10,8 @@ class AppSettings:
     """Mutable in-memory shell settings."""
 
     language: str = "en"
-    resolution: tuple[int, int] = DEFAULT_RESOLUTION
+    resolution: Size = DEFAULT_RESOLUTION
+    fullscreen_enabled: bool = False
     sound_enabled: bool = False
 
 

@@ -51,7 +51,10 @@ class UnifiedAppShell:
         pygame.init()
 
         self.context = AppContext(settings=settings or AppSettings())
-        self.screen = pygame.display.set_mode(self.context.settings.resolution)
+        self.screen = pygame.display.set_mode(
+            self.context.settings.resolution,
+            self._display_flags(),
+        )
         self.clock = pygame.time.Clock()
         self.font_title = make_ui_font(44, bold=True)
         self.font_heading = make_ui_font(30, bold=True)
@@ -68,6 +71,13 @@ class UnifiedAppShell:
         self.mouse_position: tuple[int, int] = (0, 0)
 
         pygame.display.set_caption("Interactive ML Labs")
+
+    def _display_flags(self) -> int:
+        """Return Pygame display flags for current settings."""
+        if self.context.settings.fullscreen_enabled:
+            return pygame.FULLSCREEN
+
+        return 0
 
     def run(self) -> None:
         """Run the shell event loop."""
