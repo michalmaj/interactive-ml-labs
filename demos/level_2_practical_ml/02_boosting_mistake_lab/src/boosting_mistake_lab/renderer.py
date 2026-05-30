@@ -499,7 +499,7 @@ class BoostingRenderer:
         y = BOTTOM_RECT.top + 14
 
         controls = (
-            "1-4: presets   P: next preset   Up/Down: stage   "
+            "1-4: presets   P: next preset   E: export JSON   Up/Down: stage   "
             "PageUp/PageDown: rounds   C: confidence   N: seed   R: reset"
         )
         self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)

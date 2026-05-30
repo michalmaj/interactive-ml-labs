@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Final
 
 import pygame
@@ -14,6 +15,10 @@ from boosting_mistake_lab.dataset import (
     SyntheticWeightedDatasetConfig,
     WeightedTrainTestDataset,
     make_synthetic_weighted_dataset,
+)
+from boosting_mistake_lab.export import (
+    DecisionBoundaryExportConfig,
+    write_decision_boundary_export,
 )
 from boosting_mistake_lab.presets import (
     CUSTOM_PRESET_NAME,
@@ -45,6 +50,10 @@ MAX_MIN_SAMPLES_LEAF: Final[int] = 8
 MIN_NOISE_STD: Final[float] = 0.0
 MAX_NOISE_STD: Final[float] = 1.80
 NOISE_STEP: Final[float] = 0.10
+
+EXPORT_DIR: Final[Path] = Path("exports")
+EXPORT_FILENAME: Final[str] = "boosting_mistake_lab_decision_boundary.json"
+EXPORT_GRID_RESOLUTION: Final[int] = 50
 
 
 @dataclass(slots=True)
@@ -91,6 +100,20 @@ class BoostingPygameApp:
         finally:
             pygame.quit()
 
+    def _export_current_state(self) -> None:
+        """Export current selected-stage decision boundary to JSON."""
+        result = write_decision_boundary_export(
+            dataset=self._dataset,
+            trainer_result=self._trainer_result,
+            config=DecisionBoundaryExportConfig(
+                selected_stage=self._state.selected_stage,
+                grid_resolution=EXPORT_GRID_RESOLUTION,
+            ),
+            output_path=EXPORT_DIR / EXPORT_FILENAME,
+        )
+
+        print(f"Exported Boosting Mistake Lab state to {result.output_path}")
+
     def _handle_events(self) -> None:
         """Handle all pending Pygame events."""
         for event in pygame.event.get():
@@ -122,6 +145,7 @@ class BoostingPygameApp:
             pygame.K_n: self._next_seed,
             pygame.K_c: self._toggle_confidence_view,
             pygame.K_r: self._reset_defaults,
+            pygame.K_e: self._export_current_state,
         }
         handler = handlers.get(event.key)
 

@@ -69,3 +69,6 @@ checkpoints/
 *.avi
 *.mov
 *.webm
+
+# Local demo exports
+exports/
