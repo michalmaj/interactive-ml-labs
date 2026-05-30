@@ -19,15 +19,15 @@ def test_default_settings_are_in_memory_shell_defaults() -> None:
     assert settings.sound_enabled is False
 
 
-def test_default_resolution_is_larger_windowed_app_size() -> None:
-    """Default app resolution should be the larger guided-app window size."""
-    assert DEFAULT_RESOLUTION == (1600, 900)
+def test_default_resolution_is_safe_windowed_app_size() -> None:
+    """Default app resolution should fit common laptop displays."""
+    assert DEFAULT_RESOLUTION == (1280, 720)
     assert DEFAULT_RESOLUTION in WINDOWED_RESOLUTIONS
 
 
-def test_boosting_fixed_scene_can_be_centered_in_default_resolution() -> None:
-    """Fixed Boosting scene size should center cleanly in the default window."""
-    assert center_rect(DEFAULT_RESOLUTION, BOOSTING_FIXED_SCENE_SIZE) == (
+def test_boosting_fixed_scene_can_be_centered_in_larger_resolution() -> None:
+    """Fixed Boosting scene size should center cleanly in a larger window."""
+    assert center_rect((1600, 900), BOOSTING_FIXED_SCENE_SIZE) == (
         140,
         60,
         1320,
