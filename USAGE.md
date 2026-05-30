@@ -34,6 +34,17 @@ language selection
 
 Real demo integrations are being added gradually. Individual demos can still be run directly.
 
+Common shell controls:
+
+| Key / input | Action |
+| ----------- | ------ |
+| `Up` / `Down` | Move selection |
+| Mouse hover | Move selection |
+| Mouse click / `Enter` | Activate selected item |
+| `Esc` / `Backspace` | Go back or open pause menu |
+| `H` | Toggle help overlay |
+| `L` | Toggle language |
+
 ## Standalone Demos
 
 Each demo remains runnable on its own.
@@ -118,4 +129,3 @@ git push -u origin feat/my-change
 ```
 
 Then open a pull request using the repository template.
-
