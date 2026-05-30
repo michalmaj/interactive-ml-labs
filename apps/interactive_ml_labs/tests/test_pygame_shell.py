@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pygame
 from interactive_ml_labs.pygame_app import ScreenName, UnifiedAppShell
 from interactive_ml_labs.settings import AppSettings
@@ -15,6 +17,23 @@ def test_shell_can_render_initial_screen(monkeypatch) -> None:
 
     try:
         app._render()
+    finally:
+        pygame.quit()
+
+
+def test_shell_applies_adaptive_window_size_when_enabled(monkeypatch) -> None:
+    """The shell should resolve opt-in adaptive sizing before opening the window."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    monkeypatch.setattr(
+        pygame.display,
+        "Info",
+        lambda: SimpleNamespace(current_w=1512, current_h=982),
+    )
+
+    app = UnifiedAppShell(settings=AppSettings(adaptive_window_enabled=True))
+
+    try:
+        assert app.context.settings.resolution == (1320, 780)
     finally:
         pygame.quit()
 

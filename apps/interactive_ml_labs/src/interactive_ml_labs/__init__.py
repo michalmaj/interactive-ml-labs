@@ -3,10 +3,12 @@
 from interactive_ml_labs.display import (
     BOOSTING_FIXED_SCENE_SIZE,
     DEFAULT_RESOLUTION,
+    SCREEN_MARGIN,
     WINDOWED_RESOLUTIONS,
     RectTuple,
     Size,
     center_rect,
+    choose_adaptive_window_size,
 )
 from interactive_ml_labs.fonts import POLISH_FONT_CANDIDATES, POLISH_SAMPLE_TEXT, make_ui_font
 from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
@@ -31,6 +33,7 @@ __all__ = [
     "LEVEL_NAMES",
     "POLISH_FONT_CANDIDATES",
     "POLISH_SAMPLE_TEXT",
+    "SCREEN_MARGIN",
     "WINDOWED_RESOLUTIONS",
     "AppContext",
     "AppSettings",
@@ -45,6 +48,7 @@ __all__ = [
     "SceneManager",
     "Size",
     "center_rect",
+    "choose_adaptive_window_size",
     "demos_for_level",
     "levels_from_manifests",
     "make_ui_font",

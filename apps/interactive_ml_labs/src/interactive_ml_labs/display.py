@@ -16,6 +16,31 @@ WINDOWED_RESOLUTIONS: Final[tuple[Size, ...]] = (
 
 DEFAULT_RESOLUTION: Final[Size] = (1280, 720)
 BOOSTING_FIXED_SCENE_SIZE: Final[Size] = (1320, 780)
+SCREEN_MARGIN: Final[Size] = (120, 120)
+
+
+def choose_adaptive_window_size(
+    display_size: Size,
+    *,
+    presets: tuple[Size, ...] = WINDOWED_RESOLUTIONS,
+    fallback: Size = DEFAULT_RESOLUTION,
+    margin: Size = SCREEN_MARGIN,
+) -> Size:
+    """Choose the largest preset that fits within the current display."""
+    display_width, display_height = display_size
+    margin_width, margin_height = margin
+    available_width = max(0, display_width - margin_width)
+    available_height = max(0, display_height - margin_height)
+
+    fitting_presets = [
+        preset
+        for preset in presets
+        if preset[0] <= available_width and preset[1] <= available_height
+    ]
+    if not fitting_presets:
+        return fallback
+
+    return max(fitting_presets, key=lambda preset: preset[0] * preset[1])
 
 
 def center_rect(container_size: Size, content_size: Size) -> RectTuple:

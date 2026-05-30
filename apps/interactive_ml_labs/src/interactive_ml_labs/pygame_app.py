@@ -8,6 +8,7 @@ from typing import Final
 
 import pygame
 
+from interactive_ml_labs.display import choose_adaptive_window_size
 from interactive_ml_labs.fonts import make_ui_font
 from interactive_ml_labs.manifest import DemoManifest, LocalizedText
 from interactive_ml_labs.registry import LEVEL_NAMES, demos_for_level, levels_from_manifests
@@ -51,6 +52,7 @@ class UnifiedAppShell:
         pygame.init()
 
         self.context = AppContext(settings=settings or AppSettings())
+        self._apply_adaptive_window_size()
         self.screen = pygame.display.set_mode(
             self.context.settings.resolution,
             self._display_flags(),
@@ -71,6 +73,17 @@ class UnifiedAppShell:
         self.mouse_position: tuple[int, int] = (0, 0)
 
         pygame.display.set_caption("Interactive ML Labs")
+
+    def _apply_adaptive_window_size(self) -> None:
+        """Apply opt-in adaptive window sizing before creating the display."""
+        settings = self.context.settings
+        if not settings.adaptive_window_enabled or settings.fullscreen_enabled:
+            return
+
+        display_info = pygame.display.Info()
+        settings.resolution = choose_adaptive_window_size(
+            (display_info.current_w, display_info.current_h),
+        )
 
     def _display_flags(self) -> int:
         """Return Pygame display flags for current settings."""
