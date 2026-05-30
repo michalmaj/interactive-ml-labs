@@ -79,3 +79,9 @@ The project follows a lightweight GitHub Flow:
 5. Merge only working changes into `main`.
 
 This repository is also intended to demonstrate how real software projects are developed.
+
+## Usage
+
+See [USAGE.md](USAGE.md) for local run commands.
+
+Polish version: [USAGE.pl.md](USAGE.pl.md).
