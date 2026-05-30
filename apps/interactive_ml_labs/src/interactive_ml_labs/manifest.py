@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Protocol
+
+from interactive_ml_labs.scene import Scene
 
 
 @dataclass(frozen=True, slots=True)
@@ -30,17 +31,13 @@ class ControlBinding:
     action: LocalizedText
 
 
-class Scene(Protocol):
-    """Minimal scene protocol used by the shell."""
+@dataclass(frozen=True, slots=True)
+class LevelManifest:
+    """Metadata for one learning level."""
 
-    def handle_event(self, event: object) -> None:
-        """Handle one input event."""
-
-    def update(self, dt: float) -> None:
-        """Advance scene state."""
-
-    def render(self, surface: object) -> None:
-        """Draw the scene."""
+    number: int
+    title: LocalizedText
+    summary: LocalizedText
 
 
 @dataclass(frozen=True, slots=True)

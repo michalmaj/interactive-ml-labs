@@ -1,6 +1,16 @@
 """Tests for the unified app shell manifest registry."""
 
-from interactive_ml_labs import DEMO_MANIFESTS, LEVEL_NAMES, demos_for_level, levels_from_manifests
+import pytest
+from interactive_ml_labs import (
+    DEMO_MANIFESTS,
+    LEVEL_MANIFESTS,
+    LEVEL_NAMES,
+    DemoManifest,
+    LocalizedText,
+    demos_for_level,
+    levels_from_manifests,
+    validate_demo_registry,
+)
 
 
 def test_registry_contains_current_demo_levels() -> None:
@@ -8,6 +18,7 @@ def test_registry_contains_current_demo_levels() -> None:
     assert levels_from_manifests() == (1, 2)
     assert 1 in LEVEL_NAMES
     assert 2 in LEVEL_NAMES
+    assert {level.number for level in LEVEL_MANIFESTS} >= {1, 2, 3}
 
 
 def test_registry_groups_demos_by_level() -> None:
@@ -32,3 +43,34 @@ def test_manifests_have_required_teaching_content() -> None:
         assert manifest.objectives
         assert manifest.controls
         assert manifest.tags
+        assert manifest.create_scene is not None
+
+
+def test_registry_validates_default_manifests() -> None:
+    """Default registry should pass consistency validation."""
+    validate_demo_registry()
+
+
+def test_registry_rejects_duplicate_demo_ids() -> None:
+    """Registry validation should reject duplicate demo identifiers."""
+    duplicate = DEMO_MANIFESTS[0]
+
+    with pytest.raises(ValueError, match="Duplicate demo ids"):
+        validate_demo_registry(demo_manifests=(duplicate, duplicate))
+
+
+def test_registry_rejects_unknown_demo_level() -> None:
+    """Registry validation should reject demos assigned to unknown levels."""
+    invalid_demo = DemoManifest(
+        id="unknown_level_demo",
+        level=99,
+        title=LocalizedText(en="Unknown", pl="Nieznany"),
+        summary=LocalizedText(en="Unknown level", pl="Nieznany poziom"),
+        objectives=DEMO_MANIFESTS[0].objectives,
+        controls=DEMO_MANIFESTS[0].controls,
+        create_scene=DEMO_MANIFESTS[0].create_scene,
+        tags=("test",),
+    )
+
+    with pytest.raises(ValueError, match="unknown level"):
+        validate_demo_registry(demo_manifests=(invalid_demo,))

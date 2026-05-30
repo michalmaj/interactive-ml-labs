@@ -83,25 +83,23 @@ The minimal scene contract should look like this:
 
 ```python
 class Scene:
-    def handle_event(self, event): ...
-    def update(self, dt): ...
+    def handle_event(self, event) -> SceneCommand: ...
+    def update(self, dt) -> SceneCommand: ...
     def render(self, surface): ...
 ```
 
-Open questions for implementation:
+Implemented first slice:
 
-- whether the methods return commands or mutate a scene manager,
-- how strongly scenes depend on `AppContext`,
-- whether `Esc` is always handled by the shell before the scene,
-- how a scene requests reset/export/navigation,
-- whether scene-specific state should survive pause menus.
+- scenes return `SceneCommand`,
+- demo scenes are owned by a small stack-based `SceneManager`,
+- `Esc` and `H` stay global shell shortcuts before demo event handling,
+- demo scenes can request pause, restart, back to demo selection, or quit.
 
-Current direction:
+Still open:
 
-- scenes receive an `AppContext`,
-- navigation goes through a `SceneManager`,
-- global shell shortcuts are handled consistently,
-- demo-specific logic stays inside the demo or its adapter.
+- whether scene-specific state should survive deeper overlay stacks,
+- how export commands should be represented,
+- how much of the shell menu system should eventually become scene-based too.
 
 ## App Context
 
@@ -296,5 +294,5 @@ The following are accepted as initial direction, unless later implementation wor
 - Sound is deferred.
 - Existing renderers remain standalone.
 - Level selection is dynamic from manifests.
+- Demo scenes use `SceneCommand` and `SceneManager` for shell navigation.
 - Keyboard support comes first; mouse support should be added early.
-
