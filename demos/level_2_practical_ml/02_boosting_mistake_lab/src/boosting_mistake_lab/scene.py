@@ -71,9 +71,9 @@ class BoostingPygameState:
 class BoostingMistakeScene:
     """Interactive scene for the Boosting Mistake Lab demo."""
 
-    def __init__(self, screen: pygame.Surface) -> None:
+    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
         """Initialize the scene with a target screen."""
-        self._renderer = BoostingRenderer(screen)
+        self._renderer = BoostingRenderer(screen, present_frame=present_frame)
         self._state = BoostingPygameState()
         self._dataset: WeightedTrainTestDataset
         self._trainer_result: BoostingTrainerResult

@@ -19,7 +19,7 @@ class BoostingMistakeLabSceneAdapter:
         """Create the wrapped Boosting scene."""
         _ = context
         self._surface = pygame.Surface(self.fixed_scene_size)
-        self._scene = BoostingMistakeScene(self._surface)
+        self._scene = BoostingMistakeScene(self._surface, present_frame=False)
 
     def handle_event(self, event: object) -> SceneCommand:
         """Handle one input event through the wrapped demo scene."""
