@@ -1,13 +1,13 @@
-# Uzycie
+# Użycie
 
-Ten dokument wyjasnia, jak uruchamiac Interactive ML Labs lokalnie.
+Ten dokument wyjaśnia, jak uruchamiać Interactive ML Labs lokalnie.
 
 ## Wymagania
 
 - Python 3.12 albo nowszy
 - uv
 
-Zainstaluj albo zaktualizuj zaleznosci z katalogu glownego repozytorium:
+Zainstaluj albo zaktualizuj zależności z katalogu głównego repozytorium:
 
 ```bash
 uv sync
@@ -15,28 +15,28 @@ uv sync
 
 ## Rekomendowana aplikacja
 
-Unified Pygame app jest rekomendowanym wejsciem do przegladania dem:
+Unified Pygame app jest rekomendowanym wejściem do przeglądania dem:
 
 ```bash
 uv run --package interactive-ml-labs-app interactive-ml-labs
 ```
 
-Obecny przeplyw shell-a:
+Obecny przepływ shell-a:
 
 ```text
-wybor jezyka
--> wybor poziomu
--> wybor demo
+wybór języka
+-> wybór poziomu
+-> wybór demo
 -> ekran startowy demo
 -> placeholder ekranu demo
 -> pauza / pomoc
 ```
 
-Prawdziwe integracje dem beda dodawane stopniowo. Kazde demo nadal mozna uruchamiac osobno.
+Prawdziwe integracje dem będą dodawane stopniowo. Każde demo nadal można uruchamiać osobno.
 
 ## Osobne dema
 
-Kazde demo nadal dziala jako osobny pakiet.
+Każde demo nadal działa jako osobny pakiet.
 
 ### Gradient Descent Playground
 
@@ -80,7 +80,7 @@ uv run --package boosting-mistake-lab boosting-mistake-lab
 uv run --package boosting-mistake-lab boosting-mistake-lab-ui
 ```
 
-## Kontrola jakosci
+## Kontrola jakości
 
 Uruchom lint i sprawdzenie formatowania:
 
@@ -103,9 +103,9 @@ uv run --package boosting-mistake-lab pytest demos/level_2_practical_ml/02_boost
 
 ## Workflow developerski
 
-Uzywaj malej galezi dla kazdej logicznej zmiany.
+Używaj małej gałęzi dla każdej logicznej zmiany.
 
-Typowy przeplyw:
+Typowy przepływ:
 
 ```bash
 git switch main
@@ -117,4 +117,4 @@ uv run --package interactive-ml-labs-app pytest apps/interactive_ml_labs/tests
 git push -u origin feat/my-change
 ```
 
-Potem otworz pull request zgodnie z szablonem repozytorium.
+Potem otwórz pull request zgodnie z szablonem repozytorium.
