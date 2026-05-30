@@ -11,6 +11,7 @@ class AppSettings:
 
     language: str = "en"
     resolution: Size = DEFAULT_RESOLUTION
+    adaptive_window_enabled: bool = False
     fullscreen_enabled: bool = False
     sound_enabled: bool = False
 
