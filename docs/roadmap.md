@@ -135,3 +135,21 @@ Planned pull requests:
 - [x] Add challenge mode
 - [x] Add explanation panel
 - [x] Polish demo documentation
+
+## Phase 7 — Unified Pygame app shell
+
+Goal: introduce one guided application entry point without breaking standalone demo workflows.
+
+Planned pull requests:
+
+- [ ] Add minimal app shell skeleton with placeholder screens
+- [ ] Add demo manifest and registry
+- [ ] Add generated demo intro screen
+- [ ] Add pause/help overlay
+- [ ] Integrate Boosting Mistake Lab through an adapter or scene wrapper
+- [ ] Add shell smoke tests
+- [ ] Add simple global language setting
+
+Architecture notes:
+
+- See [Unified App Shell](unified_app_shell.md).
