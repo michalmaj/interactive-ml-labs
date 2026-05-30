@@ -228,6 +228,17 @@ Fullscreen and multiple resolutions can come later.
 
 Sound should not be implemented in the first slice. A `sound_enabled` placeholder may exist in settings if it helps the architecture, but no audio assets or mixer behavior are required yet.
 
+## Fonts And Polish Text
+
+The shell should support Polish diacritics in UI text.
+
+Current direction:
+
+- keep source files as UTF-8,
+- use real Polish text in PL strings,
+- create UI fonts through a helper that prefers fonts with broad Unicode coverage,
+- add a bundled font later if system font selection becomes inconsistent across platforms.
+
 ## Existing Renderers
 
 Existing demo renderers should stay standalone.
