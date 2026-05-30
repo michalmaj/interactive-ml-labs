@@ -8,6 +8,7 @@ from typing import Final
 
 import pygame
 
+from interactive_ml_labs.fonts import make_ui_font
 from interactive_ml_labs.manifest import DemoManifest, LocalizedText
 from interactive_ml_labs.registry import LEVEL_NAMES, demos_for_level, levels_from_manifests
 from interactive_ml_labs.scene import SceneCommand, SceneCommandKind, SceneManager
@@ -51,10 +52,10 @@ class UnifiedAppShell:
         self.context = AppContext(settings=settings or AppSettings())
         self.screen = pygame.display.set_mode(self.context.settings.resolution)
         self.clock = pygame.time.Clock()
-        self.font_title = pygame.font.SysFont("arial", 44, bold=True)
-        self.font_heading = pygame.font.SysFont("arial", 30, bold=True)
-        self.font_body = pygame.font.SysFont("arial", 22)
-        self.font_small = pygame.font.SysFont("arial", 18)
+        self.font_title = make_ui_font(44, bold=True)
+        self.font_heading = make_ui_font(30, bold=True)
+        self.font_body = make_ui_font(22)
+        self.font_small = make_ui_font(18)
         self.running = True
         self.screen_name = ScreenName.LANGUAGE
         self.previous_screen = ScreenName.INTRO
@@ -148,7 +149,7 @@ class UnifiedAppShell:
         pygame.display.flip()
 
     def _render_language(self) -> None:
-        self._draw_title("Interactive ML Labs", "Choose language / Wybierz jezyk")
+        self._draw_title("Interactive ML Labs", "Choose language / Wybierz język")
         self._draw_menu(["English", "Polski"], top=230)
         self._draw_footer("Enter: select | Up/Down: move | Mouse: select")
 
@@ -157,7 +158,7 @@ class UnifiedAppShell:
         labels = [LEVEL_NAMES[level].for_language(language) for level in levels_from_manifests()]
         self._draw_title("Interactive ML Labs", self._text("Select level", "Wybierz poziom"))
         self._draw_menu(labels, top=220)
-        self._draw_footer(self._text("Esc: language | Enter: demos", "Esc: jezyk | Enter: dema"))
+        self._draw_footer(self._text("Esc: language | Enter: demos", "Esc: język | Enter: dema"))
 
     def _render_demos(self) -> None:
         demos = self._current_level_demos()
@@ -219,7 +220,7 @@ class UnifiedAppShell:
         self._draw_wrapped(
             self._text(
                 "This shell is ready. The real demo scene will be connected in a later slice.",
-                "Shell jest gotowy. Prawdziwa scena demo zostanie podpieta w kolejnym kroku.",
+                "Shell jest gotowy. Prawdziwa scena demo zostanie podpięta w kolejnym kroku.",
             ),
             (120, 280),
             900,
@@ -234,9 +235,9 @@ class UnifiedAppShell:
     def _render_pause(self) -> None:
         self._draw_title(self._text("Paused", "Pauza"), self._text("Shell menu", "Menu aplikacji"))
         labels = [
-            self._text("Resume", "Wroc"),
+            self._text("Resume", "Wróć"),
             self._text("Help", "Pomoc"),
-            self._text("Back to demos", "Wroc do dem"),
+            self._text("Back to demos", "Wróć do dem"),
             self._text("Quit", "Zamknij"),
         ]
         self._draw_menu(labels, top=220)
@@ -314,8 +315,8 @@ class UnifiedAppShell:
             self._text(
                 "Use arrow keys, Enter, Esc, H, or the mouse. "
                 "Demo-specific help will come from manifests.",
-                "Uzywaj strzalek, Enter, Esc, H albo myszy. "
-                "Pomoc dla dem bedzie pochodzic z manifestow.",
+                "Używaj strzałek, Enter, Esc, H albo myszy. "
+                "Pomoc dla dem będzie pochodzić z manifestów.",
             ),
             (rect.x + 32, rect.y + 82),
             rect.width - 64,

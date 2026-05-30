@@ -46,6 +46,20 @@ def test_manifests_have_required_teaching_content() -> None:
         assert manifest.create_scene is not None
 
 
+def test_registry_contains_polish_diacritics() -> None:
+    """Polish registry text should preserve diacritics."""
+    polish_text = " ".join(
+        [
+            *(manifest.title.pl for manifest in DEMO_MANIFESTS),
+            *(manifest.summary.pl for manifest in DEMO_MANIFESTS),
+        ],
+    )
+
+    assert "ł" in polish_text
+    assert "ó" in polish_text
+    assert "ę" in polish_text
+
+
 def test_registry_validates_default_manifests() -> None:
     """Default registry should pass consistency validation."""
     validate_demo_registry()

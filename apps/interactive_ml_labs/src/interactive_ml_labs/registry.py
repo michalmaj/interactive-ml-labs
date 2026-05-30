@@ -19,7 +19,7 @@ LEVEL_MANIFESTS: tuple[LevelManifest, ...] = (
         title=LocalizedText(en="Level 2 - Practical ML", pl="Poziom 2 - Praktyczne ML"),
         summary=LocalizedText(
             en="Model evaluation, robustness, ensembles, and practical trade-offs.",
-            pl="Ewaluacja modeli, odpornosc, ensemble i praktyczne kompromisy.",
+            pl="Ewaluacja modeli, odporność, ensemble i praktyczne kompromisy.",
         ),
     ),
     LevelManifest(
@@ -59,11 +59,11 @@ def _placeholder_demo(
         objectives=(
             LocalizedText(
                 en="Explore the main intuition behind the algorithm.",
-                pl="Zbadaj glowna intuicje stojaca za algorytmem.",
+                pl="Zbadaj główną intuicję stojącą za algorytmem.",
             ),
             LocalizedText(
                 en="Observe how parameter changes affect model behavior.",
-                pl="Zobacz, jak zmiany parametrow wplywaja na zachowanie modelu.",
+                pl="Zobacz, jak zmiany parametrów wpływają na zachowanie modelu.",
             ),
         ),
         controls=(
@@ -73,18 +73,18 @@ def _placeholder_demo(
             ),
             ControlBinding(
                 key="Esc",
-                action=LocalizedText(en="open pause menu or go back", pl="otworz pauze albo wroc"),
+                action=LocalizedText(en="open pause menu or go back", pl="otwórz pauzę albo wróć"),
             ),
             ControlBinding(
                 key="H",
-                action=LocalizedText(en="toggle help overlay", pl="pokaz lub ukryj pomoc"),
+                action=LocalizedText(en="toggle help overlay", pl="pokaż lub ukryj pomoc"),
             ),
         ),
         create_scene=lambda context, demo_id=demo_id: PlaceholderDemoScene(
             context,
             DEMO_BY_ID[demo_id],
         ),
-        difficulty=LocalizedText(en="Introductory", pl="Wprowadzajacy"),
+        difficulty=LocalizedText(en="Introductory", pl="Wprowadzający"),
         tags=tags,
     )
 
@@ -103,9 +103,9 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         demo_id="knn_vote_map",
         level=1,
         title_en="k-NN Vote Map",
-        title_pl="Mapa glosowania k-NN",
+        title_pl="Mapa głosowania k-NN",
         summary_en="Distance-based classification and neighborhood voting.",
-        summary_pl="Klasyfikacja oparta o odleglosc i glosowanie sasiadow.",
+        summary_pl="Klasyfikacja oparta o odległość i głosowanie sąsiadów.",
         tags=("classification", "distance"),
     ),
     _placeholder_demo(
@@ -114,7 +114,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title_en="Logistic Regression Boundary Lab",
         title_pl="Laboratorium granicy regresji logistycznej",
         summary_en="Probabilities, thresholds, and decision boundaries.",
-        summary_pl="Prawdopodobienstwa, progi i granice decyzyjne.",
+        summary_pl="Prawdopodobieństwa, progi i granice decyzyjne.",
         tags=("classification", "probability"),
     ),
     _placeholder_demo(
@@ -123,7 +123,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title_en="Decision Tree Splitter",
         title_pl="Dzielnik drzewa decyzyjnego",
         summary_en="Splits, impurity, and interpretable rules.",
-        summary_pl="Podzialy, nieczystosc i interpretowalne reguly.",
+        summary_pl="Podziały, nieczystość i interpretowalne reguły.",
         tags=("classification", "trees"),
     ),
     _placeholder_demo(
@@ -132,16 +132,16 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title_en="Random Forest Bagging Lab",
         title_pl="Laboratorium baggingu lasu losowego",
         summary_en="Bootstrap sampling, voting, variance, and stability.",
-        summary_pl="Bootstrap, glosowanie, wariancja i stabilnosc.",
+        summary_pl="Bootstrap, głosowanie, wariancja i stabilność.",
         tags=("ensemble", "classification"),
     ),
     _placeholder_demo(
         demo_id="boosting_mistake_lab",
         level=2,
         title_en="Boosting Mistake Lab",
-        title_pl="Laboratorium bledow boostingu",
+        title_pl="Laboratorium błędów boostingu",
         summary_en="Sequential weak learners that focus on previous mistakes.",
-        summary_pl="Sekwencyjni slabi uczniowie skupieni na poprzednich bledach.",
+        summary_pl="Sekwencyjni słabi uczniowie skupieni na poprzednich błędach.",
         tags=("ensemble", "classification", "boosting"),
     ),
 )
