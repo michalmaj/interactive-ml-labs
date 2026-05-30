@@ -31,6 +31,12 @@ from boosting_mistake_lab.explanation import (
     BoostingExplanation,
     build_boosting_explanation,
 )
+from boosting_mistake_lab.export import (
+    DecisionBoundaryExportConfig,
+    DecisionBoundaryExportResult,
+    build_decision_boundary_export,
+    write_decision_boundary_export,
+)
 from boosting_mistake_lab.learner_weight import (
     LearnerWeightResult,
     compute_learner_weight,
@@ -99,6 +105,8 @@ __all__ = [
     "BoostingTrainer",
     "BoostingTrainerConfig",
     "BoostingTrainerResult",
+    "DecisionBoundaryExportConfig",
+    "DecisionBoundaryExportResult",
     "LearnerWeightResult",
     "SampleWeightUpdateResult",
     "StagedBoostingHistory",
@@ -114,6 +122,7 @@ __all__ = [
     "boosted_accuracy_score",
     "build_boosting_comparison_report",
     "build_boosting_explanation",
+    "build_decision_boundary_export",
     "build_staged_boosting_history",
     "compute_learner_weight",
     "evaluate_boosting_challenge",
@@ -130,4 +139,5 @@ __all__ = [
     "update_sample_weights",
     "weighted_accuracy_score",
     "weighted_error_score",
+    "write_decision_boundary_export",
 ]
