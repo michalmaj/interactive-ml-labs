@@ -10,6 +10,7 @@ import pygame
 
 from interactive_ml_labs.manifest import DemoManifest, LocalizedText
 from interactive_ml_labs.registry import LEVEL_NAMES, demos_for_level, levels_from_manifests
+from interactive_ml_labs.scene import SceneCommand, SceneCommandKind, SceneManager
 from interactive_ml_labs.settings import AppContext, AppSettings
 
 FPS: Final[int] = 60
@@ -59,6 +60,7 @@ class UnifiedAppShell:
         self.previous_screen = ScreenName.INTRO
         self.selected_index = 0
         self.selected_demo: DemoManifest | None = None
+        self.scene_manager = SceneManager()
         self.menu_items: list[MenuItem] = []
         self.help_visible = False
 
@@ -79,10 +81,22 @@ class UnifiedAppShell:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            elif self.screen_name == ScreenName.PLACEHOLDER_DEMO and self._is_demo_event(event):
+                self._handle_active_demo_event(event)
             elif event.type == pygame.KEYDOWN:
                 self._handle_keydown(event.key)
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self._handle_mouse_click(event.pos)
+
+    def _is_demo_event(self, event: pygame.event.Event) -> bool:
+        return not (event.type == pygame.KEYDOWN and event.key in {pygame.K_ESCAPE, pygame.K_h})
+
+    def _handle_active_demo_event(self, event: pygame.event.Event) -> None:
+        scene = self.scene_manager.current
+        if scene is None:
+            return
+
+        self._handle_scene_command(scene.handle_event(event))
 
     def _handle_keydown(self, key: int) -> None:
         handlers = {
@@ -106,7 +120,14 @@ class UnifiedAppShell:
                 return
 
     def _update(self, dt: float) -> None:
-        _ = dt
+        if self.screen_name != ScreenName.PLACEHOLDER_DEMO:
+            return
+
+        scene = self.scene_manager.current
+        if scene is None:
+            return
+
+        self._handle_scene_command(scene.update(dt))
 
     def _render(self) -> None:
         self.screen.fill(BACKGROUND)
@@ -205,6 +226,9 @@ class UnifiedAppShell:
             self.font_body,
             TEXT,
         )
+        scene = self.scene_manager.current
+        if scene is not None:
+            scene.render(self.screen)
         self._draw_footer(self._text("Esc: pause | H: help", "Esc: pauza | H: pomoc"))
 
     def _render_pause(self) -> None:
@@ -333,6 +357,9 @@ class UnifiedAppShell:
         self._go_to(ScreenName.INTRO)
 
     def _start_demo(self) -> None:
+        demo = self._require_demo()
+        if demo.create_scene is not None:
+            self.scene_manager.replace(demo.create_scene(self.context))
         self._go_to(ScreenName.PLACEHOLDER_DEMO)
 
     def _select_pause_item(self) -> None:
@@ -342,6 +369,7 @@ class UnifiedAppShell:
             self.help_visible = not self.help_visible
         elif self.selected_index == 2:
             self.help_visible = False
+            self.scene_manager.clear()
             self._go_to(ScreenName.DEMOS)
         else:
             self.running = False
@@ -374,6 +402,26 @@ class UnifiedAppShell:
         self.screen_name = screen_name
         self.selected_index = 0
         self.menu_items = []
+
+    def _handle_scene_command(self, command: SceneCommand) -> None:
+        if command.kind == SceneCommandKind.NONE:
+            return
+        if command.kind == SceneCommandKind.PAUSE:
+            self._open_pause()
+        elif command.kind == SceneCommandKind.BACK_TO_DEMOS:
+            self.scene_manager.clear()
+            self._go_to(ScreenName.DEMOS)
+        elif command.kind == SceneCommandKind.RESTART:
+            self._restart_current_demo()
+        elif command.kind == SceneCommandKind.QUIT:
+            self.running = False
+
+    def _restart_current_demo(self) -> None:
+        demo = self._require_demo()
+        if demo.create_scene is None:
+            return
+
+        self.scene_manager.replace(demo.create_scene(self.context))
 
     def _current_menu_item_count(self) -> int:
         counts = {

@@ -2,13 +2,41 @@
 
 from __future__ import annotations
 
-from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LocalizedText
+from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 
+LEVEL_MANIFESTS: tuple[LevelManifest, ...] = (
+    LevelManifest(
+        number=1,
+        title=LocalizedText(en="Level 1 - Fundamentals", pl="Poziom 1 - Fundamenty"),
+        summary=LocalizedText(
+            en="Core machine learning intuition and foundational algorithms.",
+            pl="Podstawowa intuicja machine learningu i fundamentalne algorytmy.",
+        ),
+    ),
+    LevelManifest(
+        number=2,
+        title=LocalizedText(en="Level 2 - Practical ML", pl="Poziom 2 - Praktyczne ML"),
+        summary=LocalizedText(
+            en="Model evaluation, robustness, ensembles, and practical trade-offs.",
+            pl="Ewaluacja modeli, odpornosc, ensemble i praktyczne kompromisy.",
+        ),
+    ),
+    LevelManifest(
+        number=3,
+        title=LocalizedText(en="Level 3 - Advanced / Showcase", pl="Poziom 3 - Zaawansowane"),
+        summary=LocalizedText(
+            en="Advanced, specialized, and visually rich machine learning demos.",
+            pl="Zaawansowane, specjalistyczne i wizualnie bogate dema ML.",
+        ),
+    ),
+)
+
+LEVEL_BY_NUMBER: dict[int, LevelManifest] = {
+    manifest.number: manifest for manifest in LEVEL_MANIFESTS
+}
 LEVEL_NAMES: dict[int, LocalizedText] = {
-    1: LocalizedText(en="Level 1 - Fundamentals", pl="Poziom 1 - Fundamenty"),
-    2: LocalizedText(en="Level 2 - Practical ML", pl="Poziom 2 - Praktyczne ML"),
-    3: LocalizedText(en="Level 3 - Advanced / Showcase", pl="Poziom 3 - Zaawansowane"),
+    number: manifest.title for number, manifest in LEVEL_BY_NUMBER.items()
 }
 
 
@@ -52,7 +80,10 @@ def _placeholder_demo(
                 action=LocalizedText(en="toggle help overlay", pl="pokaz lub ukryj pomoc"),
             ),
         ),
-        create_scene=lambda context: PlaceholderDemoScene(context, DEMO_BY_ID[demo_id]),
+        create_scene=lambda context, demo_id=demo_id: PlaceholderDemoScene(
+            context,
+            DEMO_BY_ID[demo_id],
+        ),
         difficulty=LocalizedText(en="Introductory", pl="Wprowadzajacy"),
         tags=tags,
     )
@@ -129,3 +160,57 @@ def demos_for_level(
 ) -> tuple[DemoManifest, ...]:
     """Return demos belonging to one level."""
     return tuple(manifest for manifest in manifests if manifest.level == level)
+
+
+def validate_demo_registry(
+    *,
+    level_manifests: tuple[LevelManifest, ...] = LEVEL_MANIFESTS,
+    demo_manifests: tuple[DemoManifest, ...] = DEMO_MANIFESTS,
+) -> None:
+    """Validate registry consistency.
+
+    Raises:
+        ValueError: if the registry contains duplicate or incomplete metadata.
+    """
+    level_numbers = [level.number for level in level_manifests]
+    duplicate_levels = _duplicates(level_numbers)
+    if duplicate_levels:
+        raise ValueError(f"Duplicate level numbers: {duplicate_levels}")
+
+    known_levels = set(level_numbers)
+    demo_ids = [demo.id for demo in demo_manifests]
+    duplicate_demo_ids = _duplicates(demo_ids)
+    if duplicate_demo_ids:
+        raise ValueError(f"Duplicate demo ids: {duplicate_demo_ids}")
+
+    for demo in demo_manifests:
+        if demo.level not in known_levels:
+            raise ValueError(f"Demo {demo.id!r} references unknown level {demo.level}")
+        if not demo.id:
+            raise ValueError("Demo id must not be empty")
+        if not demo.title.en or not demo.title.pl:
+            raise ValueError(f"Demo {demo.id!r} must have localized titles")
+        if not demo.summary.en or not demo.summary.pl:
+            raise ValueError(f"Demo {demo.id!r} must have localized summaries")
+        if not demo.objectives:
+            raise ValueError(f"Demo {demo.id!r} must define objectives")
+        if not demo.controls:
+            raise ValueError(f"Demo {demo.id!r} must define controls")
+        if demo.create_scene is None:
+            raise ValueError(f"Demo {demo.id!r} must define a scene factory")
+
+
+def _duplicates(values: list[int] | list[str]) -> tuple[int | str, ...]:
+    """Return duplicate values in first-seen order."""
+    seen: set[int | str] = set()
+    duplicates: list[int | str] = []
+
+    for value in values:
+        if value in seen and value not in duplicates:
+            duplicates.append(value)
+        seen.add(value)
+
+    return tuple(duplicates)
+
+
+validate_demo_registry()
