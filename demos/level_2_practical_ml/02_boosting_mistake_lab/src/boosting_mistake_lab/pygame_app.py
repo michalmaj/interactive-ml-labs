@@ -15,6 +15,12 @@ from boosting_mistake_lab.dataset import (
     WeightedTrainTestDataset,
     make_synthetic_weighted_dataset,
 )
+from boosting_mistake_lab.presets import (
+    CUSTOM_PRESET_NAME,
+    DEFAULT_PRESET_NUMBER,
+    get_next_preset_number,
+    get_preset_by_number,
+)
 from boosting_mistake_lab.renderer import (
     WINDOW_SIZE,
     BoostingRenderer,
@@ -28,36 +34,32 @@ from boosting_mistake_lab.trainer import (
 
 FPS: Final[int] = 30
 
-DEFAULT_ROUND_COUNT: Final[int] = 5
+DEFAULT_PRESET = get_preset_by_number(DEFAULT_PRESET_NUMBER)
+
 MIN_ROUND_COUNT: Final[int] = 1
 MAX_ROUND_COUNT: Final[int] = 12
 
-DEFAULT_SELECTED_STAGE: Final[int] = 5
-
-DEFAULT_MIN_SAMPLES_LEAF: Final[int] = 1
 MIN_MIN_SAMPLES_LEAF: Final[int] = 1
 MAX_MIN_SAMPLES_LEAF: Final[int] = 8
 
-DEFAULT_NOISE_STD: Final[float] = 0.65
 MIN_NOISE_STD: Final[float] = 0.0
 MAX_NOISE_STD: Final[float] = 1.80
 NOISE_STEP: Final[float] = 0.10
-
-DEFAULT_SEED: Final[int] = 42
-DEFAULT_DATASET_KIND: Final[str] = DATASET_KIND_XOR
 
 
 @dataclass(slots=True)
 class BoostingPygameState:
     """Mutable Pygame demo state."""
 
-    dataset_kind: str = DEFAULT_DATASET_KIND
-    round_count: int = DEFAULT_ROUND_COUNT
-    selected_stage: int = DEFAULT_SELECTED_STAGE
-    min_samples_leaf: int = DEFAULT_MIN_SAMPLES_LEAF
-    noise_std: float = DEFAULT_NOISE_STD
-    seed: int = DEFAULT_SEED
-    confidence_view_enabled: bool = True
+    dataset_kind: str = DEFAULT_PRESET.dataset_kind
+    round_count: int = DEFAULT_PRESET.round_count
+    selected_stage: int = DEFAULT_PRESET.selected_stage
+    min_samples_leaf: int = DEFAULT_PRESET.min_samples_leaf
+    noise_std: float = DEFAULT_PRESET.noise_std
+    seed: int = DEFAULT_PRESET.seed
+    confidence_view_enabled: bool = DEFAULT_PRESET.confidence_view_enabled
+    preset_number: int = DEFAULT_PRESET_NUMBER
+    preset_name: str = DEFAULT_PRESET.name
 
 
 class BoostingPygameApp:
@@ -101,6 +103,11 @@ class BoostingPygameApp:
         """Handle keyboard shortcuts."""
         handlers: dict[int, Callable[[], None]] = {
             pygame.K_ESCAPE: self._quit,
+            pygame.K_1: lambda: self._apply_preset_by_number(1),
+            pygame.K_2: lambda: self._apply_preset_by_number(2),
+            pygame.K_3: lambda: self._apply_preset_by_number(3),
+            pygame.K_4: lambda: self._apply_preset_by_number(4),
+            pygame.K_p: self._apply_next_preset,
             pygame.K_d: self._toggle_dataset,
             pygame.K_UP: self._increase_selected_stage,
             pygame.K_DOWN: self._decrease_selected_stage,
@@ -133,6 +140,7 @@ class BoostingPygameApp:
             selected_stage=self._state.selected_stage,
             min_samples_leaf=self._state.min_samples_leaf,
             confidence_view_enabled=self._state.confidence_view_enabled,
+            preset_name=self._state.preset_name,
         )
 
     def _rebuild_demo(self) -> None:
@@ -157,6 +165,27 @@ class BoostingPygameApp:
         """Stop the app."""
         self._running = False
 
+    def _apply_preset_by_number(self, preset_number: int) -> None:
+        """Apply one preset scenario by number."""
+        preset = get_preset_by_number(preset_number)
+
+        self._state.dataset_kind = preset.dataset_kind
+        self._state.round_count = preset.round_count
+        self._state.selected_stage = preset.selected_stage
+        self._state.min_samples_leaf = preset.min_samples_leaf
+        self._state.noise_std = preset.noise_std
+        self._state.seed = preset.seed
+        self._state.confidence_view_enabled = preset.confidence_view_enabled
+        self._state.preset_number = preset_number
+        self._state.preset_name = preset.name
+
+        self._rebuild_demo()
+
+    def _apply_next_preset(self) -> None:
+        """Cycle to the next preset scenario."""
+        next_preset_number = get_next_preset_number(self._state.preset_number)
+        self._apply_preset_by_number(next_preset_number)
+
     def _toggle_dataset(self) -> None:
         """Switch between dataset variants."""
         if self._state.dataset_kind == DATASET_KIND_XOR:
@@ -164,6 +193,7 @@ class BoostingPygameApp:
         else:
             self._state.dataset_kind = DATASET_KIND_XOR
 
+        self._mark_custom()
         self._rebuild_demo()
 
     def _increase_selected_stage(self) -> None:
@@ -184,12 +214,14 @@ class BoostingPygameApp:
         """Increase total number of boosting rounds."""
         self._state.round_count = min(MAX_ROUND_COUNT, self._state.round_count + 1)
         self._state.selected_stage = self._state.round_count
+        self._mark_custom()
         self._rebuild_demo()
 
     def _decrease_round_count(self) -> None:
         """Decrease total number of boosting rounds."""
         self._state.round_count = max(MIN_ROUND_COUNT, self._state.round_count - 1)
         self._clamp_selected_stage()
+        self._mark_custom()
         self._rebuild_demo()
 
     def _increase_min_samples_leaf(self) -> None:
@@ -198,6 +230,7 @@ class BoostingPygameApp:
             MAX_MIN_SAMPLES_LEAF,
             self._state.min_samples_leaf + 1,
         )
+        self._mark_custom()
         self._rebuild_demo()
 
     def _decrease_min_samples_leaf(self) -> None:
@@ -206,6 +239,7 @@ class BoostingPygameApp:
             MIN_MIN_SAMPLES_LEAF,
             self._state.min_samples_leaf - 1,
         )
+        self._mark_custom()
         self._rebuild_demo()
 
     def _increase_noise(self) -> None:
@@ -214,6 +248,7 @@ class BoostingPygameApp:
             MAX_NOISE_STD,
             round(self._state.noise_std + NOISE_STEP, 2),
         )
+        self._mark_custom()
         self._rebuild_demo()
 
     def _decrease_noise(self) -> None:
@@ -222,11 +257,13 @@ class BoostingPygameApp:
             MIN_NOISE_STD,
             round(self._state.noise_std - NOISE_STEP, 2),
         )
+        self._mark_custom()
         self._rebuild_demo()
 
     def _next_seed(self) -> None:
         """Generate next deterministic dataset seed."""
         self._state.seed += 1
+        self._mark_custom()
         self._rebuild_demo()
 
     def _toggle_confidence_view(self) -> None:
@@ -234,10 +271,8 @@ class BoostingPygameApp:
         self._state.confidence_view_enabled = not self._state.confidence_view_enabled
 
     def _reset_defaults(self) -> None:
-        """Reset demo controls to defaults."""
-        self._state = BoostingPygameState()
-        self._clamp_selected_stage()
-        self._rebuild_demo()
+        """Reset demo controls to default preset."""
+        self._apply_preset_by_number(DEFAULT_PRESET_NUMBER)
 
     def _clamp_selected_stage(self) -> None:
         """Keep selected stage in the valid range."""
@@ -245,6 +280,11 @@ class BoostingPygameApp:
             MIN_ROUND_COUNT,
             min(self._state.selected_stage, self._state.round_count),
         )
+
+    def _mark_custom(self) -> None:
+        """Mark current settings as custom after manual parameter edits."""
+        self._state.preset_number = 0
+        self._state.preset_name = CUSTOM_PRESET_NAME
 
 
 def main() -> None:

@@ -35,6 +35,15 @@ from boosting_mistake_lab.learner_weight import (
     LearnerWeightResult,
     compute_learner_weight,
 )
+from boosting_mistake_lab.presets import (
+    CUSTOM_PRESET_NAME,
+    DEFAULT_PRESET_NUMBER,
+    BoostingPreset,
+    available_presets,
+    get_next_preset_number,
+    get_preset_by_number,
+    preset_count,
+)
 from boosting_mistake_lab.report import (
     BOOSTED_ENSEMBLE_NAME,
     WEAK_LEARNER_NAME,
@@ -71,8 +80,10 @@ from boosting_mistake_lab.weighted_error import (
 
 __all__ = [
     "BOOSTED_ENSEMBLE_NAME",
+    "CUSTOM_PRESET_NAME",
     "DATASET_KIND_AXIS_ALIGNED",
     "DATASET_KIND_XOR",
+    "DEFAULT_PRESET_NUMBER",
     "STATUS_FAILED",
     "STATUS_SUCCESS",
     "WEAK_LEARNER_NAME",
@@ -82,6 +93,7 @@ __all__ = [
     "BoostingChallengeResult",
     "BoostingComparisonReport",
     "BoostingExplanation",
+    "BoostingPreset",
     "BoostingRoundConfig",
     "BoostingRoundResult",
     "BoostingTrainer",
@@ -98,6 +110,7 @@ __all__ = [
     "WeightedDatasetSplit",
     "WeightedErrorResult",
     "WeightedTrainTestDataset",
+    "available_presets",
     "boosted_accuracy_score",
     "build_boosting_comparison_report",
     "build_boosting_explanation",
@@ -106,10 +119,13 @@ __all__ = [
     "evaluate_boosting_challenge",
     "evaluate_weighted_predictions",
     "format_boosting_comparison_report",
+    "get_next_preset_number",
+    "get_preset_by_number",
     "make_next_round_dataset",
     "make_synthetic_weighted_dataset",
     "make_uniform_sample_weights",
     "predict_boosted_ensemble",
+    "preset_count",
     "run_boosting_round",
     "update_sample_weights",
     "weighted_accuracy_score",
