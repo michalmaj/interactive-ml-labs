@@ -63,6 +63,7 @@ from boosting_mistake_lab.sample_weight_update import (
     SampleWeightUpdateResult,
     update_sample_weights,
 )
+from boosting_mistake_lab.scene import BoostingMistakeScene, BoostingPygameState
 from boosting_mistake_lab.staged_history import (
     StagedBoostingHistory,
     build_staged_boosting_history,
@@ -99,7 +100,9 @@ __all__ = [
     "BoostingChallengeResult",
     "BoostingComparisonReport",
     "BoostingExplanation",
+    "BoostingMistakeScene",
     "BoostingPreset",
+    "BoostingPygameState",
     "BoostingRoundConfig",
     "BoostingRoundResult",
     "BoostingTrainer",

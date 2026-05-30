@@ -77,6 +77,8 @@ Preferred approach:
 
 Boosting Mistake Lab is a good first real integration target because it already has a mature Pygame UI, challenge mode, explanation text, export behavior, and tests.
 
+Its standalone Pygame app should keep working while the reusable demo scene is extracted for shell integration.
+
 ## Scene Contract
 
 The minimal scene contract should look like this:
