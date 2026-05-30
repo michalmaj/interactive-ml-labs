@@ -49,6 +49,9 @@ def _placeholder_demo(
     summary_en: str,
     summary_pl: str,
     tags: tuple[str, ...],
+    objectives: tuple[LocalizedText, ...] | None = None,
+    controls: tuple[ControlBinding, ...] | None = None,
+    difficulty: LocalizedText | None = None,
 ) -> DemoManifest:
     """Build a placeholder manifest for a demo."""
     return DemoManifest(
@@ -56,7 +59,8 @@ def _placeholder_demo(
         level=level,
         title=LocalizedText(en=title_en, pl=title_pl),
         summary=LocalizedText(en=summary_en, pl=summary_pl),
-        objectives=(
+        objectives=objectives
+        or (
             LocalizedText(
                 en="Explore the main intuition behind the algorithm.",
                 pl="Zrozum, co jest najważniejsze w działaniu algorytmu.",
@@ -66,7 +70,8 @@ def _placeholder_demo(
                 pl="Sprawdź, jak parametry zmieniają zachowanie modelu.",
             ),
         ),
-        controls=(
+        controls=controls
+        or (
             ControlBinding(
                 key="Enter",
                 action=LocalizedText(en="start placeholder scene", pl="uruchom ekran demo"),
@@ -84,7 +89,7 @@ def _placeholder_demo(
             context,
             DEMO_BY_ID[demo_id],
         ),
-        difficulty=LocalizedText(en="Introductory", pl="Wprowadzający"),
+        difficulty=difficulty or LocalizedText(en="Introductory", pl="Wprowadzający"),
         tags=tags,
     )
 
@@ -140,8 +145,66 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         level=2,
         title_en="Boosting Mistake Lab",
         title_pl="Boosting Mistake Lab",
-        summary_en="Sequential weak learners that focus on previous mistakes.",
-        summary_pl="Weak learners uczące się po kolei, coraz mocniej patrząc na błędy.",
+        summary_en=(
+            "Watch boosting combine weak learners, update sample weights, "
+            "and track train/test accuracy across rounds."
+        ),
+        summary_pl=(
+            "Zobacz, jak boosting łączy weak learners, zmienia wagi próbek "
+            "i śledzi train/test accuracy po kolejnych rundach."
+        ),
+        objectives=(
+            LocalizedText(
+                en="See how each weak learner focuses on mistakes from previous rounds.",
+                pl="Zobacz, jak kolejne weak learners skupiają się na wcześniejszych błędach.",
+            ),
+            LocalizedText(
+                en="Compare staged train/test accuracy and the generalization gap.",
+                pl="Porównuj staged train/test accuracy i generalization gap.",
+            ),
+            LocalizedText(
+                en="Use confidence view and presets to discuss overfitting and robustness.",
+                pl="Używaj confidence view i presetów do rozmowy o overfittingu i odporności.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="Up / Down",
+                action=LocalizedText(
+                    en="change selected boosting stage",
+                    pl="zmień wybraną rundę boostingu",
+                ),
+            ),
+            ControlBinding(
+                key="+ / -",
+                action=LocalizedText(
+                    en="change total round count",
+                    pl="zmień liczbę rund",
+                ),
+            ),
+            ControlBinding(
+                key="1-4 / P",
+                action=LocalizedText(
+                    en="switch preset scenario",
+                    pl="przełącz preset",
+                ),
+            ),
+            ControlBinding(
+                key="C",
+                action=LocalizedText(
+                    en="toggle confidence view",
+                    pl="włącz albo wyłącz confidence view",
+                ),
+            ),
+            ControlBinding(
+                key="E",
+                action=LocalizedText(
+                    en="export selected-stage decision boundary",
+                    pl="wyeksportuj decision boundary dla wybranej rundy",
+                ),
+            ),
+        ),
+        difficulty=LocalizedText(en="Practical", pl="Praktyczny"),
         tags=("ensemble", "classification", "boosting"),
     ),
 )
