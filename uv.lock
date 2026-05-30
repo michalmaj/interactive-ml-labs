@@ -89,11 +89,15 @@ name = "interactive-ml-labs-app"
 version = "0.1.0"
 source = { editable = "apps/interactive_ml_labs" }
 dependencies = [
+    { name = "boosting-mistake-lab" },
     { name = "pygame" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "pygame", specifier = ">=2.6.1" }]
+requires-dist = [
+    { name = "boosting-mistake-lab", editable = "demos/level_2_practical_ml/02_boosting_mistake_lab" },
+    { name = "pygame", specifier = ">=2.6.1" },
+]
 
 [[package]]
 name = "interactive-ml-labs-workspace"
