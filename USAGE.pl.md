@@ -34,6 +34,17 @@ wybór języka
 
 Prawdziwe integracje dem będą dodawane stopniowo. Każde demo nadal można uruchamiać osobno.
 
+Podstawowe sterowanie shell-a:
+
+| Klawisz / wejście | Akcja |
+| ----------------- | ----- |
+| `Up` / `Down` | Przesuń zaznaczenie |
+| Ruch myszy | Przesuń zaznaczenie |
+| Klik myszy / `Enter` | Aktywuj zaznaczoną pozycję |
+| `Esc` / `Backspace` | Wróć albo otwórz pauzę |
+| `H` | Pokaż lub ukryj pomoc |
+| `L` | Zmień język |
+
 ## Osobne dema
 
 Każde demo nadal działa jako osobny pakiet.

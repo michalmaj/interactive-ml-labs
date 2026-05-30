@@ -40,6 +40,7 @@ class MenuItem:
 
     label: str
     rect: pygame.Rect
+    enabled: bool = True
 
 
 class UnifiedAppShell:
@@ -64,6 +65,7 @@ class UnifiedAppShell:
         self.scene_manager = SceneManager()
         self.menu_items: list[MenuItem] = []
         self.help_visible = False
+        self.mouse_position: tuple[int, int] = (0, 0)
 
         pygame.display.set_caption("Interactive ML Labs")
 
@@ -86,6 +88,8 @@ class UnifiedAppShell:
                 self._handle_active_demo_event(event)
             elif event.type == pygame.KEYDOWN:
                 self._handle_keydown(event.key)
+            elif event.type == pygame.MOUSEMOTION:
+                self._handle_mouse_motion(event.pos)
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self._handle_mouse_click(event.pos)
 
@@ -106,7 +110,9 @@ class UnifiedAppShell:
             pygame.K_RETURN: self._activate_selected,
             pygame.K_SPACE: self._activate_selected,
             pygame.K_ESCAPE: self._escape,
+            pygame.K_BACKSPACE: self._escape,
             pygame.K_h: self._toggle_help,
+            pygame.K_l: self._toggle_language,
         }
         handler = handlers.get(key)
 
@@ -114,11 +120,20 @@ class UnifiedAppShell:
             handler()
 
     def _handle_mouse_click(self, position: tuple[int, int]) -> None:
+        if self._select_menu_item_at(position):
+            self._activate_selected()
+
+    def _handle_mouse_motion(self, position: tuple[int, int]) -> None:
+        self.mouse_position = position
+        self._select_menu_item_at(position)
+
+    def _select_menu_item_at(self, position: tuple[int, int]) -> bool:
         for index, item in enumerate(self.menu_items):
-            if item.rect.collidepoint(position):
+            if item.enabled and item.rect.collidepoint(position):
                 self.selected_index = index
-                self._activate_selected()
-                return
+                return True
+
+        return False
 
     def _update(self, dt: float) -> None:
         if self.screen_name != ScreenName.PLACEHOLDER_DEMO:
@@ -151,14 +166,19 @@ class UnifiedAppShell:
     def _render_language(self) -> None:
         self._draw_title("Interactive ML Labs", "Choose language / Wybierz język")
         self._draw_menu(["English", "Polski"], top=230)
-        self._draw_footer("Enter: select | Up/Down: move | Mouse: select")
+        self._draw_footer("Enter: select | Up/Down: move | Mouse: select | Esc: quit")
 
     def _render_levels(self) -> None:
         language = self.context.settings.language
         labels = [LEVEL_NAMES[level].for_language(language) for level in levels_from_manifests()]
         self._draw_title("Interactive ML Labs", self._text("Select level", "Wybierz poziom"))
         self._draw_menu(labels, top=220)
-        self._draw_footer(self._text("Esc: language | Enter: demos", "Esc: język | Enter: dema"))
+        self._draw_footer(
+            self._text(
+                "Enter: demos | Esc/Backspace: language | L: language",
+                "Enter: dema | Esc/Backspace: język | L: język",
+            ),
+        )
 
     def _render_demos(self) -> None:
         demos = self._current_level_demos()
@@ -169,7 +189,12 @@ class UnifiedAppShell:
 
         self._draw_title(level_name, self._text("Select demo", "Wybierz demo"))
         self._draw_menu(labels, top=190)
-        self._draw_footer(self._text("Esc: levels | Enter: intro", "Esc: poziomy | Enter: intro"))
+        self._draw_footer(
+            self._text(
+                "Enter: intro | Esc/Backspace: levels | L: language",
+                "Enter: intro | Esc/Backspace: poziomy | L: język",
+            ),
+        )
 
     def _render_intro(self) -> None:
         demo = self._require_demo()
@@ -208,7 +233,12 @@ class UnifiedAppShell:
             self._draw_text(label, (100, y), self.font_body, TEXT)
             y += 30
 
-        self._draw_footer(self._text("Enter: start | Esc: demos", "Enter: start | Esc: dema"))
+        self._draw_footer(
+            self._text(
+                "Enter: start | Esc/Backspace: demos | L: language",
+                "Enter: start | Esc/Backspace: dema | L: język",
+            ),
+        )
 
     def _render_placeholder_demo(self) -> None:
         demo = self._require_demo()
@@ -230,7 +260,12 @@ class UnifiedAppShell:
         scene = self.scene_manager.current
         if scene is not None:
             scene.render(self.screen)
-        self._draw_footer(self._text("Esc: pause | H: help", "Esc: pauza | H: pomoc"))
+        self._draw_footer(
+            self._text(
+                "Esc: pause | H: help | L: language",
+                "Esc: pauza | H: pomoc | L: język",
+            ),
+        )
 
     def _render_pause(self) -> None:
         self._draw_title(self._text("Paused", "Pauza"), self._text("Shell menu", "Menu aplikacji"))
@@ -241,7 +276,12 @@ class UnifiedAppShell:
             self._text("Quit", "Zamknij"),
         ]
         self._draw_menu(labels, top=220)
-        self._draw_footer("Esc: resume | Enter: select")
+        self._draw_footer(
+            self._text(
+                "Esc: resume | Enter: select | L: language",
+                "Esc: wróć | Enter: wybierz | L: język",
+            ),
+        )
 
     def _draw_title(self, title: str, subtitle: str) -> None:
         self._draw_text(title, (80, 70), self.font_title, TEXT)
@@ -398,6 +438,12 @@ class UnifiedAppShell:
 
     def _toggle_help(self) -> None:
         self.help_visible = not self.help_visible
+
+    def _toggle_language(self) -> None:
+        if self.context.settings.language == "pl":
+            self.context.settings.language = "en"
+        else:
+            self.context.settings.language = "pl"
 
     def _go_to(self, screen_name: ScreenName) -> None:
         self.screen_name = screen_name

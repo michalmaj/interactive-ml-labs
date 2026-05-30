@@ -200,6 +200,7 @@ Global behavior should be consistent:
 ```text
 Esc = pause menu
 H = help overlay
+L = toggle language
 ```
 
 The pause menu should eventually contain:
