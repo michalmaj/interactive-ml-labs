@@ -11,7 +11,7 @@ LEVEL_MANIFESTS: tuple[LevelManifest, ...] = (
         title=LocalizedText(en="Level 1 - Fundamentals", pl="Poziom 1 - Fundamenty"),
         summary=LocalizedText(
             en="Core machine learning intuition and foundational algorithms.",
-            pl="Podstawowa intuicja machine learningu i fundamentalne algorytmy.",
+            pl="Pierwsze intuicje ML i algorytmy, do których często się wraca.",
         ),
     ),
     LevelManifest(
@@ -19,7 +19,7 @@ LEVEL_MANIFESTS: tuple[LevelManifest, ...] = (
         title=LocalizedText(en="Level 2 - Practical ML", pl="Poziom 2 - Praktyczne ML"),
         summary=LocalizedText(
             en="Model evaluation, robustness, ensembles, and practical trade-offs.",
-            pl="Ewaluacja modeli, odporność, ensemble i praktyczne kompromisy.",
+            pl="Ewaluacja modeli, odporność, ensemble i kompromisy z praktyki.",
         ),
     ),
     LevelManifest(
@@ -27,7 +27,7 @@ LEVEL_MANIFESTS: tuple[LevelManifest, ...] = (
         title=LocalizedText(en="Level 3 - Advanced / Showcase", pl="Poziom 3 - Zaawansowane"),
         summary=LocalizedText(
             en="Advanced, specialized, and visually rich machine learning demos.",
-            pl="Zaawansowane, specjalistyczne i wizualnie bogate dema ML.",
+            pl="Bardziej zaawansowane tematy i efektowne wizualnie eksperymenty ML.",
         ),
     ),
 )
@@ -59,17 +59,17 @@ def _placeholder_demo(
         objectives=(
             LocalizedText(
                 en="Explore the main intuition behind the algorithm.",
-                pl="Zbadaj główną intuicję stojącą za algorytmem.",
+                pl="Złap najważniejszą intuicję stojącą za algorytmem.",
             ),
             LocalizedText(
                 en="Observe how parameter changes affect model behavior.",
-                pl="Zobacz, jak zmiany parametrów wpływają na zachowanie modelu.",
+                pl="Sprawdź, jak parametry zmieniają zachowanie modelu.",
             ),
         ),
         controls=(
             ControlBinding(
                 key="Enter",
-                action=LocalizedText(en="start placeholder scene", pl="uruchom ekran placeholder"),
+                action=LocalizedText(en="start placeholder scene", pl="uruchom ekran demo"),
             ),
             ControlBinding(
                 key="Esc",
@@ -94,54 +94,54 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         demo_id="gradient_descent_playground",
         level=1,
         title_en="Gradient Descent Playground",
-        title_pl="Plac zabaw spadku gradientowego",
+        title_pl="Gradient Descent Playground",
         summary_en="Optimization, loss, and learning rate intuition.",
-        summary_pl="Intuicja optymalizacji, funkcji straty i learning rate.",
+        summary_pl="Optymalizacja, loss i intuicja stojąca za learning rate.",
         tags=("regression", "optimization"),
     ),
     _placeholder_demo(
         demo_id="knn_vote_map",
         level=1,
         title_en="k-NN Vote Map",
-        title_pl="Mapa głosowania k-NN",
+        title_pl="k-NN Vote Map",
         summary_en="Distance-based classification and neighborhood voting.",
-        summary_pl="Klasyfikacja oparta o odległość i głosowanie sąsiadów.",
+        summary_pl="Klasyfikacja przez odległość i głosowanie najbliższych sąsiadów.",
         tags=("classification", "distance"),
     ),
     _placeholder_demo(
         demo_id="logistic_regression_boundary_lab",
         level=1,
         title_en="Logistic Regression Boundary Lab",
-        title_pl="Laboratorium granicy regresji logistycznej",
+        title_pl="Logistic Regression Boundary Lab",
         summary_en="Probabilities, thresholds, and decision boundaries.",
-        summary_pl="Prawdopodobieństwa, progi i granice decyzyjne.",
+        summary_pl="Prawdopodobieństwa, progi i decision boundary w praktyce.",
         tags=("classification", "probability"),
     ),
     _placeholder_demo(
         demo_id="decision_tree_splitter",
         level=1,
         title_en="Decision Tree Splitter",
-        title_pl="Dzielnik drzewa decyzyjnego",
+        title_pl="Decision Tree Splitter",
         summary_en="Splits, impurity, and interpretable rules.",
-        summary_pl="Podziały, nieczystość i interpretowalne reguły.",
+        summary_pl="Splity, impurity i reguły, które da się wyjaśnić człowiekowi.",
         tags=("classification", "trees"),
     ),
     _placeholder_demo(
         demo_id="random_forest_bagging_lab",
         level=2,
         title_en="Random Forest Bagging Lab",
-        title_pl="Laboratorium baggingu lasu losowego",
+        title_pl="Random Forest Bagging Lab",
         summary_en="Bootstrap sampling, voting, variance, and stability.",
-        summary_pl="Bootstrap, głosowanie, wariancja i stabilność.",
+        summary_pl="Bootstrap sampling, voting, wariancja i stabilność predykcji.",
         tags=("ensemble", "classification"),
     ),
     _placeholder_demo(
         demo_id="boosting_mistake_lab",
         level=2,
         title_en="Boosting Mistake Lab",
-        title_pl="Laboratorium błędów boostingu",
+        title_pl="Boosting Mistake Lab",
         summary_en="Sequential weak learners that focus on previous mistakes.",
-        summary_pl="Sekwencyjni słabi uczniowie skupieni na poprzednich błędach.",
+        summary_pl="Weak learners uczące się po kolei, coraz mocniej patrząc na błędy.",
         tags=("ensemble", "classification", "boosting"),
     ),
 )

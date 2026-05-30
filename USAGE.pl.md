@@ -15,31 +15,31 @@ uv sync
 
 ## Rekomendowana aplikacja
 
-Unified Pygame app jest rekomendowanym wejściem do przeglądania dem:
+Unified Pygame app to zalecany sposób przechodzenia przez laboratoria:
 
 ```bash
 uv run --package interactive-ml-labs-app interactive-ml-labs
 ```
 
-Obecny przepływ shell-a:
+Obecny przepływ aplikacji:
 
 ```text
 wybór języka
 -> wybór poziomu
 -> wybór demo
 -> ekran startowy demo
--> placeholder ekranu demo
+-> ekran demo
 -> pauza / pomoc
 ```
 
-Prawdziwe integracje dem będą dodawane stopniowo. Każde demo nadal można uruchamiać osobno.
+Kolejne dema będą podpinane stopniowo. Każde demo nadal można uruchomić osobno.
 
-Podstawowe sterowanie shell-a:
+Podstawowe sterowanie:
 
 | Klawisz / wejście | Akcja |
 | ----------------- | ----- |
 | `Up` / `Down` | Przesuń zaznaczenie |
-| Ruch myszy | Przesuń zaznaczenie |
+| Ruch myszy | Przesuń zaznaczenie na wskazaną pozycję |
 | Klik myszy / `Enter` | Aktywuj zaznaczoną pozycję |
 | `Esc` / `Backspace` | Wróć albo otwórz pauzę |
 | `H` | Pokaż lub ukryj pomoc |
@@ -47,7 +47,7 @@ Podstawowe sterowanie shell-a:
 
 ## Osobne dema
 
-Każde demo nadal działa jako osobny pakiet.
+Każde demo nadal działa jako osobny pakiet i może być uruchamiane bez unified app.
 
 ### Gradient Descent Playground
 
@@ -100,7 +100,7 @@ uv run ruff check .
 uv run ruff format --check .
 ```
 
-Uruchom testy unified app shell:
+Uruchom testy unified app:
 
 ```bash
 uv run --package interactive-ml-labs-app pytest apps/interactive_ml_labs/tests
