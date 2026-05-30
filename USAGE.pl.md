@@ -21,7 +21,7 @@ Unified Pygame app to zalecany sposób przechodzenia przez laboratoria:
 uv run --package interactive-ml-labs-app interactive-ml-labs
 ```
 
-Domyślnie aplikacja otwiera okno `1280x720`. Adaptacyjny rozmiar okna jest już dostępny jako opcja w kodzie, a fullscreen dodamy później jako przełącznik w menu.
+Domyślnie aplikacja otwiera okno `1280x720`. Adaptacyjny rozmiar okna i skalowanie scen o stałym rozmiarze są już dostępne jako opcje w kodzie, a fullscreen dodamy później jako przełącznik w menu.
 
 Obecny przepływ aplikacji:
 

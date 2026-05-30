@@ -8,6 +8,7 @@ from interactive_ml_labs.display import (
     WINDOWED_RESOLUTIONS,
     center_rect,
     choose_adaptive_window_size,
+    scale_rect_to_fit,
 )
 
 
@@ -18,6 +19,7 @@ def test_default_settings_are_in_memory_shell_defaults() -> None:
     assert settings.language == "en"
     assert settings.resolution == DEFAULT_RESOLUTION
     assert settings.adaptive_window_enabled is False
+    assert settings.fixed_scene_scaling_enabled is False
     assert settings.fullscreen_enabled is False
     assert settings.sound_enabled is False
 
@@ -66,6 +68,31 @@ def test_boosting_fixed_scene_can_be_centered_in_larger_resolution() -> None:
 def test_center_rect_does_not_return_negative_offsets() -> None:
     """Centered content should clamp offsets when content is larger than container."""
     assert center_rect((640, 360), (1320, 780)) == (0, 0, 1320, 780)
+
+
+def test_scale_rect_to_fit_preserves_aspect_ratio_in_smaller_window() -> None:
+    """Fixed scenes should be letterboxed when scaled into a smaller window."""
+    assert scale_rect_to_fit((1280, 720), BOOSTING_FIXED_SCENE_SIZE) == (
+        31,
+        0,
+        1218,
+        720,
+    )
+
+
+def test_scale_rect_to_fit_can_upscale_into_larger_window() -> None:
+    """Fixed scenes should also scale up for roomier windows."""
+    assert scale_rect_to_fit((1600, 900), BOOSTING_FIXED_SCENE_SIZE) == (
+        38,
+        0,
+        1523,
+        900,
+    )
+
+
+def test_scale_rect_to_fit_handles_invalid_content_size() -> None:
+    """Invalid logical scene sizes should produce an empty rect."""
+    assert scale_rect_to_fit((1280, 720), (0, 780)) == (0, 0, 0, 0)
 
 
 def test_app_context_tracks_current_navigation() -> None:

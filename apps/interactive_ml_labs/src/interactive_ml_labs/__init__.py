@@ -9,6 +9,7 @@ from interactive_ml_labs.display import (
     Size,
     center_rect,
     choose_adaptive_window_size,
+    scale_rect_to_fit,
 )
 from interactive_ml_labs.fonts import POLISH_FONT_CANDIDATES, POLISH_SAMPLE_TEXT, make_ui_font
 from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
@@ -21,7 +22,13 @@ from interactive_ml_labs.registry import (
     levels_from_manifests,
     validate_demo_registry,
 )
-from interactive_ml_labs.scene import Scene, SceneCommand, SceneCommandKind, SceneManager
+from interactive_ml_labs.scene import (
+    FixedSizeScene,
+    Scene,
+    SceneCommand,
+    SceneCommandKind,
+    SceneManager,
+)
 from interactive_ml_labs.settings import AppContext, AppSettings
 
 __all__ = [
@@ -39,6 +46,7 @@ __all__ = [
     "AppSettings",
     "ControlBinding",
     "DemoManifest",
+    "FixedSizeScene",
     "LevelManifest",
     "LocalizedText",
     "RectTuple",
@@ -52,5 +60,6 @@ __all__ = [
     "demos_for_level",
     "levels_from_manifests",
     "make_ui_font",
+    "scale_rect_to_fit",
     "validate_demo_registry",
 ]
