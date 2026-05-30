@@ -174,8 +174,9 @@ The `exports/` directory is ignored by Git.
 | `presets.py`              | Ready-to-use teaching scenarios       |
 | `export.py`               | Decision boundary JSON export         |
 | `report.py`               | CLI comparison report                 |
+| `scene.py`                | Reusable Pygame demo scene            |
 | `renderer.py`             | Pygame rendering                      |
-| `pygame_app.py`           | Pygame application loop               |
+| `pygame_app.py`           | Standalone Pygame application loop    |
 
 
 ## Suggested classroom flow
@@ -213,4 +214,3 @@ uv run --package decision-tree-splitter pytest demos/level_1_fundamentals/04_dec
 uv run --package random-forest-bagging-lab pytest demos/level_2_practical_ml/01_random_forest_bagging_lab/tests
 uv run --package boosting-mistake-lab pytest demos/level_2_practical_ml/02_boosting_mistake_lab/tests
 ```
-
