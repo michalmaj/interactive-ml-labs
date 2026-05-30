@@ -186,6 +186,8 @@ tags
 
 The manifest registry should drive level and demo selection. The shell should not hardcode level contents in multiple places.
 
+Boosting Mistake Lab is the first manifest with demo-specific summary, objectives, and controls. Other demos may keep generic placeholder copy until they are prepared for shell integration.
+
 ## Intro Screen
 
 The shell should generate the default demo intro screen from the demo manifest.

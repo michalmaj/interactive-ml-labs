@@ -2,6 +2,7 @@
 
 import pytest
 from interactive_ml_labs import (
+    DEMO_BY_ID,
     DEMO_MANIFESTS,
     LEVEL_MANIFESTS,
     LEVEL_NAMES,
@@ -44,6 +45,26 @@ def test_manifests_have_required_teaching_content() -> None:
         assert manifest.controls
         assert manifest.tags
         assert manifest.create_scene is not None
+
+
+def test_boosting_manifest_has_demo_specific_teaching_content() -> None:
+    """Boosting manifest should describe the real demo, not only placeholder content."""
+    manifest = DEMO_BY_ID["boosting_mistake_lab"]
+    polish_text = " ".join(
+        [
+            manifest.summary.pl,
+            *(objective.pl for objective in manifest.objectives),
+            *(control.action.pl for control in manifest.controls),
+        ],
+    )
+
+    assert "weak learners" in polish_text
+    assert "train/test accuracy" in polish_text
+    assert "generalization gap" in polish_text
+    assert "confidence view" in polish_text
+    assert "decision boundary" in polish_text
+    assert len(manifest.objectives) == 3
+    assert len(manifest.controls) >= 5
 
 
 def test_registry_contains_polish_diacritics() -> None:

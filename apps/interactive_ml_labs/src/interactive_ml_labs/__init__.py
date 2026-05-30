@@ -3,6 +3,7 @@
 from interactive_ml_labs.fonts import POLISH_FONT_CANDIDATES, POLISH_SAMPLE_TEXT, make_ui_font
 from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
 from interactive_ml_labs.registry import (
+    DEMO_BY_ID,
     DEMO_MANIFESTS,
     LEVEL_MANIFESTS,
     LEVEL_NAMES,
@@ -14,6 +15,7 @@ from interactive_ml_labs.scene import Scene, SceneCommand, SceneCommandKind, Sce
 from interactive_ml_labs.settings import AppContext, AppSettings
 
 __all__ = [
+    "DEMO_BY_ID",
     "DEMO_MANIFESTS",
     "LEVEL_MANIFESTS",
     "LEVEL_NAMES",
