@@ -52,3 +52,17 @@ def center_rect(container_size: Size, content_size: Size) -> RectTuple:
     top = max(0, (container_height - content_height) // 2)
 
     return (left, top, content_width, content_height)
+
+
+def scale_rect_to_fit(container_size: Size, content_size: Size) -> RectTuple:
+    """Return a centered rect for content scaled to fit its container."""
+    container_width, container_height = container_size
+    content_width, content_height = content_size
+    if content_width <= 0 or content_height <= 0:
+        return (0, 0, 0, 0)
+
+    scale = min(container_width / content_width, container_height / content_height)
+    scaled_width = round(content_width * scale)
+    scaled_height = round(content_height * scale)
+
+    return center_rect(container_size, (scaled_width, scaled_height))

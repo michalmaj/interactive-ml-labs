@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Protocol
+from typing import Protocol, runtime_checkable
+
+from interactive_ml_labs.display import Size
 
 
 class SceneCommandKind(StrEnum):
@@ -60,6 +62,13 @@ class Scene(Protocol):
 
     def render(self, surface: object) -> None:
         """Draw the scene."""
+
+
+@runtime_checkable
+class FixedSizeScene(Scene, Protocol):
+    """Scene that renders into a stable logical surface size."""
+
+    fixed_scene_size: Size
 
 
 class SceneManager:

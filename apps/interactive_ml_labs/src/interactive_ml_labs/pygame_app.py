@@ -8,11 +8,17 @@ from typing import Final
 
 import pygame
 
-from interactive_ml_labs.display import choose_adaptive_window_size
+from interactive_ml_labs.display import Size, choose_adaptive_window_size, scale_rect_to_fit
 from interactive_ml_labs.fonts import make_ui_font
 from interactive_ml_labs.manifest import DemoManifest, LocalizedText
 from interactive_ml_labs.registry import LEVEL_NAMES, demos_for_level, levels_from_manifests
-from interactive_ml_labs.scene import SceneCommand, SceneCommandKind, SceneManager
+from interactive_ml_labs.scene import (
+    FixedSizeScene,
+    Scene,
+    SceneCommand,
+    SceneCommandKind,
+    SceneManager,
+)
 from interactive_ml_labs.settings import AppContext, AppSettings
 
 FPS: Final[int] = 60
@@ -282,12 +288,50 @@ class UnifiedAppShell:
         )
         scene = self.scene_manager.current
         if scene is not None:
-            scene.render(self.screen)
+            self._render_scene(scene)
         self._draw_footer(
             self._text(
                 "Esc: pause | H: help | L: language",
                 "Esc: pauza | H: pomoc | L: zmień język",
             ),
+        )
+
+    def _render_scene(self, scene: Scene) -> None:
+        """Render a scene directly or through an opt-in fixed-size scaling buffer."""
+        fixed_scene_size = self._fixed_scene_size_for(scene)
+        if fixed_scene_size is None:
+            scene.render(self.screen)
+            return
+
+        scene_surface = pygame.Surface(fixed_scene_size)
+        scene.render(scene_surface)
+        target_rect = scale_rect_to_fit(self.context.settings.resolution, fixed_scene_size)
+        scaled_surface = pygame.transform.smoothscale(
+            scene_surface,
+            (target_rect[2], target_rect[3]),
+        )
+        self.screen.blit(scaled_surface, (target_rect[0], target_rect[1]))
+
+    def _fixed_scene_size_for(self, scene: Scene) -> Size | None:
+        """Return the scene's fixed logical size when scaling is enabled."""
+        if not self.context.settings.fixed_scene_scaling_enabled:
+            return None
+
+        if not isinstance(scene, FixedSizeScene) or not self._is_valid_size(
+            scene.fixed_scene_size,
+        ):
+            return None
+
+        return scene.fixed_scene_size
+
+    def _is_valid_size(self, value: object) -> bool:
+        return (
+            isinstance(value, tuple)
+            and len(value) == 2
+            and isinstance(value[0], int)
+            and isinstance(value[1], int)
+            and value[0] > 0
+            and value[1] > 0
         )
 
     def _render_pause(self) -> None:

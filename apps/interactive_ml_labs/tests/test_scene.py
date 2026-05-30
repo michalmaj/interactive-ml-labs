@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from interactive_ml_labs import SceneCommand, SceneCommandKind, SceneManager
+from interactive_ml_labs import FixedSizeScene, SceneCommand, SceneCommandKind, SceneManager
 
 
 @dataclass(slots=True)
@@ -26,6 +26,13 @@ class DummyScene:
     def render(self, surface: object) -> None:
         """Draw the scene."""
         _ = surface
+
+
+@dataclass(slots=True)
+class DummyFixedSizeScene(DummyScene):
+    """Tiny fixed-size scene double."""
+
+    fixed_scene_size: tuple[int, int] = (100, 50)
 
 
 def test_scene_command_constructors() -> None:
@@ -75,3 +82,10 @@ def test_scene_manager_replace_on_empty_stack_pushes_scene() -> None:
 
     assert manager.current is scene
     assert len(manager) == 1
+
+
+def test_fixed_size_scene_is_runtime_checkable() -> None:
+    """Fixed-size scenes should expose an optional scaling contract."""
+    scene = DummyFixedSizeScene("fixed")
+
+    assert isinstance(scene, FixedSizeScene)
