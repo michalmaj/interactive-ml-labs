@@ -21,7 +21,7 @@ The unified Pygame app is the recommended entry point for browsing demos:
 uv run --package interactive-ml-labs-app interactive-ml-labs
 ```
 
-The app opens as a `1280x720` window by default. Adaptive window sizing is available as an opt-in setting in code, and fullscreen is planned as a later opt-in menu setting.
+The app opens as a `1280x720` window by default. Adaptive window sizing and fixed-scene scaling are available as opt-in settings in code, and fullscreen is planned as a later opt-in menu setting.
 
 Current app shell flow:
 
