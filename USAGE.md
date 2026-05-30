@@ -21,7 +21,7 @@ The unified Pygame app is the recommended entry point for browsing demos:
 uv run --package interactive-ml-labs-app interactive-ml-labs
 ```
 
-The app opens as a `1280x720` window by default. Adaptive window sizing and fixed-scene scaling are available as opt-in settings in code, and fullscreen is planned as a later opt-in menu setting.
+The app opens as a `1280x720` window by default. Fixed-scene scaling is enabled so larger fixed-canvas demos fit safely, adaptive window sizing is available as an opt-in setting in code, and fullscreen is planned as a later opt-in menu setting.
 
 Current app shell flow:
 
@@ -30,11 +30,11 @@ language selection
 -> level selection
 -> demo selection
 -> demo intro screen
--> placeholder demo screen
+-> demo screen
 -> pause/help overlay
 ```
 
-Real demo integrations are being added gradually. Individual demos can still be run directly.
+Real demo integrations are being added gradually. Boosting Mistake Lab is available through the unified app, and individual demos can still be run directly.
 
 Common shell controls:
 

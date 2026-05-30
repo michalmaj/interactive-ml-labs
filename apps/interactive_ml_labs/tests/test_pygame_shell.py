@@ -5,6 +5,8 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pygame
+from interactive_ml_labs import DEMO_BY_ID
+from interactive_ml_labs.boosting_scene import BoostingMistakeLabSceneAdapter
 from interactive_ml_labs.pygame_app import ScreenName, UnifiedAppShell
 from interactive_ml_labs.scene import SceneCommand
 from interactive_ml_labs.settings import AppSettings
@@ -55,6 +57,21 @@ def test_shell_applies_adaptive_window_size_when_enabled(monkeypatch) -> None:
 
     try:
         assert app.context.settings.resolution == (1320, 780)
+    finally:
+        pygame.quit()
+
+
+def test_shell_starts_boosting_scene_from_manifest(monkeypatch) -> None:
+    """The shell should start the real Boosting scene from its manifest."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.selected_demo = DEMO_BY_ID["boosting_mistake_lab"]
+        app._start_demo()
+
+        assert isinstance(app.scene_manager.current, BoostingMistakeLabSceneAdapter)
+        assert app.screen_name == ScreenName.DEMO
     finally:
         pygame.quit()
 

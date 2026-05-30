@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
+from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
 from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
+from interactive_ml_labs.scene import Scene
 
 LEVEL_MANIFESTS: tuple[LevelManifest, ...] = (
     LevelManifest(
@@ -51,6 +55,7 @@ def _placeholder_demo(
     tags: tuple[str, ...],
     objectives: tuple[LocalizedText, ...] | None = None,
     controls: tuple[ControlBinding, ...] | None = None,
+    create_scene: Callable[[object], Scene] | None = None,
     difficulty: LocalizedText | None = None,
 ) -> DemoManifest:
     """Build a placeholder manifest for a demo."""
@@ -85,9 +90,12 @@ def _placeholder_demo(
                 action=LocalizedText(en="toggle help overlay", pl="pokaż lub ukryj pomoc"),
             ),
         ),
-        create_scene=lambda context, demo_id=demo_id: PlaceholderDemoScene(
-            context,
-            DEMO_BY_ID[demo_id],
+        create_scene=create_scene
+        or (
+            lambda context, demo_id=demo_id: PlaceholderDemoScene(
+                context,
+                DEMO_BY_ID[demo_id],
+            )
         ),
         difficulty=difficulty or LocalizedText(en="Introductory", pl="Wprowadzający"),
         tags=tags,
@@ -204,6 +212,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
         ),
+        create_scene=create_boosting_mistake_lab_scene,
         difficulty=LocalizedText(en="Practical", pl="Praktyczny"),
         tags=("ensemble", "classification", "boosting"),
     ),

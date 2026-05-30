@@ -19,7 +19,7 @@ def test_default_settings_are_in_memory_shell_defaults() -> None:
     assert settings.language == "en"
     assert settings.resolution == DEFAULT_RESOLUTION
     assert settings.adaptive_window_enabled is False
-    assert settings.fixed_scene_scaling_enabled is False
+    assert settings.fixed_scene_scaling_enabled is True
     assert settings.fullscreen_enabled is False
     assert settings.sound_enabled is False
 
