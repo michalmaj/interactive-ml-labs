@@ -110,9 +110,10 @@ class BoostingRenderState:
 class BoostingRenderer:
     """Render boosting training and ensemble behavior using Pygame."""
 
-    def __init__(self, screen: pygame.Surface) -> None:
+    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
         """Initialize renderer resources."""
         self._screen = screen
+        self._present_frame = present_frame
         self._font = pygame.font.Font(None, 28)
         self._small_font = pygame.font.Font(None, 22)
         self._title_font = pygame.font.Font(None, 34)
@@ -147,7 +148,8 @@ class BoostingRenderer:
         self._draw_side_panel(state, selected_stage)
         self._draw_bottom_panel(state, selected_stage)
 
-        pygame.display.flip()
+        if self._present_frame:
+            pygame.display.flip()
 
     def _draw_panel(self, rect: pygame.Rect) -> None:
         """Draw one rounded panel."""

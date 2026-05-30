@@ -40,12 +40,11 @@ def test_boosting_scene_adapter_translates_escape_to_pause(monkeypatch) -> None:
 
 
 def test_boosting_scene_adapter_renders_to_shell_surface(monkeypatch) -> None:
-    """The adapter should draw the wrapped demo into the shell-provided surface."""
+    """The adapter should draw without presenting its own display frame."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     pygame.init()
 
     try:
-        pygame.display.set_mode((640, 360))
         scene = create_boosting_mistake_lab_scene(AppContext())
         surface = pygame.Surface(BOOSTING_FIXED_SCENE_SIZE)
 

@@ -29,3 +29,20 @@ def test_boosting_scene_handles_standalone_events(monkeypatch) -> None:
         assert not scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE))
     finally:
         pygame.quit()
+
+
+def test_boosting_scene_can_render_without_presenting_frame(monkeypatch) -> None:
+    """Embedded Boosting scenes should render to a surface without flipping display."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        screen = pygame.Surface((1320, 780))
+        scene = BoostingMistakeScene(screen, present_frame=False)
+
+        scene.render()
+
+        assert screen.get_bounding_rect().width > 0
+        assert screen.get_bounding_rect().height > 0
+    finally:
+        pygame.quit()
