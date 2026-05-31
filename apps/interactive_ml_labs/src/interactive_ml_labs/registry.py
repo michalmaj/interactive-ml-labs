@@ -6,6 +6,7 @@ from collections.abc import Callable
 
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
+from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
 from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.scene import Scene
@@ -163,6 +164,49 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title_pl="k-NN Vote Map",
         summary_en="Distance-based classification and neighborhood voting.",
         summary_pl="Klasyfikacja przez odległość i głosowanie najbliższych sąsiadów.",
+        objectives=(
+            LocalizedText(
+                en="See how k-NN classifies query points by nearby examples.",
+                pl="Zobacz, jak k-NN klasyfikuje punkty na podstawie najbliższych przykładów.",
+            ),
+            LocalizedText(
+                en="Change k and noise to compare smoother and more local decision regions.",
+                pl="Zmieniaj k i noise, żeby porównać różne decision regions.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="Mouse click",
+                action=LocalizedText(
+                    en="classify a clicked query point", pl="sklasyfikuj kliknięty punkt"
+                ),
+            ),
+            ControlBinding(
+                key="N",
+                action=LocalizedText(
+                    en="classify a random query point", pl="sklasyfikuj losowy punkt"
+                ),
+            ),
+            ControlBinding(
+                key="Up / Down",
+                action=LocalizedText(en="change k", pl="zmień k"),
+            ),
+            ControlBinding(
+                key="Left / Right",
+                action=LocalizedText(en="change dataset noise", pl="zmień noise w danych"),
+            ),
+            ControlBinding(
+                key="S",
+                action=LocalizedText(
+                    en="generate another dataset seed", pl="wygeneruj nowy seed danych"
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the current map", pl="zresetuj aktualną mapę"),
+            ),
+        ),
+        create_scene=create_knn_vote_map_scene,
         tags=("classification", "distance"),
     ),
     _placeholder_demo(
