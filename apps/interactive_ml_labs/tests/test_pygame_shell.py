@@ -217,6 +217,53 @@ def test_shell_help_overlay_uses_selected_demo_manifest(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_intro_uses_columns_for_long_demo_controls(monkeypatch) -> None:
+    """Intro controls should not overlap objectives for demos with many shortcuts."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    wrapped_items: list[tuple[str, tuple[int, int]]] = []
+
+    def capture_text(
+        text: str,
+        position: tuple[int, int],
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> None:
+        _ = text, position, font, color
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = width, color
+        wrapped_items.append((text, position))
+        return position[1] + font.get_linesize()
+
+    try:
+        app.selected_demo = DEMO_BY_ID["decision_tree_splitter"]
+        app.screen_name = ScreenName.INTRO
+        app.context.settings.language = "pl"
+        app._draw_text = capture_text
+        app._draw_wrapped = capture_wrapped
+
+        app._render_intro()
+
+        control_positions = [
+            position
+            for text, position in wrapped_items
+            if text.startswith(("- M:", "- Up / Down:", "- Left / Right:", "- D:", "- G:"))
+        ]
+
+        assert control_positions
+        assert all(position[0] > 600 for position in control_positions)
+        assert max(position[1] for position in control_positions) < 670
+    finally:
+        pygame.quit()
+
+
 def test_shell_pause_help_menu_toggles_visible_overlay(monkeypatch) -> None:
     """Pause menu Help should make the shared help overlay visible."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")

@@ -262,39 +262,63 @@ class UnifiedAppShell:
     def _render_intro(self) -> None:
         demo = self._require_demo()
         language = self.context.settings.language
+        width, _ = self.context.settings.resolution
         y = 120
 
         self._draw_text(demo.title.for_language(language), (80, y), self.font_title, TEXT)
         y += 70
-        self._draw_wrapped(
+        y = self._draw_wrapped(
             demo.summary.for_language(language),
             (80, y),
-            850,
+            min(850, width - 160),
             self.font_body,
             MUTED_TEXT,
         )
-        y += 80
-        self._draw_text(self._text("Objectives", "Cele"), (80, y), self.font_heading, ACCENT)
-        y += 42
+        y += 36
 
-        for objective in demo.objectives:
-            self._draw_wrapped(
-                "- " + objective.for_language(language),
-                (100, y),
-                900,
+        if width >= 1000:
+            gap = 48
+            column_width = (width - 160 - gap) // 2
+            self._draw_intro_section(
+                self._text("Objectives", "Cele"),
+                [objective.for_language(language) for objective in demo.objectives],
+                80,
+                y,
+                column_width,
                 self.font_body,
-                TEXT,
             )
-            y += 38
-
-        y += 20
-        self._draw_text(self._text("Controls", "Sterowanie"), (80, y), self.font_heading, ACCENT)
-        y += 40
-
-        for control in demo.controls:
-            label = f"{control.key}: {control.action.for_language(language)}"
-            self._draw_text(label, (100, y), self.font_body, TEXT)
-            y += 30
+            self._draw_intro_section(
+                self._text("Controls", "Sterowanie"),
+                [
+                    f"{control.key}: {control.action.for_language(language)}"
+                    for control in demo.controls
+                ],
+                80 + column_width + gap,
+                y,
+                column_width,
+                self.font_small if len(demo.controls) > 6 else self.font_body,
+            )
+        else:
+            y = self._draw_intro_section(
+                self._text("Objectives", "Cele"),
+                [objective.for_language(language) for objective in demo.objectives],
+                80,
+                y,
+                width - 160,
+                self.font_body,
+            )
+            y += 16
+            self._draw_intro_section(
+                self._text("Controls", "Sterowanie"),
+                [
+                    f"{control.key}: {control.action.for_language(language)}"
+                    for control in demo.controls
+                ],
+                80,
+                y,
+                width - 160,
+                self.font_small,
+            )
 
         self._draw_footer(
             self._text(
@@ -302,6 +326,25 @@ class UnifiedAppShell:
                 "Enter: start | Esc/Backspace: lista dem | S: ustawienia | L: zmień język",
             ),
         )
+
+    def _draw_intro_section(
+        self,
+        title: str,
+        items: list[str],
+        x: int,
+        y: int,
+        width: int,
+        font: pygame.font.Font,
+    ) -> int:
+        """Draw an intro section and return the next available y position."""
+        self._draw_text(title, (x, y), self.font_heading, ACCENT)
+        y += 42
+
+        for item in items:
+            y = self._draw_wrapped("- " + item, (x + 20, y), width - 20, font, TEXT)
+            y += 8
+
+        return y
 
     def _render_demo(self) -> None:
         scene = self.scene_manager.current
