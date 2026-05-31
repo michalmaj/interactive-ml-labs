@@ -34,6 +34,31 @@ class FixedSizeColorScene:
         surface.fill((240, 20, 20))
 
 
+class FixedSizeMouseScene:
+    """Tiny fixed-size scene double for input scaling tests."""
+
+    fixed_scene_size = (100, 50)
+
+    def __init__(self) -> None:
+        """Create an empty recorder."""
+        self.positions: list[tuple[int, int]] = []
+
+    def handle_event(self, event: object) -> SceneCommand:
+        """Record mouse positions passed to the scene."""
+        if isinstance(event, pygame.event.Event) and hasattr(event, "pos"):
+            self.positions.append(event.pos)
+        return SceneCommand.none()
+
+    def update(self, dt: float) -> SceneCommand:
+        """Advance scene state."""
+        _ = dt
+        return SceneCommand.none()
+
+    def render(self, surface: object) -> None:
+        """Draw the scene."""
+        _ = surface
+
+
 class CountingScene:
     """Tiny scene double used by restart tests."""
 
@@ -277,6 +302,36 @@ def test_shell_scales_fixed_size_scene_when_enabled(monkeypatch) -> None:
 
         assert app.screen.get_at((100, 100))[:3] == (240, 20, 20)
         assert app.screen.get_at((100, 40))[:3] != (240, 20, 20)
+    finally:
+        pygame.quit()
+
+
+def test_shell_maps_mouse_events_to_fixed_scene_coordinates(monkeypatch) -> None:
+    """The shell should pass logical mouse positions to scaled fixed-size scenes."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(
+        settings=AppSettings(
+            resolution=(200, 200),
+            fixed_scene_scaling_enabled=True,
+        ),
+    )
+    scene = FixedSizeMouseScene()
+    app.scene_manager.replace(scene)
+
+    try:
+        centered_click = pygame.event.Event(
+            pygame.MOUSEBUTTONDOWN,
+            {"button": 1, "pos": (100, 100)},
+        )
+        letterbox_click = pygame.event.Event(
+            pygame.MOUSEBUTTONDOWN,
+            {"button": 1, "pos": (100, 40)},
+        )
+
+        app._handle_active_demo_event(centered_click)
+        app._handle_active_demo_event(letterbox_click)
+
+        assert scene.positions == [(50, 25)]
     finally:
         pygame.quit()
 
