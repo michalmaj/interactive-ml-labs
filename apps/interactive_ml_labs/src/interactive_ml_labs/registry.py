@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
+from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.scene import Scene
@@ -110,6 +111,49 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title_pl="Gradient Descent Playground",
         summary_en="Optimization, loss, and learning rate intuition.",
         summary_pl="Optymalizacja, loss i intuicja stojąca za learning rate.",
+        objectives=(
+            LocalizedText(
+                en="Watch gradient descent reduce loss step by step.",
+                pl="Zobacz, jak gradient descent krok po kroku zmniejsza loss.",
+            ),
+            LocalizedText(
+                en="Change learning rate and noise to see when training becomes unstable.",
+                pl="Zmieniaj learning rate i noise, żeby zobaczyć, kiedy trening traci stabilność.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="Space",
+                action=LocalizedText(
+                    en="start or pause automatic steps", pl="uruchom albo zatrzymaj kroki"
+                ),
+            ),
+            ControlBinding(
+                key="N",
+                action=LocalizedText(
+                    en="perform one gradient descent step", pl="wykonaj jeden krok gradient descent"
+                ),
+            ),
+            ControlBinding(
+                key="Up / Down",
+                action=LocalizedText(en="change learning rate", pl="zmień learning rate"),
+            ),
+            ControlBinding(
+                key="Left / Right",
+                action=LocalizedText(en="change dataset noise", pl="zmień noise w danych"),
+            ),
+            ControlBinding(
+                key="S",
+                action=LocalizedText(
+                    en="generate another dataset seed", pl="wygeneruj nowy seed danych"
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the current run", pl="zresetuj aktualny przebieg"),
+            ),
+        ),
+        create_scene=create_gradient_descent_scene,
         tags=("regression", "optimization"),
     ),
     _placeholder_demo(
