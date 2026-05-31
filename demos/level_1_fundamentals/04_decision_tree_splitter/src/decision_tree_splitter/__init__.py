@@ -22,6 +22,7 @@ from decision_tree_splitter.manual_split import (
     ManualSplitConfig,
     ManualSplitPrototype,
 )
+from decision_tree_splitter.scene import DecisionTreeSplitterScene
 from decision_tree_splitter.split import (
     SplitCandidate,
     SplitEvaluation,
@@ -50,6 +51,7 @@ __all__ = [
     "DecisionTreeChallengeResult",
     "DecisionTreeConfig",
     "DecisionTreeNode",
+    "DecisionTreeSplitterScene",
     "LeafPrediction",
     "ManualSplitConfig",
     "ManualSplitPrototype",
