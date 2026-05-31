@@ -76,6 +76,55 @@ def test_shell_starts_boosting_scene_from_manifest(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_help_overlay_uses_selected_demo_manifest(monkeypatch) -> None:
+    """Help overlay should use manifest text for the selected demo."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    wrapped_text: list[str] = []
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = width, font, color
+        wrapped_text.append(text)
+        return position[1] + 24
+
+    try:
+        app.selected_demo = DEMO_BY_ID["boosting_mistake_lab"]
+        app.screen_name = ScreenName.INTRO
+        app.context.settings.language = "pl"
+        app._draw_wrapped = capture_wrapped
+
+        app._render_help_overlay()
+
+        help_text = " ".join(wrapped_text)
+        assert "weak learners" in help_text
+        assert "generalization gap" in help_text
+        assert "confidence view" in help_text
+        assert "decision boundary" in help_text
+    finally:
+        pygame.quit()
+
+
+def test_shell_pause_help_menu_toggles_visible_overlay(monkeypatch) -> None:
+    """Pause menu Help should make the shared help overlay visible."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.screen_name = ScreenName.PAUSE
+        app.selected_index = 1
+        app._activate_selected()
+
+        assert app.help_visible is True
+    finally:
+        pygame.quit()
+
+
 def test_shell_scales_fixed_size_scene_when_enabled(monkeypatch) -> None:
     """The shell should letterbox fixed-size scenes into the current window."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")

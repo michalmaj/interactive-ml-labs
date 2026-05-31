@@ -44,7 +44,7 @@ Podstawowe sterowanie:
 | Ruch myszy | Przesuń zaznaczenie na wskazaną pozycję |
 | Klik myszy / `Enter` | Aktywuj zaznaczoną pozycję |
 | `Esc` / `Backspace` | Wróć albo otwórz pauzę |
-| `H` | Pokaż lub ukryj pomoc |
+| `H` | Pokaż lub ukryj pomoc dla wybranego demo |
 | `L` | Zmień język |
 
 ## Osobne dema

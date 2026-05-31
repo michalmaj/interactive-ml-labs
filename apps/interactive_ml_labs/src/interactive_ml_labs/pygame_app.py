@@ -188,7 +188,7 @@ class UnifiedAppShell:
         }
         renderers[self.screen_name]()
 
-        if self.help_visible and self.screen_name != ScreenName.PAUSE:
+        if self.help_visible and self.screen_name != ScreenName.LANGUAGE:
             self._render_help_overlay()
 
         pygame.display.flip()
@@ -394,7 +394,7 @@ class UnifiedAppShell:
         width: int,
         font: pygame.font.Font,
         color: tuple[int, int, int],
-    ) -> None:
+    ) -> int:
         words = text.split()
         line = ""
         x, y = position
@@ -411,30 +411,101 @@ class UnifiedAppShell:
 
         if line:
             self._draw_text(line, (x, y), font, color)
+            y += font.get_linesize()
+
+        return y
 
     def _render_help_overlay(self) -> None:
         width, height = self.context.settings.resolution
-        rect = pygame.Rect(120, 130, width - 240, height - 260)
+        margin_x = min(120, max(32, width // 12))
+        margin_y = min(90, max(32, height // 10))
+        rect = pygame.Rect(
+            margin_x,
+            margin_y,
+            width - 2 * margin_x,
+            height - 2 * margin_y,
+        )
         pygame.draw.rect(self.screen, (12, 14, 17), rect, border_radius=8)
         pygame.draw.rect(self.screen, ACCENT, rect, width=2, border_radius=8)
+        language = self.context.settings.language
+        demo = self._active_help_demo()
+
         self._draw_text(
-            self._text("Help", "Pomoc"),
+            self._help_title(demo, language),
             (rect.x + 32, rect.y + 28),
             self.font_heading,
             TEXT,
         )
-        self._draw_wrapped(
-            self._text(
-                "Use arrow keys, Enter, Esc, H, or the mouse. "
-                "Demo-specific help will come from manifests.",
-                "Używaj strzałek, Enter, Esc, H albo myszy. "
-                "Treść pomocy będzie zależeć od wybranego demo.",
-            ),
-            (rect.x + 32, rect.y + 82),
-            rect.width - 64,
+
+        y = rect.y + 78
+        content_width = rect.width - 64
+        if demo is None:
+            self._draw_wrapped(
+                self._text(
+                    "Use arrow keys, Enter, Esc, H, or the mouse.",
+                    "Używaj strzałek, Enter, Esc, H albo myszy.",
+                ),
+                (rect.x + 32, y),
+                content_width,
+                self.font_body,
+                MUTED_TEXT,
+            )
+            return
+
+        y = self._draw_wrapped(
+            demo.summary.for_language(language),
+            (rect.x + 32, y),
+            content_width,
             self.font_body,
             MUTED_TEXT,
         )
+        y += 18
+        y = self._draw_help_section(
+            self._text("Objectives", "Cele"),
+            [objective.for_language(language) for objective in demo.objectives],
+            rect.x + 32,
+            y,
+            content_width,
+        )
+        y += 12
+        self._draw_help_section(
+            self._text("Controls", "Sterowanie"),
+            [
+                f"{control.key}: {control.action.for_language(language)}"
+                for control in demo.controls
+            ],
+            rect.x + 32,
+            y,
+            content_width,
+        )
+
+    def _draw_help_section(
+        self,
+        title: str,
+        items: list[str],
+        x: int,
+        y: int,
+        width: int,
+    ) -> int:
+        self._draw_text(title, (x, y), self.font_small, ACCENT)
+        y += 28
+        for item in items:
+            y = self._draw_wrapped(f"- {item}", (x + 16, y), width - 16, self.font_small, TEXT)
+            y += 4
+
+        return y
+
+    def _help_title(self, demo: DemoManifest | None, language: str) -> str:
+        if demo is None:
+            return self._text("Help", "Pomoc")
+
+        return self._text("Help", "Pomoc") + " - " + demo.title.for_language(language)
+
+    def _active_help_demo(self) -> DemoManifest | None:
+        if self.screen_name in {ScreenName.INTRO, ScreenName.DEMO, ScreenName.PAUSE}:
+            return self._require_demo()
+
+        return None
 
     def _move_up(self) -> None:
         self.selected_index = max(0, self.selected_index - 1)
