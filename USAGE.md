@@ -34,7 +34,7 @@ language selection
 -> pause/help overlay
 ```
 
-Real demo integrations are being added gradually. All Level 1 demos and Boosting Mistake Lab are available through the unified app, and individual demos can still be run directly.
+Real demo integrations are being added gradually. All current Level 1 and Level 2 demos are available through the unified app, and individual demos can still be run directly.
 
 Common shell controls:
 

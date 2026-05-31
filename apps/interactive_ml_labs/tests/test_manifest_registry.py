@@ -17,6 +17,7 @@ from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
 from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
+from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 
 
 def test_registry_contains_current_demo_levels() -> None:
@@ -147,6 +148,25 @@ def test_decision_tree_manifest_has_real_scene_and_demo_specific_controls() -> N
     assert "Gini" in text
     assert "entropy" in text
     assert len(manifest.controls) >= 9
+
+
+def test_random_forest_manifest_has_real_scene_and_demo_specific_controls() -> None:
+    """Random Forest manifest should route to the real scene and describe its controls."""
+    manifest = DEMO_BY_ID["random_forest_bagging_lab"]
+    text = " ".join(
+        [
+            manifest.summary.en,
+            *(objective.en for objective in manifest.objectives),
+            *(control.action.en for control in manifest.controls),
+        ],
+    )
+
+    assert manifest.create_scene is create_random_forest_scene
+    assert "random forest" in text
+    assert "single tree" in text
+    assert "bootstrap" in text
+    assert "confidence view" in text
+    assert len(manifest.controls) >= 8
 
 
 def test_registry_contains_polish_diacritics() -> None:
