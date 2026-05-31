@@ -14,10 +14,12 @@ from gradient_descent_playground.dataset import (
     make_synthetic_regression_dataset,
 )
 from gradient_descent_playground.metrics import mean_squared_error
+from gradient_descent_playground.scene import GradientDescentScene
 
 __all__ = [
     "ChallengeResult",
     "GradientDescentConfig",
+    "GradientDescentScene",
     "LossChallenge",
     "LossChallengeConfig",
     "StepwiseLinearRegression",
