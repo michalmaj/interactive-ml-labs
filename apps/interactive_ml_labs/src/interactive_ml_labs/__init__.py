@@ -16,6 +16,10 @@ from interactive_ml_labs.display import (
     scale_rect_to_fit,
 )
 from interactive_ml_labs.fonts import POLISH_FONT_CANDIDATES, POLISH_SAMPLE_TEXT, make_ui_font
+from interactive_ml_labs.gradient_scene import (
+    GradientDescentSceneAdapter,
+    create_gradient_descent_scene,
+)
 from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
 from interactive_ml_labs.registry import (
     DEMO_BY_ID,
@@ -52,6 +56,7 @@ __all__ = [
     "ControlBinding",
     "DemoManifest",
     "FixedSizeScene",
+    "GradientDescentSceneAdapter",
     "LevelManifest",
     "LocalizedText",
     "RectTuple",
@@ -63,6 +68,7 @@ __all__ = [
     "center_rect",
     "choose_adaptive_window_size",
     "create_boosting_mistake_lab_scene",
+    "create_gradient_descent_scene",
     "demos_for_level",
     "levels_from_manifests",
     "make_ui_font",

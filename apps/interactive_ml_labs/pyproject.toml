@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "boosting-mistake-lab",
+    "gradient-descent-playground",
     "pygame>=2.6.1",
 ]
 
@@ -21,3 +22,4 @@ packages = ["src/interactive_ml_labs"]
 
 [tool.uv.sources]
 boosting-mistake-lab = { workspace = true }
+gradient-descent-playground = { workspace = true }

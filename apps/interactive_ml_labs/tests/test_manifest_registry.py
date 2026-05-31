@@ -13,6 +13,7 @@ from interactive_ml_labs import (
     validate_demo_registry,
 )
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
+from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 
 
 def test_registry_contains_current_demo_levels() -> None:
@@ -67,6 +68,24 @@ def test_boosting_manifest_has_demo_specific_teaching_content() -> None:
     assert len(manifest.objectives) == 3
     assert len(manifest.controls) >= 5
     assert manifest.create_scene is create_boosting_mistake_lab_scene
+
+
+def test_gradient_manifest_has_real_scene_and_demo_specific_controls() -> None:
+    """Gradient manifest should route to the real scene and describe its controls."""
+    manifest = DEMO_BY_ID["gradient_descent_playground"]
+    text = " ".join(
+        [
+            manifest.summary.en,
+            *(objective.en for objective in manifest.objectives),
+            *(control.action.en for control in manifest.controls),
+        ],
+    )
+
+    assert manifest.create_scene is create_gradient_descent_scene
+    assert "gradient descent" in text
+    assert "learning rate" in text
+    assert "dataset noise" in text
+    assert len(manifest.controls) >= 6
 
 
 def test_registry_contains_polish_diacritics() -> None:

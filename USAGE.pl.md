@@ -34,7 +34,7 @@ wybór języka
 -> pauza / pomoc
 ```
 
-Kolejne dema będą podpinane stopniowo. Boosting Mistake Lab działa już w unified app, a każde demo nadal można uruchomić osobno.
+Kolejne dema będą podpinane stopniowo. Gradient Descent Playground i Boosting Mistake Lab działają już w unified app, a każde demo nadal można uruchomić osobno.
 
 Podstawowe sterowanie:
 
