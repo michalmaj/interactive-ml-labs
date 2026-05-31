@@ -32,6 +32,24 @@ class FixedSizeColorScene:
         surface.fill((240, 20, 20))
 
 
+class CountingScene:
+    """Tiny scene double used by restart tests."""
+
+    def handle_event(self, event: object) -> SceneCommand:
+        """Handle one input event."""
+        _ = event
+        return SceneCommand.none()
+
+    def update(self, dt: float) -> SceneCommand:
+        """Advance scene state."""
+        _ = dt
+        return SceneCommand.none()
+
+    def render(self, surface: object) -> None:
+        """Draw the scene."""
+        _ = surface
+
+
 def test_shell_can_render_initial_screen(monkeypatch) -> None:
     """The shell should render its first screen without opening a real window."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -121,6 +139,44 @@ def test_shell_pause_help_menu_toggles_visible_overlay(monkeypatch) -> None:
         app._activate_selected()
 
         assert app.help_visible is True
+    finally:
+        pygame.quit()
+
+
+def test_shell_pause_restart_recreates_current_demo(monkeypatch) -> None:
+    """Pause menu Restart should replace the active scene and resume the demo."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+    created_scenes: list[CountingScene] = []
+
+    def create_scene(context: object) -> CountingScene:
+        _ = context
+        scene = CountingScene()
+        created_scenes.append(scene)
+        return scene
+
+    try:
+        app.selected_demo = DEMO_BY_ID["boosting_mistake_lab"]
+        app.selected_demo = app.selected_demo.__class__(
+            id=app.selected_demo.id,
+            level=app.selected_demo.level,
+            title=app.selected_demo.title,
+            summary=app.selected_demo.summary,
+            objectives=app.selected_demo.objectives,
+            controls=app.selected_demo.controls,
+            create_scene=create_scene,
+            difficulty=app.selected_demo.difficulty,
+            tags=app.selected_demo.tags,
+        )
+        app._start_demo()
+        first_scene = app.scene_manager.current
+        app._open_pause()
+        app.selected_index = 2
+        app._activate_selected()
+
+        assert len(created_scenes) == 2
+        assert app.scene_manager.current is not first_scene
+        assert app.screen_name == ScreenName.DEMO
     finally:
         pygame.quit()
 
