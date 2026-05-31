@@ -91,9 +91,10 @@ class WorldBounds:
 class RandomForestRenderer:
     """Render single-tree and random-forest comparison using Pygame."""
 
-    def __init__(self, screen: pygame.Surface) -> None:
+    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
         """Initialize renderer resources."""
         self._screen = screen
+        self._present_frame = present_frame
         self._font = pygame.font.Font(None, 28)
         self._small_font = pygame.font.Font(None, 22)
         self._title_font = pygame.font.Font(None, 34)
@@ -160,7 +161,8 @@ class RandomForestRenderer:
             challenge_result=challenge_result,
         )
 
-        pygame.display.flip()
+        if self._present_frame:
+            pygame.display.flip()
 
     def _draw_panel(self, rect: pygame.Rect) -> None:
         """Draw one rounded panel."""
