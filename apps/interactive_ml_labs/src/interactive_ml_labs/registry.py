@@ -7,6 +7,7 @@ from collections.abc import Callable
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
+from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
 from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.scene import Scene
@@ -216,6 +217,74 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title_pl="Logistic Regression Boundary Lab",
         summary_en="Probabilities, thresholds, and decision boundaries.",
         summary_pl="Prawdopodobieństwa, progi i decision boundary w praktyce.",
+        objectives=(
+            LocalizedText(
+                en="Watch logistic regression turn a linear score into class probabilities.",
+                pl=(
+                    "Zobacz, jak logistic regression zamienia liniowy score "
+                    "na prawdopodobieństwa klas."
+                ),
+            ),
+            LocalizedText(
+                en=(
+                    "Change learning rate, threshold, and noise to compare "
+                    "stable and unstable training."
+                ),
+                pl=(
+                    "Zmieniaj learning rate, threshold i noise, żeby porównać "
+                    "stabilny i niestabilny trening."
+                ),
+            ),
+            LocalizedText(
+                en="Use precision and recall to reason about threshold trade-offs.",
+                pl=(
+                    "Używaj precision i recall, żeby rozmawiać o kompromisach "
+                    "przy wyborze threshold."
+                ),
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="Space",
+                action=LocalizedText(
+                    en="start or pause automatic training",
+                    pl="uruchom albo zatrzymaj trening",
+                ),
+            ),
+            ControlBinding(
+                key="N",
+                action=LocalizedText(
+                    en="perform one gradient descent step",
+                    pl="wykonaj jeden krok gradient descent",
+                ),
+            ),
+            ControlBinding(
+                key="Up / Down",
+                action=LocalizedText(en="change learning rate", pl="zmień learning rate"),
+            ),
+            ControlBinding(
+                key="Q / E",
+                action=LocalizedText(
+                    en="change decision threshold",
+                    pl="zmień threshold decyzyjny",
+                ),
+            ),
+            ControlBinding(
+                key="Left / Right",
+                action=LocalizedText(en="change dataset noise", pl="zmień noise w danych"),
+            ),
+            ControlBinding(
+                key="S",
+                action=LocalizedText(
+                    en="generate another dataset seed", pl="wygeneruj nowy seed danych"
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the current run", pl="zresetuj aktualny przebieg"),
+            ),
+        ),
+        create_scene=create_logistic_regression_scene,
         tags=("classification", "probability"),
     ),
     _placeholder_demo(

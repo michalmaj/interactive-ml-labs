@@ -15,6 +15,7 @@ from interactive_ml_labs import (
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
+from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
 
 
 def test_registry_contains_current_demo_levels() -> None:
@@ -105,6 +106,26 @@ def test_knn_manifest_has_real_scene_and_demo_specific_controls() -> None:
     assert "query point" in text
     assert "dataset noise" in text
     assert len(manifest.controls) >= 6
+
+
+def test_logistic_manifest_has_real_scene_and_demo_specific_controls() -> None:
+    """Logistic Regression manifest should route to the real scene and describe its controls."""
+    manifest = DEMO_BY_ID["logistic_regression_boundary_lab"]
+    text = " ".join(
+        [
+            manifest.summary.en,
+            *(objective.en for objective in manifest.objectives),
+            *(control.action.en for control in manifest.controls),
+        ],
+    )
+
+    assert manifest.create_scene is create_logistic_regression_scene
+    assert "logistic regression" in text
+    assert "learning rate" in text
+    assert "threshold" in text
+    assert "precision" in text
+    assert "recall" in text
+    assert len(manifest.controls) >= 7
 
 
 def test_registry_contains_polish_diacritics() -> None:
