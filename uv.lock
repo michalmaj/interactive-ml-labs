@@ -95,6 +95,7 @@ dependencies = [
     { name = "knn-vote-map" },
     { name = "logistic-regression-boundary-lab" },
     { name = "pygame" },
+    { name = "random-forest-bagging-lab" },
 ]
 
 [package.metadata]
@@ -105,6 +106,7 @@ requires-dist = [
     { name = "knn-vote-map", editable = "demos/level_1_fundamentals/02_knn_vote_map" },
     { name = "logistic-regression-boundary-lab", editable = "demos/level_1_fundamentals/03_logistic_regression_boundary_lab" },
     { name = "pygame", specifier = ">=2.6.1" },
+    { name = "random-forest-bagging-lab", editable = "demos/level_2_practical_ml/01_random_forest_bagging_lab" },
 ]
 
 [[package]]

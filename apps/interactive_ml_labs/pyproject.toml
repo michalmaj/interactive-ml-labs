@@ -11,6 +11,7 @@ dependencies = [
     "knn-vote-map",
     "logistic-regression-boundary-lab",
     "pygame>=2.6.1",
+    "random-forest-bagging-lab",
 ]
 
 [project.scripts]
@@ -29,3 +30,4 @@ gradient-descent-playground = { workspace = true }
 knn-vote-map = { workspace = true }
 logistic-regression-boundary-lab = { workspace = true }
 decision-tree-splitter = { workspace = true }
+random-forest-bagging-lab = { workspace = true }
