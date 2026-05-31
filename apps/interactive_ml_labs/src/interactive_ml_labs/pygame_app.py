@@ -348,6 +348,7 @@ class UnifiedAppShell:
         labels = [
             self._text("Resume", "Wróć"),
             self._text("Help", "Pomoc"),
+            self._text("Restart", "Restart"),
             self._text("Settings", "Ustawienia"),
             self._text("Back to demos", "Lista dem"),
             self._text("Quit", "Zamknij"),
@@ -581,8 +582,12 @@ class UnifiedAppShell:
         elif self.selected_index == 1:
             self.help_visible = not self.help_visible
         elif self.selected_index == 2:
-            self._open_settings()
+            self.help_visible = False
+            self._restart_current_demo()
+            self._go_to(ScreenName.DEMO)
         elif self.selected_index == 3:
+            self._open_settings()
+        elif self.selected_index == 4:
             self.help_visible = False
             self.scene_manager.clear()
             self._go_to(ScreenName.DEMOS)
@@ -675,7 +680,7 @@ class UnifiedAppShell:
             ScreenName.INTRO: 1,
             ScreenName.DEMO: 1,
             ScreenName.SETTINGS: 5,
-            ScreenName.PAUSE: 5,
+            ScreenName.PAUSE: 6,
         }
         return max(1, counts[self.screen_name])
 
