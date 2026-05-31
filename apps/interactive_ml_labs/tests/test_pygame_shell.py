@@ -8,6 +8,7 @@ import pygame
 from interactive_ml_labs import DEMO_BY_ID
 from interactive_ml_labs.boosting_scene import BoostingMistakeLabSceneAdapter
 from interactive_ml_labs.gradient_scene import GradientDescentSceneAdapter
+from interactive_ml_labs.knn_scene import KNNVoteMapSceneAdapter
 from interactive_ml_labs.pygame_app import ScreenName, UnifiedAppShell
 from interactive_ml_labs.scene import SceneCommand
 from interactive_ml_labs.settings import AppSettings
@@ -31,6 +32,31 @@ class FixedSizeColorScene:
     def render(self, surface: object) -> None:
         """Fill the target surface with a visible color."""
         surface.fill((240, 20, 20))
+
+
+class FixedSizeMouseScene:
+    """Tiny fixed-size scene double for input scaling tests."""
+
+    fixed_scene_size = (100, 50)
+
+    def __init__(self) -> None:
+        """Create an empty recorder."""
+        self.positions: list[tuple[int, int]] = []
+
+    def handle_event(self, event: object) -> SceneCommand:
+        """Record mouse positions passed to the scene."""
+        if isinstance(event, pygame.event.Event) and hasattr(event, "pos"):
+            self.positions.append(event.pos)
+        return SceneCommand.none()
+
+    def update(self, dt: float) -> SceneCommand:
+        """Advance scene state."""
+        _ = dt
+        return SceneCommand.none()
+
+    def render(self, surface: object) -> None:
+        """Draw the scene."""
+        _ = surface
 
 
 class CountingScene:
@@ -105,6 +131,21 @@ def test_shell_starts_gradient_scene_from_manifest(monkeypatch) -> None:
         app._start_demo()
 
         assert isinstance(app.scene_manager.current, GradientDescentSceneAdapter)
+        assert app.screen_name == ScreenName.DEMO
+    finally:
+        pygame.quit()
+
+
+def test_shell_starts_knn_scene_from_manifest(monkeypatch) -> None:
+    """The shell should start the real k-NN scene from its manifest."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.selected_demo = DEMO_BY_ID["knn_vote_map"]
+        app._start_demo()
+
+        assert isinstance(app.scene_manager.current, KNNVoteMapSceneAdapter)
         assert app.screen_name == ScreenName.DEMO
     finally:
         pygame.quit()
@@ -261,6 +302,36 @@ def test_shell_scales_fixed_size_scene_when_enabled(monkeypatch) -> None:
 
         assert app.screen.get_at((100, 100))[:3] == (240, 20, 20)
         assert app.screen.get_at((100, 40))[:3] != (240, 20, 20)
+    finally:
+        pygame.quit()
+
+
+def test_shell_maps_mouse_events_to_fixed_scene_coordinates(monkeypatch) -> None:
+    """The shell should pass logical mouse positions to scaled fixed-size scenes."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(
+        settings=AppSettings(
+            resolution=(200, 200),
+            fixed_scene_scaling_enabled=True,
+        ),
+    )
+    scene = FixedSizeMouseScene()
+    app.scene_manager.replace(scene)
+
+    try:
+        centered_click = pygame.event.Event(
+            pygame.MOUSEBUTTONDOWN,
+            {"button": 1, "pos": (100, 100)},
+        )
+        letterbox_click = pygame.event.Event(
+            pygame.MOUSEBUTTONDOWN,
+            {"button": 1, "pos": (100, 40)},
+        )
+
+        app._handle_active_demo_event(centered_click)
+        app._handle_active_demo_event(letterbox_click)
+
+        assert scene.positions == [(50, 25)]
     finally:
         pygame.quit()
 

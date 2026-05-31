@@ -20,6 +20,7 @@ from interactive_ml_labs.gradient_scene import (
     GradientDescentSceneAdapter,
     create_gradient_descent_scene,
 )
+from interactive_ml_labs.knn_scene import KNNVoteMapSceneAdapter, create_knn_vote_map_scene
 from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
 from interactive_ml_labs.registry import (
     DEMO_BY_ID,
@@ -57,6 +58,7 @@ __all__ = [
     "DemoManifest",
     "FixedSizeScene",
     "GradientDescentSceneAdapter",
+    "KNNVoteMapSceneAdapter",
     "LevelManifest",
     "LocalizedText",
     "RectTuple",
@@ -69,6 +71,7 @@ __all__ = [
     "choose_adaptive_window_size",
     "create_boosting_mistake_lab_scene",
     "create_gradient_descent_scene",
+    "create_knn_vote_map_scene",
     "demos_for_level",
     "levels_from_manifests",
     "make_ui_font",

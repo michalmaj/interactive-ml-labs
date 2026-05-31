@@ -133,7 +133,36 @@ class UnifiedAppShell:
         if scene is None:
             return
 
-        self._handle_scene_command(scene.handle_event(event))
+        scene_event = self._event_in_scene_coordinates(event, scene)
+        if scene_event is None:
+            return
+
+        self._handle_scene_command(scene.handle_event(scene_event))
+
+    def _event_in_scene_coordinates(
+        self,
+        event: pygame.event.Event,
+        scene: Scene,
+    ) -> pygame.event.Event | None:
+        """Translate mouse positions from window space into fixed scene space."""
+        fixed_scene_size = self._fixed_scene_size_for(scene)
+        if fixed_scene_size is None or not hasattr(event, "pos"):
+            return event
+
+        target_rect = pygame.Rect(
+            scale_rect_to_fit(self.context.settings.resolution, fixed_scene_size),
+        )
+        position = event.pos
+        if not target_rect.collidepoint(position):
+            return None
+
+        logical_position = (
+            round((position[0] - target_rect.x) * fixed_scene_size[0] / target_rect.width),
+            round((position[1] - target_rect.y) * fixed_scene_size[1] / target_rect.height),
+        )
+        attributes = dict(event.dict)
+        attributes["pos"] = logical_position
+        return pygame.event.Event(event.type, attributes)
 
     def _handle_keydown(self, key: int) -> None:
         handlers = {
