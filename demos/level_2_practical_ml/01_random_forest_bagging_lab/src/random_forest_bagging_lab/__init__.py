@@ -40,6 +40,7 @@ from random_forest_bagging_lab.report import (
     build_model_comparison_report,
     format_model_comparison_report,
 )
+from random_forest_bagging_lab.scene import RandomForestScene
 from random_forest_bagging_lab.voting import (
     VotingResult,
     majority_vote,
@@ -58,6 +59,7 @@ __all__ = [
     "RandomForestChallengeResult",
     "RandomForestConfig",
     "RandomForestModel",
+    "RandomForestScene",
     "SingleTreeBaseline",
     "SingleTreeBaselineConfig",
     "SyntheticTrainTestDatasetConfig",
