@@ -34,7 +34,7 @@ wybór języka
 -> pauza / pomoc
 ```
 
-Kolejne dema będą podpinane stopniowo. Gradient Descent Playground, k-NN Vote Map, Logistic Regression Boundary Lab i Boosting Mistake Lab działają już w unified app, a każde demo nadal można uruchomić osobno.
+Kolejne dema będą podpinane stopniowo. Wszystkie dema z Level 1 i Boosting Mistake Lab działają już w unified app, a każde demo nadal można uruchomić osobno.
 
 Podstawowe sterowanie:
 
