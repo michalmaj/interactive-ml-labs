@@ -74,13 +74,14 @@ class WorldBounds:
 class KNNVoteMapRenderer:
     """Render k-NN classification state using Pygame."""
 
-    def __init__(self, screen: pygame.Surface) -> None:
+    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
         """Initialize renderer resources.
 
         Args:
             screen: Target Pygame surface.
         """
         self._screen = screen
+        self._present_frame = present_frame
         self._font = pygame.font.Font(None, 28)
         self._small_font = pygame.font.Font(None, 22)
         self._title_font = pygame.font.Font(None, 36)
@@ -119,7 +120,8 @@ class KNNVoteMapRenderer:
         )
         self._draw_bottom_panel(snapshot, challenge_result)
 
-        pygame.display.flip()
+        if self._present_frame:
+            pygame.display.flip()
 
     def screen_to_world(self, position: tuple[int, int]) -> tuple[float, float] | None:
         """Convert a screen position into world coordinates.
