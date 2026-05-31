@@ -46,6 +46,7 @@ Podstawowe sterowanie:
 | `Esc` / `Backspace` | Wróć albo otwórz pauzę |
 | `H` | Pokaż lub ukryj pomoc dla wybranego demo |
 | `L` | Zmień język |
+| `S` | Otwórz ustawienia poza aktywnym demo |
 
 ## Osobne dema
 

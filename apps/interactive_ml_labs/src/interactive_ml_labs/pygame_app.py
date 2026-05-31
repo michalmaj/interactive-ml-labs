@@ -39,6 +39,7 @@ class ScreenName(StrEnum):
     DEMOS = "demos"
     INTRO = "intro"
     DEMO = "demo"
+    SETTINGS = "settings"
     PAUSE = "pause"
 
 
@@ -72,6 +73,7 @@ class UnifiedAppShell:
         self.running = True
         self.screen_name = ScreenName.LANGUAGE
         self.previous_screen = ScreenName.INTRO
+        self.settings_return_screen = ScreenName.LEVELS
         self.selected_index = 0
         self.selected_demo: DemoManifest | None = None
         self.scene_manager = SceneManager()
@@ -143,6 +145,7 @@ class UnifiedAppShell:
             pygame.K_BACKSPACE: self._escape,
             pygame.K_h: self._toggle_help,
             pygame.K_l: self._toggle_language,
+            pygame.K_s: self._open_settings,
         }
         handler = handlers.get(key)
 
@@ -184,6 +187,7 @@ class UnifiedAppShell:
             ScreenName.DEMOS: self._render_demos,
             ScreenName.INTRO: self._render_intro,
             ScreenName.DEMO: self._render_demo,
+            ScreenName.SETTINGS: self._render_settings,
             ScreenName.PAUSE: self._render_pause,
         }
         renderers[self.screen_name]()
@@ -196,7 +200,7 @@ class UnifiedAppShell:
     def _render_language(self) -> None:
         self._draw_title("Interactive ML Labs", "Choose language / Wybierz język")
         self._draw_menu(["English", "Polski"], top=230)
-        self._draw_footer("Enter: select | Up/Down: move | Mouse: select | Esc: quit")
+        self._draw_footer("Enter: select | Up/Down: move | Mouse: select | S: settings | Esc: quit")
 
     def _render_levels(self) -> None:
         language = self.context.settings.language
@@ -206,7 +210,7 @@ class UnifiedAppShell:
         self._draw_footer(
             self._text(
                 "Enter: demos | Esc/Backspace: language | L: language",
-                "Enter: dema | Esc/Backspace: wybór języka | L: zmień język",
+                "Enter: dema | Esc/Backspace: wybór języka | S: ustawienia | L: zmień język",
             ),
         )
 
@@ -222,7 +226,7 @@ class UnifiedAppShell:
         self._draw_footer(
             self._text(
                 "Enter: intro | Esc/Backspace: levels | L: language",
-                "Enter: intro | Esc/Backspace: poziomy | L: zmień język",
+                "Enter: intro | Esc/Backspace: poziomy | S: ustawienia | L: zmień język",
             ),
         )
 
@@ -266,7 +270,7 @@ class UnifiedAppShell:
         self._draw_footer(
             self._text(
                 "Enter: start | Esc/Backspace: demos | L: language",
-                "Enter: start | Esc/Backspace: lista dem | L: zmień język",
+                "Enter: start | Esc/Backspace: lista dem | S: ustawienia | L: zmień język",
             ),
         )
 
@@ -344,6 +348,7 @@ class UnifiedAppShell:
         labels = [
             self._text("Resume", "Wróć"),
             self._text("Help", "Pomoc"),
+            self._text("Settings", "Ustawienia"),
             self._text("Back to demos", "Lista dem"),
             self._text("Quit", "Zamknij"),
         ]
@@ -352,6 +357,29 @@ class UnifiedAppShell:
             self._text(
                 "Esc: resume | Enter: select | L: language",
                 "Esc: wróć | Enter: wybierz | L: zmień język",
+            ),
+        )
+
+    def _render_settings(self) -> None:
+        settings = self.context.settings
+        self._draw_title(
+            self._text("Settings", "Ustawienia"),
+            self._text("In-memory app options", "Opcje aplikacji w tej sesji"),
+        )
+        labels = [
+            self._text("Language: ", "Język: ") + self._language_label(),
+            self._text("Adaptive window size: ", "Adaptacyjny rozmiar okna: ")
+            + self._on_off(settings.adaptive_window_enabled),
+            self._text("Fixed-scene scaling: ", "Skalowanie stałych scen: ")
+            + self._on_off(settings.fixed_scene_scaling_enabled),
+            self._text("Sound: ", "Dźwięk: ") + self._on_off(settings.sound_enabled),
+            self._text("Back", "Wróć"),
+        ]
+        self._draw_menu(labels, top=190)
+        self._draw_footer(
+            self._text(
+                "Enter: toggle/select | Esc/Backspace: back | Adaptive size applies next launch",
+                "Enter: przełącz | Esc/Backspace: wróć | Rozmiar okna od następnego startu",
             ),
         )
 
@@ -521,6 +549,7 @@ class UnifiedAppShell:
             ScreenName.DEMOS: self._select_demo,
             ScreenName.INTRO: self._start_demo,
             ScreenName.DEMO: self._open_pause,
+            ScreenName.SETTINGS: self._select_settings_item,
             ScreenName.PAUSE: self._select_pause_item,
         }
         actions[self.screen_name]()
@@ -552,11 +581,26 @@ class UnifiedAppShell:
         elif self.selected_index == 1:
             self.help_visible = not self.help_visible
         elif self.selected_index == 2:
+            self._open_settings()
+        elif self.selected_index == 3:
             self.help_visible = False
             self.scene_manager.clear()
             self._go_to(ScreenName.DEMOS)
         else:
             self.running = False
+
+    def _select_settings_item(self) -> None:
+        settings = self.context.settings
+        if self.selected_index == 0:
+            self._toggle_language()
+        elif self.selected_index == 1:
+            settings.adaptive_window_enabled = not settings.adaptive_window_enabled
+        elif self.selected_index == 2:
+            settings.fixed_scene_scaling_enabled = not settings.fixed_scene_scaling_enabled
+        elif self.selected_index == 3:
+            settings.sound_enabled = not settings.sound_enabled
+        else:
+            self._go_to(self.settings_return_screen)
 
     def _escape(self) -> None:
         if self.screen_name == ScreenName.LANGUAGE:
@@ -569,6 +613,8 @@ class UnifiedAppShell:
             self._go_to(ScreenName.DEMOS)
         elif self.screen_name == ScreenName.DEMO:
             self._open_pause()
+        elif self.screen_name == ScreenName.SETTINGS:
+            self._go_to(self.settings_return_screen)
         elif self.screen_name == ScreenName.PAUSE:
             self._resume()
 
@@ -578,6 +624,14 @@ class UnifiedAppShell:
 
     def _resume(self) -> None:
         self._go_to(self.previous_screen)
+
+    def _open_settings(self) -> None:
+        if self.screen_name in {ScreenName.DEMO, ScreenName.SETTINGS}:
+            return
+
+        self.help_visible = False
+        self.settings_return_screen = self.screen_name
+        self._go_to(ScreenName.SETTINGS)
 
     def _toggle_help(self) -> None:
         self.help_visible = not self.help_visible
@@ -620,7 +674,8 @@ class UnifiedAppShell:
             ScreenName.DEMOS: len(self._current_level_demos()),
             ScreenName.INTRO: 1,
             ScreenName.DEMO: 1,
-            ScreenName.PAUSE: 4,
+            ScreenName.SETTINGS: 5,
+            ScreenName.PAUSE: 5,
         }
         return max(1, counts[self.screen_name])
 
@@ -635,6 +690,15 @@ class UnifiedAppShell:
 
     def _text(self, en: str, pl: str) -> str:
         return LocalizedText(en=en, pl=pl).for_language(self.context.settings.language)
+
+    def _language_label(self) -> str:
+        if self.context.settings.language == "pl":
+            return "Polski"
+
+        return "English"
+
+    def _on_off(self, enabled: bool) -> str:
+        return self._text("On", "Włączone") if enabled else self._text("Off", "Wyłączone")
 
 
 def main() -> None:

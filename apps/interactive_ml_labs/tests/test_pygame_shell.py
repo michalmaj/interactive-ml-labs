@@ -125,6 +125,55 @@ def test_shell_pause_help_menu_toggles_visible_overlay(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_s_key_opens_settings_outside_demo(monkeypatch) -> None:
+    """S should open settings from shell navigation screens."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.screen_name = ScreenName.LEVELS
+        app._handle_keydown(pygame.K_s)
+
+        assert app.screen_name == ScreenName.SETTINGS
+        assert app.settings_return_screen == ScreenName.LEVELS
+    finally:
+        pygame.quit()
+
+
+def test_shell_settings_menu_toggles_display_flags(monkeypatch) -> None:
+    """Settings menu should mutate in-memory display options."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.screen_name = ScreenName.SETTINGS
+        app.selected_index = 1
+        app._activate_selected()
+        assert app.context.settings.adaptive_window_enabled is True
+
+        app.selected_index = 2
+        app._activate_selected()
+        assert app.context.settings.fixed_scene_scaling_enabled is False
+    finally:
+        pygame.quit()
+
+
+def test_shell_settings_back_returns_to_previous_screen(monkeypatch) -> None:
+    """Settings Back should return to the screen that opened settings."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.screen_name = ScreenName.DEMOS
+        app._open_settings()
+        app.selected_index = 4
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.DEMOS
+    finally:
+        pygame.quit()
+
+
 def test_shell_scales_fixed_size_scene_when_enabled(monkeypatch) -> None:
     """The shell should letterbox fixed-size scenes into the current window."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
