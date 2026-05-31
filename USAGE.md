@@ -46,6 +46,7 @@ Common shell controls:
 | `Esc` / `Backspace` | Go back or open pause menu |
 | `H` | Toggle the selected demo help overlay |
 | `L` | Toggle language |
+| `S` | Open settings outside active demos |
 
 ## Standalone Demos
 
