@@ -11,6 +11,7 @@ from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
 from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
 from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
+from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 from interactive_ml_labs.scene import Scene
 
 LEVEL_MANIFESTS: tuple[LevelManifest, ...] = (
@@ -380,6 +381,66 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title_pl="Random Forest Bagging Lab",
         summary_en="Bootstrap sampling, voting, variance, and stability.",
         summary_pl="Bootstrap sampling, voting, wariancja i stabilność predykcji.",
+        objectives=(
+            LocalizedText(
+                en="Compare a single tree baseline with a random forest on train/test data.",
+                pl=("Porównuj single tree baseline z random forest na danych train/test."),
+            ),
+            LocalizedText(
+                en="Change tree count, max depth, noise, and bootstrap ratio to study variance.",
+                pl=(
+                    "Zmieniaj tree count, max depth, noise i bootstrap ratio, "
+                    "żeby zobaczyć wpływ na wariancję."
+                ),
+            ),
+            LocalizedText(
+                en="Use confidence view to discuss ensemble voting and uncertainty.",
+                pl=("Używaj confidence view do rozmowy o ensemble voting i niepewności predykcji."),
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="Up / Down",
+                action=LocalizedText(en="change forest tree count", pl="zmień tree count"),
+            ),
+            ControlBinding(
+                key="W / S",
+                action=LocalizedText(en="change max depth", pl="zmień max depth"),
+            ),
+            ControlBinding(
+                key="Left / Right",
+                action=LocalizedText(en="change dataset noise", pl="zmień noise w danych"),
+            ),
+            ControlBinding(
+                key="B / V",
+                action=LocalizedText(
+                    en="change bootstrap sample ratio",
+                    pl="zmień bootstrap sample ratio",
+                ),
+            ),
+            ControlBinding(
+                key="D",
+                action=LocalizedText(en="toggle dataset kind", pl="przełącz rodzaj danych"),
+            ),
+            ControlBinding(
+                key="C",
+                action=LocalizedText(
+                    en="toggle confidence view",
+                    pl="włącz albo wyłącz confidence view",
+                ),
+            ),
+            ControlBinding(
+                key="N",
+                action=LocalizedText(
+                    en="generate another dataset seed", pl="wygeneruj nowy seed danych"
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the current setup", pl="zresetuj aktualny układ"),
+            ),
+        ),
+        create_scene=create_random_forest_scene,
         tags=("ensemble", "classification"),
     ),
     _placeholder_demo(

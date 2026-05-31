@@ -12,6 +12,7 @@ from interactive_ml_labs.gradient_scene import GradientDescentSceneAdapter
 from interactive_ml_labs.knn_scene import KNNVoteMapSceneAdapter
 from interactive_ml_labs.logistic_scene import LogisticRegressionSceneAdapter
 from interactive_ml_labs.pygame_app import ScreenName, UnifiedAppShell
+from interactive_ml_labs.random_forest_scene import RandomForestSceneAdapter
 from interactive_ml_labs.scene import SceneCommand
 from interactive_ml_labs.settings import AppSettings
 
@@ -178,6 +179,21 @@ def test_shell_starts_decision_tree_scene_from_manifest(monkeypatch) -> None:
         app._start_demo()
 
         assert isinstance(app.scene_manager.current, DecisionTreeSceneAdapter)
+        assert app.screen_name == ScreenName.DEMO
+    finally:
+        pygame.quit()
+
+
+def test_shell_starts_random_forest_scene_from_manifest(monkeypatch) -> None:
+    """The shell should start the real Random Forest scene from its manifest."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.selected_demo = DEMO_BY_ID["random_forest_bagging_lab"]
+        app._start_demo()
+
+        assert isinstance(app.scene_manager.current, RandomForestSceneAdapter)
         assert app.screen_name == ScreenName.DEMO
     finally:
         pygame.quit()

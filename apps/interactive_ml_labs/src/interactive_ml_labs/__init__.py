@@ -30,6 +30,10 @@ from interactive_ml_labs.logistic_scene import (
     create_logistic_regression_scene,
 )
 from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
+from interactive_ml_labs.random_forest_scene import (
+    RandomForestSceneAdapter,
+    create_random_forest_scene,
+)
 from interactive_ml_labs.registry import (
     DEMO_BY_ID,
     DEMO_MANIFESTS,
@@ -71,6 +75,7 @@ __all__ = [
     "LevelManifest",
     "LocalizedText",
     "LogisticRegressionSceneAdapter",
+    "RandomForestSceneAdapter",
     "RectTuple",
     "Scene",
     "SceneCommand",
@@ -84,6 +89,7 @@ __all__ = [
     "create_gradient_descent_scene",
     "create_knn_vote_map_scene",
     "create_logistic_regression_scene",
+    "create_random_forest_scene",
     "demos_for_level",
     "levels_from_manifests",
     "make_ui_font",
