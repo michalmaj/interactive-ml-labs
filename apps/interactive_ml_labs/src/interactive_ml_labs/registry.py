@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
+from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
 from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
@@ -294,6 +295,82 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title_pl="Decision Tree Splitter",
         summary_en="Splits, impurity, and interpretable rules.",
         summary_pl="Splity, impurity i reguły, które da się wyjaśnić człowiekowi.",
+        objectives=(
+            LocalizedText(
+                en="Compare automatic tree splits with a manual split you can move yourself.",
+                pl=(
+                    "Porównuj automatyczne splity drzewa z manualnym splitem, "
+                    "który możesz przesuwać samodzielnie."
+                ),
+            ),
+            LocalizedText(
+                en="Change max depth, dataset noise, and split criterion to see how trees behave.",
+                pl=(
+                    "Zmieniaj max depth, noise w danych i split criterion, "
+                    "żeby zobaczyć, jak zachowują się drzewa."
+                ),
+            ),
+            LocalizedText(
+                en=(
+                    "Switch between axis-aligned and XOR data to discuss "
+                    "what tree splits can express."
+                ),
+                pl=(
+                    "Przełączaj dane axis-aligned i XOR, żeby omówić, "
+                    "co mogą wyrazić splity w drzewie."
+                ),
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="M",
+                action=LocalizedText(
+                    en="toggle automatic tree and manual split modes",
+                    pl="przełącz automatic tree i manual split",
+                ),
+            ),
+            ControlBinding(
+                key="Up / Down",
+                action=LocalizedText(en="change max depth", pl="zmień max depth"),
+            ),
+            ControlBinding(
+                key="Left / Right",
+                action=LocalizedText(en="change dataset noise", pl="zmień noise w danych"),
+            ),
+            ControlBinding(
+                key="D",
+                action=LocalizedText(en="toggle dataset kind", pl="przełącz rodzaj danych"),
+            ),
+            ControlBinding(
+                key="G",
+                action=LocalizedText(en="toggle Gini and entropy", pl="przełącz Gini i entropy"),
+            ),
+            ControlBinding(
+                key="F",
+                action=LocalizedText(
+                    en="toggle manual split feature",
+                    pl="zmień cechę manual split",
+                ),
+            ),
+            ControlBinding(
+                key="Q / E",
+                action=LocalizedText(
+                    en="move manual split threshold",
+                    pl="przesuń threshold manual split",
+                ),
+            ),
+            ControlBinding(
+                key="S",
+                action=LocalizedText(
+                    en="generate another dataset seed", pl="wygeneruj nowy seed danych"
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the current setup", pl="zresetuj aktualny układ"),
+            ),
+        ),
+        create_scene=create_decision_tree_scene,
         tags=("classification", "trees"),
     ),
     _placeholder_demo(

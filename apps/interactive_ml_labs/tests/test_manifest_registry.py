@@ -13,6 +13,7 @@ from interactive_ml_labs import (
     validate_demo_registry,
 )
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
+from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
 from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
@@ -126,6 +127,26 @@ def test_logistic_manifest_has_real_scene_and_demo_specific_controls() -> None:
     assert "precision" in text
     assert "recall" in text
     assert len(manifest.controls) >= 7
+
+
+def test_decision_tree_manifest_has_real_scene_and_demo_specific_controls() -> None:
+    """Decision Tree manifest should route to the real scene and describe its controls."""
+    manifest = DEMO_BY_ID["decision_tree_splitter"]
+    text = " ".join(
+        [
+            manifest.summary.en,
+            *(objective.en for objective in manifest.objectives),
+            *(control.action.en for control in manifest.controls),
+        ],
+    )
+
+    assert manifest.create_scene is create_decision_tree_scene
+    assert "tree splits" in text
+    assert "manual split" in text
+    assert "max depth" in text
+    assert "Gini" in text
+    assert "entropy" in text
+    assert len(manifest.controls) >= 9
 
 
 def test_registry_contains_polish_diacritics() -> None:
