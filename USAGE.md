@@ -34,7 +34,7 @@ language selection
 -> pause/help overlay
 ```
 
-Real demo integrations are being added gradually. Gradient Descent Playground and Boosting Mistake Lab are available through the unified app, and individual demos can still be run directly.
+Real demo integrations are being added gradually. Gradient Descent Playground, k-NN Vote Map, and Boosting Mistake Lab are available through the unified app, and individual demos can still be run directly.
 
 Common shell controls:
 
