@@ -44,7 +44,7 @@ Common shell controls:
 | Mouse hover | Move selection |
 | Mouse click / `Enter` | Activate selected item |
 | `Esc` / `Backspace` | Go back or open pause menu |
-| `H` | Toggle help overlay |
+| `H` | Toggle the selected demo help overlay |
 | `L` | Toggle language |
 
 ## Standalone Demos
