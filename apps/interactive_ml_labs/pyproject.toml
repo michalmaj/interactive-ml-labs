@@ -8,6 +8,7 @@ dependencies = [
     "boosting-mistake-lab",
     "gradient-descent-playground",
     "knn-vote-map",
+    "logistic-regression-boundary-lab",
     "pygame>=2.6.1",
 ]
 
@@ -25,3 +26,4 @@ packages = ["src/interactive_ml_labs"]
 boosting-mistake-lab = { workspace = true }
 gradient-descent-playground = { workspace = true }
 knn-vote-map = { workspace = true }
+logistic-regression-boundary-lab = { workspace = true }

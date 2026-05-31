@@ -9,6 +9,7 @@ from interactive_ml_labs import DEMO_BY_ID
 from interactive_ml_labs.boosting_scene import BoostingMistakeLabSceneAdapter
 from interactive_ml_labs.gradient_scene import GradientDescentSceneAdapter
 from interactive_ml_labs.knn_scene import KNNVoteMapSceneAdapter
+from interactive_ml_labs.logistic_scene import LogisticRegressionSceneAdapter
 from interactive_ml_labs.pygame_app import ScreenName, UnifiedAppShell
 from interactive_ml_labs.scene import SceneCommand
 from interactive_ml_labs.settings import AppSettings
@@ -146,6 +147,21 @@ def test_shell_starts_knn_scene_from_manifest(monkeypatch) -> None:
         app._start_demo()
 
         assert isinstance(app.scene_manager.current, KNNVoteMapSceneAdapter)
+        assert app.screen_name == ScreenName.DEMO
+    finally:
+        pygame.quit()
+
+
+def test_shell_starts_logistic_scene_from_manifest(monkeypatch) -> None:
+    """The shell should start the real Logistic Regression scene from its manifest."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.selected_demo = DEMO_BY_ID["logistic_regression_boundary_lab"]
+        app._start_demo()
+
+        assert isinstance(app.scene_manager.current, LogisticRegressionSceneAdapter)
         assert app.screen_name == ScreenName.DEMO
     finally:
         pygame.quit()
