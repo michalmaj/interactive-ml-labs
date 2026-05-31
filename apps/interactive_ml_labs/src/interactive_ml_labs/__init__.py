@@ -4,6 +4,10 @@ from interactive_ml_labs.boosting_scene import (
     BoostingMistakeLabSceneAdapter,
     create_boosting_mistake_lab_scene,
 )
+from interactive_ml_labs.decision_tree_scene import (
+    DecisionTreeSceneAdapter,
+    create_decision_tree_scene,
+)
 from interactive_ml_labs.display import (
     BOOSTING_FIXED_SCENE_SIZE,
     DEFAULT_RESOLUTION,
@@ -59,6 +63,7 @@ __all__ = [
     "AppSettings",
     "BoostingMistakeLabSceneAdapter",
     "ControlBinding",
+    "DecisionTreeSceneAdapter",
     "DemoManifest",
     "FixedSizeScene",
     "GradientDescentSceneAdapter",
@@ -75,6 +80,7 @@ __all__ = [
     "center_rect",
     "choose_adaptive_window_size",
     "create_boosting_mistake_lab_scene",
+    "create_decision_tree_scene",
     "create_gradient_descent_scene",
     "create_knn_vote_map_scene",
     "create_logistic_regression_scene",
