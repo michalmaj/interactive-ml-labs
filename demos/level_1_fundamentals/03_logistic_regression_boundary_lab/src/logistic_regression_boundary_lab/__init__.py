@@ -30,10 +30,12 @@ from logistic_regression_boundary_lab.probability_grid import (
     ProbabilityGrid,
     compute_probability_grid,
 )
+from logistic_regression_boundary_lab.scene import LogisticRegressionBoundaryScene
 
 __all__ = [
     "ClassificationMetrics",
     "ConfusionMatrixCounts",
+    "LogisticRegressionBoundaryScene",
     "LogisticRegressionConfig",
     "PrecisionRecallChallenge",
     "PrecisionRecallChallengeConfig",

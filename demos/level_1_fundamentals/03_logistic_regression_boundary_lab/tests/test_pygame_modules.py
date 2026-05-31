@@ -5,6 +5,7 @@ These tests only import modules. They do not initialize the graphical window.
 
 import logistic_regression_boundary_lab.pygame_app
 import logistic_regression_boundary_lab.renderer
+import logistic_regression_boundary_lab.scene
 
 
 def test_import_pygame_app_module() -> None:
@@ -17,3 +18,9 @@ def test_import_renderer_module() -> None:
     """The renderer module should be importable."""
 
     assert logistic_regression_boundary_lab.renderer is not None
+
+
+def test_import_scene_module() -> None:
+    """The reusable Pygame scene module should be importable."""
+
+    assert logistic_regression_boundary_lab.scene is not None
