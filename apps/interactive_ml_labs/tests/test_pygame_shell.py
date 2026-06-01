@@ -280,6 +280,39 @@ def test_shell_intro_uses_columns_for_long_demo_controls(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_demo_selection_renders_selected_demo_details(monkeypatch) -> None:
+    """Demo selection should show manifest details for the highlighted demo."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    wrapped_text: list[str] = []
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = position, width, font, color
+        wrapped_text.append(text)
+        return position[1] + 24
+
+    try:
+        app.context.current_level = 1
+        app.screen_name = ScreenName.DEMOS
+        app.selected_index = 2
+        app._draw_wrapped = capture_wrapped
+
+        app._render_demos()
+
+        detail_text = " ".join(wrapped_text)
+        assert "Logistic Regression Boundary Lab" in detail_text
+        assert "Probabilities, thresholds" in detail_text
+        assert "classification, probability" in detail_text
+    finally:
+        pygame.quit()
+
+
 def test_shell_pause_help_menu_toggles_visible_overlay(monkeypatch) -> None:
     """Pause menu Help should make the shared help overlay visible."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
