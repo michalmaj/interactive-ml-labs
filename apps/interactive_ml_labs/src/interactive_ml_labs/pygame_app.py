@@ -633,10 +633,34 @@ class UnifiedAppShell:
             self.font_body,
             MUTED_TEXT,
         )
-        y += 18
+        y += 22
+        objectives = [objective.for_language(language) for objective in demo.objectives]
+        controls = [
+            f"{control.key}: {control.action.for_language(language)}" for control in demo.controls
+        ]
+
+        if rect.width >= 880:
+            gap = 36
+            column_width = (content_width - gap) // 2
+            self._draw_help_section(
+                self._text("Goals", "Cele"),
+                objectives,
+                rect.x + 32,
+                y,
+                column_width,
+            )
+            self._draw_help_section(
+                self._text("Controls", "Sterowanie"),
+                controls,
+                rect.x + 32 + column_width + gap,
+                y,
+                column_width,
+            )
+            return
+
         y = self._draw_help_section(
-            self._text("Objectives", "Cele"),
-            [objective.for_language(language) for objective in demo.objectives],
+            self._text("Goals", "Cele"),
+            objectives,
             rect.x + 32,
             y,
             content_width,
@@ -644,10 +668,7 @@ class UnifiedAppShell:
         y += 12
         self._draw_help_section(
             self._text("Controls", "Sterowanie"),
-            [
-                f"{control.key}: {control.action.for_language(language)}"
-                for control in demo.controls
-            ],
+            controls,
             rect.x + 32,
             y,
             content_width,
