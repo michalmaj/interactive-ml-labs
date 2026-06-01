@@ -357,11 +357,42 @@ def test_shell_settings_menu_toggles_display_flags(monkeypatch) -> None:
         app.screen_name = ScreenName.SETTINGS
         app.selected_index = 1
         app._activate_selected()
-        assert app.context.settings.adaptive_window_enabled is True
+        assert app.context.settings.fullscreen_enabled is True
 
         app.selected_index = 2
         app._activate_selected()
+        assert app.context.settings.adaptive_window_enabled is True
+
+        app.selected_index = 3
+        app._activate_selected()
         assert app.context.settings.fixed_scene_scaling_enabled is False
+    finally:
+        pygame.quit()
+
+
+def test_shell_settings_fullscreen_recreates_display_mode(monkeypatch) -> None:
+    """Fullscreen toggle should immediately recreate the display surface."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+    calls: list[tuple[tuple[int, int], int]] = []
+
+    def record_set_mode(size: tuple[int, int], flags: int = 0) -> pygame.Surface:
+        calls.append((size, flags))
+        return pygame.Surface(size)
+
+    try:
+        monkeypatch.setattr(pygame.display, "set_mode", record_set_mode)
+        app.screen_name = ScreenName.SETTINGS
+        app.selected_index = 1
+        app._activate_selected()
+
+        assert app.context.settings.fullscreen_enabled is True
+        assert calls[-1] == ((640, 360), pygame.FULLSCREEN)
+
+        app._activate_selected()
+
+        assert app.context.settings.fullscreen_enabled is False
+        assert calls[-1] == ((640, 360), 0)
     finally:
         pygame.quit()
 
@@ -374,7 +405,7 @@ def test_shell_settings_back_returns_to_previous_screen(monkeypatch) -> None:
     try:
         app.screen_name = ScreenName.DEMOS
         app._open_settings()
-        app.selected_index = 4
+        app.selected_index = 5
         app._activate_selected()
 
         assert app.screen_name == ScreenName.DEMOS

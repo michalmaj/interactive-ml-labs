@@ -101,6 +101,13 @@ class UnifiedAppShell:
 
         return 0
 
+    def _apply_display_mode(self) -> None:
+        """Recreate the display surface using current display settings."""
+        self.screen = pygame.display.set_mode(
+            self.context.settings.resolution,
+            self._display_flags(),
+        )
+
     def run(self) -> None:
         """Run the shell event loop."""
         try:
@@ -441,6 +448,7 @@ class UnifiedAppShell:
         )
         labels = [
             self._text("Language: ", "Język: ") + self._language_label(),
+            self._text("Fullscreen: ", "Pełny ekran: ") + self._on_off(settings.fullscreen_enabled),
             self._text("Adaptive window size: ", "Adaptacyjny rozmiar okna: ")
             + self._on_off(settings.adaptive_window_enabled),
             self._text("Fixed-scene scaling: ", "Skalowanie stałych scen: ")
@@ -452,7 +460,7 @@ class UnifiedAppShell:
         self._draw_footer(
             self._text(
                 "Enter: toggle/select | Esc/Backspace: back | Adaptive size applies next launch",
-                "Enter: przełącz | Esc/Backspace: wróć | Rozmiar okna od następnego startu",
+                "Enter: przełącz | Esc/Backspace: wróć | Adaptacyjny rozmiar od następnego startu",
             ),
         )
 
@@ -671,10 +679,13 @@ class UnifiedAppShell:
         if self.selected_index == 0:
             self._toggle_language()
         elif self.selected_index == 1:
-            settings.adaptive_window_enabled = not settings.adaptive_window_enabled
+            settings.fullscreen_enabled = not settings.fullscreen_enabled
+            self._apply_display_mode()
         elif self.selected_index == 2:
-            settings.fixed_scene_scaling_enabled = not settings.fixed_scene_scaling_enabled
+            settings.adaptive_window_enabled = not settings.adaptive_window_enabled
         elif self.selected_index == 3:
+            settings.fixed_scene_scaling_enabled = not settings.fixed_scene_scaling_enabled
+        elif self.selected_index == 4:
             settings.sound_enabled = not settings.sound_enabled
         else:
             self._go_to(self.settings_return_screen)
@@ -751,7 +762,7 @@ class UnifiedAppShell:
             ScreenName.DEMOS: len(self._current_level_demos()),
             ScreenName.INTRO: 1,
             ScreenName.DEMO: 1,
-            ScreenName.SETTINGS: 5,
+            ScreenName.SETTINGS: 6,
             ScreenName.PAUSE: 6,
         }
         return max(1, counts[self.screen_name])
