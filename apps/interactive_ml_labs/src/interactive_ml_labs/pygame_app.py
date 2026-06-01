@@ -258,13 +258,79 @@ class UnifiedAppShell:
         )
 
         self._draw_title(level_name, self._text("Select demo", "Wybierz demo"))
-        self._draw_menu(labels, top=190)
+        self._draw_menu(labels, top=190, width=500)
+        self._render_demo_details(demos[self.selected_index])
         self._draw_footer(
             self._text(
                 "Enter: intro | Esc/Backspace: levels | L: language",
                 "Enter: intro | Esc/Backspace: poziomy | S: ustawienia | L: zmień język",
             ),
         )
+
+    def _render_demo_details(self, demo: DemoManifest) -> None:
+        """Draw details for the currently selected demo."""
+        language = self.context.settings.language
+        width, height = self.context.settings.resolution
+        left = 640
+        top = 190
+        panel_width = max(360, width - left - 80)
+        panel_height = max(360, height - top - 100)
+        rect = pygame.Rect(left, top, panel_width, panel_height)
+
+        pygame.draw.rect(self.screen, PANEL, rect, border_radius=8)
+        pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
+
+        y = rect.y + 28
+        content_x = rect.x + 28
+        content_width = rect.width - 56
+        self._draw_wrapped(
+            demo.title.for_language(language),
+            (content_x, y),
+            content_width,
+            self.font_heading,
+            TEXT,
+        )
+        y += 58
+        y = self._draw_wrapped(
+            demo.summary.for_language(language),
+            (content_x, y),
+            content_width,
+            self.font_body,
+            MUTED_TEXT,
+        )
+        y += 24
+
+        difficulty = demo.difficulty or LocalizedText(en="Introductory", pl="Wprowadzający")
+        self._draw_text(
+            self._text("Difficulty", "Trudność"), (content_x, y), self.font_small, ACCENT
+        )
+        y += 26
+        self._draw_text(difficulty.for_language(language), (content_x, y), self.font_body, TEXT)
+        y += 44
+
+        self._draw_text(self._text("Tags", "Tagi"), (content_x, y), self.font_small, ACCENT)
+        y += 26
+        y = self._draw_wrapped(
+            ", ".join(demo.tags),
+            (content_x, y),
+            content_width,
+            self.font_body,
+            TEXT,
+        )
+        y += 24
+
+        if demo.objectives:
+            self._draw_text(
+                self._text("First goal", "Pierwszy cel"), (content_x, y), self.font_small, ACCENT
+            )
+            y += 26
+            self._draw_wrapped(
+                demo.objectives[0].for_language(language),
+                (content_x, y),
+                content_width,
+                self.font_small,
+                TEXT,
+            )
 
     def _render_intro(self) -> None:
         demo = self._require_demo()
@@ -468,9 +534,8 @@ class UnifiedAppShell:
         self._draw_text(title, (80, 70), self.font_title, TEXT)
         self._draw_text(subtitle, (82, 128), self.font_body, MUTED_TEXT)
 
-    def _draw_menu(self, labels: list[str], *, top: int) -> None:
+    def _draw_menu(self, labels: list[str], *, top: int, width: int = 760) -> None:
         self.menu_items = []
-        width = 760
         height = 54
         left = 80
 
