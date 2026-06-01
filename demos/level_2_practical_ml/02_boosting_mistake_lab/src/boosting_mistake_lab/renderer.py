@@ -21,6 +21,7 @@ from boosting_mistake_lab.weak_learner import WeakLearnerBaseline
 type FloatArray = NDArray[np.float64]
 type IntArray = NDArray[np.int_]
 type Predictor = Callable[[FloatArray], tuple[int, float]]
+type CopyTable = dict[str, dict[str, str]]
 
 WINDOW_WIDTH: Final[int] = 1320
 WINDOW_HEIGHT: Final[int] = 780
@@ -45,7 +46,8 @@ LEFT_PLOT_RECT: Final[pygame.Rect] = pygame.Rect(40, 40, 430, 520)
 RIGHT_PLOT_RECT: Final[pygame.Rect] = pygame.Rect(500, 40, 430, 520)
 SIDE_RECT: Final[pygame.Rect] = pygame.Rect(960, 40, 320, 540)
 BOTTOM_RECT: Final[pygame.Rect] = pygame.Rect(40, 600, 1240, 120)
-STAGED_PLOT_RECT: Final[pygame.Rect] = pygame.Rect(984, 402, 270, 112)
+STAGED_PLOT_WIDTH: Final[int] = 270
+STAGED_PLOT_HEIGHT: Final[int] = 88
 
 PADDING: Final[int] = 34
 PANEL_RADIUS: Final[int] = 14
@@ -79,6 +81,41 @@ REGION_COLORS: Final[dict[int, tuple[int, int, int]]] = {
     CLASS_ZERO_LABEL: CLASS_ZERO_REGION_COLOR,
     CLASS_ONE_LABEL: CLASS_ONE_REGION_COLOR,
 }
+UI_COPY: Final[CopyTable] = {
+    "boosting": {"en": "Boosting", "pl": "Boosting"},
+    "weak_learner_title": {"en": "Weak learner", "pl": "Weak learner"},
+    "boosted_ensemble_title": {"en": "Boosted ensemble", "pl": "Boosted ensemble"},
+    "stage": {"en": "stage", "pl": "etap"},
+    "dataset": {"en": "Dataset", "pl": "Dataset"},
+    "preset": {"en": "Preset", "pl": "Preset"},
+    "stage_label": {"en": "Stage", "pl": "Etap"},
+    "min_leaf": {"en": "Min leaf", "pl": "Min leaf"},
+    "noise": {"en": "Noise", "pl": "Szum"},
+    "seed": {"en": "Seed", "pl": "Seed"},
+    "confidence_view": {"en": "Conf. view", "pl": "Confidence"},
+    "stage_train": {"en": "Stage train", "pl": "Train acc."},
+    "stage_test": {"en": "Stage test", "pl": "Test acc."},
+    "stage_gap": {"en": "Stage gap", "pl": "Gap"},
+    "stage_confidence": {"en": "Stage conf.", "pl": "Confidence"},
+    "stage_alpha": {"en": "Stage alpha", "pl": "Alpha"},
+    "best_round": {"en": "Best round", "pl": "Best round"},
+    "best_test": {"en": "Best test", "pl": "Best test"},
+    "challenge": {"en": "Challenge", "pl": "Cel"},
+    "staged_accuracy": {"en": "Staged accuracy", "pl": "Staged accuracy"},
+    "train_legend": {"en": "blue=train", "pl": "nieb.=train"},
+    "test_legend": {"en": "orange=test", "pl": "pom.=test"},
+    "controls": {
+        "en": (
+            "1-4: presets   P: next preset   E: export JSON   Up/Down: stage   "
+            "[/]: rounds   C: confidence   N: seed   R: reset"
+        ),
+        "pl": (
+            "1-4: presety   P: kolejny preset   E: eksport JSON   Up/Down: etap   "
+            "[/]: rundy   C: confidence   N: seed   R: reset"
+        ),
+    },
+    "hint": {"en": "Hint", "pl": "Wskazówka"},
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -110,10 +147,17 @@ class BoostingRenderState:
 class BoostingRenderer:
     """Render boosting training and ensemble behavior using Pygame."""
 
-    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        *,
+        present_frame: bool = True,
+        language: str = "en",
+    ) -> None:
         """Initialize renderer resources."""
         self._screen = screen
         self._present_frame = present_frame
+        self._language = _normalize_language(language)
         self._font = pygame.font.Font(None, 28)
         self._small_font = pygame.font.Font(None, 22)
         self._title_font = pygame.font.Font(None, 34)
@@ -203,7 +247,7 @@ class BoostingRenderer:
             bounds=bounds,
         )
         self._draw_text(
-            f"Weak learner — stage {selected_stage}",
+            f"{self._copy('weak_learner_title')} - {self._copy('stage')} {selected_stage}",
             rect.left + PADDING,
             rect.top + 16,
             self._font,
@@ -255,7 +299,10 @@ class BoostingRenderer:
             bounds=bounds,
         )
         self._draw_text(
-            f"Boosted ensemble — stage {selected_stage}/{state.round_count}",
+            (
+                f"{self._copy('boosted_ensemble_title')} - "
+                f"{self._copy('stage')} {selected_stage}/{state.round_count}"
+            ),
             rect.left + PADDING,
             rect.top + 16,
             self._font,
@@ -368,31 +415,37 @@ class BoostingRenderer:
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 20
 
-        self._draw_text("Boosting", x, y, self._title_font, TEXT_COLOR)
+        self._draw_text(self._copy("boosting"), x, y, self._title_font, TEXT_COLOR)
         y += 38
 
         rows = [
-            ("Dataset", state.dataset_kind),
-            ("Preset", state.preset_name),
-            ("Stage", f"{selected_stage}/{state.round_count}"),
-            ("Min leaf", str(state.min_samples_leaf)),
-            ("Noise", f"{state.noise_std:.2f}"),
-            ("Seed", str(state.seed)),
-            ("Conf. view", _enabled_text(state.confidence_view_enabled)),
-            ("Stage train", f"{history.boosted_train_accuracies[selected_index]:.3f}"),
-            ("Stage test", f"{history.boosted_test_accuracies[selected_index]:.3f}"),
-            ("Stage gap", f"{history.boosted_generalization_gaps[selected_index]:.3f}"),
-            ("Stage conf.", f"{history.mean_test_confidences[selected_index]:.3f}"),
-            ("Stage alpha", f"{history.learner_weights[selected_index]:.3f}"),
+            (self._copy("dataset"), state.dataset_kind),
+            (self._copy("preset"), state.preset_name),
+            (self._copy("stage_label"), f"{selected_stage}/{state.round_count}"),
+            (self._copy("min_leaf"), str(state.min_samples_leaf)),
+            (self._copy("noise"), f"{state.noise_std:.2f}"),
+            (self._copy("seed"), str(state.seed)),
             (
-                "Best round",
+                self._copy("confidence_view"),
+                _enabled_text(state.confidence_view_enabled, self._language),
+            ),
+            (self._copy("stage_train"), f"{history.boosted_train_accuracies[selected_index]:.3f}"),
+            (self._copy("stage_test"), f"{history.boosted_test_accuracies[selected_index]:.3f}"),
+            (self._copy("stage_gap"), f"{history.boosted_generalization_gaps[selected_index]:.3f}"),
+            (
+                self._copy("stage_confidence"),
+                f"{history.mean_test_confidences[selected_index]:.3f}",
+            ),
+            (self._copy("stage_alpha"), f"{history.learner_weights[selected_index]:.3f}"),
+            (
+                self._copy("best_round"),
                 str(int(state.trainer_result.snapshot.metrics["best_staged_round_index"])),
             ),
             (
-                "Best test",
+                self._copy("best_test"),
                 f"{state.trainer_result.snapshot.metrics['best_staged_boosted_test_accuracy']:.3f}",
             ),
-            ("Challenge", challenge.status),
+            (self._copy("challenge"), _status_text(challenge.status, self._language)),
         ]
 
         for label, value in rows:
@@ -400,23 +453,30 @@ class BoostingRenderer:
             self._draw_text(str(value), x + 126, y, self._small_font, TEXT_COLOR)
             y += SMALL_TEXT_LINE_HEIGHT
 
-        self._draw_staged_accuracy_plot(state, selected_stage)
+        self._draw_staged_accuracy_plot(state, selected_stage, title_y=y + 8)
 
     def _draw_staged_accuracy_plot(
         self,
         state: BoostingRenderState,
         selected_stage: int,
+        *,
+        title_y: int,
     ) -> None:
         """Draw staged train/test accuracy mini-plot."""
         history = state.trainer_result.staged_history
-        rect = STAGED_PLOT_RECT
+        rect = pygame.Rect(
+            SIDE_RECT.left + 24,
+            title_y + 24,
+            STAGED_PLOT_WIDTH,
+            STAGED_PLOT_HEIGHT,
+        )
 
         pygame.draw.rect(self._screen, PLOT_GRID_COLOR, rect, width=1, border_radius=6)
 
         self._draw_text(
-            "Staged accuracy",
+            self._copy("staged_accuracy"),
             rect.left,
-            rect.top - 24,
+            title_y,
             self._small_font,
             TEXT_COLOR,
         )
@@ -435,9 +495,11 @@ class BoostingRenderer:
         )
 
         legend_y = rect.bottom + 8
-        self._draw_text("blue=train", rect.left, legend_y, self._small_font, MUTED_TEXT_COLOR)
         self._draw_text(
-            "orange=test", rect.left + 112, legend_y, self._small_font, MUTED_TEXT_COLOR
+            self._copy("train_legend"), rect.left, legend_y, self._small_font, MUTED_TEXT_COLOR
+        )
+        self._draw_text(
+            self._copy("test_legend"), rect.left + 112, legend_y, self._small_font, MUTED_TEXT_COLOR
         )
 
     def _draw_accuracy_curve(
@@ -495,16 +557,13 @@ class BoostingRenderer:
             selected_stage=selected_stage,
             confidence_view_enabled=state.confidence_view_enabled,
             challenge_result=challenge,
+            language=self._language,
         )
 
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
 
-        controls = (
-            "1-4: presets   P: next preset   E: export JSON   Up/Down: stage   "
-            "PageUp/PageDown: rounds   C: confidence   N: seed   R: reset"
-        )
-        self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
+        self._draw_text(self._copy("controls"), x, y, self._small_font, TEXT_COLOR)
 
         status_color = SUCCESS_COLOR if challenge.passed else ERROR_COLOR
 
@@ -525,12 +584,16 @@ class BoostingRenderer:
 
         hint = explanation.hints[0]
         self._draw_text(
-            f"Hint: {hint}",
+            f"{self._copy('hint')}: {hint}",
             x,
             y + 3 * TEXT_LINE_HEIGHT,
             self._small_font,
             MUTED_TEXT_COLOR,
         )
+
+    def _copy(self, key: str) -> str:
+        """Return localized UI copy."""
+        return UI_COPY[key][self._language]
 
     def _draw_text(
         self,
@@ -634,12 +697,34 @@ def _blend_colors(
     )
 
 
-def _enabled_text(value: bool) -> str:
+def _enabled_text(value: bool, language: str = "en") -> str:
     """Return short enabled/disabled text."""
+    if language == "pl":
+        return "wł." if value else "wył."
+
     if value:
         return "on"
 
     return "off"
+
+
+def _status_text(status: str, language: str) -> str:
+    """Return localized compact challenge status."""
+    if language == "pl":
+        if status == "success":
+            return "gotowe"
+
+        return "do poprawy"
+
+    return status
+
+
+def _normalize_language(language: str) -> str:
+    """Return a supported UI language code."""
+    if language.lower().startswith("pl"):
+        return "pl"
+
+    return "en"
 
 
 def _weight_to_radius(weight: float, sample_count: int) -> int:

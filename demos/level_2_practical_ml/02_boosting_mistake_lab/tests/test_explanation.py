@@ -107,6 +107,26 @@ def test_build_boosting_explanation_mentions_confidence_view() -> None:
     assert any("Confidence view is on" in message for message in explanation.messages)
 
 
+def test_build_boosting_explanation_can_use_polish_copy() -> None:
+    """Explanation builder should support Polish UI copy for the demo shell."""
+    explanation = build_boosting_explanation(
+        trainer_snapshot=_snapshot(
+            boosted_test_accuracy=0.90,
+            completed_round_count=5,
+            boosted_generalization_gap=0.10,
+            best_staged_round_index=4,
+            best_staged_boosted_test_accuracy=0.92,
+        ),
+        selected_stage=4,
+        confidence_view_enabled=True,
+        language="pl",
+    )
+
+    assert explanation.title == "Cel osiągnięty"
+    assert "Dobry balans" in explanation.summary
+    assert any("Confidence view jest włączony" in message for message in explanation.messages)
+
+
 def test_build_boosting_explanation_suggests_moving_toward_best_round() -> None:
     """Explanation should suggest moving toward the best staged round."""
     explanation = build_boosting_explanation(

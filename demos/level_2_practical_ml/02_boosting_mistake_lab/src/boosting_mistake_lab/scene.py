@@ -71,9 +71,19 @@ class BoostingPygameState:
 class BoostingMistakeScene:
     """Interactive scene for the Boosting Mistake Lab demo."""
 
-    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        *,
+        present_frame: bool = True,
+        language: str = "en",
+    ) -> None:
         """Initialize the scene with a target screen."""
-        self._renderer = BoostingRenderer(screen, present_frame=present_frame)
+        self._renderer = BoostingRenderer(
+            screen,
+            present_frame=present_frame,
+            language=language,
+        )
         self._state = BoostingPygameState()
         self._dataset: WeightedTrainTestDataset
         self._trainer_result: BoostingTrainerResult
@@ -125,8 +135,8 @@ class BoostingMistakeScene:
             pygame.K_d: self._toggle_dataset,
             pygame.K_UP: self._increase_selected_stage,
             pygame.K_DOWN: self._decrease_selected_stage,
-            pygame.K_PAGEUP: self._increase_round_count,
-            pygame.K_PAGEDOWN: self._decrease_round_count,
+            pygame.K_RIGHTBRACKET: self._increase_round_count,
+            pygame.K_LEFTBRACKET: self._decrease_round_count,
             pygame.K_EQUALS: self._increase_round_count,
             pygame.K_MINUS: self._decrease_round_count,
             pygame.K_w: self._increase_min_samples_leaf,
