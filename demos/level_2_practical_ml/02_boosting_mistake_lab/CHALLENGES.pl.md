@@ -304,7 +304,7 @@ uv run --package boosting-mistake-lab boosting-mistake-lab-ui
 Zadanie:
 
 1. Ustaw dataset `xor`.
-2. Zwiększ całkowitą liczbę rund klawiszem `PageUp`.
+2. Zwiększ całkowitą liczbę rund klawiszem `]`.
 3. Zmieniaj selected stage klawiszami `Up` i `Down`.
 4. Obserwuj lewy panel.
 5. Obserwuj prawy panel.

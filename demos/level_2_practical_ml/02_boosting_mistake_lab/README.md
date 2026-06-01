@@ -67,8 +67,8 @@ Background color shows decision regions.
 | `P`              | Switch to next preset                           |
 | `Up`             | Increase selected boosting stage                |
 | `Down`           | Decrease selected boosting stage                |
-| `PageUp` / `+`   | Increase total boosting round count             |
-| `PageDown` / `-` | Decrease total boosting round count             |
+| `]` / `+`        | Increase total boosting round count             |
+| `[` / `-`        | Decrease total boosting round count             |
 | `D`              | Toggle dataset: `axis_aligned` / `xor`          |
 | `W`              | Increase weak learner `min_samples_leaf`        |
 | `S`              | Decrease weak learner `min_samples_leaf`        |
