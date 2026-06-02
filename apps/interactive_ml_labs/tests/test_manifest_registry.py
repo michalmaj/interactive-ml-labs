@@ -92,23 +92,43 @@ def test_gradient_manifest_has_real_scene_and_demo_specific_controls() -> None:
     assert len(manifest.controls) >= 6
 
 
-def test_gradient_manifest_has_in_app_theory_content() -> None:
-    """Gradient manifest should include compact content for the generated theory screen."""
-    manifest = DEMO_BY_ID["gradient_descent_playground"]
+def test_manifests_have_in_app_theory_content() -> None:
+    """Every integrated demo should include compact content for the theory screen."""
+    for manifest in DEMO_MANIFESTS:
+        assert manifest.theory is not None
+        assert len(manifest.theory.sections) >= 3
 
-    assert manifest.theory is not None
-    assert len(manifest.theory.sections) >= 3
+        for section in manifest.theory.sections:
+            assert section.title.en
+            assert section.title.pl
+            assert section.body
+            assert all(paragraph.en and paragraph.pl for paragraph in section.body)
+
+
+@pytest.mark.parametrize(
+    ("demo_id", "expected_terms"),
+    [
+        ("gradient_descent_playground", ("Gradient descent", "learning rate", "loss")),
+        ("knn_vote_map", ("k-NN", "query", "vote map")),
+        ("logistic_regression_boundary_lab", ("Logistic regression", "threshold", "precision")),
+        ("decision_tree_splitter", ("Decision tree", "manual split", "impurity")),
+        ("random_forest_bagging_lab", ("Random forest", "bootstrap", "confidence view")),
+        ("boosting_mistake_lab", ("Boosting", "weak learner", "staged train/test accuracy")),
+    ],
+)
+def test_demo_theory_contains_key_terms(demo_id: str, expected_terms: tuple[str, ...]) -> None:
+    """Theory copy should preserve important domain vocabulary."""
+    manifest = DEMO_BY_ID[demo_id]
 
     theory_text = " ".join(
         [
             *(section.title.pl for section in manifest.theory.sections),
             *(paragraph.pl for section in manifest.theory.sections for paragraph in section.body),
         ],
-    )
+    ).lower()
 
-    assert "Gradient descent" in theory_text
-    assert "learning rate" in theory_text
-    assert "loss" in theory_text
+    for term in expected_terms:
+        assert term.lower() in theory_text
 
 
 def test_knn_manifest_has_real_scene_and_demo_specific_controls() -> None:
