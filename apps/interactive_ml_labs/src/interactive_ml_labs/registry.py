@@ -324,6 +324,110 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         ),
         create_scene=create_knn_vote_map_scene,
         tags=("classification", "distance"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "k-NN classifies a query point by looking at the labels "
+                                "of nearby training examples."
+                            ),
+                            pl=(
+                                "k-NN klasyfikuje punkt query, patrząc na etykiety "
+                                "najbliższych przykładów treningowych."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The colored background is a vote map: it shows what class "
+                                "the model would choose in each region."
+                            ),
+                            pl=(
+                                "Kolorowe tło to vote map: pokazuje, jaką klasę model "
+                                "wybrałby w danym regionie."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Why it works", pl="Dlaczego to działa"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "The algorithm assumes that nearby points usually belong "
+                                "to similar classes."
+                            ),
+                            pl=(
+                                "Algorytm zakłada, że punkty blisko siebie zwykle należą "
+                                "do podobnych klas."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The value of k controls how many neighbors get a vote "
+                                "before the final prediction is chosen."
+                            ),
+                            pl=(
+                                "Wartość k decyduje, ilu sąsiadów głosuje przed wyborem "
+                                "finalnej predykcji."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Small k reacts strongly to local details, so the boundary "
+                                "can become jagged."
+                            ),
+                            pl=(
+                                "Małe k mocno reaguje na lokalne szczegóły, więc boundary "
+                                "może robić się poszarpane."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Larger k smooths the map, but it can ignore small local "
+                                "structures in the data."
+                            ),
+                            pl=(
+                                "Większe k wygładza mapę, ale może ignorować małe lokalne "
+                                "struktury w danych."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "k-NN does not train parameters in the usual sense; "
+                                "it stores data and uses distance at prediction time."
+                            ),
+                            pl=(
+                                "k-NN nie trenuje parametrów w klasycznym sensie; "
+                                "przechowuje dane i używa odległości podczas predykcji."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A high accuracy for one seed does not guarantee stability "
+                                "when noise or data layout changes."
+                            ),
+                            pl=(
+                                "Wysoka accuracy dla jednego seedu nie gwarantuje stabilności, "
+                                "gdy zmieni się szum albo układ danych."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
     ),
     _placeholder_demo(
         demo_id="logistic_regression_boundary_lab",
@@ -401,6 +505,110 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         ),
         create_scene=create_logistic_regression_scene,
         tags=("classification", "probability"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Logistic regression turns a linear score into a probability "
+                                "for class_1."
+                            ),
+                            pl=(
+                                "Logistic regression zamienia liniowy score na probability "
+                                "dla klasy class_1."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The decision boundary appears where probability crosses "
+                                "the selected threshold."
+                            ),
+                            pl=(
+                                "Decision boundary pojawia się tam, gdzie probability "
+                                "przekracza wybrany threshold."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Why it works", pl="Dlaczego to działa"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "The model learns weights and bias, then uses sigmoid "
+                                "to squash the score into a 0..1 value."
+                            ),
+                            pl=(
+                                "Model uczy się weights i bias, a potem używa sigmoid, "
+                                "żeby zamienić score na wartość 0..1."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Gradient descent changes those parameters to reduce "
+                                "classification loss."
+                            ),
+                            pl=(
+                                "Gradient descent zmienia te parametry, żeby zmniejszać "
+                                "classification loss."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Changing threshold can improve precision while hurting recall, "
+                                "or the other way around."
+                            ),
+                            pl=(
+                                "Zmiana threshold może poprawić precision kosztem recall "
+                                "albo odwrotnie."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The probability background changes during training before "
+                                "the final class labels are chosen."
+                            ),
+                            pl=(
+                                "Tło probability zmienia się w trakcie treningu, zanim "
+                                "model wybierze finalne klasy."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Probability is not the same thing as correctness; "
+                                "a confident model can still be wrong."
+                            ),
+                            pl=(
+                                "Probability nie jest tym samym co poprawność; "
+                                "pewny model nadal może się mylić."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Accuracy alone can hide FP/FN trade-offs, so precision "
+                                "and recall matter."
+                            ),
+                            pl=(
+                                "Sama accuracy może ukrywać kompromis FP/FN, dlatego "
+                                "precision i recall są ważne."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
     ),
     _placeholder_demo(
         demo_id="decision_tree_splitter",
@@ -486,6 +694,107 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         ),
         create_scene=create_decision_tree_scene,
         tags=("classification", "trees"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "A decision tree classifies points by asking a sequence "
+                                "of simple feature questions."
+                            ),
+                            pl=(
+                                "Decision tree klasyfikuje punkty, zadając serię prostych "
+                                "pytań o cechy."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Each split divides the space into smaller regions that "
+                                "can receive different predictions."
+                            ),
+                            pl=(
+                                "Każdy split dzieli przestrzeń na mniejsze regiony, "
+                                "które mogą dostać różne predykcje."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Why it works", pl="Dlaczego to działa"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "The tree searches for splits that make child nodes "
+                                "more pure than the parent node."
+                            ),
+                            pl=(
+                                "Drzewo szuka splitów, które sprawiają, że child nodes "
+                                "są bardziej jednorodne niż parent node."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Gini and entropy are two ways to score impurity; information gain "
+                                "measures the improvement."
+                            ),
+                            pl=(
+                                "Gini i entropy to dwa sposoby mierzenia impurity; "
+                                "information gain mierzy poprawę po splicie."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Manual split mode lets you compare your intuition with "
+                                "the measured gain."
+                            ),
+                            pl=("Manual split pozwala porównać własną intuicję z policzonym gain."),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "XOR data is hard for a shallow axis-aligned tree, "
+                                "because one split is not enough."
+                            ),
+                            pl=(
+                                "Dane XOR są trudne dla płytkiego axis-aligned tree, "
+                                "bo jeden split nie wystarcza."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "A deeper tree can fit training data very well, but it may "
+                                "generalize worse."
+                            ),
+                            pl=(
+                                "Głębsze drzewo może świetnie dopasować train data, "
+                                "ale gorzej generalizować."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A split that looks good visually is not always the best one "
+                                "by impurity reduction."
+                            ),
+                            pl=(
+                                "Split, który wygląda dobrze wizualnie, nie zawsze jest najlepszy "
+                                "według redukcji impurity."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
     ),
     _placeholder_demo(
         demo_id="random_forest_bagging_lab",
@@ -555,6 +864,107 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         ),
         create_scene=create_random_forest_scene,
         tags=("ensemble", "classification"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Random forest combines many decision trees instead of trusting "
+                                "one tree."
+                            ),
+                            pl=(
+                                "Random forest łączy wiele decision trees zamiast ufać "
+                                "jednemu drzewu."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Each tree votes, and the forest prediction is the class "
+                                "with the most votes."
+                            ),
+                            pl=(
+                                "Każde drzewo głosuje, a predykcją forest jest klasa "
+                                "z największą liczbą głosów."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Why it works", pl="Dlaczego to działa"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Bootstrap sampling gives trees slightly different training sets, "
+                                "so their mistakes are less identical."
+                            ),
+                            pl=(
+                                "Bootstrap sampling daje drzewom trochę inne zbiory treningowe, "
+                                "więc ich błędy są mniej identyczne."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Voting can reduce variance: one unstable tree matters less "
+                                "inside a larger ensemble."
+                            ),
+                            pl=(
+                                "Voting może zmniejszać wariancję: jedno niestabilne drzewo "
+                                "ma mniejszy wpływ w większym ensemble."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Compare train/test accuracy and gap for the single tree "
+                                "versus the forest."
+                            ),
+                            pl=("Porównuj train/test accuracy i gap dla single tree oraz forest."),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Confidence view shows where trees agree strongly and where "
+                                "the vote is less certain."
+                            ),
+                            pl=(
+                                "Confidence view pokazuje, gdzie drzewa mocno się zgadzają, "
+                                "a gdzie głosowanie jest mniej pewne."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "More trees usually improve stability, but they do not fix "
+                                "bad data or a poor setup automatically."
+                            ),
+                            pl=(
+                                "Więcej drzew zwykle poprawia stabilność, ale nie naprawia "
+                                "automatycznie złych danych ani słabej konfiguracji."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "High confidence means trees agree; it does not guarantee "
+                                "that the prediction is correct."
+                            ),
+                            pl=(
+                                "Wysokie confidence oznacza zgodność drzew; nie gwarantuje, "
+                                "że predykcja jest poprawna."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
     ),
     _placeholder_demo(
         demo_id="boosting_mistake_lab",
@@ -623,6 +1033,110 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         create_scene=create_boosting_mistake_lab_scene,
         difficulty=LocalizedText(en="Practical", pl="Praktyczny"),
         tags=("ensemble", "classification", "boosting"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Boosting builds an ensemble one weak learner at a time, "
+                                "with each round reacting to earlier mistakes."
+                            ),
+                            pl=(
+                                "Boosting buduje ensemble po jednym weak learnerze, "
+                                "a każda runda reaguje na wcześniejsze błędy."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The selected stage lets you inspect how the ensemble changes "
+                                "after each boosting round."
+                            ),
+                            pl=(
+                                "Selected stage pozwala zobaczyć, jak ensemble zmienia się "
+                                "po każdej rundzie boostingu."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Why it works", pl="Dlaczego to działa"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "After a weak learner makes mistakes, boosting increases "
+                                "the weight of examples that need more attention."
+                            ),
+                            pl=(
+                                "Po błędach weak learnera boosting zwiększa wagi przykładów, "
+                                "które wymagają większej uwagi."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Learners with lower weighted error receive stronger influence "
+                                "in the final vote."
+                            ),
+                            pl=(
+                                "Learners z niższym weighted error dostają większy wpływ "
+                                "na finalne głosowanie."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Watch staged train/test accuracy: train can improve while "
+                                "test starts to flatten or drop."
+                            ),
+                            pl=(
+                                "Obserwuj staged train/test accuracy: train może rosnąć, "
+                                "gdy test zaczyna się wypłaszczać albo spadać."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Confidence view helps identify regions where the ensemble "
+                                "has weaker agreement."
+                            ),
+                            pl=(
+                                "Confidence view pomaga znaleźć regiony, w których ensemble "
+                                "ma słabszą zgodność."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Adding more rounds is not always better; too many rounds "
+                                "can increase overfitting."
+                            ),
+                            pl=(
+                                "Dodawanie rund nie zawsze pomaga; zbyt wiele rund "
+                                "może zwiększyć overfitting."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A weak learner is not useless because it is weak; boosting "
+                                "uses many small corrections together."
+                            ),
+                            pl=(
+                                "Weak learner nie jest bezużyteczny tylko dlatego, że jest słaby; "
+                                "boosting łączy wiele małych korekt."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
     ),
 )
 
