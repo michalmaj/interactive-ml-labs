@@ -32,6 +32,21 @@ class ControlBinding:
 
 
 @dataclass(frozen=True, slots=True)
+class TheorySection:
+    """Short generated theory block for the in-app lesson screen."""
+
+    title: LocalizedText
+    body: tuple[LocalizedText, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class DemoTheory:
+    """Compact in-app theory content for one demo."""
+
+    sections: tuple[TheorySection, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class LevelManifest:
     """Metadata for one learning level."""
 
@@ -53,3 +68,4 @@ class DemoManifest:
     create_scene: Callable[[object], Scene] | None = None
     difficulty: LocalizedText | None = None
     tags: tuple[str, ...] = field(default_factory=tuple)
+    theory: DemoTheory | None = None
