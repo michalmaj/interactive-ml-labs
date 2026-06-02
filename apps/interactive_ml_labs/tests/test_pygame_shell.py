@@ -355,31 +355,67 @@ def test_shell_theory_screen_renders_manifest_sections(monkeypatch) -> None:
     """Theory screen should render compact manifest theory sections."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
-    wrapped_text: list[str] = []
+    rendered_text: list[str] = []
 
-    def capture_wrapped(
+    def capture_text(
         text: str,
         position: tuple[int, int],
-        width: int,
         font: pygame.font.Font,
         color: tuple[int, int, int],
-    ) -> int:
-        _ = position, width, font, color
-        wrapped_text.append(text)
-        return position[1] + 24
+    ) -> None:
+        _ = position, font, color
+        rendered_text.append(text)
 
     try:
         app.selected_demo = DEMO_BY_ID["gradient_descent_playground"]
         app.screen_name = ScreenName.THEORY
         app.context.settings.language = "pl"
-        app._draw_wrapped = capture_wrapped
+        app._draw_text = capture_text
 
         app._render_theory()
 
-        theory_text = " ".join(wrapped_text)
+        theory_text = " ".join(rendered_text)
         assert "Gradient descent" in theory_text
         assert "learning rate" in theory_text
         assert "loss" in theory_text
+    finally:
+        pygame.quit()
+
+
+def test_shell_theory_content_stays_above_footer(monkeypatch) -> None:
+    """Long theory content should not draw into the shared footer area."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    rendered_text: list[tuple[str, tuple[int, int]]] = []
+
+    def capture_text(
+        text: str,
+        position: tuple[int, int],
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> None:
+        _ = font, color
+        rendered_text.append((text, position))
+
+    try:
+        app.selected_demo = DEMO_BY_ID["random_forest_bagging_lab"]
+        app.screen_name = ScreenName.THEORY
+        app.context.settings.language = "pl"
+        app._draw_text = capture_text
+
+        app._render_theory()
+
+        footer_y = app._footer_y()
+        content_bottom = app._content_bottom()
+        content_positions = [
+            position
+            for text, position in rendered_text
+            if not text.startswith(("Enter:", "Esc/Backspace:"))
+        ]
+
+        assert content_positions
+        assert max(position[1] for position in content_positions) <= content_bottom
+        assert max(position[1] for position in content_positions) < footer_y
     finally:
         pygame.quit()
 
@@ -465,6 +501,22 @@ def test_shell_pause_help_menu_toggles_visible_overlay(monkeypatch) -> None:
         app._activate_selected()
 
         assert app.help_visible is True
+    finally:
+        pygame.quit()
+
+
+def test_shell_pause_menu_stays_above_footer(monkeypatch) -> None:
+    """Pause menu options should not collide with the shared footer."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+
+    try:
+        app.screen_name = ScreenName.PAUSE
+
+        app._render_pause()
+
+        assert app.menu_items
+        assert max(item.rect.bottom for item in app.menu_items) < app._footer_y()
     finally:
         pygame.quit()
 

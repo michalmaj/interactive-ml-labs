@@ -29,6 +29,8 @@ PANEL_SELECTED: Final[tuple[int, int, int]] = (55, 97, 126)
 TEXT: Final[tuple[int, int, int]] = (235, 238, 241)
 MUTED_TEXT: Final[tuple[int, int, int]] = (166, 173, 181)
 ACCENT: Final[tuple[int, int, int]] = (113, 204, 152)
+FOOTER_OFFSET: Final[int] = 50
+FOOTER_RESERVED_HEIGHT: Final[int] = 84
 
 
 class ScreenName(StrEnum):
@@ -413,6 +415,7 @@ class UnifiedAppShell:
         width, _ = self.context.settings.resolution
         content_width = min(980, width - 160)
         y = 70
+        content_bottom = self._content_bottom()
 
         self._draw_text(demo.title.for_language(language), (80, y), self.font_title, TEXT)
         y += 58
@@ -435,25 +438,43 @@ class UnifiedAppShell:
                 self.font_body,
                 TEXT,
             )
+        elif width >= 1100:
+            gap = 56
+            column_width = (content_width - gap) // 2
+            column_count = 2
+            sections_per_column = (len(theory.sections) + column_count - 1) // column_count
+
+            for column_index in range(column_count):
+                section_x = 80 + column_index * (column_width + gap)
+                section_y = y
+                section_start = column_index * sections_per_column
+                section_end = section_start + sections_per_column
+
+                for section in theory.sections[section_start:section_end]:
+                    section_y, fits = self._draw_theory_section(
+                        section.title.for_language(language),
+                        [paragraph.for_language(language) for paragraph in section.body],
+                        section_x,
+                        section_y,
+                        column_width,
+                        content_bottom,
+                    )
+                    if not fits:
+                        self._draw_more_content_hint(content_bottom)
+                        break
         else:
             for section in theory.sections:
-                self._draw_text(
+                y, fits = self._draw_theory_section(
                     section.title.for_language(language),
-                    (80, y),
-                    self.font_heading,
-                    ACCENT,
+                    [paragraph.for_language(language) for paragraph in section.body],
+                    80,
+                    y,
+                    content_width,
+                    content_bottom,
                 )
-                y += 38
-                for paragraph in section.body:
-                    y = self._draw_wrapped(
-                        "- " + paragraph.for_language(language),
-                        (104, y),
-                        content_width - 24,
-                        self.font_body,
-                        TEXT,
-                    )
-                    y += 8
-                y += 18
+                if not fits:
+                    self._draw_more_content_hint(content_bottom)
+                    break
 
         if self.theory_return_screen == ScreenName.INTRO:
             footer = self._text(
@@ -467,6 +488,36 @@ class UnifiedAppShell:
             )
 
         self._draw_footer(footer)
+
+    def _draw_theory_section(
+        self,
+        title: str,
+        paragraphs: list[str],
+        x: int,
+        y: int,
+        width: int,
+        bottom: int,
+    ) -> tuple[int, bool]:
+        """Draw one theory section without crossing the footer-safe boundary."""
+        if y + self.font_heading.get_linesize() + 12 > bottom:
+            return y, False
+
+        self._draw_text(title, (x, y), self.font_heading, ACCENT)
+        y += 38
+        for paragraph in paragraphs:
+            y, fits = self._draw_wrapped_limited(
+                "- " + paragraph,
+                (x + 24, y),
+                width - 24,
+                self.font_body,
+                TEXT,
+                bottom,
+            )
+            if not fits:
+                return y, False
+            y += 8
+
+        return y + 18, True
 
     def _draw_intro_section(
         self,
@@ -567,7 +618,8 @@ class UnifiedAppShell:
             self._text("Back to demos", "Lista dem"),
             self._text("Quit", "Zamknij"),
         ]
-        self._draw_menu(labels, top=220)
+        menu_top = 180 if self.context.settings.resolution[1] >= 700 else 150
+        self._draw_menu(labels, top=menu_top)
         self._draw_footer(
             self._text(
                 "Esc: resume | Enter: select | T: theory | L: language",
@@ -617,8 +669,17 @@ class UnifiedAppShell:
             self.menu_items.append(MenuItem(label=label, rect=rect))
 
     def _draw_footer(self, text: str) -> None:
+        self._draw_text(text, (80, self._footer_y()), self.font_small, MUTED_TEXT)
+
+    def _footer_y(self) -> int:
+        """Return the y position reserved for the global footer."""
         _, height = self.context.settings.resolution
-        self._draw_text(text, (80, height - 50), self.font_small, MUTED_TEXT)
+        return height - FOOTER_OFFSET
+
+    def _content_bottom(self) -> int:
+        """Return the last safe y coordinate before footer controls."""
+        _, height = self.context.settings.resolution
+        return height - FOOTER_RESERVED_HEIGHT
 
     def _draw_text(
         self,
@@ -657,6 +718,55 @@ class UnifiedAppShell:
             y += font.get_linesize()
 
         return y
+
+    def _draw_wrapped_limited(
+        self,
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+        bottom: int,
+    ) -> tuple[int, bool]:
+        """Draw wrapped text without crossing a vertical content boundary."""
+        words = text.split()
+        line = ""
+        x, y = position
+        line_height = font.get_linesize()
+
+        for word in words:
+            candidate = f"{line} {word}".strip()
+            if font.size(candidate)[0] <= width:
+                line = candidate
+                continue
+
+            if y + line_height > bottom:
+                return y, False
+
+            self._draw_text(line, (x, y), font, color)
+            y += line_height
+            line = word
+
+        if line:
+            if y + line_height > bottom:
+                return y, False
+
+            self._draw_text(line, (x, y), font, color)
+            y += line_height
+
+        return y, True
+
+    def _draw_more_content_hint(self, bottom: int) -> None:
+        """Draw a compact hint when screen content is clipped above the footer."""
+        self._draw_text(
+            self._text(
+                "Use a taller window to see more notes.",
+                "Zwiększ okno, żeby zobaczyć więcej notatek.",
+            ),
+            (80, bottom - self.font_small.get_linesize()),
+            self.font_small,
+            MUTED_TEXT,
+        )
 
     def _render_help_overlay(self) -> None:
         width, height = self.context.settings.resolution
