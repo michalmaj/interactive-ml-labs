@@ -38,6 +38,7 @@ class ScreenName(StrEnum):
     LEVELS = "levels"
     DEMOS = "demos"
     INTRO = "intro"
+    THEORY = "theory"
     DEMO = "demo"
     SETTINGS = "settings"
     PAUSE = "pause"
@@ -73,6 +74,7 @@ class UnifiedAppShell:
         self.running = True
         self.screen_name = ScreenName.LANGUAGE
         self.previous_screen = ScreenName.INTRO
+        self.theory_return_screen = ScreenName.INTRO
         self.settings_return_screen = ScreenName.LEVELS
         self.selected_index = 0
         self.selected_demo: DemoManifest | None = None
@@ -133,7 +135,9 @@ class UnifiedAppShell:
                 self._handle_mouse_click(event.pos)
 
     def _is_demo_event(self, event: pygame.event.Event) -> bool:
-        return not (event.type == pygame.KEYDOWN and event.key in {pygame.K_ESCAPE, pygame.K_h})
+        return not (
+            event.type == pygame.KEYDOWN and event.key in {pygame.K_ESCAPE, pygame.K_h, pygame.K_t}
+        )
 
     def _handle_active_demo_event(self, event: pygame.event.Event) -> None:
         scene = self.scene_manager.current
@@ -182,6 +186,7 @@ class UnifiedAppShell:
             pygame.K_h: self._toggle_help,
             pygame.K_l: self._toggle_language,
             pygame.K_s: self._open_settings,
+            pygame.K_t: self._open_theory,
         }
         handler = handlers.get(key)
 
@@ -222,6 +227,7 @@ class UnifiedAppShell:
             ScreenName.LEVELS: self._render_levels,
             ScreenName.DEMOS: self._render_demos,
             ScreenName.INTRO: self._render_intro,
+            ScreenName.THEORY: self._render_theory,
             ScreenName.DEMO: self._render_demo,
             ScreenName.SETTINGS: self._render_settings,
             ScreenName.PAUSE: self._render_pause,
@@ -395,10 +401,72 @@ class UnifiedAppShell:
 
         self._draw_footer(
             self._text(
-                "Enter: start | Esc/Backspace: demos | L: language",
-                "Enter: start | Esc/Backspace: lista dem | S: ustawienia | L: zmień język",
+                "Enter: start | T: theory | Esc/Backspace: demos | S: settings | L: language",
+                "Enter: start | T: teoria | Esc/Backspace: lista dem | S: ustawienia | L: język",
             ),
         )
+
+    def _render_theory(self) -> None:
+        demo = self._require_demo()
+        theory = demo.theory
+        language = self.context.settings.language
+        width, _ = self.context.settings.resolution
+        content_width = min(980, width - 160)
+        y = 70
+
+        self._draw_text(demo.title.for_language(language), (80, y), self.font_title, TEXT)
+        y += 58
+        self._draw_text(
+            self._text("Theory", "Teoria"),
+            (82, y),
+            self.font_heading,
+            ACCENT,
+        )
+        y += 50
+
+        if theory is None:
+            y = self._draw_wrapped(
+                self._text(
+                    "The in-app theory notes for this demo will be added in a later slice.",
+                    "Notatki teorii dla tego demo dodamy w kolejnym kroku.",
+                ),
+                (80, y),
+                content_width,
+                self.font_body,
+                TEXT,
+            )
+        else:
+            for section in theory.sections:
+                self._draw_text(
+                    section.title.for_language(language),
+                    (80, y),
+                    self.font_heading,
+                    ACCENT,
+                )
+                y += 38
+                for paragraph in section.body:
+                    y = self._draw_wrapped(
+                        "- " + paragraph.for_language(language),
+                        (104, y),
+                        content_width - 24,
+                        self.font_body,
+                        TEXT,
+                    )
+                    y += 8
+                y += 18
+
+        if self.theory_return_screen == ScreenName.INTRO:
+            footer = self._text(
+                "Enter: start demo | Esc/Backspace: intro | L: language",
+                "Enter: start demo | Esc/Backspace: intro | L: język",
+            )
+        else:
+            footer = self._text(
+                "Esc/Backspace: back | L: language",
+                "Esc/Backspace: wróć | L: język",
+            )
+
+        self._draw_footer(footer)
 
     def _draw_intro_section(
         self,
@@ -445,8 +513,8 @@ class UnifiedAppShell:
             self._render_scene(scene)
         self._draw_footer(
             self._text(
-                "Esc: pause | H: help | L: language",
-                "Esc: pauza | H: pomoc | L: zmień język",
+                "Esc: pause | H: help | T: theory | L: language",
+                "Esc: pauza | H: pomoc | T: teoria | L: język",
             ),
         )
 
@@ -493,6 +561,7 @@ class UnifiedAppShell:
         labels = [
             self._text("Resume", "Wróć"),
             self._text("Help", "Pomoc"),
+            self._text("Theory", "Teoria"),
             self._text("Restart", "Restart"),
             self._text("Settings", "Ustawienia"),
             self._text("Back to demos", "Lista dem"),
@@ -501,8 +570,8 @@ class UnifiedAppShell:
         self._draw_menu(labels, top=220)
         self._draw_footer(
             self._text(
-                "Esc: resume | Enter: select | L: language",
-                "Esc: wróć | Enter: wybierz | L: zmień język",
+                "Esc: resume | Enter: select | T: theory | L: language",
+                "Esc: wróć | Enter: wybierz | T: teoria | L: język",
             ),
         )
 
@@ -715,6 +784,7 @@ class UnifiedAppShell:
             ScreenName.LEVELS: self._select_level,
             ScreenName.DEMOS: self._select_demo,
             ScreenName.INTRO: self._start_demo,
+            ScreenName.THEORY: self._activate_theory,
             ScreenName.DEMO: self._open_pause,
             ScreenName.SETTINGS: self._select_settings_item,
             ScreenName.PAUSE: self._select_pause_item,
@@ -749,11 +819,14 @@ class UnifiedAppShell:
             self.help_visible = not self.help_visible
         elif self.selected_index == 2:
             self.help_visible = False
+            self._open_theory()
+        elif self.selected_index == 3:
+            self.help_visible = False
             self._restart_current_demo()
             self._go_to(ScreenName.DEMO)
-        elif self.selected_index == 3:
-            self._open_settings()
         elif self.selected_index == 4:
+            self._open_settings()
+        elif self.selected_index == 5:
             self.help_visible = False
             self.scene_manager.clear()
             self._go_to(ScreenName.DEMOS)
@@ -785,6 +858,8 @@ class UnifiedAppShell:
             self._go_to(ScreenName.LEVELS)
         elif self.screen_name == ScreenName.INTRO:
             self._go_to(ScreenName.DEMOS)
+        elif self.screen_name == ScreenName.THEORY:
+            self._go_to(self.theory_return_screen)
         elif self.screen_name == ScreenName.DEMO:
             self._open_pause()
         elif self.screen_name == ScreenName.SETTINGS:
@@ -800,7 +875,7 @@ class UnifiedAppShell:
         self._go_to(self.previous_screen)
 
     def _open_settings(self) -> None:
-        if self.screen_name in {ScreenName.DEMO, ScreenName.SETTINGS}:
+        if self.screen_name in {ScreenName.DEMO, ScreenName.SETTINGS, ScreenName.THEORY}:
             return
 
         self.help_visible = False
@@ -809,6 +884,25 @@ class UnifiedAppShell:
 
     def _toggle_help(self) -> None:
         self.help_visible = not self.help_visible
+
+    def _open_theory(self) -> None:
+        if self.screen_name not in {
+            ScreenName.INTRO,
+            ScreenName.DEMO,
+            ScreenName.PAUSE,
+        }:
+            return
+
+        self.help_visible = False
+        self.theory_return_screen = self.screen_name
+        self._go_to(ScreenName.THEORY)
+
+    def _activate_theory(self) -> None:
+        if self.theory_return_screen == ScreenName.INTRO:
+            self._start_demo()
+            return
+
+        self._go_to(self.theory_return_screen)
 
     def _toggle_language(self) -> None:
         if self.context.settings.language == "pl":
@@ -847,9 +941,10 @@ class UnifiedAppShell:
             ScreenName.LEVELS: len(levels_from_manifests()),
             ScreenName.DEMOS: len(self._current_level_demos()),
             ScreenName.INTRO: 1,
+            ScreenName.THEORY: 1,
             ScreenName.DEMO: 1,
             ScreenName.SETTINGS: 6,
-            ScreenName.PAUSE: 6,
+            ScreenName.PAUSE: 7,
         }
         return max(1, counts[self.screen_name])
 

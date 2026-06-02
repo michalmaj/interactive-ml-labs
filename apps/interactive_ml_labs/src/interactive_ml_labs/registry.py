@@ -9,7 +9,14 @@ from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
 from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
-from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
+from interactive_ml_labs.manifest import (
+    ControlBinding,
+    DemoManifest,
+    DemoTheory,
+    LevelManifest,
+    LocalizedText,
+    TheorySection,
+)
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 from interactive_ml_labs.scene import Scene
@@ -62,6 +69,7 @@ def _placeholder_demo(
     controls: tuple[ControlBinding, ...] | None = None,
     create_scene: Callable[[object], Scene] | None = None,
     difficulty: LocalizedText | None = None,
+    theory: DemoTheory | None = None,
 ) -> DemoManifest:
     """Build a placeholder manifest for a demo."""
     return DemoManifest(
@@ -104,6 +112,7 @@ def _placeholder_demo(
         ),
         difficulty=difficulty or LocalizedText(en="Introductory", pl="Wprowadzający"),
         tags=tags,
+        theory=theory,
     )
 
 
@@ -159,6 +168,110 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         ),
         create_scene=create_gradient_descent_scene,
         tags=("regression", "optimization"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Gradient descent tries to find model parameters that make "
+                                "loss smaller."
+                            ),
+                            pl=(
+                                "Gradient descent szuka takich parametrów modelu, "
+                                "żeby loss był coraz mniejszy."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Here the model is a straight line, so the moving parts are "
+                                "weight and bias."
+                            ),
+                            pl=(
+                                "Tutaj model jest prostą, więc najważniejsze parametry "
+                                "to weight i bias."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Why it works", pl="Dlaczego to działa"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "The gradient points toward the steepest loss increase, "
+                                "so training steps in the opposite direction."
+                            ),
+                            pl=(
+                                "Gradient wskazuje kierunek najszybszego wzrostu loss, "
+                                "więc trening idzie w stronę przeciwną."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Learning rate decides how large each step is. Too small is slow; "
+                                "too large can overshoot."
+                            ),
+                            pl=(
+                                "Learning rate decyduje o wielkości kroku. Za mały działa wolno, "
+                                "za duży może przeskakiwać dobre rozwiązanie."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Watch the regression line move and compare it with the loss "
+                                "history chart."
+                            ),
+                            pl=(
+                                "Patrz, jak przesuwa się linia regresji, i porównuj to "
+                                "z wykresem historii loss."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "More noise makes the target harder because the data no longer "
+                                "sits close to one clean line."
+                            ),
+                            pl=(
+                                "Większy szum utrudnia zadanie, bo punkty nie leżą już blisko "
+                                "jednej czystej prostej."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "A lower loss is not magic; it means predictions are closer "
+                                "to the training targets."
+                            ),
+                            pl=(
+                                "Niższy loss to nie magia: oznacza, że predykcje są bliżej "
+                                "wartości z danych treningowych."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "If loss jumps around, learning rate is often too aggressive "
+                                "for the current data."
+                            ),
+                            pl=(
+                                "Jeśli loss skacze, learning rate często jest zbyt agresywny "
+                                "dla aktualnych danych."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
     ),
     _placeholder_demo(
         demo_id="knn_vote_map",

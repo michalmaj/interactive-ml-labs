@@ -29,7 +29,14 @@ from interactive_ml_labs.logistic_scene import (
     LogisticRegressionSceneAdapter,
     create_logistic_regression_scene,
 )
-from interactive_ml_labs.manifest import ControlBinding, DemoManifest, LevelManifest, LocalizedText
+from interactive_ml_labs.manifest import (
+    ControlBinding,
+    DemoManifest,
+    DemoTheory,
+    LevelManifest,
+    LocalizedText,
+    TheorySection,
+)
 from interactive_ml_labs.random_forest_scene import (
     RandomForestSceneAdapter,
     create_random_forest_scene,
@@ -69,6 +76,7 @@ __all__ = [
     "ControlBinding",
     "DecisionTreeSceneAdapter",
     "DemoManifest",
+    "DemoTheory",
     "FixedSizeScene",
     "GradientDescentSceneAdapter",
     "KNNVoteMapSceneAdapter",
@@ -82,6 +90,7 @@ __all__ = [
     "SceneCommandKind",
     "SceneManager",
     "Size",
+    "TheorySection",
     "center_rect",
     "choose_adaptive_window_size",
     "create_boosting_mistake_lab_scene",
