@@ -18,6 +18,7 @@ from decision_tree_splitter.tree import DecisionTreeNode
 type FloatArray = NDArray[np.float64]
 type IntArray = NDArray[np.int_]
 type BoolArray = NDArray[np.bool_]
+type CopyTable = dict[str, dict[str, str]]
 
 WINDOW_WIDTH: Final[int] = 1120
 WINDOW_HEIGHT: Final[int] = 740
@@ -67,6 +68,46 @@ REGION_COLORS: Final[dict[int, tuple[int, int, int]]] = {
     CLASS_ZERO_LABEL: CLASS_ZERO_REGION_COLOR,
     CLASS_ONE_LABEL: CLASS_ONE_REGION_COLOR,
 }
+UI_COPY: Final[CopyTable] = {
+    "auto_title": {"en": "Automatic recursive tree", "pl": "Automatyczne drzewo"},
+    "manual_title": {"en": "Manual split mode", "pl": "Manual split"},
+    "manual_invalid_title": {
+        "en": "Manual split mode - invalid split",
+        "pl": "Manual split - split niepoprawny",
+    },
+    "title": {"en": "Decision tree", "pl": "Decision tree"},
+    "mode": {"en": "Mode", "pl": "Tryb"},
+    "dataset": {"en": "Dataset", "pl": "Dataset"},
+    "criterion": {"en": "Criterion", "pl": "Criterion"},
+    "max_depth": {"en": "Max depth", "pl": "Max depth"},
+    "actual_depth": {"en": "Actual depth", "pl": "Depth"},
+    "accuracy": {"en": "Accuracy", "pl": "Accuracy"},
+    "nodes": {"en": "Nodes", "pl": "Węzły"},
+    "leaves": {"en": "Leaves", "pl": "Liście"},
+    "noise": {"en": "Noise", "pl": "Szum"},
+    "seed": {"en": "Seed", "pl": "Seed"},
+    "challenge": {"en": "Challenge", "pl": "Cel"},
+    "status": {"en": "Status", "pl": "Status"},
+    "depth": {"en": "Depth", "pl": "Depth"},
+    "manual_split": {"en": "Manual split", "pl": "Manual split"},
+    "rule": {"en": "Rule", "pl": "Reguła"},
+    "gain": {"en": "Gain", "pl": "Gain"},
+    "parent_imp": {"en": "Parent imp.", "pl": "Parent imp."},
+    "left_imp": {"en": "Left imp.", "pl": "Left imp."},
+    "right_imp": {"en": "Right imp.", "pl": "Right imp."},
+    "root_split": {"en": "Root split", "pl": "Root split"},
+    "no_split": {"en": "No split selected.", "pl": "Brak splitu."},
+    "controls": {
+        "en": (
+            "M: mode   D: dataset   G: criterion   F: manual feature   "
+            "Q/E: threshold   Up/Down: depth   Left/Right: noise   S: seed"
+        ),
+        "pl": (
+            "M: tryb   D: dataset   G: criterion   F: feature splitu   "
+            "Q/E: threshold   Up/Down: depth   Left/Right: szum   S: seed"
+        ),
+    },
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -82,7 +123,13 @@ class WorldBounds:
 class DecisionTreeRenderer:
     """Render decision tree state using Pygame."""
 
-    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        *,
+        present_frame: bool = True,
+        language: str = "en",
+    ) -> None:
         """Initialize renderer resources.
 
         Args:
@@ -90,6 +137,7 @@ class DecisionTreeRenderer:
         """
         self._screen = screen
         self._present_frame = present_frame
+        self._language = _normalize_language(language)
         self._font = pygame.font.Font(None, 28)
         self._small_font = pygame.font.Font(None, 22)
         self._title_font = pygame.font.Font(None, 36)
@@ -179,7 +227,7 @@ class DecisionTreeRenderer:
         self._draw_points(features, targets, predictions, bounds)
 
         self._draw_text(
-            "Automatic recursive tree",
+            self._copy("auto_title"),
             MAIN_RECT.left + PADDING,
             MAIN_RECT.top + 18,
             self._font,
@@ -240,10 +288,10 @@ class DecisionTreeRenderer:
 
     def _draw_manual_title(self, manual_error: str | None) -> None:
         """Draw manual split plot title."""
-        title = "Manual split mode"
+        title = self._copy("manual_title")
 
         if manual_error is not None:
-            title = "Manual split mode — invalid split"
+            title = self._copy("manual_invalid_title")
 
         self._draw_text(
             title,
@@ -397,20 +445,20 @@ class DecisionTreeRenderer:
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 22
 
-        self._draw_text("Decision tree", x, y, self._title_font, TEXT_COLOR)
+        self._draw_text(self._copy("title"), x, y, self._title_font, TEXT_COLOR)
         y += 44
 
         rows = [
-            ("Mode", mode),
-            ("Dataset", dataset_kind),
-            ("Criterion", str(snapshot.metrics["criterion"])),
-            ("Max depth", f"{float(snapshot.metrics['max_depth']):.0f}"),
-            ("Actual depth", f"{float(snapshot.metrics['actual_depth']):.0f}"),
-            ("Accuracy", f"{float(snapshot.metrics['training_accuracy']):.3f}"),
-            ("Nodes", f"{float(snapshot.metrics['node_count']):.0f}"),
-            ("Leaves", f"{float(snapshot.metrics['leaf_count']):.0f}"),
-            ("Noise", f"{noise_std:.2f}"),
-            ("Seed", str(seed)),
+            (self._copy("mode"), _mode_text(mode, self._language)),
+            (self._copy("dataset"), dataset_kind),
+            (self._copy("criterion"), str(snapshot.metrics["criterion"])),
+            (self._copy("max_depth"), f"{float(snapshot.metrics['max_depth']):.0f}"),
+            (self._copy("actual_depth"), f"{float(snapshot.metrics['actual_depth']):.0f}"),
+            (self._copy("accuracy"), f"{float(snapshot.metrics['training_accuracy']):.3f}"),
+            (self._copy("nodes"), f"{float(snapshot.metrics['node_count']):.0f}"),
+            (self._copy("leaves"), f"{float(snapshot.metrics['leaf_count']):.0f}"),
+            (self._copy("noise"), f"{noise_std:.2f}"),
+            (self._copy("seed"), str(seed)),
         ]
 
         for label, value in rows:
@@ -441,17 +489,17 @@ class DecisionTreeRenderer:
         y: int,
     ) -> None:
         """Draw challenge status and targets."""
-        self._draw_text("Challenge", x, y, self._font, TEXT_COLOR)
+        self._draw_text(self._copy("challenge"), x, y, self._font, TEXT_COLOR)
         y += 26
 
         rows = [
-            ("Status", challenge_result.status),
+            (self._copy("status"), _status_text(challenge_result.status, self._language)),
             (
-                "Accuracy",
+                self._copy("accuracy"),
                 f"{challenge_result.accuracy:.2f}/{challenge_result.target_accuracy:.2f}",
             ),
             (
-                "Depth",
+                self._copy("depth"),
                 f"{challenge_result.max_depth}/{challenge_result.max_allowed_depth}",
             ),
         ]
@@ -472,23 +520,35 @@ class DecisionTreeRenderer:
         y: int,
     ) -> None:
         """Draw manual split metrics."""
-        self._draw_text("Manual split", x, y, self._font, TEXT_COLOR)
+        self._draw_text(self._copy("manual_split"), x, y, self._font, TEXT_COLOR)
         y += 28
 
         rows = [
-            ("Rule", f"x{feature_index + 1} <= {threshold:.3f}"),
+            (self._copy("rule"), f"x{feature_index + 1} <= {threshold:.3f}"),
         ]
 
         if manual_snapshot is None:
-            rows.append(("Status", "invalid"))
+            rows.append((self._copy("status"), _valid_text(False, self._language)))
         else:
             rows.extend(
                 [
-                    ("Status", "valid"),
-                    ("Gain", f"{float(manual_snapshot.metrics['information_gain']):.4f}"),
-                    ("Parent imp.", f"{float(manual_snapshot.metrics['parent_impurity']):.3f}"),
-                    ("Left imp.", f"{float(manual_snapshot.metrics['left_impurity']):.3f}"),
-                    ("Right imp.", f"{float(manual_snapshot.metrics['right_impurity']):.3f}"),
+                    (self._copy("status"), _valid_text(True, self._language)),
+                    (
+                        self._copy("gain"),
+                        f"{float(manual_snapshot.metrics['information_gain']):.4f}",
+                    ),
+                    (
+                        self._copy("parent_imp"),
+                        f"{float(manual_snapshot.metrics['parent_impurity']):.3f}",
+                    ),
+                    (
+                        self._copy("left_imp"),
+                        f"{float(manual_snapshot.metrics['left_impurity']):.3f}",
+                    ),
+                    (
+                        self._copy("right_imp"),
+                        f"{float(manual_snapshot.metrics['right_impurity']):.3f}",
+                    ),
                 ],
             )
 
@@ -510,19 +570,19 @@ class DecisionTreeRenderer:
         """Draw root split summary."""
         root = _extract_root(snapshot)
 
-        self._draw_text("Root split", x, y, self._font, TEXT_COLOR)
+        self._draw_text(self._copy("root_split"), x, y, self._font, TEXT_COLOR)
         y += 28
 
         if root.is_leaf or root.split_evaluation is None:
-            self._draw_text("No split selected.", x, y, self._small_font, MUTED_TEXT_COLOR)
+            self._draw_text(self._copy("no_split"), x, y, self._small_font, MUTED_TEXT_COLOR)
             return
 
         candidate = root.split_evaluation.candidate
         rows = [
-            ("Rule", f"x{candidate.feature_index + 1} <= {candidate.threshold:.3f}"),
-            ("Gain", f"{root.split_evaluation.information_gain:.4f}"),
-            ("Left imp.", f"{root.split_evaluation.left_impurity:.3f}"),
-            ("Right imp.", f"{root.split_evaluation.right_impurity:.3f}"),
+            (self._copy("rule"), f"x{candidate.feature_index + 1} <= {candidate.threshold:.3f}"),
+            (self._copy("gain"), f"{root.split_evaluation.information_gain:.4f}"),
+            (self._copy("left_imp"), f"{root.split_evaluation.left_impurity:.3f}"),
+            (self._copy("right_imp"), f"{root.split_evaluation.right_impurity:.3f}"),
         ]
 
         for label, value in rows:
@@ -542,17 +602,14 @@ class DecisionTreeRenderer:
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
 
-        controls = (
-            "M: mode   D: dataset   G: criterion   F: manual feature   "
-            "Q/E: threshold   Up/Down: depth   Left/Right: noise   S: seed"
-        )
-        self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
+        self._draw_text(self._copy("controls"), x, y, self._small_font, TEXT_COLOR)
 
         explanation = build_explanation_text(
             snapshot,
             mode=mode,
             manual_error=manual_error,
             challenge_result=challenge_result,
+            language=self._language,
         )
         self._draw_text(
             explanation,
@@ -561,6 +618,10 @@ class DecisionTreeRenderer:
             self._small_font,
             MUTED_TEXT_COLOR,
         )
+
+    def _copy(self, key: str) -> str:
+        """Return localized UI copy."""
+        return UI_COPY[key][self._language]
 
     def _draw_text(
         self,
@@ -584,6 +645,41 @@ def _extract_root(snapshot: AlgorithmSnapshot) -> DecisionTreeNode:
         raise TypeError(msg)
 
     return root
+
+
+def _normalize_language(language: str) -> str:
+    """Return a supported UI language code."""
+    if language.lower().startswith("pl"):
+        return "pl"
+
+    return "en"
+
+
+def _status_text(status: str, language: str) -> str:
+    """Return a localized compact status label."""
+    if language != "pl":
+        return status
+
+    return {"success": "gotowe", "failed": "do poprawy"}.get(status, status)
+
+
+def _valid_text(value: bool, language: str) -> str:
+    """Return localized valid/invalid text."""
+    if language == "pl":
+        return "poprawny" if value else "niepoprawny"
+
+    return "valid" if value else "invalid"
+
+
+def _mode_text(mode: str, language: str) -> str:
+    """Return localized mode text."""
+    if language != "pl":
+        return mode
+
+    return {
+        MODE_AUTO_TREE: "auto",
+        MODE_MANUAL_SPLIT: "manual",
+    }.get(mode, mode)
 
 
 def _compute_world_bounds(features: FloatArray) -> WorldBounds:

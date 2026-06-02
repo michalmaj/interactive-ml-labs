@@ -58,9 +58,19 @@ class DecisionTreeSplitterScene:
 
     fixed_scene_size = WINDOW_SIZE
 
-    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        *,
+        present_frame: bool = True,
+        language: str = "en",
+    ) -> None:
         """Initialize the scene with a target screen."""
-        self._renderer = DecisionTreeRenderer(screen, present_frame=present_frame)
+        self._renderer = DecisionTreeRenderer(
+            screen,
+            present_frame=present_frame,
+            language=language,
+        )
         self._challenge = DecisionTreeChallenge()
 
         self._mode = MODE_AUTO_TREE

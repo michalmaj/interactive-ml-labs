@@ -36,6 +36,21 @@ def test_knn_scene_adapter_translates_escape_to_pause(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_knn_scene_adapter_passes_shell_language(monkeypatch) -> None:
+    """The wrapped k-NN demo should use the shell language setting."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.settings.language = "pl"
+        scene = create_knn_vote_map_scene(context)
+
+        assert scene._scene._renderer._language == "pl"
+    finally:
+        pygame.quit()
+
+
 def test_knn_scene_adapter_updates_and_renders_to_shell_surface(monkeypatch) -> None:
     """The adapter should update and draw without presenting its own frame."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")

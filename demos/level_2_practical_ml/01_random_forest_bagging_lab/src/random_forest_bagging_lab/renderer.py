@@ -23,6 +23,7 @@ from random_forest_bagging_lab.report import ModelComparisonReport, ModelReportM
 
 type FloatArray = NDArray[np.float64]
 type IntArray = NDArray[np.int_]
+type CopyTable = dict[str, dict[str, str]]
 
 WINDOW_WIDTH: Final[int] = 1320
 WINDOW_HEIGHT: Final[int] = 780
@@ -76,6 +77,48 @@ REGION_COLORS: Final[dict[int, tuple[int, int, int]]] = {
     CLASS_ZERO_LABEL: CLASS_ZERO_REGION_COLOR,
     CLASS_ONE_LABEL: CLASS_ONE_REGION_COLOR,
 }
+UI_COPY: Final[CopyTable] = {
+    "single_tree": {"en": "Single tree baseline", "pl": "Single tree baseline"},
+    "random_forest": {"en": "Random forest", "pl": "Random forest"},
+    "title": {"en": "Random Forest", "pl": "Random Forest"},
+    "dataset": {"en": "Dataset", "pl": "Dataset"},
+    "noise": {"en": "Noise", "pl": "Szum"},
+    "seed": {"en": "Seed", "pl": "Seed"},
+    "trees": {"en": "Trees", "pl": "Drzewa"},
+    "max_depth": {"en": "Max depth", "pl": "Max depth"},
+    "bootstrap": {"en": "Bootstrap", "pl": "Bootstrap"},
+    "confidence_view": {"en": "Conf. view", "pl": "Confidence"},
+    "challenge": {"en": "Challenge", "pl": "Cel"},
+    "target": {"en": "Target", "pl": "Target"},
+    "tree_limit": {"en": "Tree limit", "pl": "Limit drzew"},
+    "gap_limit": {"en": "Gap limit", "pl": "Limit gap"},
+    "single_tree_short": {"en": "Single tree", "pl": "Single tree"},
+    "forest": {"en": "Forest", "pl": "Forest"},
+    "train": {"en": "Train", "pl": "Train"},
+    "test": {"en": "Test", "pl": "Test"},
+    "gap": {"en": "Gap", "pl": "Gap"},
+    "confidence": {"en": "Conf.", "pl": "Conf."},
+    "controls": {
+        "en": (
+            "D: dataset   Up/Down: trees   W/S: max depth   "
+            "B/V: bootstrap ratio   C: confidence view   Left/Right: noise   N: seed"
+        ),
+        "pl": (
+            "D: dataset   Up/Down: drzewa   W/S: max depth   "
+            "B/V: bootstrap ratio   C: confidence view   Left/Right: szum   N: seed"
+        ),
+    },
+    "legend": {
+        "en": (
+            "Circles = train, squares = test, X = misclassified test. "
+            "Left = one tree, right = forest voting."
+        ),
+        "pl": (
+            "Kółka = train, kwadraty = test, X = błędny test. "
+            "Lewa strona = jedno drzewo, prawa = głosowanie forest."
+        ),
+    },
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -91,10 +134,17 @@ class WorldBounds:
 class RandomForestRenderer:
     """Render single-tree and random-forest comparison using Pygame."""
 
-    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        *,
+        present_frame: bool = True,
+        language: str = "en",
+    ) -> None:
         """Initialize renderer resources."""
         self._screen = screen
         self._present_frame = present_frame
+        self._language = _normalize_language(language)
         self._font = pygame.font.Font(None, 28)
         self._small_font = pygame.font.Font(None, 22)
         self._title_font = pygame.font.Font(None, 34)
@@ -130,7 +180,7 @@ class RandomForestRenderer:
         )
 
         self._draw_model_panel(
-            title="Single tree baseline",
+            title=self._copy("single_tree"),
             rect=LEFT_PLOT_RECT,
             model=baseline_model,
             snapshot=baseline_snapshot,
@@ -138,7 +188,7 @@ class RandomForestRenderer:
             confidence_view_enabled=False,
         )
         self._draw_model_panel(
-            title="Random forest",
+            title=self._copy("random_forest"),
             rect=RIGHT_PLOT_RECT,
             model=forest_model,
             snapshot=forest_snapshot,
@@ -314,33 +364,42 @@ class RandomForestRenderer:
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 20
 
-        self._draw_text("Random Forest", x, y, self._title_font, TEXT_COLOR)
+        self._draw_text(self._copy("title"), x, y, self._title_font, TEXT_COLOR)
         y += 38
 
         rows = [
-            ("Dataset", dataset_kind),
-            ("Noise", f"{noise_std:.2f}"),
-            ("Seed", str(seed)),
-            ("Trees", str(tree_count)),
-            ("Max depth", str(max_depth)),
-            ("Bootstrap", f"{bootstrap_sample_ratio:.2f}"),
-            ("Conf. view", _enabled_text(confidence_view_enabled)),
-            ("Challenge", challenge_result.status),
-            ("Target", build_challenge_target_text(challenge_result)),
-            ("Tree limit", build_tree_limit_text(challenge_result)),
-            ("Gap limit", build_gap_limit_text(challenge_result)),
+            (self._copy("dataset"), dataset_kind),
+            (self._copy("noise"), f"{noise_std:.2f}"),
+            (self._copy("seed"), str(seed)),
+            (self._copy("trees"), str(tree_count)),
+            (self._copy("max_depth"), str(max_depth)),
+            (self._copy("bootstrap"), f"{bootstrap_sample_ratio:.2f}"),
+            (self._copy("confidence_view"), _enabled_text(confidence_view_enabled, self._language)),
+            (self._copy("challenge"), _status_text(challenge_result.status, self._language)),
+            (self._copy("target"), build_challenge_target_text(challenge_result)),
+            (self._copy("tree_limit"), build_tree_limit_text(challenge_result)),
+            (self._copy("gap_limit"), build_gap_limit_text(challenge_result)),
         ]
 
         for label, value in rows:
-            color = _challenge_color(value) if label == "Challenge" else TEXT_COLOR
+            color = (
+                _challenge_color(challenge_result.status)
+                if label == self._copy("challenge")
+                else TEXT_COLOR
+            )
             self._draw_text(f"{label}:", x, y, self._small_font, MUTED_TEXT_COLOR)
             self._draw_text(value, x + 126, y, self._small_font, color)
             y += SMALL_TEXT_LINE_HEIGHT
 
         y += 4
-        self._draw_model_metrics("Single tree", comparison_report.single_tree, x, y)
+        self._draw_model_metrics(
+            self._copy("single_tree_short"),
+            comparison_report.single_tree,
+            x,
+            y,
+        )
         y += 88
-        self._draw_model_metrics("Forest", comparison_report.forest, x, y)
+        self._draw_model_metrics(self._copy("forest"), comparison_report.forest, x, y)
 
     def _draw_model_metrics(
         self,
@@ -354,13 +413,13 @@ class RandomForestRenderer:
         y += 24
 
         rows = [
-            ("Train", f"{metrics.train_accuracy:.3f}"),
-            ("Test", f"{metrics.test_accuracy:.3f}"),
-            ("Gap", f"{metrics.generalization_gap:.3f}"),
+            (self._copy("train"), f"{metrics.train_accuracy:.3f}"),
+            (self._copy("test"), f"{metrics.test_accuracy:.3f}"),
+            (self._copy("gap"), f"{metrics.generalization_gap:.3f}"),
         ]
 
         if metrics.mean_test_confidence is not None:
-            rows.append(("Conf.", f"{metrics.mean_test_confidence:.3f}"))
+            rows.append((self._copy("confidence"), f"{metrics.mean_test_confidence:.3f}"))
 
         for label, value in rows:
             self._draw_text(f"{label}:", x, y, self._small_font, MUTED_TEXT_COLOR)
@@ -377,21 +436,19 @@ class RandomForestRenderer:
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
 
-        controls = (
-            "D: dataset   Up/Down: trees   W/S: max depth   "
-            "B/V: bootstrap ratio   C: confidence view   Left/Right: noise   N: seed"
+        self._draw_text(self._copy("controls"), x, y, self._small_font, TEXT_COLOR)
+        self._draw_text(
+            self._copy("legend"),
+            x,
+            y + TEXT_LINE_HEIGHT,
+            self._small_font,
+            MUTED_TEXT_COLOR,
         )
-        self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
-
-        legend = (
-            "Circles = train, squares = test, X = misclassified test. "
-            "Left = one tree, right = forest voting."
-        )
-        self._draw_text(legend, x, y + TEXT_LINE_HEIGHT, self._small_font, MUTED_TEXT_COLOR)
 
         bottom_message = build_bottom_panel_explanation(
             confidence_view_enabled=confidence_view_enabled,
             challenge_result=challenge_result,
+            language=self._language,
         )
         self._draw_text(
             bottom_message,
@@ -400,6 +457,10 @@ class RandomForestRenderer:
             self._small_font,
             MUTED_TEXT_COLOR,
         )
+
+    def _copy(self, key: str) -> str:
+        """Return localized UI copy."""
+        return UI_COPY[key][self._language]
 
     def _draw_text(
         self,
@@ -473,12 +534,31 @@ def _challenge_color(value: str) -> tuple[int, int, int]:
     return ERROR_COLOR
 
 
-def _enabled_text(value: bool) -> str:
+def _enabled_text(value: bool, language: str = "en") -> str:
     """Return short enabled/disabled text."""
+    if language == "pl":
+        return "wł." if value else "wył."
+
     if value:
         return "on"
 
     return "off"
+
+
+def _status_text(status: str, language: str) -> str:
+    """Return a localized compact status label."""
+    if language == "pl":
+        return {"success": "gotowe", "failed": "do poprawy"}.get(status, status)
+
+    return status
+
+
+def _normalize_language(language: str) -> str:
+    """Return a supported UI language code."""
+    if language.lower().startswith("pl"):
+        return "pl"
+
+    return "en"
 
 
 def _compute_world_bounds(train_features: FloatArray, test_features: FloatArray) -> WorldBounds:

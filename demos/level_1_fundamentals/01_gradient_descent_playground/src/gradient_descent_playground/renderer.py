@@ -14,6 +14,7 @@ from gradient_descent_playground.challenge import ChallengeResult
 from gradient_descent_playground.explanation import build_explanation_lines
 
 type FloatArray = NDArray[np.float64]
+type CopyTable = dict[str, dict[str, str]]
 
 WINDOW_WIDTH: Final[int] = 1100
 WINDOW_HEIGHT: Final[int] = 720
@@ -42,6 +43,33 @@ SMALL_TEXT_LINE_HEIGHT: Final[int] = 22
 
 MIN_WORLD_SPAN: Final[float] = 1.0
 WORLD_MARGIN_RATIO: Final[float] = 0.12
+UI_COPY: Final[CopyTable] = {
+    "data_world": {"en": "Data world", "pl": "Świat danych"},
+    "algorithm": {"en": "Algorithm", "pl": "Algorytm"},
+    "status": {"en": "Status", "pl": "Status"},
+    "running": {"en": "Running", "pl": "Działa"},
+    "step": {"en": "Step", "pl": "Krok"},
+    "loss": {"en": "Loss", "pl": "Loss"},
+    "weight": {"en": "Weight", "pl": "Weight"},
+    "bias": {"en": "Bias", "pl": "Bias"},
+    "learning_rate": {"en": "Learning rate", "pl": "Learning rate"},
+    "noise_std": {"en": "Noise std", "pl": "Szum"},
+    "seed": {"en": "Seed", "pl": "Seed"},
+    "loss_history": {"en": "Loss history", "pl": "Historia loss"},
+    "challenge": {"en": "Challenge", "pl": "Cel"},
+    "target_loss": {"en": "Target loss", "pl": "Target loss"},
+    "steps_left": {"en": "Steps left", "pl": "Kroki"},
+    "controls": {
+        "en": (
+            "Space: run/pause   N: step   R: reset   "
+            "Up/Down: learning rate   Left/Right: noise   S: seed   Esc: quit"
+        ),
+        "pl": (
+            "Space: start/pauza   N: krok   R: reset   "
+            "Up/Down: learning rate   Left/Right: szum   S: seed   Esc: wyjście"
+        ),
+    },
+}
 
 
 @dataclass(slots=True)
@@ -57,7 +85,13 @@ class WorldBounds:
 class GradientDescentRenderer:
     """Render Gradient Descent Playground state using Pygame."""
 
-    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        *,
+        present_frame: bool = True,
+        language: str = "en",
+    ) -> None:
         """Initialize renderer resources.
 
         Args:
@@ -65,6 +99,7 @@ class GradientDescentRenderer:
         """
         self._screen = screen
         self._present_frame = present_frame
+        self._language = _normalize_language(language)
         self._font = pygame.font.Font(None, 28)
         self._small_font = pygame.font.Font(None, 22)
         self._title_font = pygame.font.Font(None, 36)
@@ -129,7 +164,7 @@ class GradientDescentRenderer:
         self._draw_regression_line(snapshot, bounds)
 
         self._draw_text(
-            "Data world",
+            self._copy("data_world"),
             MAIN_RECT.left + PADDING,
             MAIN_RECT.top + 18,
             self._font,
@@ -191,19 +226,19 @@ class GradientDescentRenderer:
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 22
 
-        self._draw_text("Algorithm", x, y, self._title_font, TEXT_COLOR)
+        self._draw_text(self._copy("algorithm"), x, y, self._title_font, TEXT_COLOR)
         y += 46
 
         rows = [
-            ("Status", snapshot.status),
-            ("Running", "yes" if running else "no"),
-            ("Step", str(snapshot.iteration)),
-            ("Loss", f"{float(snapshot.metrics['loss']):.6f}"),
-            ("Weight", f"{float(snapshot.metrics['weight']):.6f}"),
-            ("Bias", f"{float(snapshot.metrics['bias']):.6f}"),
-            ("Learning rate", f"{float(snapshot.metrics['learning_rate']):.4f}"),
-            ("Noise std", f"{noise_std:.2f}"),
-            ("Seed", str(seed)),
+            (self._copy("status"), _status_text(snapshot.status, self._language)),
+            (self._copy("running"), _yes_no(running, self._language)),
+            (self._copy("step"), str(snapshot.iteration)),
+            (self._copy("loss"), f"{float(snapshot.metrics['loss']):.6f}"),
+            (self._copy("weight"), f"{float(snapshot.metrics['weight']):.6f}"),
+            (self._copy("bias"), f"{float(snapshot.metrics['bias']):.6f}"),
+            (self._copy("learning_rate"), f"{float(snapshot.metrics['learning_rate']):.4f}"),
+            (self._copy("noise_std"), f"{noise_std:.2f}"),
+            (self._copy("seed"), str(seed)),
         ]
 
         for label, value in rows:
@@ -212,20 +247,20 @@ class GradientDescentRenderer:
             y += SMALL_TEXT_LINE_HEIGHT
 
         y += 18
-        self._draw_text("Loss history", x, y, self._font, TEXT_COLOR)
+        self._draw_text(self._copy("loss_history"), x, y, self._font, TEXT_COLOR)
         y += 30
 
         loss_history = snapshot.visual_state["loss_history"]
         self._draw_loss_history(loss_history, pygame.Rect(x, y, 220, 110))
 
         y += 132
-        self._draw_text("Challenge", x, y, self._font, TEXT_COLOR)
+        self._draw_text(self._copy("challenge"), x, y, self._font, TEXT_COLOR)
         y += 28
 
         challenge_rows = [
-            ("Status", challenge_result.status),
-            ("Target loss", f"{challenge_result.target_loss:.4f}"),
-            ("Steps left", str(challenge_result.steps_remaining)),
+            (self._copy("status"), _status_text(challenge_result.status, self._language)),
+            (self._copy("target_loss"), f"{challenge_result.target_loss:.4f}"),
+            (self._copy("steps_left"), str(challenge_result.steps_remaining)),
         ]
 
         for label, value in challenge_rows:
@@ -268,14 +303,13 @@ class GradientDescentRenderer:
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
 
-        controls = (
-            "Space: run/pause   N: step   R: reset   "
-            "Up/Down: learning rate   Left/Right: noise   S: seed   Esc: quit"
+        self._draw_text(self._copy("controls"), x, y, self._small_font, TEXT_COLOR)
+
+        explanation_lines = build_explanation_lines(
+            snapshot,
+            challenge_result,
+            language=self._language,
         )
-
-        self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
-
-        explanation_lines = build_explanation_lines(snapshot, challenge_result)
         explanation_y = y + TEXT_LINE_HEIGHT
 
         for index, line in enumerate(explanation_lines):
@@ -286,6 +320,10 @@ class GradientDescentRenderer:
                 self._small_font,
                 MUTED_TEXT_COLOR,
             )
+
+    def _copy(self, key: str) -> str:
+        """Return localized UI copy."""
+        return UI_COPY[key][self._language]
 
     def _draw_text(
         self,
@@ -323,6 +361,37 @@ def _compute_world_bounds(
         y_min=y_min - y_margin,
         y_max=y_max + y_margin,
     )
+
+
+def _normalize_language(language: str) -> str:
+    """Return a supported UI language code."""
+    if language.lower().startswith("pl"):
+        return "pl"
+
+    return "en"
+
+
+def _yes_no(value: bool, language: str) -> str:
+    """Return a localized boolean label."""
+    if language == "pl":
+        return "tak" if value else "nie"
+
+    return "yes" if value else "no"
+
+
+def _status_text(status: str, language: str) -> str:
+    """Return a localized compact status label."""
+    if language != "pl":
+        return status
+
+    return {
+        "completed": "gotowe",
+        "running": "w toku",
+        "initialized": "start",
+        "success": "gotowe",
+        "failed": "nie",
+        "in_progress": "w toku",
+    }.get(status, status)
 
 
 def _world_to_screen(

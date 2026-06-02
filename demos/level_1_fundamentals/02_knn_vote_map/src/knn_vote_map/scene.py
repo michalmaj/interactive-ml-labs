@@ -40,9 +40,19 @@ LEFT_MOUSE_BUTTON: Final[int] = 1
 class KNNVoteMapScene:
     """Interactive scene for the k-NN Vote Map demo."""
 
-    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        *,
+        present_frame: bool = True,
+        language: str = "en",
+    ) -> None:
         """Initialize the scene with a target screen."""
-        self._renderer = KNNVoteMapRenderer(screen, present_frame=present_frame)
+        self._renderer = KNNVoteMapRenderer(
+            screen,
+            present_frame=present_frame,
+            language=language,
+        )
         self._challenge = KNNAccuracyChallenge()
 
         self._k = DEFAULT_UI_K
