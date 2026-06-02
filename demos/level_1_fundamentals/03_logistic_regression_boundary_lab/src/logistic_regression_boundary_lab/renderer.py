@@ -16,6 +16,7 @@ from logistic_regression_boundary_lab.probability_grid import ProbabilityGrid
 
 type FloatArray = NDArray[np.float64]
 type IntArray = NDArray[np.int_]
+type CopyTable = dict[str, dict[str, str]]
 
 WINDOW_WIDTH: Final[int] = 1100
 WINDOW_HEIGHT: Final[int] = 720
@@ -55,6 +56,36 @@ CLASS_COLORS: Final[dict[int, tuple[int, int, int]]] = {
     0: CLASS_ZERO_COLOR,
     1: CLASS_ONE_COLOR,
 }
+UI_COPY: Final[CopyTable] = {
+    "probability_background": {
+        "en": "Probability background",
+        "pl": "Tło probability",
+    },
+    "title": {"en": "Logistic regression", "pl": "Logistic regression"},
+    "running": {"en": "Running", "pl": "Działa"},
+    "step": {"en": "Step", "pl": "Krok"},
+    "loss": {"en": "Loss", "pl": "Loss"},
+    "accuracy": {"en": "Accuracy", "pl": "Accuracy"},
+    "precision": {"en": "Precision", "pl": "Precision"},
+    "recall": {"en": "Recall", "pl": "Recall"},
+    "threshold": {"en": "Threshold", "pl": "Threshold"},
+    "noise": {"en": "Noise", "pl": "Szum"},
+    "seed": {"en": "Seed", "pl": "Seed"},
+    "challenge": {"en": "Challenge", "pl": "Cel"},
+    "status": {"en": "Status", "pl": "Status"},
+    "confusion_matrix": {"en": "Confusion matrix", "pl": "Confusion matrix"},
+    "loss_history": {"en": "Loss history", "pl": "Historia loss"},
+    "controls": {
+        "en": (
+            "Space: run/pause   N: step   R: reset   Up/Down: learning rate   "
+            "Q/E: threshold   Left/Right: noise   S: seed   Esc: quit"
+        ),
+        "pl": (
+            "Space: start/pauza   N: krok   R: reset   Up/Down: learning rate   "
+            "Q/E: threshold   Left/Right: szum   S: seed   Esc: wyjście"
+        ),
+    },
+}
 
 
 @dataclass(slots=True)
@@ -70,7 +101,13 @@ class WorldBounds:
 class LogisticRegressionRenderer:
     """Render logistic regression state using Pygame."""
 
-    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        *,
+        present_frame: bool = True,
+        language: str = "en",
+    ) -> None:
         """Initialize renderer resources.
 
         Args:
@@ -78,6 +115,7 @@ class LogisticRegressionRenderer:
         """
         self._screen = screen
         self._present_frame = present_frame
+        self._language = _normalize_language(language)
         self._font = pygame.font.Font(None, 28)
         self._small_font = pygame.font.Font(None, 22)
         self._title_font = pygame.font.Font(None, 36)
@@ -156,7 +194,7 @@ class LogisticRegressionRenderer:
         self._draw_points(features, targets, predictions, bounds)
 
         self._draw_text(
-            "Probability background",
+            self._copy("probability_background"),
             MAIN_RECT.left + PADDING,
             MAIN_RECT.top + 18,
             self._font,
@@ -300,20 +338,20 @@ class LogisticRegressionRenderer:
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 22
 
-        self._draw_text("Logistic regression", x, y, self._title_font, TEXT_COLOR)
+        self._draw_text(self._copy("title"), x, y, self._title_font, TEXT_COLOR)
         y += 42
 
         rows = [
-            ("Running", "yes" if running else "no"),
-            ("Step", str(snapshot.iteration)),
-            ("Loss", f"{float(snapshot.metrics['loss']):.5f}"),
-            ("Accuracy", f"{float(snapshot.metrics['accuracy']):.3f}"),
-            ("Precision", f"{float(snapshot.metrics['precision']):.3f}"),
-            ("Recall", f"{float(snapshot.metrics['recall']):.3f}"),
+            (self._copy("running"), _yes_no(running, self._language)),
+            (self._copy("step"), str(snapshot.iteration)),
+            (self._copy("loss"), f"{float(snapshot.metrics['loss']):.5f}"),
+            (self._copy("accuracy"), f"{float(snapshot.metrics['accuracy']):.3f}"),
+            (self._copy("precision"), f"{float(snapshot.metrics['precision']):.3f}"),
+            (self._copy("recall"), f"{float(snapshot.metrics['recall']):.3f}"),
             ("LR", f"{float(snapshot.metrics['learning_rate']):.3f}"),
-            ("Threshold", f"{float(snapshot.metrics['threshold']):.2f}"),
-            ("Noise", f"{noise_std:.2f}"),
-            ("Seed", str(seed)),
+            (self._copy("threshold"), f"{float(snapshot.metrics['threshold']):.2f}"),
+            (self._copy("noise"), f"{noise_std:.2f}"),
+            (self._copy("seed"), str(seed)),
         ]
 
         for label, value in rows:
@@ -322,17 +360,17 @@ class LogisticRegressionRenderer:
             y += SMALL_TEXT_LINE_HEIGHT
 
         y += 6
-        self._draw_text("Challenge", x, y, self._font, TEXT_COLOR)
+        self._draw_text(self._copy("challenge"), x, y, self._font, TEXT_COLOR)
         y += 24
 
         challenge_rows = [
-            ("Status", challenge_result.status),
+            (self._copy("status"), _status_text(challenge_result.status, self._language)),
             (
-                "Precision",
+                self._copy("precision"),
                 f"{challenge_result.precision:.2f}/{challenge_result.target_precision:.2f}",
             ),
             (
-                "Recall",
+                self._copy("recall"),
                 f"{challenge_result.recall:.2f}/{challenge_result.target_recall:.2f}",
             ),
         ]
@@ -343,13 +381,13 @@ class LogisticRegressionRenderer:
             y += SMALL_TEXT_LINE_HEIGHT
 
         y += 4
-        self._draw_text("Confusion matrix", x, y, self._font, TEXT_COLOR)
+        self._draw_text(self._copy("confusion_matrix"), x, y, self._font, TEXT_COLOR)
         y += 23
 
         self._draw_confusion_matrix(snapshot, x, y)
         y += 48
 
-        self._draw_text("Loss history", x, y, self._font, TEXT_COLOR)
+        self._draw_text(self._copy("loss_history"), x, y, self._font, TEXT_COLOR)
         y += 23
 
         loss_history = tuple(float(value) for value in snapshot.visual_state["loss_history"])
@@ -419,14 +457,13 @@ class LogisticRegressionRenderer:
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
 
-        controls = (
-            "Space: run/pause   N: step   R: reset   Up/Down: learning rate   "
-            "Q/E: threshold   Left/Right: noise   S: seed   Esc: quit"
+        self._draw_text(self._copy("controls"), x, y, self._small_font, TEXT_COLOR)
+
+        explanation_lines = build_explanation_lines(
+            snapshot,
+            challenge_result,
+            language=self._language,
         )
-
-        self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
-
-        explanation_lines = build_explanation_lines(snapshot, challenge_result)
         explanation_y = y + TEXT_LINE_HEIGHT
 
         for index, line in enumerate(explanation_lines):
@@ -437,6 +474,10 @@ class LogisticRegressionRenderer:
                 self._small_font,
                 MUTED_TEXT_COLOR,
             )
+
+    def _copy(self, key: str) -> str:
+        """Return localized UI copy."""
+        return UI_COPY[key][self._language]
 
     def _draw_text(
         self,
@@ -459,6 +500,35 @@ def _bounds_from_probability_grid(probability_grid: ProbabilityGrid) -> WorldBou
         y_min=float(np.min(probability_grid.y_values)),
         y_max=float(np.max(probability_grid.y_values)),
     )
+
+
+def _normalize_language(language: str) -> str:
+    """Return a supported UI language code."""
+    if language.lower().startswith("pl"):
+        return "pl"
+
+    return "en"
+
+
+def _yes_no(value: bool, language: str) -> str:
+    """Return a localized boolean label."""
+    if language == "pl":
+        return "tak" if value else "nie"
+
+    return "yes" if value else "no"
+
+
+def _status_text(status: str, language: str) -> str:
+    """Return a localized compact status label."""
+    if language != "pl":
+        return status
+
+    return {
+        "success": "gotowe",
+        "failed": "nie",
+        "in_progress": "w toku",
+        "completed": "gotowe",
+    }.get(status, status)
 
 
 def _world_to_screen(

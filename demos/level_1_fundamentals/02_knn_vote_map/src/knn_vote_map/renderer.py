@@ -17,6 +17,7 @@ from knn_vote_map.explanation import build_explanation_lines
 
 type FloatArray = NDArray[np.float64]
 type IntArray = NDArray[np.int_]
+type CopyTable = dict[str, dict[str, str]]
 
 WINDOW_WIDTH: Final[int] = 1100
 WINDOW_HEIGHT: Final[int] = 720
@@ -59,6 +60,31 @@ BACKGROUND_CLASS_COLORS: Final[dict[int, tuple[int, int, int]]] = {
     0: CLASS_ZERO_BACKGROUND_COLOR,
     1: CLASS_ONE_BACKGROUND_COLOR,
 }
+UI_COPY: Final[CopyTable] = {
+    "vote_map": {"en": "Vote map", "pl": "Mapa głosowania"},
+    "classifier": {"en": "k-NN classifier", "pl": "k-NN classifier"},
+    "status": {"en": "Status", "pl": "Status"},
+    "samples": {"en": "Samples", "pl": "Próbki"},
+    "noise_std": {"en": "Noise std", "pl": "Szum"},
+    "seed": {"en": "Seed", "pl": "Seed"},
+    "prediction": {"en": "Prediction", "pl": "Predykcja"},
+    "challenge": {"en": "Challenge", "pl": "Cel"},
+    "accuracy": {"en": "Accuracy", "pl": "Accuracy"},
+    "target": {"en": "Target", "pl": "Target"},
+    "correct": {"en": "Correct", "pl": "Trafione"},
+    "votes": {"en": "Votes", "pl": "Głosy"},
+    "no_query": {"en": "No query point yet.", "pl": "Brak punktu query."},
+    "controls": {
+        "en": (
+            "Click map: classify point   N: random query   R: reset   Up/Down: k   "
+            "Left/Right: noise   S: seed   Esc: quit"
+        ),
+        "pl": (
+            "Kliknij mapę: klasyfikuj punkt   N: losowy query   R: reset   Up/Down: k   "
+            "Left/Right: szum   S: seed   Esc: wyjście"
+        ),
+    },
+}
 
 
 @dataclass(slots=True)
@@ -74,7 +100,13 @@ class WorldBounds:
 class KNNVoteMapRenderer:
     """Render k-NN classification state using Pygame."""
 
-    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        *,
+        present_frame: bool = True,
+        language: str = "en",
+    ) -> None:
         """Initialize renderer resources.
 
         Args:
@@ -82,6 +114,7 @@ class KNNVoteMapRenderer:
         """
         self._screen = screen
         self._present_frame = present_frame
+        self._language = _normalize_language(language)
         self._font = pygame.font.Font(None, 28)
         self._small_font = pygame.font.Font(None, 22)
         self._title_font = pygame.font.Font(None, 36)
@@ -171,7 +204,7 @@ class KNNVoteMapRenderer:
             self._draw_query_point(query_array, bounds)
 
         self._draw_text(
-            "Vote map",
+            self._copy("vote_map"),
             MAIN_RECT.left + PADDING,
             MAIN_RECT.top + 18,
             self._font,
@@ -306,19 +339,19 @@ class KNNVoteMapRenderer:
         x = SIDE_RECT.left + 24
         y = SIDE_RECT.top + 22
 
-        self._draw_text("k-NN classifier", x, y, self._title_font, TEXT_COLOR)
+        self._draw_text(self._copy("classifier"), x, y, self._title_font, TEXT_COLOR)
         y += 46
 
         rows = [
-            ("Status", snapshot.status),
+            (self._copy("status"), _status_text(snapshot.status, self._language)),
             ("k", str(snapshot.metrics["k"])),
-            ("Samples", str(snapshot.metrics["sample_count"])),
-            ("Noise std", f"{noise_std:.2f}"),
-            ("Seed", str(seed)),
+            (self._copy("samples"), str(snapshot.metrics["sample_count"])),
+            (self._copy("noise_std"), f"{noise_std:.2f}"),
+            (self._copy("seed"), str(seed)),
         ]
 
         if snapshot.metrics.get("has_prediction"):
-            rows.append(("Prediction", str(snapshot.metrics["predicted_label"])))
+            rows.append((self._copy("prediction"), str(snapshot.metrics["predicted_label"])))
 
         for label, value in rows:
             self._draw_text(f"{label}:", x, y, self._small_font, MUTED_TEXT_COLOR)
@@ -326,14 +359,17 @@ class KNNVoteMapRenderer:
             y += SMALL_TEXT_LINE_HEIGHT
 
         y += 16
-        self._draw_text("Challenge", x, y, self._font, TEXT_COLOR)
+        self._draw_text(self._copy("challenge"), x, y, self._font, TEXT_COLOR)
         y += 28
 
         challenge_rows = [
-            ("Status", challenge_result.status),
-            ("Accuracy", f"{challenge_result.accuracy:.2f}"),
-            ("Target", f"{challenge_result.target_accuracy:.2f}"),
-            ("Correct", f"{challenge_result.correct_count}/{challenge_result.sample_count}"),
+            (self._copy("status"), _status_text(challenge_result.status, self._language)),
+            (self._copy("accuracy"), f"{challenge_result.accuracy:.2f}"),
+            (self._copy("target"), f"{challenge_result.target_accuracy:.2f}"),
+            (
+                self._copy("correct"),
+                f"{challenge_result.correct_count}/{challenge_result.sample_count}",
+            ),
         ]
 
         for label, value in challenge_rows:
@@ -342,7 +378,7 @@ class KNNVoteMapRenderer:
             y += SMALL_TEXT_LINE_HEIGHT
 
         y += 16
-        self._draw_text("Votes", x, y, self._font, TEXT_COLOR)
+        self._draw_text(self._copy("votes"), x, y, self._font, TEXT_COLOR)
         y += 28
 
         vote_counts = snapshot.visual_state.get("vote_counts", {})
@@ -358,7 +394,7 @@ class KNNVoteMapRenderer:
                 self._draw_text(str(count), x + 120, y, self._small_font, TEXT_COLOR)
                 y += SMALL_TEXT_LINE_HEIGHT
         else:
-            self._draw_text("No query point yet.", x, y, self._small_font, MUTED_TEXT_COLOR)
+            self._draw_text(self._copy("no_query"), x, y, self._small_font, MUTED_TEXT_COLOR)
 
     def _draw_bottom_panel(
         self,
@@ -369,14 +405,13 @@ class KNNVoteMapRenderer:
         x = BOTTOM_RECT.left + 24
         y = BOTTOM_RECT.top + 14
 
-        controls = (
-            "Click map: classify point   N: random query   R: reset   Up/Down: k   "
-            "Left/Right: noise   S: seed   Esc: quit"
+        self._draw_text(self._copy("controls"), x, y, self._small_font, TEXT_COLOR)
+
+        explanation_lines = build_explanation_lines(
+            snapshot,
+            challenge_result,
+            language=self._language,
         )
-
-        self._draw_text(controls, x, y, self._small_font, TEXT_COLOR)
-
-        explanation_lines = build_explanation_lines(snapshot, challenge_result)
         explanation_y = y + TEXT_LINE_HEIGHT
 
         for index, line in enumerate(explanation_lines):
@@ -387,6 +422,10 @@ class KNNVoteMapRenderer:
                 self._small_font,
                 MUTED_TEXT_COLOR,
             )
+
+    def _copy(self, key: str) -> str:
+        """Return localized UI copy."""
+        return UI_COPY[key][self._language]
 
     def _draw_text(
         self,
@@ -428,6 +467,28 @@ def _compute_world_bounds(
         y_min=y_min - y_margin,
         y_max=y_max + y_margin,
     )
+
+
+def _normalize_language(language: str) -> str:
+    """Return a supported UI language code."""
+    if language.lower().startswith("pl"):
+        return "pl"
+
+    return "en"
+
+
+def _status_text(status: str, language: str) -> str:
+    """Return a localized compact status label."""
+    if language != "pl":
+        return status
+
+    return {
+        "completed": "gotowe",
+        "success": "gotowe",
+        "failed": "nie",
+        "in_progress": "w toku",
+        "initialized": "start",
+    }.get(status, status)
 
 
 def _world_to_screen(

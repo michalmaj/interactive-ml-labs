@@ -39,9 +39,19 @@ SEED_STEP: Final[int] = 1
 class GradientDescentScene:
     """Interactive scene for the Gradient Descent Playground demo."""
 
-    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        *,
+        present_frame: bool = True,
+        language: str = "en",
+    ) -> None:
         """Initialize the scene with a target screen."""
-        self._renderer = GradientDescentRenderer(screen, present_frame=present_frame)
+        self._renderer = GradientDescentRenderer(
+            screen,
+            present_frame=present_frame,
+            language=language,
+        )
         self._challenge = LossChallenge()
 
         self._running = False

@@ -64,9 +64,19 @@ class RandomForestScene:
 
     fixed_scene_size = WINDOW_SIZE
 
-    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        *,
+        present_frame: bool = True,
+        language: str = "en",
+    ) -> None:
         """Initialize scene state."""
-        self._renderer = RandomForestRenderer(screen, present_frame=present_frame)
+        self._renderer = RandomForestRenderer(
+            screen,
+            present_frame=present_frame,
+            language=language,
+        )
         self._challenge = RandomForestChallenge()
 
         self._dataset_kind = DEFAULT_DATASET_KIND

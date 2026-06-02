@@ -53,9 +53,19 @@ TEST_SEED_OFFSET: Final[int] = 70_000
 class LogisticRegressionBoundaryScene:
     """Interactive scene for the Logistic Regression Boundary Lab demo."""
 
-    def __init__(self, screen: pygame.Surface, *, present_frame: bool = True) -> None:
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        *,
+        present_frame: bool = True,
+        language: str = "en",
+    ) -> None:
         """Initialize the scene with a target screen."""
-        self._renderer = LogisticRegressionRenderer(screen, present_frame=present_frame)
+        self._renderer = LogisticRegressionRenderer(
+            screen,
+            present_frame=present_frame,
+            language=language,
+        )
         self._challenge = PrecisionRecallChallenge()
 
         self._running = False

@@ -18,9 +18,12 @@ class KNNVoteMapSceneAdapter:
 
     def __init__(self, context: AppContext) -> None:
         """Create the wrapped k-NN scene."""
-        _ = context
         self._surface = pygame.Surface(self.fixed_scene_size)
-        self._scene = KNNVoteMapScene(self._surface, present_frame=False)
+        self._scene = KNNVoteMapScene(
+            self._surface,
+            present_frame=False,
+            language=context.settings.language,
+        )
 
     def handle_event(self, event: object) -> SceneCommand:
         """Handle one input event through the wrapped demo scene."""
