@@ -334,6 +334,93 @@ def test_shell_intro_uses_columns_for_long_demo_controls(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_opens_theory_screen_from_intro(monkeypatch) -> None:
+    """The intro screen should expose the generated in-app theory screen."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+
+    try:
+        app.selected_demo = DEMO_BY_ID["gradient_descent_playground"]
+        app.screen_name = ScreenName.INTRO
+
+        app._handle_keydown(pygame.K_t)
+
+        assert app.screen_name == ScreenName.THEORY
+        assert app.theory_return_screen == ScreenName.INTRO
+    finally:
+        pygame.quit()
+
+
+def test_shell_theory_screen_renders_manifest_sections(monkeypatch) -> None:
+    """Theory screen should render compact manifest theory sections."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    wrapped_text: list[str] = []
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = position, width, font, color
+        wrapped_text.append(text)
+        return position[1] + 24
+
+    try:
+        app.selected_demo = DEMO_BY_ID["gradient_descent_playground"]
+        app.screen_name = ScreenName.THEORY
+        app.context.settings.language = "pl"
+        app._draw_wrapped = capture_wrapped
+
+        app._render_theory()
+
+        theory_text = " ".join(wrapped_text)
+        assert "Gradient descent" in theory_text
+        assert "learning rate" in theory_text
+        assert "loss" in theory_text
+    finally:
+        pygame.quit()
+
+
+def test_shell_theory_enter_starts_demo_from_intro(monkeypatch) -> None:
+    """Enter on theory should start the demo when the student came from intro."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.selected_demo = DEMO_BY_ID["gradient_descent_playground"]
+        app.screen_name = ScreenName.THEORY
+        app.theory_return_screen = ScreenName.INTRO
+
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.DEMO
+        assert isinstance(app.scene_manager.current, GradientDescentSceneAdapter)
+    finally:
+        pygame.quit()
+
+
+def test_shell_theory_escape_returns_to_pause(monkeypatch) -> None:
+    """Esc on theory should return to pause when opened from the pause menu."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.selected_demo = DEMO_BY_ID["gradient_descent_playground"]
+        app.screen_name = ScreenName.PAUSE
+        app.selected_index = 2
+
+        app._activate_selected()
+        assert app.screen_name == ScreenName.THEORY
+
+        app._escape()
+        assert app.screen_name == ScreenName.PAUSE
+    finally:
+        pygame.quit()
+
+
 def test_shell_demo_selection_renders_selected_demo_details(monkeypatch) -> None:
     """Demo selection should show manifest details for the highlighted demo."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -406,11 +493,12 @@ def test_shell_pause_restart_recreates_current_demo(monkeypatch) -> None:
             create_scene=create_scene,
             difficulty=app.selected_demo.difficulty,
             tags=app.selected_demo.tags,
+            theory=app.selected_demo.theory,
         )
         app._start_demo()
         first_scene = app.scene_manager.current
         app._open_pause()
-        app.selected_index = 2
+        app.selected_index = 3
         app._activate_selected()
 
         assert len(created_scenes) == 2

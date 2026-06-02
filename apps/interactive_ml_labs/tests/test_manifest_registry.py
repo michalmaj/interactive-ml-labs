@@ -92,6 +92,25 @@ def test_gradient_manifest_has_real_scene_and_demo_specific_controls() -> None:
     assert len(manifest.controls) >= 6
 
 
+def test_gradient_manifest_has_in_app_theory_content() -> None:
+    """Gradient manifest should include compact content for the generated theory screen."""
+    manifest = DEMO_BY_ID["gradient_descent_playground"]
+
+    assert manifest.theory is not None
+    assert len(manifest.theory.sections) >= 3
+
+    theory_text = " ".join(
+        [
+            *(section.title.pl for section in manifest.theory.sections),
+            *(paragraph.pl for section in manifest.theory.sections for paragraph in section.body),
+        ],
+    )
+
+    assert "Gradient descent" in theory_text
+    assert "learning rate" in theory_text
+    assert "loss" in theory_text
+
+
 def test_knn_manifest_has_real_scene_and_demo_specific_controls() -> None:
     """k-NN manifest should route to the real scene and describe its controls."""
     manifest = DEMO_BY_ID["knn_vote_map"]
