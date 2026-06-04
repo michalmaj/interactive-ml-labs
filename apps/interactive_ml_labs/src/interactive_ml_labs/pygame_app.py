@@ -31,6 +31,7 @@ MUTED_TEXT: Final[tuple[int, int, int]] = (166, 173, 181)
 ACCENT: Final[tuple[int, int, int]] = (113, 204, 152)
 FOOTER_OFFSET: Final[int] = 50
 FOOTER_RESERVED_HEIGHT: Final[int] = 84
+THEORY_SCROLL_STEP: Final[int] = 72
 
 
 class ScreenName(StrEnum):
@@ -84,6 +85,8 @@ class UnifiedAppShell:
         self.menu_items: list[MenuItem] = []
         self.help_visible = False
         self.mouse_position: tuple[int, int] = (0, 0)
+        self.theory_scroll_offset = 0
+        self.theory_max_scroll = 0
 
         pygame.display.set_caption("Interactive ML Labs")
 
@@ -131,6 +134,8 @@ class UnifiedAppShell:
                 self._handle_active_demo_event(event)
             elif event.type == pygame.KEYDOWN:
                 self._handle_keydown(event.key)
+            elif event.type == pygame.MOUSEWHEEL:
+                self._handle_mouse_wheel(event.y)
             elif event.type == pygame.MOUSEMOTION:
                 self._handle_mouse_motion(event.pos)
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -202,6 +207,14 @@ class UnifiedAppShell:
     def _handle_mouse_motion(self, position: tuple[int, int]) -> None:
         self.mouse_position = position
         self._select_menu_item_at(position)
+
+    def _handle_mouse_wheel(self, y: int) -> None:
+        """Scroll the active theory screen with the mouse wheel."""
+        if self.screen_name != ScreenName.THEORY:
+            return
+
+        self.theory_scroll_offset -= y * THEORY_SCROLL_STEP
+        self._clamp_theory_scroll()
 
     def _select_menu_item_at(self, position: tuple[int, int]) -> bool:
         for index, item in enumerate(self.menu_items):
@@ -415,7 +428,7 @@ class UnifiedAppShell:
         width, _ = self.context.settings.resolution
         content_width = min(980, width - 160)
         y = 70
-        content_bottom = self._content_bottom()
+        self._clamp_theory_scroll()
 
         self._draw_text(demo.title.for_language(language), (80, y), self.font_title, TEXT)
         y += 58
@@ -426,17 +439,23 @@ class UnifiedAppShell:
             ACCENT,
         )
         y += 50
+        content_top = y
+        content_bottom = self._content_bottom()
+        content_y = content_top - self.theory_scroll_offset
+        content_end = content_y
 
         if theory is None:
-            y = self._draw_wrapped(
+            content_end = self._draw_wrapped_visible(
                 self._text(
                     "The in-app theory notes for this demo will be added in a later slice.",
                     "Notatki teorii dla tego demo dodamy w kolejnym kroku.",
                 ),
-                (80, y),
+                (80, content_y),
                 content_width,
                 self.font_body,
                 TEXT,
+                content_top,
+                content_bottom,
             )
         elif width >= 1100:
             gap = 56
@@ -446,45 +465,45 @@ class UnifiedAppShell:
 
             for column_index in range(column_count):
                 section_x = 80 + column_index * (column_width + gap)
-                section_y = y
+                section_y = content_y
                 section_start = column_index * sections_per_column
                 section_end = section_start + sections_per_column
 
                 for section in theory.sections[section_start:section_end]:
-                    section_y, fits = self._draw_theory_section(
+                    section_y = self._draw_theory_section(
                         section.title.for_language(language),
                         [paragraph.for_language(language) for paragraph in section.body],
                         section_x,
                         section_y,
                         column_width,
+                        content_top,
                         content_bottom,
                     )
-                    if not fits:
-                        self._draw_more_content_hint(content_bottom)
-                        break
+                content_end = max(content_end, section_y)
         else:
             for section in theory.sections:
-                y, fits = self._draw_theory_section(
+                content_end = self._draw_theory_section(
                     section.title.for_language(language),
                     [paragraph.for_language(language) for paragraph in section.body],
                     80,
-                    y,
+                    content_end,
                     content_width,
+                    content_top,
                     content_bottom,
                 )
-                if not fits:
-                    self._draw_more_content_hint(content_bottom)
-                    break
+
+        self._update_theory_scroll_limit(content_end, content_bottom)
+        self._draw_scroll_indicator(content_top, content_bottom)
 
         if self.theory_return_screen == ScreenName.INTRO:
             footer = self._text(
-                "Enter: start demo | Esc/Backspace: intro | L: language",
-                "Enter: start demo | Esc/Backspace: intro | L: język",
+                "Wheel: scroll | Enter: start demo | Esc/Backspace: intro | L: language",
+                "Kółko: przewijaj | Enter: start demo | Esc/Backspace: intro | L: język",
             )
         else:
             footer = self._text(
-                "Esc/Backspace: back | L: language",
-                "Esc/Backspace: wróć | L: język",
+                "Wheel: scroll | Esc/Backspace: back | L: language",
+                "Kółko: przewijaj | Esc/Backspace: wróć | L: język",
             )
 
         self._draw_footer(footer)
@@ -496,28 +515,26 @@ class UnifiedAppShell:
         x: int,
         y: int,
         width: int,
+        top: int,
         bottom: int,
-    ) -> tuple[int, bool]:
-        """Draw one theory section without crossing the footer-safe boundary."""
-        if y + self.font_heading.get_linesize() + 12 > bottom:
-            return y, False
-
-        self._draw_text(title, (x, y), self.font_heading, ACCENT)
+    ) -> int:
+        """Draw one theory section inside the scrollable theory viewport."""
+        if self._line_is_visible(y, self.font_heading, top, bottom):
+            self._draw_text(title, (x, y), self.font_heading, ACCENT)
         y += 38
         for paragraph in paragraphs:
-            y, fits = self._draw_wrapped_limited(
+            y = self._draw_wrapped_visible(
                 "- " + paragraph,
                 (x + 24, y),
                 width - 24,
                 self.font_body,
                 TEXT,
+                top,
                 bottom,
             )
-            if not fits:
-                return y, False
             y += 8
 
-        return y + 18, True
+        return y + 18
 
     def _draw_intro_section(
         self,
@@ -719,20 +736,20 @@ class UnifiedAppShell:
 
         return y
 
-    def _draw_wrapped_limited(
+    def _draw_wrapped_visible(
         self,
         text: str,
         position: tuple[int, int],
         width: int,
         font: pygame.font.Font,
         color: tuple[int, int, int],
+        top: int,
         bottom: int,
-    ) -> tuple[int, bool]:
-        """Draw wrapped text without crossing a vertical content boundary."""
+    ) -> int:
+        """Draw wrapped text only when each line intersects the visible viewport."""
         words = text.split()
         line = ""
         x, y = position
-        line_height = font.get_linesize()
 
         for word in words:
             candidate = f"{line} {word}".strip()
@@ -740,32 +757,62 @@ class UnifiedAppShell:
                 line = candidate
                 continue
 
-            if y + line_height > bottom:
-                return y, False
-
-            self._draw_text(line, (x, y), font, color)
-            y += line_height
+            if self._line_is_visible(y, font, top, bottom):
+                self._draw_text(line, (x, y), font, color)
+            y += font.get_linesize()
             line = word
 
         if line:
-            if y + line_height > bottom:
-                return y, False
+            if self._line_is_visible(y, font, top, bottom):
+                self._draw_text(line, (x, y), font, color)
+            y += font.get_linesize()
 
-            self._draw_text(line, (x, y), font, color)
-            y += line_height
+        return y
 
-        return y, True
+    def _line_is_visible(
+        self,
+        y: int,
+        font: pygame.font.Font,
+        top: int,
+        bottom: int,
+    ) -> bool:
+        """Return whether one text line fits fully inside the visible viewport."""
+        return y >= top and y + font.get_linesize() <= bottom
 
-    def _draw_more_content_hint(self, bottom: int) -> None:
-        """Draw a compact hint when screen content is clipped above the footer."""
-        self._draw_text(
-            self._text(
-                "Use a taller window to see more notes.",
-                "Zwiększ okno, żeby zobaczyć więcej notatek.",
-            ),
-            (80, bottom - self.font_small.get_linesize()),
-            self.font_small,
-            MUTED_TEXT,
+    def _update_theory_scroll_limit(self, content_end: int, content_bottom: int) -> None:
+        """Update the maximum scroll offset from rendered content height."""
+        self.theory_max_scroll = max(
+            0,
+            content_end + self.theory_scroll_offset - content_bottom,
+        )
+        self._clamp_theory_scroll()
+
+    def _clamp_theory_scroll(self) -> None:
+        """Keep the theory scroll offset inside the available scroll range."""
+        self.theory_scroll_offset = max(
+            0,
+            min(self.theory_scroll_offset, self.theory_max_scroll),
+        )
+
+    def _draw_scroll_indicator(self, top: int, bottom: int) -> None:
+        """Draw a small scrollbar for scrollable theory content."""
+        if self.theory_max_scroll <= 0:
+            return
+
+        width, _ = self.context.settings.resolution
+        track_height = bottom - top
+        track_rect = pygame.Rect(width - 48, top, 4, track_height)
+        pygame.draw.rect(self.screen, (55, 61, 69), track_rect, border_radius=2)
+
+        visible_ratio = track_height / (track_height + self.theory_max_scroll)
+        thumb_height = max(36, round(track_height * visible_ratio))
+        thumb_range = track_height - thumb_height
+        thumb_y = top + round(thumb_range * self.theory_scroll_offset / self.theory_max_scroll)
+        pygame.draw.rect(
+            self.screen,
+            ACCENT,
+            pygame.Rect(track_rect.x, thumb_y, track_rect.width, thumb_height),
+            border_radius=2,
         )
 
     def _render_help_overlay(self) -> None:
@@ -1005,6 +1052,7 @@ class UnifiedAppShell:
 
         self.help_visible = False
         self.theory_return_screen = self.screen_name
+        self.theory_scroll_offset = 0
         self._go_to(ScreenName.THEORY)
 
     def _activate_theory(self) -> None:

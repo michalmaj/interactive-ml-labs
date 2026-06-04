@@ -410,12 +410,51 @@ def test_shell_theory_content_stays_above_footer(monkeypatch) -> None:
         content_positions = [
             position
             for text, position in rendered_text
-            if not text.startswith(("Enter:", "Esc/Backspace:"))
+            if position[1] < footer_y and not text.startswith(("Enter:", "Esc/Backspace:"))
         ]
 
         assert content_positions
         assert max(position[1] for position in content_positions) <= content_bottom
         assert max(position[1] for position in content_positions) < footer_y
+    finally:
+        pygame.quit()
+
+
+def test_shell_theory_mouse_wheel_scrolls_content(monkeypatch) -> None:
+    """Mouse wheel should scroll the generated theory screen."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(900, 520)))
+
+    try:
+        app.selected_demo = DEMO_BY_ID["random_forest_bagging_lab"]
+        app.screen_name = ScreenName.THEORY
+
+        app._render_theory()
+        assert app.theory_max_scroll > 0
+
+        app._handle_mouse_wheel(-1)
+        assert app.theory_scroll_offset > 0
+
+        app._handle_mouse_wheel(100)
+        assert app.theory_scroll_offset == 0
+    finally:
+        pygame.quit()
+
+
+def test_shell_open_theory_resets_scroll_position(monkeypatch) -> None:
+    """Opening theory should start at the top of the lesson notes."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(900, 520)))
+
+    try:
+        app.selected_demo = DEMO_BY_ID["random_forest_bagging_lab"]
+        app.screen_name = ScreenName.INTRO
+        app.theory_scroll_offset = 120
+
+        app._open_theory()
+
+        assert app.screen_name == ScreenName.THEORY
+        assert app.theory_scroll_offset == 0
     finally:
         pygame.quit()
 
