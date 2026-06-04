@@ -40,7 +40,7 @@ def build_explanation_lines(
                 "Try increasing noise or lowering learning rate to make it harder.",
             ),
             pl=(
-                "Cel osiągnięty: model zszedł poniżej target loss.",
+                "Cel osiągnięty: model zszedł poniżej wymaganego target loss.",
                 "Zwiększ szum albo obniż learning rate, żeby utrudnić zadanie.",
             ),
         )
@@ -53,7 +53,7 @@ def build_explanation_lines(
                 "Try increasing learning rate carefully or reducing data noise.",
             ),
             pl=(
-                "Cel nieosiągnięty: limit kroków skończył się przed target loss.",
+                "Cel nieosiągnięty: limit kroków skończył się przed dojściem do target loss.",
                 "Ostrożnie zwiększ learning rate albo zmniejsz szum danych.",
             ),
         )
@@ -66,7 +66,7 @@ def build_explanation_lines(
                 "Press N for one step or Space to run gradient descent.",
             ),
             pl=(
-                "Model startuje z początkową wagą i biasem.",
+                "Model startuje z początkowym weight i bias.",
                 "N robi jeden krok, a Space uruchamia gradient descent.",
             ),
         )
@@ -83,7 +83,7 @@ def build_explanation_lines(
             _current_state_line(snapshot, language=language),
         ),
         pl=(
-            "Model aktualizuje parametry, żeby zmniejszać mean squared error.",
+            "Model aktualizuje parametry, żeby obniżyć mean squared error.",
             _current_state_line(snapshot, language=language),
         ),
     )

@@ -24,7 +24,7 @@ def build_bottom_panel_explanation(
 
     if challenge_result.success:
         if language == "pl":
-            return "Cel osiągnięty: forest dobrze generalizuje bez zbyt wielu drzew."
+            return "Cel osiągnięty: Random Forest dobrze generalizuje bez zbyt wielu drzew."
 
         return challenge_result.message
 
@@ -56,9 +56,9 @@ def build_confidence_view_explanation(
 
     if language == "pl":
         if confidence_view_enabled:
-            return "Confidence view: jaśniejsze regiony forest oznaczają słabszą zgodność drzew."
+            return "Confidence view: jaśniejsze regiony oznaczają słabszą zgodność drzew."
 
-        return "Confidence view jest wyłączony: regiony forest pokazują tylko finalną klasę."
+        return "Confidence view jest wyłączony: regiony pokazują tylko finalną klasę."
 
     if confidence_view_enabled:
         return "Confidence view: pale forest regions mean weaker agreement between trees."
@@ -120,13 +120,13 @@ def _challenge_message(challenge_result: RandomForestChallengeResult) -> str:
     failed: list[str] = []
 
     if challenge_result.forest_test_accuracy < challenge_result.target_test_accuracy:
-        failed.append("test accuracy jest za niskie")
+        failed.append("test accuracy jest za niska")
     if challenge_result.forest_tree_count > challenge_result.max_tree_count:
-        failed.append("forest używa za wielu drzew")
+        failed.append("Random Forest używa za wielu drzew")
     if challenge_result.forest_generalization_gap > challenge_result.max_generalization_gap:
         failed.append("generalization gap jest za duży")
 
     if not failed:
-        return "Cel jest blisko, ale konfiguracja wymaga jeszcze dostrojenia."
+        return "Cel jest blisko, ale konfiguracja wymaga jeszcze korekty."
 
     return "Cel nieosiągnięty: " + ", ".join(failed) + "."
