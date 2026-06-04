@@ -10,7 +10,7 @@ import pygame
 
 from interactive_ml_labs.display import Size, choose_adaptive_window_size, scale_rect_to_fit
 from interactive_ml_labs.fonts import make_ui_font
-from interactive_ml_labs.manifest import DemoManifest, LocalizedText
+from interactive_ml_labs.manifest import DemoManifest, DemoTheory, LocalizedText
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.registry import LEVEL_NAMES, demos_for_level, levels_from_manifests
 from interactive_ml_labs.scene import (
@@ -458,10 +458,11 @@ class UnifiedAppShell:
                 content_bottom,
             )
         elif width >= 1100:
+            lesson_blocks = self._theory_lesson_blocks(theory, language)
             gap = 56
             column_width = (content_width - gap) // 2
             column_count = 2
-            sections_per_column = (len(theory.sections) + column_count - 1) // column_count
+            sections_per_column = (len(lesson_blocks) + column_count - 1) // column_count
 
             for column_index in range(column_count):
                 section_x = 80 + column_index * (column_width + gap)
@@ -469,10 +470,10 @@ class UnifiedAppShell:
                 section_start = column_index * sections_per_column
                 section_end = section_start + sections_per_column
 
-                for section in theory.sections[section_start:section_end]:
+                for title, paragraphs in lesson_blocks[section_start:section_end]:
                     section_y = self._draw_theory_section(
-                        section.title.for_language(language),
-                        [paragraph.for_language(language) for paragraph in section.body],
+                        title,
+                        paragraphs,
                         section_x,
                         section_y,
                         column_width,
@@ -481,10 +482,10 @@ class UnifiedAppShell:
                     )
                 content_end = max(content_end, section_y)
         else:
-            for section in theory.sections:
+            for title, paragraphs in self._theory_lesson_blocks(theory, language):
                 content_end = self._draw_theory_section(
-                    section.title.for_language(language),
-                    [paragraph.for_language(language) for paragraph in section.body],
+                    title,
+                    paragraphs,
                     80,
                     content_end,
                     content_width,
@@ -507,6 +508,41 @@ class UnifiedAppShell:
             )
 
         self._draw_footer(footer)
+
+    def _theory_lesson_blocks(
+        self,
+        theory: DemoTheory,
+        language: str,
+    ) -> list[tuple[str, list[str]]]:
+        """Build renderable lesson blocks from manifest theory content."""
+        blocks = [
+            (
+                section.title.for_language(language),
+                [paragraph.for_language(language) for paragraph in section.body],
+            )
+            for section in theory.sections
+        ]
+
+        if theory.mini_challenges:
+            blocks.append(
+                (
+                    self._text("Mini challenge", "Mini-zadania"),
+                    [challenge.for_language(language) for challenge in theory.mini_challenges],
+                ),
+            )
+
+        if theory.glossary:
+            blocks.append(
+                (
+                    self._text("Glossary", "Słowniczek"),
+                    [
+                        f"{entry.term}: {entry.definition.for_language(language)}"
+                        for entry in theory.glossary
+                    ],
+                ),
+            )
+
+        return blocks
 
     def _draw_theory_section(
         self,
