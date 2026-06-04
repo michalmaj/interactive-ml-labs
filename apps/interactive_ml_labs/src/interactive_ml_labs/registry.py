@@ -58,7 +58,7 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
             pl=(
                 "Ustaw bardzo niski learning rate. Zobacz, ile kroków potrzeba, "
-                "zanim loss zacznie wyraźnie spadać."
+                "zanim loss zacznie zauważalnie spadać."
             ),
         ),
         LocalizedText(
@@ -68,7 +68,7 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
             pl=(
                 "Ustaw learning rate tak wysoko, żeby kroki przeskakiwały minimum. "
-                "Zwróć uwagę, czy ścieżka zaczyna odbijać się na boki."
+                "Zobacz, czy ścieżka zaczyna odbijać się na boki."
             ),
         ),
         LocalizedText(
@@ -100,7 +100,7 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
             pl=(
                 "Przesuń query point blisko granicy klas i zobacz, "
-                "którzy sąsiedzi decydują o etykiecie."
+                "którzy sąsiedzi decydują o predykcji."
             ),
         ),
         LocalizedText(
@@ -135,7 +135,7 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
             pl=(
                 "Znajdź ustawienie, w którym accuracy wygląda dobrze, "
-                "ale jedna klasa jest wyraźnie traktowana gorzej."
+                "ale jedna klasa wypada wyraźnie gorzej."
             ),
         ),
     ),
@@ -147,7 +147,7 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
             pl=(
                 "Ustaw podział, który wizualnie wydaje się oczywisty, "
-                "i sprawdź, jak reaguje impurity score."
+                "i sprawdź, jak zareaguje impurity score."
             ),
         ),
         LocalizedText(
@@ -166,8 +166,7 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
                 "the resulting prediction regions."
             ),
             pl=(
-                "Przełączaj widoki i połącz linię podziału z regionami "
-                "predykcji, które powstają po splicie."
+                "Przełączaj widoki i sprawdź, jakie regiony predykcji powstają po wybranym splicie."
             ),
         ),
     ),
@@ -184,7 +183,7 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
         ),
         LocalizedText(
             en="Turn on confidence view and look for places where trees disagree.",
-            pl="Włącz confidence view i znajdź obszary, w których drzewa się ze sobą nie zgadzają.",
+            pl=("Włącz confidence view i znajdź obszary, w których drzewa nie są zgodne."),
         ),
         LocalizedText(
             en=(
@@ -193,7 +192,7 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
             pl=(
                 "Zwiększ rozmiar ensemble i sprawdź, czy Random Forest się "
-                "stabilizuje, czy tylko robi bardziej złożony."
+                "stabilizuje, czy tylko robi się bardziej złożony."
             ),
         ),
     ),
@@ -205,7 +204,7 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
             pl=(
                 "Dodawaj weak learner po jednym i obserwuj, które wcześniej "
-                "błędne punkty dostają większą uwagę."
+                "źle klasyfikowane punkty dostają większą uwagę."
             ),
         ),
         LocalizedText(
@@ -215,7 +214,7 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
             pl=(
                 "Porównuj train i test accuracy po wielu rundach. Szukaj momentu, "
-                "w którym różnica zaczyna wyglądać podejrzanie."
+                "w którym różnica zaczyna być niepokojąco duża."
             ),
         ),
         LocalizedText(
@@ -285,7 +284,7 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             term="threshold",
             definition=LocalizedText(
                 en="The probability cutoff used to turn a score into a class label.",
-                pl="Próg prawdopodobieństwa, który zamienia wynik modelu na etykietę klasy.",
+                pl="Próg probability, który zamienia wynik modelu na etykietę klasy.",
             ),
         ),
         GlossaryTerm(
@@ -299,7 +298,7 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             term="precision / recall",
             definition=LocalizedText(
                 en="Two complementary ways to inspect classification mistakes.",
-                pl="Dwa uzupełniające się sposoby patrzenia na błędy klasyfikacji.",
+                pl="Dwa uzupełniające się sposoby analizowania błędów klasyfikacji.",
             ),
         ),
     ),
@@ -308,7 +307,7 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             term="split",
             definition=LocalizedText(
                 en="A rule that sends data points to one side of the tree or the other.",
-                pl="Reguła, która wysyła punkty danych na jedną albo drugą stronę drzewa.",
+                pl="Reguła, która kieruje punkty na jedną albo drugą stronę drzewa.",
             ),
         ),
         GlossaryTerm(
@@ -326,7 +325,7 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                     "instead of the stable pattern."
                 ),
                 pl=(
-                    "Sytuacja, w której model uczy się przypadków z treningu "
+                    "Sytuacja, w której model uczy się przypadkowych szczegółów z treningu "
                     "zamiast stabilnego wzorca."
                 ),
             ),
@@ -357,7 +356,7 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             term="confidence view",
             definition=LocalizedText(
                 en="A view that highlights where the forest agrees strongly or weakly.",
-                pl="Widok pokazujący, gdzie Random Forest zgadza się mocno, a gdzie słabo.",
+                pl="Widok pokazujący, gdzie drzewa w Random Forest są zgodne, a gdzie nie.",
             ),
         ),
     ),
@@ -431,11 +430,11 @@ def _placeholder_demo(
         or (
             LocalizedText(
                 en="Explore the main intuition behind the algorithm.",
-                pl="Zrozum, co jest najważniejsze w działaniu algorytmu.",
+                pl="Zobacz, jaka intuicja stoi za działaniem algorytmu.",
             ),
             LocalizedText(
                 en="Observe how parameter changes affect model behavior.",
-                pl="Sprawdź, jak parametry zmieniają zachowanie modelu.",
+                pl="Sprawdź, jak zmiana parametrów wpływa na zachowanie modelu.",
             ),
         ),
         controls=controls
@@ -473,7 +472,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title_en="Gradient Descent Playground",
         title_pl="Gradient Descent Playground",
         summary_en="Optimization, loss, and learning rate intuition.",
-        summary_pl="Optymalizacja, loss i intuicja stojąca za learning rate.",
+        summary_pl="Optymalizacja, loss i praktyczna intuicja stojąca za learning rate.",
         objectives=(
             LocalizedText(
                 en="Watch gradient descent reduce loss step by step.",
@@ -481,14 +480,18 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             LocalizedText(
                 en="Change learning rate and noise to see when training becomes unstable.",
-                pl="Zmieniaj learning rate i noise, żeby zobaczyć, kiedy trening traci stabilność.",
+                pl=(
+                    "Zmieniaj learning rate i noise, żeby zobaczyć, "
+                    "kiedy trening przestaje być stabilny."
+                ),
             ),
         ),
         controls=(
             ControlBinding(
                 key="Space",
                 action=LocalizedText(
-                    en="start or pause automatic steps", pl="uruchom albo zatrzymaj kroki"
+                    en="start or pause automatic steps",
+                    pl="uruchom albo zatrzymaj automatyczne kroki",
                 ),
             ),
             ControlBinding(
@@ -508,7 +511,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ControlBinding(
                 key="S",
                 action=LocalizedText(
-                    en="generate another dataset seed", pl="wygeneruj nowy seed danych"
+                    en="generate another dataset seed", pl="wylosuj nowy seed danych"
                 ),
             ),
             ControlBinding(
@@ -539,8 +542,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "weight and bias."
                             ),
                             pl=(
-                                "Tutaj model jest prostą, więc najważniejsze parametry "
-                                "to weight i bias."
+                                "Tutaj model jest prostą, więc kluczowe parametry to weight i bias."
                             ),
                         ),
                     ),
@@ -579,7 +581,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "history chart."
                             ),
                             pl=(
-                                "Patrz, jak przesuwa się linia regresji, i porównuj to "
+                                "Obserwuj, jak przesuwa się linia regresji, i porównuj to "
                                 "z wykresem historii loss."
                             ),
                         ),
@@ -604,7 +606,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "to the training targets."
                             ),
                             pl=(
-                                "Niższy loss to nie magia: oznacza, że predykcje są bliżej "
+                                "Niższy loss to nie magia: oznacza, że predykcje są bliższe "
                                 "wartości z danych treningowych."
                             ),
                         ),
@@ -639,7 +641,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             LocalizedText(
                 en="Change k and noise to compare smoother and more local decision regions.",
-                pl="Zmieniaj k i noise, żeby porównać różne decision regions.",
+                pl="Zmieniaj k i noise, żeby porównać gładsze i bardziej lokalne decision regions.",
             ),
         ),
         controls=(
@@ -666,7 +668,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ControlBinding(
                 key="S",
                 action=LocalizedText(
-                    en="generate another dataset seed", pl="wygeneruj nowy seed danych"
+                    en="generate another dataset seed", pl="wylosuj nowy seed danych"
                 ),
             ),
             ControlBinding(
@@ -687,7 +689,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "of nearby training examples."
                             ),
                             pl=(
-                                "k-NN klasyfikuje punkt query, patrząc na etykiety "
+                                "k-NN klasyfikuje query point, patrząc na etykiety "
                                 "najbliższych przykładów treningowych."
                             ),
                         ),
@@ -772,7 +774,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "when noise or data layout changes."
                             ),
                             pl=(
-                                "Wysoka accuracy dla jednego seedu nie gwarantuje stabilności, "
+                                "Wysoka accuracy dla jednego seedu nie gwarantuje, "
+                                "że model będzie stabilny, "
                                 "gdy zmieni się szum albo układ danych."
                             ),
                         ),
@@ -789,7 +792,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title_en="Logistic Regression Boundary Lab",
         title_pl="Logistic Regression Boundary Lab",
         summary_en="Probabilities, thresholds, and decision boundaries.",
-        summary_pl="Prawdopodobieństwa, progi i decision boundary w praktyce.",
+        summary_pl="Probability, threshold i decision boundary w praktyce.",
         objectives=(
             LocalizedText(
                 en="Watch logistic regression turn a linear score into class probabilities.",
@@ -805,14 +808,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
                 pl=(
                     "Zmieniaj learning rate, threshold i noise, żeby porównać "
-                    "stabilny i niestabilny trening."
+                    "stabilny trening z niestabilnym."
                 ),
             ),
             LocalizedText(
                 en="Use precision and recall to reason about threshold trade-offs.",
                 pl=(
-                    "Używaj precision i recall, żeby rozmawiać o kompromisach "
-                    "przy wyborze threshold."
+                    "Używaj precision i recall, żeby analizować kompromisy przy wyborze threshold."
                 ),
             ),
         ),
@@ -849,7 +851,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ControlBinding(
                 key="S",
                 action=LocalizedText(
-                    en="generate another dataset seed", pl="wygeneruj nowy seed danych"
+                    en="generate another dataset seed", pl="wylosuj nowy seed danych"
                 ),
             ),
             ControlBinding(
@@ -871,7 +873,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             ),
                             pl=(
                                 "Logistic regression zamienia liniowy score na probability "
-                                "dla klasy class_1."
+                                "dla class_1."
                             ),
                         ),
                         LocalizedText(
@@ -930,8 +932,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "the final class labels are chosen."
                             ),
                             pl=(
-                                "Tło probability zmienia się w trakcie treningu, zanim "
-                                "model wybierze finalne klasy."
+                                "Tło probability zmienia się w trakcie treningu, jeszcze zanim "
+                                "model przypisze finalne klasy."
                             ),
                         ),
                     ),
@@ -972,12 +974,12 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title_en="Decision Tree Splitter",
         title_pl="Decision Tree Splitter",
         summary_en="Splits, impurity, and interpretable rules.",
-        summary_pl="Splity, impurity i reguły, które da się wyjaśnić człowiekowi.",
+        summary_pl="Splity, impurity i reguły, które da się łatwo wyjaśnić.",
         objectives=(
             LocalizedText(
                 en="Compare automatic tree splits with a manual split you can move yourself.",
                 pl=(
-                    "Porównuj automatyczne splity drzewa z manualnym splitem, "
+                    "Porównuj automatyczne splity drzewa z własnym manual split, "
                     "który możesz przesuwać samodzielnie."
                 ),
             ),
@@ -994,7 +996,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     "what tree splits can express."
                 ),
                 pl=(
-                    "Przełączaj dane axis-aligned i XOR, żeby omówić, "
+                    "Przełączaj dane axis-aligned i XOR, żeby zobaczyć, "
                     "co mogą wyrazić splity w drzewie."
                 ),
             ),
@@ -1040,7 +1042,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ControlBinding(
                 key="S",
                 action=LocalizedText(
-                    en="generate another dataset seed", pl="wygeneruj nowy seed danych"
+                    en="generate another dataset seed", pl="wylosuj nowy seed danych"
                 ),
             ),
             ControlBinding(
@@ -1071,7 +1073,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "can receive different predictions."
                             ),
                             pl=(
-                                "Każdy split dzieli przestrzeń na mniejsze regiony, "
+                                "Każdy split dzieli przestrzeń na mniejsze obszary, "
                                 "które mogą dostać różne predykcje."
                             ),
                         ),
@@ -1164,7 +1166,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         objectives=(
             LocalizedText(
                 en="Compare a single tree baseline with a random forest on train/test data.",
-                pl=("Porównuj single tree baseline z random forest na danych train/test."),
+                pl=("Porównuj single tree baseline z Random Forest na danych train/test."),
             ),
             LocalizedText(
                 en="Change tree count, max depth, noise, and bootstrap ratio to study variance.",
@@ -1175,7 +1177,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             LocalizedText(
                 en="Use confidence view to discuss ensemble voting and uncertainty.",
-                pl=("Używaj confidence view do rozmowy o ensemble voting i niepewności predykcji."),
+                pl=("Używaj confidence view, żeby omawiać ensemble voting i niepewność predykcji."),
             ),
         ),
         controls=(
@@ -1212,7 +1214,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ControlBinding(
                 key="N",
                 action=LocalizedText(
-                    en="generate another dataset seed", pl="wygeneruj nowy seed danych"
+                    en="generate another dataset seed", pl="wylosuj nowy seed danych"
                 ),
             ),
             ControlBinding(
@@ -1233,7 +1235,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "one tree."
                             ),
                             pl=(
-                                "Random forest łączy wiele decision trees zamiast ufać "
+                                "Random Forest łączy wiele decision trees zamiast ufać "
                                 "jednemu drzewu."
                             ),
                         ),
@@ -1243,7 +1245,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "with the most votes."
                             ),
                             pl=(
-                                "Każde drzewo głosuje, a predykcją forest jest klasa "
+                                "Każde drzewo głosuje, a predykcją Random Forest jest klasa "
                                 "z największą liczbą głosów."
                             ),
                         ),
@@ -1282,7 +1284,10 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "Compare train/test accuracy and gap for the single tree "
                                 "versus the forest."
                             ),
-                            pl=("Porównuj train/test accuracy i gap dla single tree oraz forest."),
+                            pl=(
+                                "Porównuj train/test accuracy i gap dla single tree "
+                                "oraz Random Forest."
+                            ),
                         ),
                         LocalizedText(
                             en=(
@@ -1315,7 +1320,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "that the prediction is correct."
                             ),
                             pl=(
-                                "Wysokie confidence oznacza zgodność drzew; nie gwarantuje, "
+                                "Wysokie confidence oznacza zgodność drzew; nie gwarantuje jednak, "
                                 "że predykcja jest poprawna."
                             ),
                         ),
@@ -1336,7 +1341,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             "and track train/test accuracy across rounds."
         ),
         summary_pl=(
-            "Zobacz, jak boosting łączy weak learners, zmienia wagi próbek "
+            "Zobacz, jak boosting łączy weak learners, zmienia wagi przykładów "
             "i śledzi train/test accuracy po kolejnych rundach."
         ),
         objectives=(
@@ -1350,7 +1355,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             LocalizedText(
                 en="Use confidence view and presets to discuss overfitting and robustness.",
-                pl="Używaj confidence view i presetów do rozmowy o overfittingu i odporności.",
+                pl="Używaj confidence view i presetów, żeby omawiać overfitting i odporność.",
             ),
         ),
         controls=(
@@ -1455,7 +1460,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             ),
                             pl=(
                                 "Obserwuj staged train/test accuracy: train może rosnąć, "
-                                "gdy test zaczyna się wypłaszczać albo spadać."
+                                "nawet gdy test zaczyna się wypłaszczać albo spadać."
                             ),
                         ),
                         LocalizedText(
