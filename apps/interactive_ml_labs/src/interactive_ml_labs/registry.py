@@ -13,6 +13,7 @@ from interactive_ml_labs.manifest import (
     ControlBinding,
     DemoManifest,
     DemoTheory,
+    GlossaryTerm,
     LevelManifest,
     LocalizedText,
     TheorySection,
@@ -47,6 +48,355 @@ LEVEL_MANIFESTS: tuple[LevelManifest, ...] = (
         ),
     ),
 )
+
+LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
+    "gradient_descent_playground": (
+        LocalizedText(
+            en=(
+                "Set learning rate very low. Watch how many steps are needed "
+                "before the loss visibly improves."
+            ),
+            pl=(
+                "Ustaw bardzo niski learning rate. Zobacz, ile kroków potrzeba, "
+                "zanim loss zacznie wyraźnie spadać."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Set learning rate high enough to overshoot. Notice whether "
+                "the path bounces around the minimum."
+            ),
+            pl=(
+                "Ustaw learning rate tak wysoko, żeby kroki przeskakiwały minimum. "
+                "Zwróć uwagę, czy ścieżka zaczyna odbijać się na boki."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Change the starting point and compare whether the same "
+                "learning rate still feels stable."
+            ),
+            pl=(
+                "Zmień punkt startowy i porównaj, czy ten sam learning rate "
+                "nadal zachowuje się stabilnie."
+            ),
+        ),
+    ),
+    "knn_vote_map": (
+        LocalizedText(
+            en=(
+                "Try k=1, then a larger odd k. Look for regions where "
+                "the vote map becomes smoother but less local."
+            ),
+            pl=(
+                "Porównaj k=1 z większym nieparzystym k. Szukaj miejsc, "
+                "gdzie vote map robi się gładsza, ale mniej lokalna."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Move the query point close to a class boundary and watch "
+                "which neighbors decide the label."
+            ),
+            pl=(
+                "Przesuń query point blisko granicy klas i zobacz, "
+                "którzy sąsiedzi decydują o etykiecie."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Add an outlier near a dense region and check how much it "
+                "matters for small and large k."
+            ),
+            pl=(
+                "Dodaj outlier blisko gęstego obszaru i sprawdź, jak mocno "
+                "wpływa na wynik przy małym i dużym k."
+            ),
+        ),
+    ),
+    "logistic_regression_boundary_lab": (
+        LocalizedText(
+            en="Move the threshold away from 0.5 and compare precision with recall.",
+            pl="Odsuń threshold od 0.5 i porównaj precision z recall.",
+        ),
+        LocalizedText(
+            en=(
+                "Add ambiguous points near the boundary and watch how "
+                "the probability field changes."
+            ),
+            pl=(
+                "Dodaj niejednoznaczne punkty blisko granicy i obserwuj, "
+                "jak zmienia się pole prawdopodobieństwa."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Find a setting where accuracy looks fine, but one class is clearly treated worse."
+            ),
+            pl=(
+                "Znajdź ustawienie, w którym accuracy wygląda dobrze, "
+                "ale jedna klasa jest wyraźnie traktowana gorzej."
+            ),
+        ),
+    ),
+    "decision_tree_splitter": (
+        LocalizedText(
+            en=(
+                "Make one split that feels visually obvious, then compare "
+                "how the impurity score reacts."
+            ),
+            pl=(
+                "Ustaw podział, który wizualnie wydaje się oczywisty, "
+                "i sprawdź, jak reaguje impurity score."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Try several manual splits that isolate just a few points. "
+                "Notice when the tree starts memorizing noise."
+            ),
+            pl=(
+                "Przetestuj kilka manual splitów izolujących tylko parę punktów. "
+                "Zobacz, kiedy drzewo zaczyna zapamiętywać szum."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Switch between views and connect the split line with "
+                "the resulting prediction regions."
+            ),
+            pl=(
+                "Przełączaj widoki i połącz linię podziału z regionami "
+                "predykcji, które powstają po splicie."
+            ),
+        ),
+    ),
+    "random_forest_bagging_lab": (
+        LocalizedText(
+            en=(
+                "Train a few individual trees and compare their boundaries "
+                "with the forest boundary."
+            ),
+            pl=(
+                "Wytrenuj kilka pojedynczych drzew i porównaj ich granice "
+                "z granicą całego Random Forest."
+            ),
+        ),
+        LocalizedText(
+            en="Turn on confidence view and look for places where trees disagree.",
+            pl="Włącz confidence view i znajdź obszary, w których drzewa się ze sobą nie zgadzają.",
+        ),
+        LocalizedText(
+            en=(
+                "Increase ensemble size and check whether the forest stabilizes "
+                "or only becomes more complex."
+            ),
+            pl=(
+                "Zwiększ rozmiar ensemble i sprawdź, czy Random Forest się "
+                "stabilizuje, czy tylko robi bardziej złożony."
+            ),
+        ),
+    ),
+    "boosting_mistake_lab": (
+        LocalizedText(
+            en=(
+                "Add one weak learner at a time and watch which previously "
+                "wrong points get more attention."
+            ),
+            pl=(
+                "Dodawaj weak learner po jednym i obserwuj, które wcześniej "
+                "błędne punkty dostają większą uwagę."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Compare train and test accuracy after many rounds. Look for "
+                "the moment when the gap becomes suspicious."
+            ),
+            pl=(
+                "Porównuj train i test accuracy po wielu rundach. Szukaj momentu, "
+                "w którym różnica zaczyna wyglądać podejrzanie."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Reset and try a simpler sequence. Ask whether a smaller "
+                "ensemble explains the pattern well enough."
+            ),
+            pl=(
+                "Zresetuj demo i spróbuj prostszej sekwencji. Sprawdź, "
+                "czy mniejszy ensemble wystarczająco dobrze tłumaczy wzorzec."
+            ),
+        ),
+    ),
+}
+
+LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
+    "gradient_descent_playground": (
+        GlossaryTerm(
+            term="loss",
+            definition=LocalizedText(
+                en="A number that says how bad the model currently is; lower is better.",
+                pl="Liczba mówiąca, jak źle model działa w danej chwili; im niżej, tym lepiej.",
+            ),
+        ),
+        GlossaryTerm(
+            term="learning rate",
+            definition=LocalizedText(
+                en="The step size used when the model updates its parameters.",
+                pl="Rozmiar kroku, którym model aktualizuje swoje parametry.",
+            ),
+        ),
+        GlossaryTerm(
+            term="gradient",
+            definition=LocalizedText(
+                en="A direction that points toward the steepest increase of the loss.",
+                pl=(
+                    "Kierunek najszybszego wzrostu loss; gradient descent idzie w stronę przeciwną."
+                ),
+            ),
+        ),
+    ),
+    "knn_vote_map": (
+        GlossaryTerm(
+            term="k",
+            definition=LocalizedText(
+                en="The number of nearest neighbors allowed to vote.",
+                pl="Liczba najbliższych sąsiadów, którzy biorą udział w głosowaniu.",
+            ),
+        ),
+        GlossaryTerm(
+            term="query point",
+            definition=LocalizedText(
+                en="The point whose label the algorithm is trying to predict.",
+                pl="Punkt, dla którego algorytm próbuje przewidzieć etykietę.",
+            ),
+        ),
+        GlossaryTerm(
+            term="vote map",
+            definition=LocalizedText(
+                en="A visual map showing which class would win in different parts of the space.",
+                pl="Mapa pokazująca, która klasa wygrałaby w różnych miejscach przestrzeni.",
+            ),
+        ),
+    ),
+    "logistic_regression_boundary_lab": (
+        GlossaryTerm(
+            term="threshold",
+            definition=LocalizedText(
+                en="The probability cutoff used to turn a score into a class label.",
+                pl="Próg prawdopodobieństwa, który zamienia wynik modelu na etykietę klasy.",
+            ),
+        ),
+        GlossaryTerm(
+            term="decision boundary",
+            definition=LocalizedText(
+                en="The line or curve where the predicted class changes.",
+                pl="Linia albo krzywa, na której zmienia się przewidywana klasa.",
+            ),
+        ),
+        GlossaryTerm(
+            term="precision / recall",
+            definition=LocalizedText(
+                en="Two complementary ways to inspect classification mistakes.",
+                pl="Dwa uzupełniające się sposoby patrzenia na błędy klasyfikacji.",
+            ),
+        ),
+    ),
+    "decision_tree_splitter": (
+        GlossaryTerm(
+            term="split",
+            definition=LocalizedText(
+                en="A rule that sends data points to one side of the tree or the other.",
+                pl="Reguła, która wysyła punkty danych na jedną albo drugą stronę drzewa.",
+            ),
+        ),
+        GlossaryTerm(
+            term="impurity",
+            definition=LocalizedText(
+                en="A score describing how mixed the classes are inside a region.",
+                pl="Miara pokazująca, jak bardzo klasy są wymieszane w danym regionie.",
+            ),
+        ),
+        GlossaryTerm(
+            term="overfitting",
+            definition=LocalizedText(
+                en=(
+                    "When a model learns small accidents in the training data "
+                    "instead of the stable pattern."
+                ),
+                pl=(
+                    "Sytuacja, w której model uczy się przypadków z treningu "
+                    "zamiast stabilnego wzorca."
+                ),
+            ),
+        ),
+    ),
+    "random_forest_bagging_lab": (
+        GlossaryTerm(
+            term="bootstrap",
+            definition=LocalizedText(
+                en=(
+                    "Sampling training examples with replacement so each tree "
+                    "sees a slightly different dataset."
+                ),
+                pl=(
+                    "Losowanie przykładów ze zwracaniem, dzięki któremu każde "
+                    "drzewo widzi trochę inny zbiór."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="ensemble",
+            definition=LocalizedText(
+                en="A group of models whose predictions are combined.",
+                pl="Grupa modeli, których predykcje są łączone.",
+            ),
+        ),
+        GlossaryTerm(
+            term="confidence view",
+            definition=LocalizedText(
+                en="A view that highlights where the forest agrees strongly or weakly.",
+                pl="Widok pokazujący, gdzie Random Forest zgadza się mocno, a gdzie słabo.",
+            ),
+        ),
+    ),
+    "boosting_mistake_lab": (
+        GlossaryTerm(
+            term="weak learner",
+            definition=LocalizedText(
+                en="A simple model that is only slightly better than guessing on its own.",
+                pl="Prosty model, który sam jest tylko trochę lepszy od zgadywania.",
+            ),
+        ),
+        GlossaryTerm(
+            term="boosting",
+            definition=LocalizedText(
+                en=(
+                    "Training weak learners in sequence so later learners focus "
+                    "on earlier mistakes."
+                ),
+                pl=(
+                    "Trenowanie weak learnerów po kolei, tak aby kolejne "
+                    "skupiały się na wcześniejszych błędach."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="train/test accuracy",
+            definition=LocalizedText(
+                en=(
+                    "Accuracy measured on data used for training and on held-out "
+                    "data used for checking generalization."
+                ),
+                pl=(
+                    "Accuracy mierzona na danych treningowych oraz na osobnych "
+                    "danych do sprawdzania generalizacji."
+                ),
+            ),
+        ),
+    ),
+}
 
 LEVEL_BY_NUMBER: dict[int, LevelManifest] = {
     manifest.number: manifest for manifest in LEVEL_MANIFESTS
@@ -271,6 +621,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     ),
                 ),
             ),
+            mini_challenges=LESSON_CHALLENGES["gradient_descent_playground"],
+            glossary=LESSON_GLOSSARY["gradient_descent_playground"],
         ),
     ),
     _placeholder_demo(
@@ -427,6 +779,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     ),
                 ),
             ),
+            mini_challenges=LESSON_CHALLENGES["knn_vote_map"],
+            glossary=LESSON_GLOSSARY["knn_vote_map"],
         ),
     ),
     _placeholder_demo(
@@ -608,6 +962,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     ),
                 ),
             ),
+            mini_challenges=LESSON_CHALLENGES["logistic_regression_boundary_lab"],
+            glossary=LESSON_GLOSSARY["logistic_regression_boundary_lab"],
         ),
     ),
     _placeholder_demo(
@@ -794,6 +1150,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     ),
                 ),
             ),
+            mini_challenges=LESSON_CHALLENGES["decision_tree_splitter"],
+            glossary=LESSON_GLOSSARY["decision_tree_splitter"],
         ),
     ),
     _placeholder_demo(
@@ -964,6 +1322,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     ),
                 ),
             ),
+            mini_challenges=LESSON_CHALLENGES["random_forest_bagging_lab"],
+            glossary=LESSON_GLOSSARY["random_forest_bagging_lab"],
         ),
     ),
     _placeholder_demo(
@@ -1136,6 +1496,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     ),
                 ),
             ),
+            mini_challenges=LESSON_CHALLENGES["boosting_mistake_lab"],
+            glossary=LESSON_GLOSSARY["boosting_mistake_lab"],
         ),
     ),
 )
