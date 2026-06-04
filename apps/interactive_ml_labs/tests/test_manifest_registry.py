@@ -22,9 +22,10 @@ from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 
 def test_registry_contains_current_demo_levels() -> None:
     """Manifest registry should expose levels dynamically."""
-    assert levels_from_manifests() == (1, 2)
+    assert levels_from_manifests() == (1, 2, 3)
     assert 1 in LEVEL_NAMES
     assert 2 in LEVEL_NAMES
+    assert 3 in LEVEL_NAMES
     assert {level.number for level in LEVEL_MANIFESTS} >= {1, 2, 3}
 
 
@@ -32,11 +33,39 @@ def test_registry_groups_demos_by_level() -> None:
     """Demo lookup should return only demos from the requested level."""
     level_one_demos = demos_for_level(1)
     level_two_demos = demos_for_level(2)
+    level_three_demos = demos_for_level(3)
 
     assert {demo.level for demo in level_one_demos} == {1}
     assert {demo.level for demo in level_two_demos} == {2}
+    assert {demo.level for demo in level_three_demos} == {3}
     assert len(level_one_demos) >= 4
     assert len(level_two_demos) >= 2
+    assert len(level_three_demos) == 1
+
+
+def test_level_three_placeholder_describes_future_advanced_demos() -> None:
+    """Level 3 placeholder should explain the future advanced/showcase track."""
+    manifest = DEMO_BY_ID["level_3_coming_soon"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.title.pl,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+        ],
+    )
+
+    assert manifest.level == 3
+    assert "Coming Soon" in text
+    assert "advanced" in text
+    assert "Level 3" in text
+    assert "Coming soon" in text
+    assert manifest.difficulty.pl == "W przygotowaniu"
+    assert manifest.tags == ("level-3", "showcase", "planning")
 
 
 def test_manifests_have_required_teaching_content() -> None:
