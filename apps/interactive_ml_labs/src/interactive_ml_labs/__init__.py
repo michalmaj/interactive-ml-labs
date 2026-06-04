@@ -57,7 +57,15 @@ from interactive_ml_labs.scene import (
     SceneCommandKind,
     SceneManager,
 )
-from interactive_ml_labs.settings import AppContext, AppSettings
+from interactive_ml_labs.settings import (
+    AppContext,
+    AppSettings,
+    default_settings_path,
+    load_app_settings,
+    save_app_settings,
+    settings_from_json,
+    settings_to_json,
+)
 
 __all__ = [
     "BOOSTING_FIXED_SCENE_SIZE",
@@ -99,9 +107,14 @@ __all__ = [
     "create_knn_vote_map_scene",
     "create_logistic_regression_scene",
     "create_random_forest_scene",
+    "default_settings_path",
     "demos_for_level",
     "levels_from_manifests",
+    "load_app_settings",
     "make_ui_font",
+    "save_app_settings",
     "scale_rect_to_fit",
+    "settings_from_json",
+    "settings_to_json",
     "validate_demo_registry",
 ]

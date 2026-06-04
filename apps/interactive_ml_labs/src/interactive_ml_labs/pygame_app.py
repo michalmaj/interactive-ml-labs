@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
+from pathlib import Path
 from typing import Final
 
 import pygame
@@ -20,7 +21,12 @@ from interactive_ml_labs.scene import (
     SceneCommandKind,
     SceneManager,
 )
-from interactive_ml_labs.settings import AppContext, AppSettings
+from interactive_ml_labs.settings import (
+    AppContext,
+    AppSettings,
+    load_app_settings,
+    save_app_settings,
+)
 
 FPS: Final[int] = 60
 BACKGROUND: Final[tuple[int, int, int]] = (22, 25, 29)
@@ -59,11 +65,17 @@ class MenuItem:
 class UnifiedAppShell:
     """Small first slice of the unified Pygame app shell."""
 
-    def __init__(self, settings: AppSettings | None = None) -> None:
+    def __init__(
+        self,
+        settings: AppSettings | None = None,
+        settings_path: Path | None = None,
+    ) -> None:
         """Initialize the shell."""
         pygame.init()
 
-        self.context = AppContext(settings=settings or AppSettings())
+        self.settings_path = settings_path
+        self.settings_persistence_enabled = settings is None or settings_path is not None
+        self.context = AppContext(settings=settings or load_app_settings(settings_path))
         self._apply_adaptive_window_size()
         self.screen = pygame.display.set_mode(
             self.context.settings.resolution,
@@ -114,6 +126,11 @@ class UnifiedAppShell:
             self.context.settings.resolution,
             self._display_flags(),
         )
+
+    def _save_settings(self) -> None:
+        """Persist settings when the shell owns settings storage."""
+        if self.settings_persistence_enabled:
+            save_app_settings(self.context.settings, self.settings_path)
 
     def run(self) -> None:
         """Run the shell event loop."""
@@ -986,6 +1003,7 @@ class UnifiedAppShell:
 
     def _select_language(self) -> None:
         self.context.settings.language = "en" if self.selected_index == 0 else "pl"
+        self._save_settings()
         self._go_to(ScreenName.LEVELS)
 
     def _select_level(self) -> None:
@@ -1033,10 +1051,13 @@ class UnifiedAppShell:
         elif self.selected_index == 1:
             settings.fullscreen_enabled = not settings.fullscreen_enabled
             self._apply_display_mode()
+            self._save_settings()
         elif self.selected_index == 2:
             settings.adaptive_window_enabled = not settings.adaptive_window_enabled
+            self._save_settings()
         elif self.selected_index == 3:
             settings.fixed_scene_scaling_enabled = not settings.fixed_scene_scaling_enabled
+            self._save_settings()
         elif self.selected_index == 4:
             settings.sound_enabled = not settings.sound_enabled
         else:
@@ -1103,6 +1124,7 @@ class UnifiedAppShell:
             self.context.settings.language = "en"
         else:
             self.context.settings.language = "pl"
+        self._save_settings()
 
     def _go_to(self, screen_name: ScreenName) -> None:
         self.screen_name = screen_name
