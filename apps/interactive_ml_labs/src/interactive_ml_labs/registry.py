@@ -228,6 +228,38 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
         ),
     ),
+    "level_3_coming_soon": (
+        LocalizedText(
+            en=(
+                "Pick one advanced idea you want to explain visually: dimensionality "
+                "reduction, clustering, calibration, or model monitoring."
+            ),
+            pl=(
+                "Wybierz jeden zaawansowany temat do pokazania wizualnie: "
+                "dimensionality reduction, clustering, calibration albo model monitoring."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Write down what the student should be able to change, observe, "
+                "and explain after five minutes."
+            ),
+            pl=(
+                "Zapisz, co student powinien móc zmienić, zaobserwować "
+                "i wyjaśnić po pięciu minutach pracy z demo."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Compare two candidate ideas and choose the one with the clearest "
+                "interactive feedback loop."
+            ),
+            pl=(
+                "Porównaj dwa pomysły i wybierz ten, który ma najczytelniejszą "
+                "pętlę interakcji: ustawienie, obserwacja, wniosek."
+            ),
+        ),
+    ),
 }
 
 LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
@@ -391,6 +423,47 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                 pl=(
                     "Accuracy mierzona na danych treningowych oraz na osobnych "
                     "danych do sprawdzania generalizacji."
+                ),
+            ),
+        ),
+    ),
+    "level_3_coming_soon": (
+        GlossaryTerm(
+            term="showcase demo",
+            definition=LocalizedText(
+                en=(
+                    "A visually strong demo that helps students connect an advanced "
+                    "ML idea with concrete behavior."
+                ),
+                pl=(
+                    "Efektowne wizualnie demo, które łączy zaawansowaną ideę ML "
+                    "z konkretnym zachowaniem modelu."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="interactive feedback loop",
+            definition=LocalizedText(
+                en=(
+                    "The cycle where a student changes a setting, observes the result, "
+                    "and explains why it happened."
+                ),
+                pl=(
+                    "Cykl, w którym student zmienia ustawienie, obserwuje rezultat "
+                    "i wyjaśnia, dlaczego tak się stało."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="advanced experiment",
+            definition=LocalizedText(
+                en=(
+                    "A lab that goes beyond core algorithms and focuses on richer "
+                    "model behavior or real-world ML workflow."
+                ),
+                pl=(
+                    "Lab wykraczający poza podstawowe algorytmy, skupiony na bogatszym "
+                    "zachowaniu modeli albo praktycznym workflow ML."
                 ),
             ),
         ),
@@ -1503,6 +1576,146 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["boosting_mistake_lab"],
             glossary=LESSON_GLOSSARY["boosting_mistake_lab"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="level_3_coming_soon",
+        level=3,
+        title_en="Coming Soon: Advanced Experiments",
+        title_pl="Coming soon: zaawansowane eksperymenty",
+        summary_en=(
+            "A preview slot for richer Level 3 demos: dimensionality reduction, "
+            "clustering, calibration, monitoring, and other showcase topics."
+        ),
+        summary_pl=(
+            "Zapowiedź bardziej zaawansowanych dem Level 3: dimensionality reduction, "
+            "clustering, calibration, monitoring i innych tematów showcase."
+        ),
+        objectives=(
+            LocalizedText(
+                en="Show that Level 3 is reserved for advanced, visually rich ML experiments.",
+                pl=(
+                    "Pokaż, że Level 3 jest miejscem na zaawansowane, "
+                    "wizualnie mocniejsze eksperymenty ML."
+                ),
+            ),
+            LocalizedText(
+                en="Keep the guided app shape visible before the first Level 3 demo lands.",
+                pl=(
+                    "Pokaż docelowy kształt aplikacji, zanim pojawi się "
+                    "pierwsze właściwe demo Level 3."
+                ),
+            ),
+            LocalizedText(
+                en="Give students a hint about the kinds of workflows coming next.",
+                pl="Daj studentom podgląd tematów i workflow, które pojawią się później.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="Enter",
+                action=LocalizedText(
+                    en="open the coming-soon placeholder scene",
+                    pl="otwórz placeholder Coming soon",
+                ),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read Level 3 planning notes",
+                    pl="przeczytaj notatki o planie Level 3",
+                ),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="go back to the demo list",
+                    pl="wróć do listy dem",
+                ),
+            ),
+        ),
+        difficulty=LocalizedText(en="Coming soon", pl="W przygotowaniu"),
+        tags=("level-3", "showcase", "planning"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this slot shows", pl="Co pokazuje ten ekran"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Level 3 is planned as the advanced/showcase layer "
+                                "of Interactive ML Labs."
+                            ),
+                            pl=(
+                                "Level 3 jest planowany jako zaawansowana, pokazowa "
+                                "warstwa Interactive ML Labs."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The placeholder keeps the learning path visible even before "
+                                "the first advanced demo is implemented."
+                            ),
+                            pl=(
+                                "Placeholder pokazuje pełną ścieżkę nauki jeszcze zanim "
+                                "powstanie pierwsze zaawansowane demo."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What belongs here", pl="Co tu pasuje"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Good Level 3 demos should make a more complex ML idea visible, "
+                                "not only configurable."
+                            ),
+                            pl=(
+                                "Dobre demo Level 3 powinno pokazywać bardziej złożoną ideę ML "
+                                "w sposób widoczny, a nie tylko konfigurowalny."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Examples: PCA and embeddings, clustering behavior, "
+                                "calibration, drift, monitoring, or model comparison workflows."
+                            ),
+                            pl=(
+                                "Przykłady: PCA i embeddings, zachowanie clusteringu, "
+                                "calibration, drift, monitoring albo workflow porównywania modeli."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Design principle", pl="Zasada projektowa"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "A showcase demo should still be teachable: the student changes "
+                                "one thing, observes a clear reaction, and can explain it."
+                            ),
+                            pl=(
+                                "Demo showcase nadal musi uczyć: student zmienia jedną rzecz, "
+                                "widzi czytelną reakcję i potrafi ją wyjaśnić."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "If the visual result is impressive but hard to reason about, "
+                                "it is not ready for the guided app yet."
+                            ),
+                            pl=(
+                                "Jeśli efekt wygląda imponująco, ale trudno go wyjaśnić, "
+                                "to demo nie jest jeszcze gotowe do guided app."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["level_3_coming_soon"],
+            glossary=LESSON_GLOSSARY["level_3_coming_soon"],
         ),
     ),
 )
