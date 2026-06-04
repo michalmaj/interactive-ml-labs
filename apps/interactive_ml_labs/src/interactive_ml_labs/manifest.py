@@ -40,10 +40,20 @@ class TheorySection:
 
 
 @dataclass(frozen=True, slots=True)
+class GlossaryTerm:
+    """Short term definition shown in the in-app lesson screen."""
+
+    term: str
+    definition: LocalizedText
+
+
+@dataclass(frozen=True, slots=True)
 class DemoTheory:
-    """Compact in-app theory content for one demo."""
+    """Compact in-app lesson content for one demo."""
 
     sections: tuple[TheorySection, ...]
+    mini_challenges: tuple[LocalizedText, ...] = field(default_factory=tuple)
+    glossary: tuple[GlossaryTerm, ...] = field(default_factory=tuple)
 
 
 @dataclass(frozen=True, slots=True)
