@@ -352,7 +352,7 @@ def test_shell_opens_theory_screen_from_intro(monkeypatch) -> None:
 
 
 def test_shell_theory_screen_renders_manifest_sections(monkeypatch) -> None:
-    """Theory screen should render compact manifest theory sections."""
+    """Theory screen should render lesson sections from the manifest."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
     rendered_text: list[str] = []
@@ -378,6 +378,15 @@ def test_shell_theory_screen_renders_manifest_sections(monkeypatch) -> None:
         assert "Gradient descent" in theory_text
         assert "learning rate" in theory_text
         assert "loss" in theory_text
+        assert "Mini-zadania" in theory_text
+
+        rendered_text.clear()
+        app.theory_scroll_offset = app.theory_max_scroll
+        app._render_theory()
+
+        theory_text = " ".join(rendered_text)
+        assert "Słowniczek" in theory_text
+        assert "gradient:" in theory_text
     finally:
         pygame.quit()
 

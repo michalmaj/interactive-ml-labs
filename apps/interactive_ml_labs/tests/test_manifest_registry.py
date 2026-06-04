@@ -93,16 +93,24 @@ def test_gradient_manifest_has_real_scene_and_demo_specific_controls() -> None:
 
 
 def test_manifests_have_in_app_theory_content() -> None:
-    """Every integrated demo should include compact content for the theory screen."""
+    """Every integrated demo should include complete lesson content for the theory screen."""
     for manifest in DEMO_MANIFESTS:
         assert manifest.theory is not None
         assert len(manifest.theory.sections) >= 3
+        assert len(manifest.theory.mini_challenges) >= 2
+        assert len(manifest.theory.glossary) >= 2
 
         for section in manifest.theory.sections:
             assert section.title.en
             assert section.title.pl
             assert section.body
             assert all(paragraph.en and paragraph.pl for paragraph in section.body)
+
+        assert all(challenge.en and challenge.pl for challenge in manifest.theory.mini_challenges)
+        for entry in manifest.theory.glossary:
+            assert entry.term
+            assert entry.definition.en
+            assert entry.definition.pl
 
 
 @pytest.mark.parametrize(
@@ -124,6 +132,9 @@ def test_demo_theory_contains_key_terms(demo_id: str, expected_terms: tuple[str,
         [
             *(section.title.pl for section in manifest.theory.sections),
             *(paragraph.pl for section in manifest.theory.sections for paragraph in section.body),
+            *(challenge.pl for challenge in manifest.theory.mini_challenges),
+            *(entry.term for entry in manifest.theory.glossary),
+            *(entry.definition.pl for entry in manifest.theory.glossary),
         ],
     ).lower()
 
