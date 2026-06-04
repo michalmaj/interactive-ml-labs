@@ -112,11 +112,12 @@ def _build_messages(
     """Build explanation messages."""
     if language == "pl":
         stage_message = (
-            f"Etap {selected_stage}/{round_count}: prawy panel używa weak learnerów "
+            f"Etap {selected_stage}/{round_count}: prawy panel korzysta z weak learnerów "
             f"z rund 1..{selected_stage}."
         )
         best_round_message = (
-            f"Najlepsza staged test accuracy to {best_test_accuracy:.3f} w rundzie {best_round}."
+            f"Najlepsza staged test accuracy wynosi {best_test_accuracy:.3f} "
+            f"w rundzie {best_round}."
         )
     else:
         stage_message = (
@@ -137,7 +138,7 @@ def _confidence_message(confidence_view_enabled: bool, language: str) -> str:
         if confidence_view_enabled:
             return (
                 "Confidence view jest włączony: jaśniejsze regiony oznaczają "
-                "słabszą zgodność ensemble."
+                "słabszą zgodność w ensemble."
             )
 
         return "Confidence view jest wyłączony: kolory pokazują tylko predykcje klas."
@@ -164,7 +165,7 @@ def _build_hints(
         language=language,
         en="Try increasing rounds, lowering noise, or inspecting the best staged round.",
         pl=(
-            "Spróbuj zwiększyć liczbę rund, zmniejszyć szum albo sprawdzić "
+            "Spróbuj zwiększyć liczbę rund, zmniejszyć szum albo obejrzeć "
             "najlepszą rundę na staged plot."
         ),
     )

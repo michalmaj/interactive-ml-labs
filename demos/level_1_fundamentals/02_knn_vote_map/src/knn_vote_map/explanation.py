@@ -56,7 +56,7 @@ def _initial_lines(
         if language == "pl":
             return (
                 "Cel osiągnięty na ukrytych danych testowych.",
-                "Kliknij mapę albo naciśnij N, żeby podejrzeć lokalne decyzje k-NN.",
+                "Kliknij mapę albo naciśnij N, żeby zobaczyć lokalne decyzje k-NN.",
             )
 
         return (
@@ -67,7 +67,7 @@ def _initial_lines(
     if language == "pl":
         return (
             "Cel nie jest jeszcze osiągnięty na ukrytych danych testowych.",
-            "Zmień k, szum albo seed; kliknij mapę, żeby sprawdzić decyzję.",
+            "Zmień k, szum albo seed; kliknij mapę, żeby sprawdzić predykcję.",
         )
 
     return (
@@ -86,7 +86,7 @@ def _vote_line(
     """Build a compact explanation of the voting result."""
     if not isinstance(vote_counts, dict) or not vote_counts:
         if language == "pl":
-            return f"Punkt query dostał klasę class_{predicted_label} przy k={k}."
+            return f"Query point dostał klasę class_{predicted_label} przy k={k}."
 
         return f"The query point was classified as class_{predicted_label} using k={k}."
 
@@ -114,9 +114,7 @@ def _challenge_line(challenge_result: KNNAccuracyChallengeResult, *, language: s
         )
 
     if language == "pl":
-        return (
-            f"Jeszcze nie: accuracy={challenge_result.accuracy:.2f}; dostrój k albo zmniejsz szum."
-        )
+        return f"Jeszcze nie: accuracy={challenge_result.accuracy:.2f}; zmień k albo zmniejsz szum."
 
     return (
         f"Challenge not completed: accuracy is {challenge_result.accuracy:.2f}; "

@@ -49,7 +49,7 @@ def _manual_mode_explanation(manual_error: str | None, *, language: str) -> str:
     """Build explanation for manual split mode."""
     if manual_error is not None:
         if language == "pl":
-            return "Manual split jest niepoprawny, bo nie tworzy dwóch użytecznych gałęzi."
+            return "Manual split jest niepoprawny: nie tworzy dwóch użytecznych gałęzi."
 
         return "Manual split is invalid because it does not create two useful children."
 

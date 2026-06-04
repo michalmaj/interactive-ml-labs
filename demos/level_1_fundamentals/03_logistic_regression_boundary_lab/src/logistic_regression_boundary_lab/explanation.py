@@ -57,8 +57,8 @@ def _initial_lines(
 
     if language == "pl":
         return (
-            "Tło pokazuje probability klasy class_1 przed thresholdingiem.",
-            "Trenuj model, a potem dostrój threshold, żeby zbalansować FP i FN.",
+            "Tło pokazuje probability dla class_1 przed thresholdingiem.",
+            "Trenuj model, a potem zmieniaj threshold, żeby zbalansować FP i FN.",
         )
 
     return (
@@ -112,7 +112,7 @@ def _challenge_line(
     if language == "pl":
         return (
             f"Jeszcze nie: threshold={threshold:.2f}, "
-            f"FP={false_positive}, FN={false_negative}; dostrój threshold."
+            f"FP={false_positive}, FN={false_negative}; zmień threshold."
         )
 
     return (
