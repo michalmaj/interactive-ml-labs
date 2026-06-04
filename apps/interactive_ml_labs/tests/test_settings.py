@@ -1,5 +1,7 @@
 """Tests for unified app shell settings."""
 
+import json
+
 from interactive_ml_labs import AppContext, AppSettings
 from interactive_ml_labs.display import (
     BOOSTING_FIXED_SCENE_SIZE,
@@ -9,6 +11,12 @@ from interactive_ml_labs.display import (
     center_rect,
     choose_adaptive_window_size,
     scale_rect_to_fit,
+)
+from interactive_ml_labs.settings import (
+    load_app_settings,
+    save_app_settings,
+    settings_from_json,
+    settings_to_json,
 )
 
 
@@ -103,3 +111,78 @@ def test_app_context_tracks_current_navigation() -> None:
 
     assert context.current_level == 2
     assert context.selected_demo_id == "boosting_mistake_lab"
+
+
+def test_settings_serialization_persists_user_preferences_only() -> None:
+    """Persistent settings should store user intent, not computed window size."""
+    settings = AppSettings(
+        language="pl",
+        resolution=(1920, 1080),
+        fullscreen_enabled=True,
+        adaptive_window_enabled=True,
+        fixed_scene_scaling_enabled=False,
+        sound_enabled=True,
+    )
+
+    data = settings_to_json(settings)
+
+    assert data == {
+        "version": 1,
+        "language": "pl",
+        "fullscreen_enabled": True,
+        "adaptive_window_enabled": True,
+        "fixed_scene_scaling_enabled": False,
+    }
+
+
+def test_settings_from_json_uses_defaults_for_invalid_values() -> None:
+    """Malformed values should not break app startup."""
+    settings = settings_from_json(
+        {
+            "language": "de",
+            "fullscreen_enabled": "yes",
+            "adaptive_window_enabled": True,
+            "fixed_scene_scaling_enabled": False,
+        },
+    )
+
+    assert settings.language == "en"
+    assert settings.fullscreen_enabled is False
+    assert settings.adaptive_window_enabled is True
+    assert settings.fixed_scene_scaling_enabled is False
+
+
+def test_load_app_settings_returns_defaults_when_file_is_missing(tmp_path) -> None:
+    """Missing settings files should keep first-run defaults."""
+    settings = load_app_settings(tmp_path / "missing" / "settings.json")
+
+    assert settings == AppSettings()
+
+
+def test_save_and_load_app_settings_round_trip(tmp_path) -> None:
+    """Settings should round-trip through the per-user JSON file."""
+    settings_path = tmp_path / "interactive-ml-labs" / "settings.json"
+    settings = AppSettings(
+        language="pl",
+        fullscreen_enabled=True,
+        adaptive_window_enabled=True,
+        fixed_scene_scaling_enabled=False,
+    )
+
+    save_app_settings(settings, settings_path)
+    loaded_settings = load_app_settings(settings_path)
+
+    assert loaded_settings.language == "pl"
+    assert loaded_settings.fullscreen_enabled is True
+    assert loaded_settings.adaptive_window_enabled is True
+    assert loaded_settings.fixed_scene_scaling_enabled is False
+    assert loaded_settings.resolution == DEFAULT_RESOLUTION
+    assert json.loads(settings_path.read_text(encoding="utf-8")) == settings_to_json(settings)
+
+
+def test_load_app_settings_returns_defaults_for_invalid_json(tmp_path) -> None:
+    """A corrupt settings file should be ignored."""
+    settings_path = tmp_path / "settings.json"
+    settings_path.write_text("{", encoding="utf-8")
+
+    assert load_app_settings(settings_path) == AppSettings()

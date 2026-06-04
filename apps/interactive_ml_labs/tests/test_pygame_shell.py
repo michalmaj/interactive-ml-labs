@@ -14,7 +14,7 @@ from interactive_ml_labs.logistic_scene import LogisticRegressionSceneAdapter
 from interactive_ml_labs.pygame_app import ScreenName, UnifiedAppShell
 from interactive_ml_labs.random_forest_scene import RandomForestSceneAdapter
 from interactive_ml_labs.scene import SceneCommand
-from interactive_ml_labs.settings import AppSettings
+from interactive_ml_labs.settings import AppSettings, save_app_settings
 
 
 class FixedSizeColorScene:
@@ -668,6 +668,43 @@ def test_shell_settings_fullscreen_recreates_display_mode(monkeypatch) -> None:
 
         assert app.context.settings.fullscreen_enabled is False
         assert calls[-1] == ((640, 360), 0)
+    finally:
+        pygame.quit()
+
+
+def test_shell_loads_and_saves_persisted_settings(monkeypatch, tmp_path) -> None:
+    """The shell should load settings from disk and persist user changes."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    settings_path = tmp_path / "settings.json"
+    save_app_settings(
+        AppSettings(
+            language="pl",
+            resolution=(640, 360),
+            adaptive_window_enabled=True,
+            fixed_scene_scaling_enabled=False,
+        ),
+        settings_path,
+    )
+    app = UnifiedAppShell(settings_path=settings_path)
+
+    try:
+        assert app.context.settings.language == "pl"
+        assert app.context.settings.adaptive_window_enabled is True
+        assert app.context.settings.fixed_scene_scaling_enabled is False
+
+        app._handle_keydown(pygame.K_l)
+        loaded = settings_path.read_text(encoding="utf-8")
+
+        assert app.context.settings.language == "en"
+        assert '"language": "en"' in loaded
+
+        app.screen_name = ScreenName.SETTINGS
+        app.selected_index = 1
+        app._activate_selected()
+        loaded = settings_path.read_text(encoding="utf-8")
+
+        assert app.context.settings.fullscreen_enabled is True
+        assert '"fullscreen_enabled": true' in loaded
     finally:
         pygame.quit()
 
