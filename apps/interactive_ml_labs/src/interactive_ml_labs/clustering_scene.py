@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 import random
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Final
 
 import pygame
@@ -67,6 +68,13 @@ class Point:
     y: float
 
 
+class KMeansPhase(StrEnum):
+    """Current half-step of the K-Means update cycle."""
+
+    ASSIGN = "assign"
+    UPDATE = "update"
+
+
 PRESETS: Final[tuple[DataPreset, ...]] = (
     DataPreset("Clean blobs", "Clean blobs", "blobs"),
     DataPreset("Uneven blobs", "Nierówne blobs", "uneven"),
@@ -90,6 +98,7 @@ class ClusteringLabScene:
         self.iteration = 0
         self.auto_run = False
         self.show_links = False
+        self.kmeans_phase = KMeansPhase.UPDATE
         self.inertia = 0.0
         self.inertia_history: list[float] = []
         self.points: list[Point] = []
@@ -170,8 +179,20 @@ class ClusteringLabScene:
         self._draw_panel(surface, panel_rect)
 
     def step(self) -> None:
-        """Run one K-Means assignment/update iteration."""
-        self._assign_points()
+        """Run one visible half-step of K-Means."""
+        if self.kmeans_phase == KMeansPhase.ASSIGN:
+            self._assign_points()
+            self._replace_current_inertia_sample()
+            self.kmeans_phase = KMeansPhase.UPDATE
+            return
+
+        self._update_centroids_from_assignments()
+        self.inertia = self._inertia_for_current_assignments()
+        self.iteration += 1
+        self.inertia_history.append(self.inertia)
+        self.kmeans_phase = KMeansPhase.ASSIGN
+
+    def _update_centroids_from_assignments(self) -> None:
         next_centroids: list[Point] = []
         for cluster_index in range(self.k):
             cluster_points = [
@@ -190,9 +211,6 @@ class ClusteringLabScene:
                 next_centroids.append(self.centroids[cluster_index])
 
         self.centroids = next_centroids
-        self._assign_points()
-        self.iteration += 1
-        self.inertia_history.append(self.inertia)
 
     def _generate_dataset(self) -> None:
         self._rng.seed(self._sample_seed + self.preset_index * 1000)
@@ -288,6 +306,7 @@ class ClusteringLabScene:
         self._auto_elapsed = 0.0
         self._assign_points()
         self.inertia_history = [self.inertia]
+        self.kmeans_phase = KMeansPhase.UPDATE
 
     def _change_k(self, delta: int) -> None:
         self.k = max(MIN_K, min(MAX_K, self.k + delta))
@@ -295,7 +314,13 @@ class ClusteringLabScene:
 
     def _assign_points(self) -> None:
         self.assignments = [self._nearest_centroid(point) for point in self.points]
-        self.inertia = sum(
+        self.inertia = self._inertia_for_current_assignments()
+
+    def _inertia_for_current_assignments(self) -> float:
+        if not self.assignments:
+            return 0.0
+
+        return sum(
             _squared_distance(point, self.centroids[assignment])
             for point, assignment in zip(self.points, self.assignments, strict=True)
         )
@@ -320,6 +345,7 @@ class ClusteringLabScene:
         self.points[self.dragged_point_index] = self._from_screen(position, pygame.Rect(PLOT_RECT))
         self._assign_points()
         self._replace_current_inertia_sample()
+        self.kmeans_phase = KMeansPhase.UPDATE
 
     def _nearest_point_index(
         self,
@@ -414,17 +440,18 @@ class ClusteringLabScene:
         rows = (
             (self._label("k", "k"), str(self.k)),
             (self._label("Iteration", "Iteracja"), str(self.iteration)),
+            (self._label("Next", "Dalej"), self._phase_label()),
             (self._label("Inertia", "Inertia"), f"{self.inertia:.2f}"),
             (self._label("Auto-run", "Auto-run"), auto_label),
             (self._label("Links", "Linie"), links_label),
         )
         for label, value in rows:
             self._draw_text(surface, f"{label}: {value}", (x, y), self._font_body, TEXT)
-            y += 28
+            y += 24
 
-        sparkline_rect = pygame.Rect(x, y + 4, 270, 58)
+        sparkline_rect = pygame.Rect(x, y + 2, 270, 50)
         self._draw_inertia_sparkline(surface, sparkline_rect)
-        y += 82
+        y += 66
 
         self._draw_text(
             surface,
@@ -578,8 +605,8 @@ class ClusteringLabScene:
         y += 56
         y += 34
         y += 38
-        y += 5 * 28
-        y += 82
+        y += 6 * 24
+        y += 66
         y += 24
         y += len(self._wrap_text(self._observation_hint(), 270, self._font_small)) * 18
         y += 8
@@ -606,6 +633,12 @@ class ClusteringLabScene:
             ),
         }
         return hints[self.preset.key]
+
+    def _phase_label(self) -> str:
+        if self.kmeans_phase == KMeansPhase.ASSIGN:
+            return self._label("assign points", "przypisz punkty")
+
+        return self._label("move centroids", "przesuń centroidy")
 
     def _label(self, en: str, pl: str) -> str:
         if self._language == "pl":

@@ -7,6 +7,7 @@ from interactive_ml_labs.clustering_scene import (
     PANEL_RECT,
     PLOT_RECT,
     ClusteringLabScene,
+    KMeansPhase,
     create_clustering_lab_scene,
 )
 from interactive_ml_labs.display import DEFAULT_RESOLUTION
@@ -81,11 +82,32 @@ def test_clustering_scene_step_updates_centroids_and_inertia(monkeypatch) -> Non
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE))
 
         assert scene.iteration == 1
+        assert scene.kmeans_phase == KMeansPhase.ASSIGN
         assert tuple(scene.centroids) != initial_centroids
         assert len(scene.assignments) == len(scene.points)
         assert scene.inertia > 0.0
         assert len(scene.inertia_history) == len(initial_history) + 1
         assert scene.inertia_history[-1] == scene.inertia
+    finally:
+        pygame.quit()
+
+
+def test_clustering_scene_assignment_phase_updates_without_new_iteration(monkeypatch) -> None:
+    """K-Means should expose assignment and centroid-update as separate phases."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_clustering_lab_scene(AppContext())
+        scene.step()
+        inertia_after_update = scene.inertia
+
+        scene.step()
+
+        assert scene.iteration == 1
+        assert scene.kmeans_phase == KMeansPhase.UPDATE
+        assert scene.inertia_history[-1] == scene.inertia
+        assert scene.inertia <= inertia_after_update
     finally:
         pygame.quit()
 
@@ -174,6 +196,7 @@ def test_clustering_scene_resets_inertia_history_with_centroids(monkeypatch) -> 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
 
         assert scene.iteration == 0
+        assert scene.kmeans_phase == KMeansPhase.UPDATE
         assert len(scene.inertia_history) == 1
         assert scene.inertia_history[0] == scene.inertia
     finally:

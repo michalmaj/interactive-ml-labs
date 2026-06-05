@@ -1707,8 +1707,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ControlBinding(
                 key="Space",
                 action=LocalizedText(
-                    en="advance one K-Means iteration",
-                    pl="wykonaj jedną iterację K-Means",
+                    en="advance one K-Means phase",
+                    pl="wykonaj kolejną fazę K-Means",
                 ),
             ),
             ControlBinding(
