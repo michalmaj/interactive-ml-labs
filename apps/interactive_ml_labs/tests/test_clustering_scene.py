@@ -6,6 +6,7 @@ from interactive_ml_labs.clustering_scene import (
     MIN_K,
     PANEL_RECT,
     PLOT_RECT,
+    AlgorithmMode,
     ClusteringLabScene,
     KMeansPhase,
     create_clustering_lab_scene,
@@ -143,6 +144,66 @@ def test_clustering_scene_toggles_centroid_links(monkeypatch) -> None:
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_c))
         assert scene.show_links is False
+    finally:
+        pygame.quit()
+
+
+def test_clustering_scene_toggles_dbscan_mode(monkeypatch) -> None:
+    """M should switch between K-Means and DBSCAN."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_clustering_lab_scene(AppContext())
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        assert scene.algorithm_mode == AlgorithmMode.DBSCAN
+        assert len(scene.dbscan_labels) == len(scene.points)
+        assert scene.dbscan_cluster_count >= 1
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        assert scene.algorithm_mode == AlgorithmMode.KMEANS
+        assert scene.kmeans_phase == KMeansPhase.UPDATE
+    finally:
+        pygame.quit()
+
+
+def test_clustering_scene_dbscan_eps_changes_with_keyboard(monkeypatch) -> None:
+    """Minus and equals should tune eps in DBSCAN mode."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_clustering_lab_scene(AppContext())
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+        initial_eps = scene.dbscan_eps
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+        assert scene.dbscan_eps > initial_eps
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
+        assert scene.dbscan_eps == initial_eps
+        assert len(scene.dbscan_labels) == len(scene.points)
+    finally:
+        pygame.quit()
+
+
+def test_clustering_scene_dbscan_ignores_auto_run(monkeypatch) -> None:
+    """DBSCAN mode should not advance K-Means auto-run iterations."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_clustering_lab_scene(AppContext())
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+        scene.auto_run = True
+
+        scene.update(1.20)
+
+        assert scene.algorithm_mode == AlgorithmMode.DBSCAN
+        assert scene.iteration == 0
     finally:
         pygame.quit()
 

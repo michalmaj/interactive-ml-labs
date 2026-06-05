@@ -1700,8 +1700,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ControlBinding(
                 key="- / =",
                 action=LocalizedText(
-                    en="decrease or increase k",
-                    pl="zmniejsz albo zwiększ k",
+                    en="decrease or increase k in K-Means, or eps in DBSCAN",
+                    pl="zmniejsz albo zwiększ k w K-Means albo eps w DBSCAN",
                 ),
             ),
             ControlBinding(
@@ -1723,6 +1723,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 action=LocalizedText(
                     en="show or hide point-to-centroid links",
                     pl="pokaż albo ukryj linie punkt-centroid",
+                ),
+            ),
+            ControlBinding(
+                key="M",
+                action=LocalizedText(
+                    en="switch between K-Means and DBSCAN",
+                    pl="przełącz między K-Means i DBSCAN",
                 ),
             ),
             ControlBinding(

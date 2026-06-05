@@ -5,6 +5,7 @@ from interactive_ml_labs.boosting_scene import (
     create_boosting_mistake_lab_scene,
 )
 from interactive_ml_labs.clustering_scene import (
+    AlgorithmMode,
     ClusteringLabScene,
     create_clustering_lab_scene,
 )
@@ -82,6 +83,7 @@ __all__ = [
     "POLISH_SAMPLE_TEXT",
     "SCREEN_MARGIN",
     "WINDOWED_RESOLUTIONS",
+    "AlgorithmMode",
     "AppContext",
     "AppSettings",
     "BoostingMistakeLabSceneAdapter",

@@ -75,6 +75,13 @@ class KMeansPhase(StrEnum):
     UPDATE = "update"
 
 
+class AlgorithmMode(StrEnum):
+    """Available clustering algorithms in the scene."""
+
+    KMEANS = "kmeans"
+    DBSCAN = "dbscan"
+
+
 PRESETS: Final[tuple[DataPreset, ...]] = (
     DataPreset("Clean blobs", "Clean blobs", "blobs"),
     DataPreset("Uneven blobs", "Nierówne blobs", "uneven"),
@@ -94,7 +101,12 @@ class ClusteringLabScene:
         self._rng = random.Random(7)
         self._sample_seed = 7
         self.preset_index = 0
+        self.algorithm_mode = AlgorithmMode.KMEANS
         self.k = 3
+        self.dbscan_eps = 0.24
+        self.dbscan_min_points = 5
+        self.dbscan_labels: list[int] = []
+        self.dbscan_cluster_count = 0
         self.iteration = 0
         self.auto_run = False
         self.show_links = False
@@ -140,24 +152,26 @@ class ClusteringLabScene:
             self.preset_index = key - pygame.K_1
             self._generate_dataset()
         elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
-            self._change_k(-1)
+            self._adjust_cluster_parameter(-1)
         elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
-            self._change_k(1)
+            self._adjust_cluster_parameter(1)
         elif key == pygame.K_SPACE:
             self.step()
-        elif key == pygame.K_a:
+        elif key == pygame.K_a and self.algorithm_mode == AlgorithmMode.KMEANS:
             self.auto_run = not self.auto_run
         elif key == pygame.K_c:
             self.show_links = not self.show_links
+        elif key == pygame.K_m:
+            self._toggle_algorithm_mode()
         elif key == pygame.K_r:
-            self._reset_centroids()
+            self._reset_algorithm()
         elif key == pygame.K_n:
             self._sample_seed += 1
             self._generate_dataset()
 
     def update(self, dt: float) -> SceneCommand:
         """Advance auto-run K-Means iterations."""
-        if not self.auto_run:
+        if not self.auto_run or self.algorithm_mode == AlgorithmMode.DBSCAN:
             return SceneCommand.none()
 
         self._auto_elapsed += dt
@@ -180,6 +194,10 @@ class ClusteringLabScene:
 
     def step(self) -> None:
         """Run one visible half-step of K-Means."""
+        if self.algorithm_mode == AlgorithmMode.DBSCAN:
+            self._run_dbscan()
+            return
+
         if self.kmeans_phase == KMeansPhase.ASSIGN:
             self._assign_points()
             self._replace_current_inertia_sample()
@@ -241,7 +259,7 @@ class ClusteringLabScene:
                 Point(-0.82, -0.76),
             ]
 
-        self._reset_centroids()
+        self._reset_algorithm()
 
     def _make_blobs(
         self,
@@ -312,6 +330,34 @@ class ClusteringLabScene:
         self.k = max(MIN_K, min(MAX_K, self.k + delta))
         self._reset_centroids()
 
+    def _adjust_cluster_parameter(self, direction: int) -> None:
+        if self.algorithm_mode == AlgorithmMode.DBSCAN:
+            self._change_dbscan_eps(0.03 * direction)
+            return
+
+        self._change_k(direction)
+
+    def _change_dbscan_eps(self, delta: float) -> None:
+        self.dbscan_eps = round(_clamp(self.dbscan_eps + delta, 0.08, 0.50), 2)
+        self._run_dbscan()
+
+    def _toggle_algorithm_mode(self) -> None:
+        if self.algorithm_mode == AlgorithmMode.KMEANS:
+            self.algorithm_mode = AlgorithmMode.DBSCAN
+            self.auto_run = False
+            self._run_dbscan()
+            return
+
+        self.algorithm_mode = AlgorithmMode.KMEANS
+        self._reset_centroids()
+
+    def _reset_algorithm(self) -> None:
+        if self.algorithm_mode == AlgorithmMode.DBSCAN:
+            self._run_dbscan()
+            return
+
+        self._reset_centroids()
+
     def _assign_points(self) -> None:
         self.assignments = [self._nearest_centroid(point) for point in self.points]
         self.inertia = self._inertia_for_current_assignments()
@@ -343,6 +389,10 @@ class ClusteringLabScene:
             return
 
         self.points[self.dragged_point_index] = self._from_screen(position, pygame.Rect(PLOT_RECT))
+        if self.algorithm_mode == AlgorithmMode.DBSCAN:
+            self._run_dbscan()
+            return
+
         self._assign_points()
         self._replace_current_inertia_sample()
         self.kmeans_phase = KMeansPhase.UPDATE
@@ -369,6 +419,49 @@ class ClusteringLabScene:
         distances = [_squared_distance(point, centroid) for centroid in self.centroids]
         return min(range(len(distances)), key=distances.__getitem__)
 
+    def _run_dbscan(self) -> None:
+        labels = [0 for _ in self.points]
+        cluster_id = 0
+        for point_index in range(len(self.points)):
+            if labels[point_index] != 0:
+                continue
+
+            neighbors = self._dbscan_neighbors(point_index)
+            if len(neighbors) < self.dbscan_min_points:
+                labels[point_index] = -1
+                continue
+
+            cluster_id += 1
+            labels[point_index] = cluster_id
+            seed_index = 0
+            while seed_index < len(neighbors):
+                neighbor_index = neighbors[seed_index]
+                if labels[neighbor_index] == -1:
+                    labels[neighbor_index] = cluster_id
+                if labels[neighbor_index] != 0:
+                    seed_index += 1
+                    continue
+
+                labels[neighbor_index] = cluster_id
+                neighbor_neighbors = self._dbscan_neighbors(neighbor_index)
+                if len(neighbor_neighbors) >= self.dbscan_min_points:
+                    for candidate in neighbor_neighbors:
+                        if candidate not in neighbors:
+                            neighbors.append(candidate)
+                seed_index += 1
+
+        self.dbscan_labels = labels
+        self.dbscan_cluster_count = cluster_id
+
+    def _dbscan_neighbors(self, point_index: int) -> list[int]:
+        point = self.points[point_index]
+        radius_squared = self.dbscan_eps**2
+        return [
+            candidate_index
+            for candidate_index, candidate in enumerate(self.points)
+            if _squared_distance(point, candidate) <= radius_squared
+        ]
+
     def _replace_current_inertia_sample(self) -> None:
         if self.inertia_history:
             self.inertia_history[-1] = self.inertia
@@ -385,7 +478,7 @@ class ClusteringLabScene:
             pygame.draw.line(surface, GRID, (x, rect.top), (x, rect.bottom), 1)
             pygame.draw.line(surface, GRID, (rect.left, y), (rect.right, y), 1)
 
-        if self.show_links:
+        if self.show_links and self.algorithm_mode == AlgorithmMode.KMEANS:
             for point, assignment in zip(self.points, self.assignments, strict=True):
                 pygame.draw.line(
                     surface,
@@ -395,9 +488,12 @@ class ClusteringLabScene:
                     1,
                 )
 
-        for point, assignment in zip(self.points, self.assignments, strict=True):
-            color = CLUSTER_COLORS[assignment % len(CLUSTER_COLORS)]
+        for point, label in zip(self.points, self._point_labels(), strict=True):
+            color = self._cluster_color(label)
             pygame.draw.circle(surface, color, self._to_screen(point, rect), POINT_RADIUS)
+
+        if self.algorithm_mode == AlgorithmMode.DBSCAN:
+            return
 
         for index, centroid in enumerate(self.centroids):
             color = CLUSTER_COLORS[index % len(CLUSTER_COLORS)]
@@ -438,6 +534,7 @@ class ClusteringLabScene:
         auto_label = self._label("on", "wł.") if self.auto_run else self._label("off", "wył.")
         links_label = self._label("on", "wł.") if self.show_links else self._label("off", "wył.")
         rows = (
+            (self._label("Mode", "Tryb"), self._mode_label()),
             (self._label("k", "k"), str(self.k)),
             (self._label("Iteration", "Iteracja"), str(self.iteration)),
             (self._label("Next", "Dalej"), self._phase_label()),
@@ -450,7 +547,10 @@ class ClusteringLabScene:
             y += 24
 
         sparkline_rect = pygame.Rect(x, y + 2, 270, 50)
-        self._draw_inertia_sparkline(surface, sparkline_rect)
+        if self.algorithm_mode == AlgorithmMode.DBSCAN:
+            self._draw_dbscan_summary(surface, sparkline_rect)
+        else:
+            self._draw_inertia_sparkline(surface, sparkline_rect)
         y += 66
 
         self._draw_text(
@@ -486,7 +586,7 @@ class ClusteringLabScene:
             self._draw_text(
                 surface,
                 control,
-                (x + column * 138, y + row * 24),
+                (x + column * 138, y + row * 20),
                 self._font_small,
                 MUTED_TEXT,
             )
@@ -514,10 +614,11 @@ class ClusteringLabScene:
     def _control_labels(self) -> tuple[str, ...]:
         return (
             f"1-4: {self._label('presets', 'presety')}",
-            "- / =: k",
+            f"- / =: {self._label('k or eps', 'k lub eps')}",
             f"Space: {self._label('step', 'krok')}",
             "A: auto-run",
             f"C: {self._label('links', 'linie')}",
+            "M: K-Means/DBSCAN",
             f"R: {self._label('reset', 'reset')}",
             f"N: {self._label('new sample', 'nowa próbka')}",
             self._label("drag points", "przesuń punkty"),
@@ -525,7 +626,7 @@ class ClusteringLabScene:
 
     def _controls_bottom_y(self, start_y: int) -> int:
         rows = math.ceil(len(self._control_labels()) / 2)
-        return start_y + rows * 24
+        return start_y + rows * 20
 
     def _draw_inertia_sparkline(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         pygame.draw.rect(surface, SPARKLINE_BG, rect, border_radius=6)
@@ -562,6 +663,28 @@ class ClusteringLabScene:
             pygame.draw.lines(surface, ACCENT, False, points, 2)
         for point in points:
             pygame.draw.circle(surface, ACCENT, point, 3)
+
+    def _draw_dbscan_summary(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
+        pygame.draw.rect(surface, SPARKLINE_BG, rect, border_radius=6)
+        pygame.draw.rect(surface, GRID, rect, width=1, border_radius=6)
+        noise_count = sum(1 for label in self.dbscan_labels if label == -1)
+        self._draw_text(
+            surface,
+            "DBSCAN",
+            (rect.x + 10, rect.y + 7),
+            self._font_small,
+            MUTED_TEXT,
+        )
+        self._draw_text(
+            surface,
+            self._label(
+                f"clusters: {self.dbscan_cluster_count}, noise: {noise_count}",
+                f"klastry: {self.dbscan_cluster_count}, noise: {noise_count}",
+            ),
+            (rect.x + 10, rect.y + 30),
+            self._font_small,
+            ACCENT,
+        )
 
     def _draw_wrapped(
         self,
@@ -605,7 +728,7 @@ class ClusteringLabScene:
         y += 56
         y += 34
         y += 38
-        y += 6 * 24
+        y += 7 * 24
         y += 66
         y += 24
         y += len(self._wrap_text(self._observation_hint(), 270, self._font_small)) * 18
@@ -634,7 +757,28 @@ class ClusteringLabScene:
         }
         return hints[self.preset.key]
 
+    def _point_labels(self) -> list[int]:
+        if self.algorithm_mode == AlgorithmMode.DBSCAN:
+            return self.dbscan_labels
+
+        return self.assignments
+
+    def _cluster_color(self, label: int) -> tuple[int, int, int]:
+        if label == -1:
+            return MUTED_TEXT
+
+        return CLUSTER_COLORS[label % len(CLUSTER_COLORS)]
+
+    def _mode_label(self) -> str:
+        if self.algorithm_mode == AlgorithmMode.DBSCAN:
+            return f"DBSCAN eps={self.dbscan_eps:.2f}"
+
+        return "K-Means"
+
     def _phase_label(self) -> str:
+        if self.algorithm_mode == AlgorithmMode.DBSCAN:
+            return self._label("density scan", "skan gęstości")
+
         if self.kmeans_phase == KMeansPhase.ASSIGN:
             return self._label("assign points", "przypisz punkty")
 
