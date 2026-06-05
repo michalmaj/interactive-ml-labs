@@ -15,7 +15,7 @@ from interactive_ml_labs.scene import SceneCommand
 from interactive_ml_labs.settings import AppContext
 
 PLOT_RECT: Final[tuple[int, int, int, int]] = (48, 72, 820, 580)
-PANEL_RECT: Final[tuple[int, int, int, int]] = (904, 72, 328, 580)
+PANEL_RECT: Final[tuple[int, int, int, int]] = (904, 72, 328, 620)
 BACKGROUND: Final[tuple[int, int, int]] = (22, 25, 29)
 PANEL: Final[tuple[int, int, int]] = (36, 41, 47)
 PLOT_BG: Final[tuple[int, int, int]] = (18, 21, 25)
@@ -433,7 +433,7 @@ class ClusteringLabScene:
             self._font_heading,
             TEXT,
         )
-        y += 30
+        y += 24
         y = self._draw_wrapped(
             surface,
             self._observation_hint(),
@@ -441,9 +441,9 @@ class ClusteringLabScene:
             270,
             self._font_small,
             MUTED_TEXT,
-            line_height=20,
+            line_height=18,
         )
-        y += 14
+        y += 8
         self._draw_text(
             surface,
             self._label("Controls", "Sterowanie"),
@@ -451,17 +451,8 @@ class ClusteringLabScene:
             self._font_heading,
             TEXT,
         )
-        y += 30
-        controls = (
-            f"1-4: {self._label('presets', 'presety')}",
-            "- / =: k",
-            f"Space: {self._label('step', 'krok')}",
-            "A: auto-run",
-            f"C: {self._label('links', 'linie')}",
-            f"R: {self._label('reset', 'reset')}",
-            f"N: {self._label('new sample', 'nowa próbka')}",
-            self._label("drag points", "przesuń punkty"),
-        )
+        y += 26
+        controls = self._control_labels()
         for index, control in enumerate(controls):
             column = index % 2
             row = index // 2
@@ -492,6 +483,22 @@ class ClusteringLabScene:
         color: tuple[int, int, int],
     ) -> None:
         surface.blit(font.render(text, True, color), position)
+
+    def _control_labels(self) -> tuple[str, ...]:
+        return (
+            f"1-4: {self._label('presets', 'presety')}",
+            "- / =: k",
+            f"Space: {self._label('step', 'krok')}",
+            "A: auto-run",
+            f"C: {self._label('links', 'linie')}",
+            f"R: {self._label('reset', 'reset')}",
+            f"N: {self._label('new sample', 'nowa próbka')}",
+            self._label("drag points", "przesuń punkty"),
+        )
+
+    def _controls_bottom_y(self, start_y: int) -> int:
+        rows = math.ceil(len(self._control_labels()) / 2)
+        return start_y + rows * 24
 
     def _draw_inertia_sparkline(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         pygame.draw.rect(surface, SPARKLINE_BG, rect, border_radius=6)
@@ -540,6 +547,14 @@ class ClusteringLabScene:
         *,
         line_height: int,
     ) -> int:
+        x, y = position
+        for line in self._wrap_text(text, width, font):
+            self._draw_text(surface, line, (x, y), font, color)
+            y += line_height
+
+        return y
+
+    def _wrap_text(self, text: str, width: int, font: pygame.font.Font) -> list[str]:
         words = text.split()
         lines: list[str] = []
         current = ""
@@ -556,11 +571,19 @@ class ClusteringLabScene:
         if current:
             lines.append(current)
 
-        x, y = position
-        for line in lines:
-            self._draw_text(surface, line, (x, y), font, color)
-            y += line_height
+        return lines
 
+    def _panel_controls_start_y(self, rect: pygame.Rect) -> int:
+        y = rect.y + 24
+        y += 56
+        y += 34
+        y += 38
+        y += 5 * 28
+        y += 82
+        y += 24
+        y += len(self._wrap_text(self._observation_hint(), 270, self._font_small)) * 18
+        y += 8
+        y += 26
         return y
 
     def _observation_hint(self) -> str:
