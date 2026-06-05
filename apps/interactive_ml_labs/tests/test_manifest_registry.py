@@ -40,7 +40,8 @@ def test_registry_groups_demos_by_level() -> None:
     assert {demo.level for demo in level_three_demos} == {3}
     assert len(level_one_demos) >= 4
     assert len(level_two_demos) >= 2
-    assert len(level_three_demos) == 1
+    assert len(level_three_demos) == 2
+    assert level_three_demos[0].id == "clustering_lab"
 
 
 def test_level_three_placeholder_describes_future_advanced_demos() -> None:
@@ -66,6 +67,36 @@ def test_level_three_placeholder_describes_future_advanced_demos() -> None:
     assert "Coming soon" in text
     assert manifest.difficulty.pl == "W przygotowaniu"
     assert manifest.tags == ("level-3", "showcase", "planning")
+
+
+def test_clustering_manifest_sets_first_level_three_demo_contract() -> None:
+    """Clustering Lab should be the first real Level 3 demo contract."""
+    manifest = DEMO_BY_ID["clustering_lab"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(entry.term for entry in manifest.theory.glossary),
+        ],
+    )
+
+    assert manifest.level == 3
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Zaawansowane"
+    assert manifest.tags == ("clustering", "k-means", "unsupervised", "visualization")
+    assert "K-Means" in text
+    assert "centroid" in text
+    assert "inertia" in text
+    assert "DBSCAN" in text
+    assert "Space" in text
 
 
 def test_manifests_have_required_teaching_content() -> None:
