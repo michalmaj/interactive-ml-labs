@@ -24,6 +24,7 @@ TEXT: Final[tuple[int, int, int]] = (235, 238, 241)
 MUTED_TEXT: Final[tuple[int, int, int]] = (166, 173, 181)
 ACCENT: Final[tuple[int, int, int]] = (113, 204, 152)
 LINK: Final[tuple[int, int, int]] = (78, 87, 97)
+SPARKLINE_BG: Final[tuple[int, int, int]] = (27, 31, 36)
 CENTROID_STROKE: Final[tuple[int, int, int]] = (14, 18, 22)
 POINT_RADIUS: Final[int] = 5
 CENTROID_RADIUS: Final[int] = 11
@@ -90,6 +91,7 @@ class ClusteringLabScene:
         self.auto_run = False
         self.show_links = False
         self.inertia = 0.0
+        self.inertia_history: list[float] = []
         self.points: list[Point] = []
         self.centroids: list[Point] = []
         self.assignments: list[int] = []
@@ -190,6 +192,7 @@ class ClusteringLabScene:
         self.centroids = next_centroids
         self._assign_points()
         self.iteration += 1
+        self.inertia_history.append(self.inertia)
 
     def _generate_dataset(self) -> None:
         self._rng.seed(self._sample_seed + self.preset_index * 1000)
@@ -284,6 +287,7 @@ class ClusteringLabScene:
         self.auto_run = False
         self._auto_elapsed = 0.0
         self._assign_points()
+        self.inertia_history = [self.inertia]
 
     def _change_k(self, delta: int) -> None:
         self.k = max(MIN_K, min(MAX_K, self.k + delta))
@@ -315,6 +319,7 @@ class ClusteringLabScene:
 
         self.points[self.dragged_point_index] = self._from_screen(position, pygame.Rect(PLOT_RECT))
         self._assign_points()
+        self._replace_current_inertia_sample()
 
     def _nearest_point_index(
         self,
@@ -337,6 +342,13 @@ class ClusteringLabScene:
     def _nearest_centroid(self, point: Point) -> int:
         distances = [_squared_distance(point, centroid) for centroid in self.centroids]
         return min(range(len(distances)), key=distances.__getitem__)
+
+    def _replace_current_inertia_sample(self) -> None:
+        if self.inertia_history:
+            self.inertia_history[-1] = self.inertia
+            return
+
+        self.inertia_history.append(self.inertia)
 
     def _draw_plot(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         pygame.draw.rect(surface, PLOT_BG, rect, border_radius=8)
@@ -410,7 +422,10 @@ class ClusteringLabScene:
             self._draw_text(surface, f"{label}: {value}", (x, y), self._font_body, TEXT)
             y += 28
 
-        y += 16
+        sparkline_rect = pygame.Rect(x, y + 4, 270, 58)
+        self._draw_inertia_sparkline(surface, sparkline_rect)
+        y += 82
+
         self._draw_text(
             surface,
             self._label("Watch", "Obserwuj"),
@@ -477,6 +492,42 @@ class ClusteringLabScene:
         color: tuple[int, int, int],
     ) -> None:
         surface.blit(font.render(text, True, color), position)
+
+    def _draw_inertia_sparkline(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
+        pygame.draw.rect(surface, SPARKLINE_BG, rect, border_radius=6)
+        pygame.draw.rect(surface, GRID, rect, width=1, border_radius=6)
+        self._draw_text(
+            surface,
+            self._label("Inertia trend", "Trend inertia"),
+            (rect.x + 10, rect.y + 7),
+            self._font_small,
+            MUTED_TEXT,
+        )
+        if len(self.inertia_history) < 2:
+            self._draw_text(
+                surface,
+                self._label("step to build history", "zrób krok, aby zobaczyć trend"),
+                (rect.x + 10, rect.y + 30),
+                self._font_small,
+                MUTED_TEXT,
+            )
+            return
+
+        values = self.inertia_history[-12:]
+        minimum = min(values)
+        maximum = max(values)
+        span = max(maximum - minimum, 0.001)
+        points: list[tuple[int, int]] = []
+        chart_rect = pygame.Rect(rect.x + 10, rect.y + 24, rect.width - 20, rect.height - 34)
+        for index, value in enumerate(values):
+            x = chart_rect.left + round(index * chart_rect.width / max(1, len(values) - 1))
+            y = chart_rect.bottom - round((value - minimum) * chart_rect.height / span)
+            points.append((x, y))
+
+        if len(points) >= 2:
+            pygame.draw.lines(surface, ACCENT, False, points, 2)
+        for point in points:
+            pygame.draw.circle(surface, ACCENT, point, 3)
 
     def _draw_wrapped(
         self,
