@@ -103,6 +103,23 @@ def test_clustering_scene_auto_run_steps_over_time(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_clustering_scene_toggles_centroid_links(monkeypatch) -> None:
+    """C should show or hide point-to-centroid helper lines."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_clustering_lab_scene(AppContext())
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_c))
+        assert scene.show_links is True
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_c))
+        assert scene.show_links is False
+    finally:
+        pygame.quit()
+
+
 def test_clustering_scene_new_sample_regenerates_points(monkeypatch) -> None:
     """N should regenerate the current dataset sample."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
