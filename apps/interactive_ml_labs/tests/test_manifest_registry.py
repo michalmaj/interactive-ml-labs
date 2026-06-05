@@ -13,6 +13,7 @@ from interactive_ml_labs import (
     validate_demo_registry,
 )
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
+from interactive_ml_labs.clustering_scene import create_clustering_lab_scene
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
@@ -92,6 +93,7 @@ def test_clustering_manifest_sets_first_level_three_demo_contract() -> None:
     assert manifest.difficulty is not None
     assert manifest.difficulty.pl == "Zaawansowane"
     assert manifest.tags == ("clustering", "k-means", "unsupervised", "visualization")
+    assert manifest.create_scene is create_clustering_lab_scene
     assert "K-Means" in text
     assert "centroid" in text
     assert "inertia" in text

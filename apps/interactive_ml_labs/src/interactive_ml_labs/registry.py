@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
+from interactive_ml_labs.clustering_scene import create_clustering_lab_scene
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
@@ -1645,18 +1646,19 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["boosting_mistake_lab"],
         ),
     ),
-    _placeholder_demo(
-        demo_id="clustering_lab",
+    DemoManifest(
+        id="clustering_lab",
         level=3,
-        title_en="Clustering Lab",
-        title_pl="Clustering Lab",
-        summary_en=(
-            "Explore how K-Means groups unlabeled points, why choosing k matters, "
-            "and where centroid-based clustering breaks down."
-        ),
-        summary_pl=(
-            "Zobacz, jak K-Means grupuje punkty bez etykiet, dlaczego wybór k "
-            "ma znaczenie i kiedy clustering oparty na centroidach zaczyna zawodzić."
+        title=LocalizedText(en="Clustering Lab", pl="Clustering Lab"),
+        summary=LocalizedText(
+            en=(
+                "Explore how K-Means groups unlabeled points, why choosing k matters, "
+                "and where centroid-based clustering breaks down."
+            ),
+            pl=(
+                "Zobacz, jak K-Means grupuje punkty bez etykiet, dlaczego wybór k "
+                "ma znaczenie i kiedy clustering oparty na centroidach zaczyna zawodzić."
+            ),
         ),
         objectives=(
             LocalizedText(
@@ -1731,6 +1733,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
         ),
+        create_scene=create_clustering_lab_scene,
         difficulty=LocalizedText(en="Advanced", pl="Zaawansowane"),
         tags=("clustering", "k-means", "unsupervised", "visualization"),
         theory=DemoTheory(
