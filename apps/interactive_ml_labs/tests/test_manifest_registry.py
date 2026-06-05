@@ -97,6 +97,8 @@ def test_clustering_manifest_sets_first_level_three_demo_contract() -> None:
     assert "K-Means" in text
     assert "centroid" in text
     assert "inertia" in text
+    assert "Dragging" in text
+    assert "point-to-centroid" in text
     assert "DBSCAN" in text
     assert "Space" in text
     assert "C" in text

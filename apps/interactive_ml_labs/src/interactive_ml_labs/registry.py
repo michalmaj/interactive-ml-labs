@@ -1827,6 +1827,66 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     ),
                 ),
                 TheorySection(
+                    title=LocalizedText(
+                        en="What the interaction shows",
+                        pl="Co pokazuje interakcja",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Dragging a point changes the data, not only the display. "
+                                "After the move, K-Means recomputes assignments against the "
+                                "current centroids."
+                            ),
+                            pl=(
+                                "Przesuwanie punktu zmienia dane, a nie tylko obrazek. "
+                                "Po takim ruchu K-Means ponownie liczy przypisania względem "
+                                "aktualnych centroidów."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Point-to-centroid links make those assignments explicit: "
+                                "each point belongs to the closest centroid."
+                            ),
+                            pl=(
+                                "Linie punkt-centroid pokazują te przypisania wprost: "
+                                "każdy punkt należy do najbliższego centroidu."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(
+                        en="How to read inertia",
+                        pl="Jak czytać inertia",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "The inertia trend shows whether K-Means is reducing the "
+                                "sum of squared point-to-centroid distances."
+                            ),
+                            pl=(
+                                "Trend inertia pokazuje, czy K-Means zmniejsza sumę "
+                                "kwadratów odległości punktów od centroidów."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Lower inertia does not always mean a better explanation. "
+                                "A larger k can reduce the score while splitting a natural "
+                                "group into artificial pieces."
+                            ),
+                            pl=(
+                                "Niższa inertia nie zawsze oznacza lepsze wyjaśnienie danych. "
+                                "Większe k może poprawić wynik, a jednocześnie pociąć naturalną "
+                                "grupę na sztuczne kawałki."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
                     title=LocalizedText(en="Where it breaks", pl="Gdzie to się psuje"),
                     body=(
                         LocalizedText(
