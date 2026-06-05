@@ -4,6 +4,7 @@ import pygame
 from interactive_ml_labs.clustering_scene import (
     MAX_K,
     MIN_K,
+    PANEL_RECT,
     PLOT_RECT,
     ClusteringLabScene,
     create_clustering_lab_scene,
@@ -209,5 +210,25 @@ def test_clustering_scene_renders_to_shell_surface(monkeypatch) -> None:
 
         assert surface.get_bounding_rect().width > 0
         assert surface.get_bounding_rect().height > 0
+    finally:
+        pygame.quit()
+
+
+def test_clustering_scene_controls_fit_inside_panel(monkeypatch) -> None:
+    """The right-side panel should contain the full controls block."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.settings.language = "pl"
+        scene = create_clustering_lab_scene(context)
+        panel_rect = pygame.Rect(PANEL_RECT)
+
+        for preset_index in range(4):
+            scene.preset_index = preset_index
+            controls_y = scene._panel_controls_start_y(panel_rect)
+
+            assert scene._controls_bottom_y(controls_y) <= panel_rect.bottom - 16
     finally:
         pygame.quit()
