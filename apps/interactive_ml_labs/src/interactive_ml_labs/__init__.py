@@ -4,6 +4,10 @@ from interactive_ml_labs.boosting_scene import (
     BoostingMistakeLabSceneAdapter,
     create_boosting_mistake_lab_scene,
 )
+from interactive_ml_labs.clustering_scene import (
+    ClusteringLabScene,
+    create_clustering_lab_scene,
+)
 from interactive_ml_labs.decision_tree_scene import (
     DecisionTreeSceneAdapter,
     create_decision_tree_scene,
@@ -81,6 +85,7 @@ __all__ = [
     "AppContext",
     "AppSettings",
     "BoostingMistakeLabSceneAdapter",
+    "ClusteringLabScene",
     "ControlBinding",
     "DecisionTreeSceneAdapter",
     "DemoManifest",
@@ -102,6 +107,7 @@ __all__ = [
     "center_rect",
     "choose_adaptive_window_size",
     "create_boosting_mistake_lab_scene",
+    "create_clustering_lab_scene",
     "create_decision_tree_scene",
     "create_gradient_descent_scene",
     "create_knn_vote_map_scene",
