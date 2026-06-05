@@ -1739,6 +1739,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     pl="wygeneruj nową próbkę danych",
                 ),
             ),
+            ControlBinding(
+                key="Mouse drag",
+                action=LocalizedText(
+                    en="move a data point",
+                    pl="przesuń punkt danych",
+                ),
+            ),
         ),
         create_scene=create_clustering_lab_scene,
         difficulty=LocalizedText(en="Advanced", pl="Zaawansowane"),

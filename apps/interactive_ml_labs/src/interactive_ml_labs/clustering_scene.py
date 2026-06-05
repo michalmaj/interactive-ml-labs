@@ -14,6 +14,8 @@ from interactive_ml_labs.fonts import make_ui_font
 from interactive_ml_labs.scene import SceneCommand
 from interactive_ml_labs.settings import AppContext
 
+PLOT_RECT: Final[tuple[int, int, int, int]] = (48, 72, 820, 580)
+PANEL_RECT: Final[tuple[int, int, int, int]] = (904, 72, 328, 580)
 BACKGROUND: Final[tuple[int, int, int]] = (22, 25, 29)
 PANEL: Final[tuple[int, int, int]] = (36, 41, 47)
 PLOT_BG: Final[tuple[int, int, int]] = (18, 21, 25)
@@ -26,6 +28,7 @@ CENTROID_STROKE: Final[tuple[int, int, int]] = (14, 18, 22)
 POINT_RADIUS: Final[int] = 5
 CENTROID_RADIUS: Final[int] = 11
 AUTO_STEP_SECONDS: Final[float] = 0.55
+DRAG_PICK_RADIUS: Final[int] = 14
 MAX_K: Final[int] = 6
 MIN_K: Final[int] = 2
 
@@ -90,6 +93,7 @@ class ClusteringLabScene:
         self.points: list[Point] = []
         self.centroids: list[Point] = []
         self.assignments: list[int] = []
+        self.dragged_point_index: int | None = None
         self._auto_elapsed = 0.0
         self._font_title = make_ui_font(32, bold=True)
         self._font_heading = make_ui_font(24, bold=True)
@@ -103,30 +107,42 @@ class ClusteringLabScene:
         return PRESETS[self.preset_index]
 
     def handle_event(self, event: object) -> SceneCommand:
-        """Handle keyboard input for the playground."""
-        if not isinstance(event, pygame.event.Event) or event.type != pygame.KEYDOWN:
+        """Handle keyboard and mouse input for the playground."""
+        if not isinstance(event, pygame.event.Event):
             return SceneCommand.none()
 
-        if event.key in {pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4}:
-            self.preset_index = event.key - pygame.K_1
-            self._generate_dataset()
-        elif event.key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
-            self._change_k(-1)
-        elif event.key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
-            self._change_k(1)
-        elif event.key == pygame.K_SPACE:
-            self.step()
-        elif event.key == pygame.K_a:
-            self.auto_run = not self.auto_run
-        elif event.key == pygame.K_c:
-            self.show_links = not self.show_links
-        elif event.key == pygame.K_r:
-            self._reset_centroids()
-        elif event.key == pygame.K_n:
-            self._sample_seed += 1
-            self._generate_dataset()
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            self._start_drag(event.pos)
+        elif event.type == pygame.MOUSEMOTION and self.dragged_point_index is not None:
+            self._drag_point(event.pos)
+        elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            self.dragged_point_index = None
+        elif event.type != pygame.KEYDOWN:
+            return SceneCommand.none()
+        else:
+            self._handle_keydown(event.key)
 
         return SceneCommand.none()
+
+    def _handle_keydown(self, key: int) -> None:
+        if key in {pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4}:
+            self.preset_index = key - pygame.K_1
+            self._generate_dataset()
+        elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
+            self._change_k(-1)
+        elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
+            self._change_k(1)
+        elif key == pygame.K_SPACE:
+            self.step()
+        elif key == pygame.K_a:
+            self.auto_run = not self.auto_run
+        elif key == pygame.K_c:
+            self.show_links = not self.show_links
+        elif key == pygame.K_r:
+            self._reset_centroids()
+        elif key == pygame.K_n:
+            self._sample_seed += 1
+            self._generate_dataset()
 
     def update(self, dt: float) -> SceneCommand:
         """Advance auto-run K-Means iterations."""
@@ -146,8 +162,8 @@ class ClusteringLabScene:
             return
 
         surface.fill(BACKGROUND)
-        plot_rect = pygame.Rect(48, 72, 820, 580)
-        panel_rect = pygame.Rect(904, 72, 328, 580)
+        plot_rect = pygame.Rect(PLOT_RECT)
+        panel_rect = pygame.Rect(PANEL_RECT)
         self._draw_plot(surface, plot_rect)
         self._draw_panel(surface, panel_rect)
 
@@ -280,6 +296,44 @@ class ClusteringLabScene:
             for point, assignment in zip(self.points, self.assignments, strict=True)
         )
 
+    def _start_drag(self, position: tuple[int, int]) -> None:
+        plot_rect = pygame.Rect(PLOT_RECT)
+        if not plot_rect.collidepoint(position):
+            return
+
+        nearest_index = self._nearest_point_index(position, plot_rect)
+        if nearest_index is None:
+            return
+
+        self.dragged_point_index = nearest_index
+        self.auto_run = False
+        self._drag_point(position)
+
+    def _drag_point(self, position: tuple[int, int]) -> None:
+        if self.dragged_point_index is None:
+            return
+
+        self.points[self.dragged_point_index] = self._from_screen(position, pygame.Rect(PLOT_RECT))
+        self._assign_points()
+
+    def _nearest_point_index(
+        self,
+        position: tuple[int, int],
+        plot_rect: pygame.Rect,
+    ) -> int | None:
+        nearest_index: int | None = None
+        nearest_distance = DRAG_PICK_RADIUS**2
+        for index, point in enumerate(self.points):
+            screen_position = self._to_screen(point, plot_rect)
+            distance = (screen_position[0] - position[0]) ** 2 + (
+                screen_position[1] - position[1]
+            ) ** 2
+            if distance <= nearest_distance:
+                nearest_index = index
+                nearest_distance = distance
+
+        return nearest_index
+
     def _nearest_centroid(self, point: Point) -> int:
         distances = [_squared_distance(point, centroid) for centroid in self.centroids]
         return min(range(len(distances)), key=distances.__getitem__)
@@ -391,6 +445,7 @@ class ClusteringLabScene:
             f"C: {self._label('links', 'linie')}",
             f"R: {self._label('reset', 'reset')}",
             f"N: {self._label('new sample', 'nowa próbka')}",
+            self._label("drag points", "przesuń punkty"),
         )
         for index, control in enumerate(controls):
             column = index % 2
@@ -407,6 +462,11 @@ class ClusteringLabScene:
         x = rect.left + round((point.x + 1.0) * 0.5 * rect.width)
         y = rect.top + round((1.0 - (point.y + 1.0) * 0.5) * rect.height)
         return (x, y)
+
+    def _from_screen(self, position: tuple[int, int], rect: pygame.Rect) -> Point:
+        x = _clamp(((position[0] - rect.left) / rect.width) * 2.0 - 1.0, -0.95, 0.95)
+        y = _clamp(((rect.bottom - position[1]) / rect.height) * 2.0 - 1.0, -0.95, 0.95)
+        return Point(x, y)
 
     def _draw_text(
         self,
