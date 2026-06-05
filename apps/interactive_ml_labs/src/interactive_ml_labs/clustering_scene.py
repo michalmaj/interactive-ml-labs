@@ -21,6 +21,7 @@ GRID: Final[tuple[int, int, int]] = (45, 51, 58)
 TEXT: Final[tuple[int, int, int]] = (235, 238, 241)
 MUTED_TEXT: Final[tuple[int, int, int]] = (166, 173, 181)
 ACCENT: Final[tuple[int, int, int]] = (113, 204, 152)
+LINK: Final[tuple[int, int, int]] = (78, 87, 97)
 CENTROID_STROKE: Final[tuple[int, int, int]] = (14, 18, 22)
 POINT_RADIUS: Final[int] = 5
 CENTROID_RADIUS: Final[int] = 11
@@ -84,6 +85,7 @@ class ClusteringLabScene:
         self.k = 3
         self.iteration = 0
         self.auto_run = False
+        self.show_links = False
         self.inertia = 0.0
         self.points: list[Point] = []
         self.centroids: list[Point] = []
@@ -116,6 +118,8 @@ class ClusteringLabScene:
             self.step()
         elif event.key == pygame.K_a:
             self.auto_run = not self.auto_run
+        elif event.key == pygame.K_c:
+            self.show_links = not self.show_links
         elif event.key == pygame.K_r:
             self._reset_centroids()
         elif event.key == pygame.K_n:
@@ -289,6 +293,16 @@ class ClusteringLabScene:
             pygame.draw.line(surface, GRID, (x, rect.top), (x, rect.bottom), 1)
             pygame.draw.line(surface, GRID, (rect.left, y), (rect.right, y), 1)
 
+        if self.show_links:
+            for point, assignment in zip(self.points, self.assignments, strict=True):
+                pygame.draw.line(
+                    surface,
+                    LINK,
+                    self._to_screen(point, rect),
+                    self._to_screen(self.centroids[assignment], rect),
+                    1,
+                )
+
         for point, assignment in zip(self.points, self.assignments, strict=True):
             color = CLUSTER_COLORS[assignment % len(CLUSTER_COLORS)]
             pygame.draw.circle(surface, color, self._to_screen(point, rect), POINT_RADIUS)
@@ -328,19 +342,39 @@ class ClusteringLabScene:
             self._font_body,
             ACCENT,
         )
-        y += 48
+        y += 38
         auto_label = self._label("on", "wł.") if self.auto_run else self._label("off", "wył.")
+        links_label = self._label("on", "wł.") if self.show_links else self._label("off", "wył.")
         rows = (
             (self._label("k", "k"), str(self.k)),
             (self._label("Iteration", "Iteracja"), str(self.iteration)),
             (self._label("Inertia", "Inertia"), f"{self.inertia:.2f}"),
             (self._label("Auto-run", "Auto-run"), auto_label),
+            (self._label("Links", "Linie"), links_label),
         )
         for label, value in rows:
             self._draw_text(surface, f"{label}: {value}", (x, y), self._font_body, TEXT)
-            y += 32
+            y += 28
 
-        y += 28
+        y += 16
+        self._draw_text(
+            surface,
+            self._label("Watch", "Obserwuj"),
+            (x, y),
+            self._font_heading,
+            TEXT,
+        )
+        y += 30
+        y = self._draw_wrapped(
+            surface,
+            self._observation_hint(),
+            (x, y),
+            270,
+            self._font_small,
+            MUTED_TEXT,
+            line_height=20,
+        )
+        y += 14
         self._draw_text(
             surface,
             self._label("Controls", "Sterowanie"),
@@ -348,18 +382,26 @@ class ClusteringLabScene:
             self._font_heading,
             TEXT,
         )
-        y += 34
+        y += 30
         controls = (
             f"1-4: {self._label('presets', 'presety')}",
             "- / =: k",
             f"Space: {self._label('step', 'krok')}",
             "A: auto-run",
+            f"C: {self._label('links', 'linie')}",
             f"R: {self._label('reset', 'reset')}",
             f"N: {self._label('new sample', 'nowa próbka')}",
         )
-        for control in controls:
-            self._draw_text(surface, control, (x, y), self._font_small, MUTED_TEXT)
-            y += 25
+        for index, control in enumerate(controls):
+            column = index % 2
+            row = index // 2
+            self._draw_text(
+                surface,
+                control,
+                (x + column * 138, y + row * 24),
+                self._font_small,
+                MUTED_TEXT,
+            )
 
     def _to_screen(self, point: Point, rect: pygame.Rect) -> tuple[int, int]:
         x = rect.left + round((point.x + 1.0) * 0.5 * rect.width)
@@ -375,6 +417,61 @@ class ClusteringLabScene:
         color: tuple[int, int, int],
     ) -> None:
         surface.blit(font.render(text, True, color), position)
+
+    def _draw_wrapped(
+        self,
+        surface: pygame.Surface,
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+        *,
+        line_height: int,
+    ) -> int:
+        words = text.split()
+        lines: list[str] = []
+        current = ""
+        for word in words:
+            candidate = word if not current else f"{current} {word}"
+            if font.size(candidate)[0] <= width:
+                current = candidate
+                continue
+
+            if current:
+                lines.append(current)
+            current = word
+
+        if current:
+            lines.append(current)
+
+        x, y = position
+        for line in lines:
+            self._draw_text(surface, line, (x, y), font, color)
+            y += line_height
+
+        return y
+
+    def _observation_hint(self) -> str:
+        hints = {
+            "blobs": self._label(
+                "Clean blobs show the case where K-Means usually feels natural.",
+                "Clean blobs pokazują sytuację, w której K-Means zwykle wygląda naturalnie.",
+            ),
+            "uneven": self._label(
+                "Uneven blobs reveal how cluster size and density can pull centroids.",
+                "Uneven blobs pokazują, jak rozmiar i gęstość klastrów przesuwają centroidy.",
+            ),
+            "moons": self._label(
+                "Moons make the round-cluster assumption visible.",
+                "Moons dobrze pokazują założenie o okrągłych klastrach.",
+            ),
+            "outliers": self._label(
+                "Outliers show how a few distant points can distort centroid placement.",
+                "Outliery pokazują, jak kilka dalekich punktów zniekształca położenie centroidów.",
+            ),
+        }
+        return hints[self.preset.key]
 
     def _label(self, en: str, pl: str) -> str:
         if self._language == "pl":

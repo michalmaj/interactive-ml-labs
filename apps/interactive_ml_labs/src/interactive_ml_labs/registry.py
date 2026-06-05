@@ -1719,6 +1719,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
             ControlBinding(
+                key="C",
+                action=LocalizedText(
+                    en="show or hide point-to-centroid links",
+                    pl="pokaż albo ukryj linie punkt-centroid",
+                ),
+            ),
+            ControlBinding(
                 key="R",
                 action=LocalizedText(
                     en="reset centroids",
