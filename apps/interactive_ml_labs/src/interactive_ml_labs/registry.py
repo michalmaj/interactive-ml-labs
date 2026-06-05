@@ -228,6 +228,38 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
         ),
     ),
+    "clustering_lab": (
+        LocalizedText(
+            en=(
+                "Start with clean blobs and change k. Notice when K-Means "
+                "matches the visible groups and when it starts inventing structure."
+            ),
+            pl=(
+                "Zacznij od prostych blobs i zmieniaj k. Zobacz, kiedy K-Means "
+                "pasuje do widocznych grup, a kiedy zaczyna wymyślać strukturę."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Switch to moons or uneven blobs and ask what assumption K-Means "
+                "is making about cluster shape."
+            ),
+            pl=(
+                "Przełącz się na moons albo uneven blobs i sprawdź, jakie "
+                "założenie o kształcie klastrów robi K-Means."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Add or reveal outliers and watch how strongly a few points can "
+                "pull centroids away from the dense regions."
+            ),
+            pl=(
+                "Dodaj albo pokaż outliery i zobacz, jak mocno kilka punktów "
+                "potrafi odciągnąć centroidy od gęstych obszarów."
+            ),
+        ),
+    ),
     "level_3_coming_soon": (
         LocalizedText(
             en=(
@@ -423,6 +455,41 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                 pl=(
                     "Accuracy mierzona na danych treningowych oraz na osobnych "
                     "danych do sprawdzania generalizacji."
+                ),
+            ),
+        ),
+    ),
+    "clustering_lab": (
+        GlossaryTerm(
+            term="clustering",
+            definition=LocalizedText(
+                en=(
+                    "Grouping data without class labels, usually by looking for "
+                    "points that are close or dense together."
+                ),
+                pl=(
+                    "Grupowanie danych bez etykiet klas, zwykle przez szukanie "
+                    "punktów, które są blisko siebie albo tworzą gęste obszary."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="centroid",
+            definition=LocalizedText(
+                en="The current center of a K-Means cluster.",
+                pl="Aktualny środek klastra w K-Means.",
+            ),
+        ),
+        GlossaryTerm(
+            term="inertia",
+            definition=LocalizedText(
+                en=(
+                    "A K-Means score based on distances from points to their "
+                    "assigned centroids; lower is usually tighter."
+                ),
+                pl=(
+                    "Miara K-Means oparta na odległościach punktów od przypisanych "
+                    "centroidów; niższa zwykle oznacza ciaśniejsze klastry."
                 ),
             ),
         ),
@@ -1576,6 +1643,200 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["boosting_mistake_lab"],
             glossary=LESSON_GLOSSARY["boosting_mistake_lab"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="clustering_lab",
+        level=3,
+        title_en="Clustering Lab",
+        title_pl="Clustering Lab",
+        summary_en=(
+            "Explore how K-Means groups unlabeled points, why choosing k matters, "
+            "and where centroid-based clustering breaks down."
+        ),
+        summary_pl=(
+            "Zobacz, jak K-Means grupuje punkty bez etykiet, dlaczego wybór k "
+            "ma znaczenie i kiedy clustering oparty na centroidach zaczyna zawodzić."
+        ),
+        objectives=(
+            LocalizedText(
+                en=(
+                    "Connect K-Means assignments with the visible position of "
+                    "centroids and data points."
+                ),
+                pl=("Połącz przypisania K-Means z położeniem centroidów i punktów na wykresie."),
+            ),
+            LocalizedText(
+                en=(
+                    "Compare clean blobs, uneven blobs, moons, and outliers to see "
+                    "which data shapes fit K-Means assumptions."
+                ),
+                pl=(
+                    "Porównaj clean blobs, uneven blobs, moons i outliery, żeby "
+                    "zobaczyć, które kształty danych pasują do założeń K-Means."
+                ),
+            ),
+            LocalizedText(
+                en=(
+                    "Treat k as a modeling decision, not a fact discovered "
+                    "automatically by the algorithm."
+                ),
+                pl=(
+                    "Traktuj k jako decyzję modelującą, a nie fakt automatycznie "
+                    "odkrywany przez algorytm."
+                ),
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1-4",
+                action=LocalizedText(
+                    en="switch dataset preset",
+                    pl="zmień preset danych",
+                ),
+            ),
+            ControlBinding(
+                key="- / =",
+                action=LocalizedText(
+                    en="decrease or increase k",
+                    pl="zmniejsz albo zwiększ k",
+                ),
+            ),
+            ControlBinding(
+                key="Space",
+                action=LocalizedText(
+                    en="advance one K-Means iteration",
+                    pl="wykonaj jedną iterację K-Means",
+                ),
+            ),
+            ControlBinding(
+                key="A",
+                action=LocalizedText(
+                    en="toggle auto-run",
+                    pl="włącz albo wyłącz auto-run",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(
+                    en="reset centroids",
+                    pl="zresetuj centroidy",
+                ),
+            ),
+            ControlBinding(
+                key="N",
+                action=LocalizedText(
+                    en="generate a new dataset sample",
+                    pl="wygeneruj nową próbkę danych",
+                ),
+            ),
+        ),
+        difficulty=LocalizedText(en="Advanced", pl="Zaawansowane"),
+        tags=("clustering", "k-means", "unsupervised", "visualization"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What clustering asks", pl="O co pyta clustering"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Clustering looks for structure in data without using class labels."
+                            ),
+                            pl=(
+                                "Clustering szuka struktury w danych bez korzystania "
+                                "z etykiet klas."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "That makes the result useful for exploration, but also "
+                                "dependent on the assumptions built into the algorithm."
+                            ),
+                            pl=(
+                                "To pomaga w eksploracji danych, ale wynik zależy od "
+                                "założeń zapisanych w algorytmie."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What K-Means assumes", pl="Co zakłada K-Means"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "K-Means represents each cluster with a centroid and "
+                                "assigns points to the nearest one."
+                            ),
+                            pl=(
+                                "K-Means opisuje każdy klaster przez centroid i przypisuje "
+                                "punkty do najbliższego centroidu."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "It works best when clusters are compact, roughly round, "
+                                "and not wildly different in size."
+                            ),
+                            pl=(
+                                "Najlepiej działa, gdy klastry są zwarte, mniej więcej "
+                                "okrągłe i niezbyt różne pod względem rozmiaru."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Why k is a choice", pl="Dlaczego k jest wyborem"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "The algorithm does not know how many groups are meaningful. "
+                                "The student or practitioner has to choose k."
+                            ),
+                            pl=(
+                                "Algorytm nie wie, ile grup ma sens. To student albo "
+                                "praktyk musi wybrać k."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A lower inertia can look better numerically while still "
+                                "splitting a natural group into artificial pieces."
+                            ),
+                            pl=(
+                                "Niższa inertia może wyglądać lepiej liczbowo, ale nadal "
+                                "dzielić naturalną grupę na sztuczne kawałki."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Where it breaks", pl="Gdzie to się psuje"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Moons, uneven densities, and outliers expose the limits "
+                                "of centroid-based clustering."
+                            ),
+                            pl=(
+                                "Moons, nierówne gęstości i outliery pokazują ograniczenia "
+                                "clusteringu opartego na centroidach."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "That is where density-based methods such as DBSCAN become "
+                                "a natural next comparison."
+                            ),
+                            pl=(
+                                "W tym miejscu naturalnym kolejnym porównaniem stają się "
+                                "metody oparte na gęstości, takie jak DBSCAN."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["clustering_lab"],
+            glossary=LESSON_GLOSSARY["clustering_lab"],
         ),
     ),
     _placeholder_demo(
