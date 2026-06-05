@@ -236,8 +236,8 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
                 "matches the visible groups and when it starts inventing structure."
             ),
             pl=(
-                "Zacznij od prostych blobs i zmieniaj k. Zobacz, kiedy K-Means "
-                "pasuje do widocznych grup, a kiedy zaczyna wymyślać strukturę."
+                "Zacznij od clean blobs i zmieniaj k. Zobacz, kiedy K-Means "
+                "pasuje do danych, a kiedy zaczyna tworzyć sztuczne podziały."
             ),
         ),
         LocalizedText(
@@ -247,7 +247,7 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
             pl=(
                 "Przełącz się na moons albo uneven blobs i sprawdź, jakie "
-                "założenie o kształcie klastrów robi K-Means."
+                "założenie o kształcie klastrów ma K-Means."
             ),
         ),
         LocalizedText(
@@ -256,8 +256,8 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
                 "pull centroids away from the dense regions."
             ),
             pl=(
-                "Dodaj albo pokaż outliery i zobacz, jak mocno kilka punktów "
-                "potrafi odciągnąć centroidy od gęstych obszarów."
+                "Pokaż outliery i zobacz, jak mocno kilka odległych punktów "
+                "potrafi przesunąć centroidy."
             ),
         ),
     ),
@@ -1657,7 +1657,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             pl=(
                 "Zobacz, jak K-Means grupuje punkty bez etykiet, dlaczego wybór k "
-                "ma znaczenie i kiedy clustering oparty na centroidach zaczyna zawodzić."
+                "ma znaczenie i kiedy clustering oparty na centroidach przestaje pasować."
             ),
         ),
         objectives=(
@@ -1666,7 +1666,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     "Connect K-Means assignments with the visible position of "
                     "centroids and data points."
                 ),
-                pl=("Połącz przypisania K-Means z położeniem centroidów i punktów na wykresie."),
+                pl=("Powiąż przypisania K-Means z położeniem centroidów i punktów na wykresie."),
             ),
             LocalizedText(
                 en=(
@@ -1674,7 +1674,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     "which data shapes fit K-Means assumptions."
                 ),
                 pl=(
-                    "Porównaj clean blobs, uneven blobs, moons i outliery, żeby "
+                    "Porównaj clean blobs, uneven blobs, moons i outliery, aby "
                     "zobaczyć, które kształty danych pasują do założeń K-Means."
                 ),
             ),
@@ -1684,7 +1684,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     "automatically by the algorithm."
                 ),
                 pl=(
-                    "Traktuj k jako decyzję modelującą, a nie fakt automatycznie "
+                    "Traktuj k jako decyzję projektową, a nie fakt automatycznie "
                     "odkrywany przez algorytm."
                 ),
             ),

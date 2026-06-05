@@ -69,9 +69,9 @@ class Point:
 
 PRESETS: Final[tuple[DataPreset, ...]] = (
     DataPreset("Clean blobs", "Clean blobs", "blobs"),
-    DataPreset("Uneven blobs", "Uneven blobs", "uneven"),
+    DataPreset("Uneven blobs", "Nierówne blobs", "uneven"),
     DataPreset("Moons", "Moons", "moons"),
-    DataPreset("Outliers", "Outliers", "outliers"),
+    DataPreset("Outliers", "Outliery", "outliers"),
 )
 
 
@@ -590,19 +590,19 @@ class ClusteringLabScene:
         hints = {
             "blobs": self._label(
                 "Clean blobs show the case where K-Means usually feels natural.",
-                "Clean blobs pokazują sytuację, w której K-Means zwykle wygląda naturalnie.",
+                "Clean blobs pokazują przypadek, w którym K-Means zwykle działa intuicyjnie.",
             ),
             "uneven": self._label(
                 "Uneven blobs reveal how cluster size and density can pull centroids.",
-                "Uneven blobs pokazują, jak rozmiar i gęstość klastrów przesuwają centroidy.",
+                "Nierówne blobs pokazują, jak rozmiar i gęstość grup przesuwają centroidy.",
             ),
             "moons": self._label(
                 "Moons make the round-cluster assumption visible.",
-                "Moons dobrze pokazują założenie o okrągłych klastrach.",
+                "Moons obnażają założenie K-Means o zwartych, okrągłych klastrach.",
             ),
             "outliers": self._label(
                 "Outliers show how a few distant points can distort centroid placement.",
-                "Outliery pokazują, jak kilka dalekich punktów zniekształca położenie centroidów.",
+                "Outliery pokazują, jak kilka odległych punktów potrafi przesunąć centroidy.",
             ),
         }
         return hints[self.preset.key]
