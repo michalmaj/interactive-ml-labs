@@ -4,6 +4,7 @@ import pygame
 from interactive_ml_labs.clustering_scene import (
     MAX_K,
     MIN_K,
+    PLOT_RECT,
     ClusteringLabScene,
     create_clustering_lab_scene,
 )
@@ -116,6 +117,39 @@ def test_clustering_scene_toggles_centroid_links(monkeypatch) -> None:
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_c))
         assert scene.show_links is False
+    finally:
+        pygame.quit()
+
+
+def test_clustering_scene_drags_nearest_point(monkeypatch) -> None:
+    """Mouse drag should move a picked point and refresh assignments."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_clustering_lab_scene(AppContext())
+        plot_rect = pygame.Rect(PLOT_RECT)
+        first_point_position = scene._to_screen(scene.points[0], plot_rect)
+        target_position = (plot_rect.centerx, plot_rect.centery)
+        scene.auto_run = True
+
+        scene.handle_event(
+            pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=first_point_position),
+        )
+        scene.handle_event(
+            pygame.event.Event(
+                pygame.MOUSEMOTION, pos=target_position, rel=(0, 0), buttons=(1, 0, 0)
+            ),
+        )
+        scene.handle_event(
+            pygame.event.Event(pygame.MOUSEBUTTONUP, button=1, pos=target_position),
+        )
+
+        assert scene.auto_run is False
+        assert scene.dragged_point_index is None
+        assert abs(scene.points[0].x) < 0.01
+        assert abs(scene.points[0].y) < 0.01
+        assert len(scene.assignments) == len(scene.points)
     finally:
         pygame.quit()
 

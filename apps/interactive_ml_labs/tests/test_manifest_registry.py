@@ -100,6 +100,7 @@ def test_clustering_manifest_sets_first_level_three_demo_contract() -> None:
     assert "DBSCAN" in text
     assert "Space" in text
     assert "C" in text
+    assert "Mouse drag" in text
 
 
 def test_manifests_have_required_teaching_content() -> None:
