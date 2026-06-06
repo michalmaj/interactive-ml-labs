@@ -38,6 +38,8 @@ language selection
 
 Real demo integrations are being added gradually. All current Level 1 and Level 2 demos are available through the unified app, and individual demos can still be run directly.
 
+The unified app also includes the first Level 3 lab, Clustering Lab. It is currently app-only and demonstrates K-Means phases, inertia, draggable points, and a DBSCAN comparison mode.
+
 Common shell controls:
 
 | Key / input | Action |
@@ -52,7 +54,7 @@ Common shell controls:
 
 ## Standalone Demos
 
-Each demo remains runnable on its own.
+Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Clustering Lab, are launched from the unified app.
 
 ### Gradient Descent Playground
 

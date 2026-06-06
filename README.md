@@ -67,6 +67,7 @@ Practical model evaluation, robustness, and interpretation:
 
 Advanced and visually rich topics:
 
+- Clustering Lab: K-Means phases and DBSCAN comparison,
 - Naive Bayes spam detection,
 - CNN filter visualization,
 - t-SNE / UMAP,
@@ -92,7 +93,7 @@ This repository is also intended to demonstrate how real software projects are d
 
 ## Current status
 
-The unified app currently includes all implemented Level 1 and Level 2 demos:
+The unified app is now the recommended guided experience. It includes all implemented Level 1 and Level 2 demos:
 
 - Gradient Descent Playground,
 - k-NN Vote Map,
@@ -101,17 +102,21 @@ The unified app currently includes all implemented Level 1 and Level 2 demos:
 - Random Forest Bagging Lab,
 - Boosting Mistake Lab.
 
-Each of these demos can also still be run as a standalone command. The unified app is the recommended guided experience, while standalone entry points remain part of the supported workflow.
+It also includes the first real Level 3 lab:
+
+- Clustering Lab, with K-Means assignment/update phases, point-to-centroid links, inertia trend, draggable points, and a DBSCAN comparison mode.
+
+The original Level 1 and Level 2 demos can still be run as standalone commands. The unified app is the recommended path for students, while standalone entry points remain part of the supported development and teaching workflow.
 
 ## Next milestones
 
-Near-term work focuses on polishing the app shell before adding larger new topics:
+Near-term work focuses on turning Level 3 into a stronger guided learning track while keeping the shell stable:
 
-- add a fullscreen on/off setting,
-- improve demo selection with richer manifest details,
-- refine the in-demo help overlay,
-- start localizing text inside individual Pygame demos,
-- plan a first Level 3 showcase demo once the shell feels stable.
+- collect review feedback on Clustering Lab after classroom-style use,
+- improve the Level 3 learning flow from theory to interaction to mini-challenges,
+- decide the next Level 3 demo candidate, likely PCA / dimensionality reduction or model comparison,
+- continue polishing Polish copy inside demos without forcing translations of standard ML terms,
+- keep app settings, scaling, and help overlays stable as new Level 3 scenes are added.
 
 ## Usage
 
