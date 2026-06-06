@@ -291,6 +291,16 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
                 "z ręcznym kierunkiem, który zachowuje dużo mniej wariancji."
             ),
         ),
+        LocalizedText(
+            en=(
+                "Toggle residual lines and connect reconstruction error with the "
+                "distance from each point to its projection."
+            ),
+            pl=(
+                "Włącz residual lines i połącz błąd rekonstrukcji z odległością "
+                "każdego punktu od jego projekcji."
+            ),
+        ),
     ),
     "level_3_coming_soon": (
         LocalizedText(
@@ -2174,6 +2184,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
             ControlBinding(
+                key="C",
+                action=LocalizedText(
+                    en="show or hide reconstruction residual lines",
+                    pl="pokaż albo ukryj residual lines rekonstrukcji",
+                ),
+            ),
+            ControlBinding(
                 key="R",
                 action=LocalizedText(
                     en="reset the projection direction",
@@ -2256,6 +2273,16 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             pl=(
                                 "Projekcja na jedną komponentę zamienia chmurę w linię. "
                                 "Może pokazać główny trend, ale ukrywa rozrzut w bok."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Residual lines show the missing sideways part: each line connects "
+                                "a point to its reconstruction on the projection axis."
+                            ),
+                            pl=(
+                                "Residual lines pokazują brakującą część w bok: każda linia łączy "
+                                "punkt z jego rekonstrukcją na osi projekcji."
                             ),
                         ),
                     ),

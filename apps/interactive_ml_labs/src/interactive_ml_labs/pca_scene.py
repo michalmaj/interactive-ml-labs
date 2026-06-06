@@ -24,6 +24,7 @@ MUTED_TEXT: Final[tuple[int, int, int]] = (165, 172, 181)
 ACCENT: Final[tuple[int, int, int]] = (118, 205, 247)
 SECONDARY: Final[tuple[int, int, int]] = (246, 181, 111)
 POINT: Final[tuple[int, int, int]] = (146, 217, 150)
+RESIDUAL: Final[tuple[int, int, int]] = (92, 103, 116)
 DEFAULT_PROJECTION_ANGLE_DEGREES: Final[int] = 31
 ANGLE_STEP_DEGREES: Final[int] = 5
 MIN_NOISE_LEVEL: Final[int] = 0
@@ -78,6 +79,7 @@ class PCALabScene:
         self._points = self._build_preview_points()
         self.projection_angle_degrees = DEFAULT_PROJECTION_ANGLE_DEGREES
         self.projection_mode = PCAProjectionMode.MANUAL
+        self.show_residuals = True
 
     @property
     def preset(self) -> PCADataPreset:
@@ -146,6 +148,16 @@ class PCALabScene:
         axis_start = self._to_screen((-direction[0] * 0.88, -direction[1] * 0.88), plot_rect)
         axis_end = self._to_screen((direction[0] * 0.88, direction[1] * 0.88), plot_rect)
         pygame.draw.line(surface, ACCENT, axis_start, axis_end, 4)
+        if self.show_residuals:
+            for point in self._points:
+                projected = self._project_point_to_active_axis(point)
+                pygame.draw.line(
+                    surface,
+                    RESIDUAL,
+                    self._to_screen(point, plot_rect),
+                    self._to_screen(projected, plot_rect),
+                    1,
+                )
         for point in self._points:
             pygame.draw.circle(surface, POINT, self._to_screen(point, plot_rect), 5)
         self._draw_text(
@@ -242,8 +254,8 @@ class PCALabScene:
         self._draw_wrapped(
             surface,
             self._label(
-                "F fits PCA. Left/Right returns to manual rotation. R resets.",
-                "F dopasowuje PCA. Left/Right wraca do ręcznego obrotu. R resetuje.",
+                "C toggles residuals. F fits PCA. Left/Right rotates.",
+                "C przełącza residuals. F dopasowuje PCA. Left/Right obraca.",
             ),
             (rect.x + 22, help_y),
             rect.width - 44,
@@ -281,6 +293,8 @@ class PCALabScene:
             self._rotate_projection(ANGLE_STEP_DEGREES)
         elif key == pygame.K_f:
             self._toggle_fit_mode()
+        elif key == pygame.K_c:
+            self.show_residuals = not self.show_residuals
         elif key == pygame.K_r:
             self.projection_mode = PCAProjectionMode.MANUAL
             self.projection_angle_degrees = DEFAULT_PROJECTION_ANGLE_DEGREES
@@ -392,6 +406,19 @@ class PCALabScene:
         mean_y = sum(point[1] for point in self._points) / len(self._points)
         return tuple((point[0] - mean_x, point[1] - mean_y) for point in self._points)
 
+    def _point_mean(self) -> tuple[float, float]:
+        return (
+            sum(point[0] for point in self._points) / len(self._points),
+            sum(point[1] for point in self._points) / len(self._points),
+        )
+
+    def _project_point_to_active_axis(self, point: tuple[float, float]) -> tuple[float, float]:
+        mean_x, mean_y = self._point_mean()
+        centered_point = (point[0] - mean_x, point[1] - mean_y)
+        score = self._projection_score(centered_point)
+        direction_x, direction_y = self._projection_direction()
+        return (mean_x + score * direction_x, mean_y + score * direction_y)
+
     def _explained_variance_ratio(self) -> float:
         centered = self._centered_points()
         total_variance = sum(x * x + y * y for x, y in centered)
@@ -403,13 +430,18 @@ class PCALabScene:
 
     def _status_rows(self) -> tuple[tuple[str, str], ...]:
         kept = round(self._explained_variance_ratio() * 100)
+        if self.show_residuals:
+            residuals_label = self._label("on", "wł.")
+        else:
+            residuals_label = self._label("off", "wył.")
         return (
             (self._label("mode", "tryb"), self._mode_label()),
             (self._label("data", "dane"), self.preset.for_language(self._language)),
             (self._label("noise", "noise"), str(self.noise_level)),
+            (self._label("residuals", "residuals"), residuals_label),
             (self._label("angle", "kąt"), f"{self._active_projection_angle_degrees()}°"),
             (self._label("kept variance", "zachowana wariancja"), f"{kept}%"),
-            (self._label("lost variance", "utracona wariancja"), f"{100 - kept}%"),
+            (self._label("recon error", "błąd rekonstrukcji"), f"{100 - kept}%"),
         )
 
     def _mode_label(self) -> str:
