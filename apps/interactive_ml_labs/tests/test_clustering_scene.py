@@ -208,6 +208,52 @@ def test_clustering_scene_dbscan_ignores_auto_run(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_clustering_scene_status_rows_follow_algorithm_mode(monkeypatch) -> None:
+    """The side panel should show only mode-relevant status values."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.settings.language = "pl"
+        scene = create_clustering_lab_scene(context)
+
+        kmeans_labels = {label for label, _value in scene._status_rows()}
+        assert "k" in kmeans_labels
+        assert "Inertia" in kmeans_labels
+        assert "Auto-run" in kmeans_labels
+        assert "eps" not in kmeans_labels
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+        dbscan_labels = {label for label, _value in scene._status_rows()}
+
+        assert "eps" in dbscan_labels
+        assert "min points" in dbscan_labels
+        assert "Klastry" in dbscan_labels
+        assert "Noise" in dbscan_labels
+        assert "k" not in dbscan_labels
+        assert "Inertia" not in dbscan_labels
+        assert "Auto-run" not in dbscan_labels
+    finally:
+        pygame.quit()
+
+
+def test_clustering_scene_observation_hint_follows_algorithm_mode(monkeypatch) -> None:
+    """Observation copy should explain the active clustering algorithm."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_clustering_lab_scene(AppContext())
+        assert "K-Means" in scene._observation_hint()
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        assert "DBSCAN" in scene._observation_hint()
+    finally:
+        pygame.quit()
+
+
 def test_clustering_scene_drags_nearest_point(monkeypatch) -> None:
     """Mouse drag should move a picked point and refresh assignments."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -311,8 +357,11 @@ def test_clustering_scene_controls_fit_inside_panel(monkeypatch) -> None:
 
         for preset_index in range(4):
             scene.preset_index = preset_index
-            controls_y = scene._panel_controls_start_y(panel_rect)
+            for mode_key in (None, pygame.K_m):
+                if mode_key is not None:
+                    scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=mode_key))
+                controls_y = scene._panel_controls_start_y(panel_rect)
 
-            assert scene._controls_bottom_y(controls_y) <= panel_rect.bottom - 16
+                assert scene._controls_bottom_y(controls_y) <= panel_rect.bottom - 16
     finally:
         pygame.quit()

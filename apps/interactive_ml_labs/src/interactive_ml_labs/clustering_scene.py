@@ -531,18 +531,7 @@ class ClusteringLabScene:
             ACCENT,
         )
         y += 38
-        auto_label = self._label("on", "wł.") if self.auto_run else self._label("off", "wył.")
-        links_label = self._label("on", "wł.") if self.show_links else self._label("off", "wył.")
-        rows = (
-            (self._label("Mode", "Tryb"), self._mode_label()),
-            (self._label("k", "k"), str(self.k)),
-            (self._label("Iteration", "Iteracja"), str(self.iteration)),
-            (self._label("Next", "Dalej"), self._phase_label()),
-            (self._label("Inertia", "Inertia"), f"{self.inertia:.2f}"),
-            (self._label("Auto-run", "Auto-run"), auto_label),
-            (self._label("Links", "Linie"), links_label),
-        )
-        for label, value in rows:
+        for label, value in self._status_rows():
             self._draw_text(surface, f"{label}: {value}", (x, y), self._font_body, TEXT)
             y += 24
 
@@ -667,7 +656,6 @@ class ClusteringLabScene:
     def _draw_dbscan_summary(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         pygame.draw.rect(surface, SPARKLINE_BG, rect, border_radius=6)
         pygame.draw.rect(surface, GRID, rect, width=1, border_radius=6)
-        noise_count = sum(1 for label in self.dbscan_labels if label == -1)
         self._draw_text(
             surface,
             "DBSCAN",
@@ -678,8 +666,8 @@ class ClusteringLabScene:
         self._draw_text(
             surface,
             self._label(
-                f"clusters: {self.dbscan_cluster_count}, noise: {noise_count}",
-                f"klastry: {self.dbscan_cluster_count}, noise: {noise_count}",
+                f"clusters: {self.dbscan_cluster_count}, noise: {self._dbscan_noise_count()}",
+                f"klastry: {self.dbscan_cluster_count}, noise: {self._dbscan_noise_count()}",
             ),
             (rect.x + 10, rect.y + 30),
             self._font_small,
@@ -728,7 +716,7 @@ class ClusteringLabScene:
         y += 56
         y += 34
         y += 38
-        y += 7 * 24
+        y += len(self._status_rows()) * 24
         y += 66
         y += 24
         y += len(self._wrap_text(self._observation_hint(), 270, self._font_small)) * 18
@@ -737,6 +725,27 @@ class ClusteringLabScene:
         return y
 
     def _observation_hint(self) -> str:
+        if self.algorithm_mode == AlgorithmMode.DBSCAN:
+            hints = {
+                "blobs": self._label(
+                    "DBSCAN should find dense regions without choosing k first.",
+                    "DBSCAN powinien znaleźć gęste obszary bez wcześniejszego wyboru k.",
+                ),
+                "uneven": self._label(
+                    "Change eps and watch smaller dense groups appear or merge.",
+                    "Zmieniaj eps i obserwuj, jak mniejsze gęste grupy pojawiają się albo łączą.",
+                ),
+                "moons": self._label(
+                    "DBSCAN can follow curved shapes when eps matches the local density.",
+                    "DBSCAN podąża za krzywymi, gdy eps pasuje do lokalnej gęstości.",
+                ),
+                "outliers": self._label(
+                    "Noise points stay muted when they do not belong to any dense region.",
+                    "Punkty noise zostają przygaszone, gdy nie należą do żadnego gęstego obszaru.",
+                ),
+            }
+            return hints[self.preset.key]
+
         hints = {
             "blobs": self._label(
                 "Clean blobs show the case where K-Means usually feels natural.",
@@ -756,6 +765,32 @@ class ClusteringLabScene:
             ),
         }
         return hints[self.preset.key]
+
+    def _status_rows(self) -> tuple[tuple[str, str], ...]:
+        if self.algorithm_mode == AlgorithmMode.DBSCAN:
+            return (
+                (self._label("Mode", "Tryb"), "DBSCAN"),
+                (self._label("eps", "eps"), f"{self.dbscan_eps:.2f}"),
+                (self._label("min points", "min points"), str(self.dbscan_min_points)),
+                (self._label("Clusters", "Klastry"), str(self.dbscan_cluster_count)),
+                (self._label("Noise", "Noise"), str(self._dbscan_noise_count())),
+                (self._label("Next", "Dalej"), self._phase_label()),
+            )
+
+        auto_label = self._label("on", "wł.") if self.auto_run else self._label("off", "wył.")
+        links_label = self._label("on", "wł.") if self.show_links else self._label("off", "wył.")
+        return (
+            (self._label("Mode", "Tryb"), self._mode_label()),
+            (self._label("k", "k"), str(self.k)),
+            (self._label("Iteration", "Iteracja"), str(self.iteration)),
+            (self._label("Next", "Dalej"), self._phase_label()),
+            (self._label("Inertia", "Inertia"), f"{self.inertia:.2f}"),
+            (self._label("Auto-run", "Auto-run"), auto_label),
+            (self._label("Links", "Linie"), links_label),
+        )
+
+    def _dbscan_noise_count(self) -> int:
+        return sum(1 for label in self.dbscan_labels if label == -1)
 
     def _point_labels(self) -> list[int]:
         if self.algorithm_mode == AlgorithmMode.DBSCAN:
