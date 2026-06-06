@@ -19,6 +19,7 @@ from interactive_ml_labs.manifest import (
     LocalizedText,
     TheorySection,
 )
+from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 from interactive_ml_labs.scene import Scene
@@ -255,6 +256,38 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             pl=(
                 "Użyj outlierów, żeby porównać przesuwanie centroidów w K-Means "
                 "z wykrywaniem noise w DBSCAN."
+            ),
+        ),
+    ),
+    "pca_lab": (
+        LocalizedText(
+            en=(
+                "Compare the wide 2D cloud with the 1D projection. Ask what structure "
+                "survives when PCA keeps only the strongest direction."
+            ),
+            pl=(
+                "Porównaj szeroką chmurę 2D z projekcją 1D. Sprawdź, jaka struktura "
+                "zostaje, gdy PCA zachowuje tylko najsilniejszy kierunek."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Use explained variance as a warning label: high variance kept means "
+                "less information lost, not zero information lost."
+            ),
+            pl=(
+                "Traktuj explained variance jak etykietę ostrzegawczą: dużo zachowanej "
+                "wariancji oznacza mniejszą stratę informacji, nie brak straty."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Write down one question for the interactive version: should students "
+                "rotate data, change noise, or choose how many components to keep?"
+            ),
+            pl=(
+                "Zapisz pytanie do wersji interaktywnej: czy student powinien obracać dane, "
+                "zmieniać szum, czy wybierać liczbę komponentów?"
             ),
         ),
     ),
@@ -516,6 +549,35 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             definition=LocalizedText(
                 en="A point that DBSCAN does not place inside any dense cluster.",
                 pl="Punkt, którego DBSCAN nie przypisuje do żadnego gęstego klastra.",
+            ),
+        ),
+    ),
+    "pca_lab": (
+        GlossaryTerm(
+            term="PCA",
+            definition=LocalizedText(
+                en=(
+                    "Principal Component Analysis; a linear method that finds directions "
+                    "where the data varies the most."
+                ),
+                pl=(
+                    "Principal Component Analysis; liniowa metoda szukająca kierunków, "
+                    "w których dane różnią się najbardziej."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="principal component",
+            definition=LocalizedText(
+                en="A new axis ordered by how much variance it explains.",
+                pl="Nowa oś uporządkowana według tego, ile wariancji wyjaśnia.",
+            ),
+        ),
+        GlossaryTerm(
+            term="explained variance",
+            definition=LocalizedText(
+                en="The share of data spread preserved by selected PCA components.",
+                pl="Część rozrzutu danych zachowana przez wybrane komponenty PCA.",
             ),
         ),
     ),
@@ -2033,6 +2095,174 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["clustering_lab"],
             glossary=LESSON_GLOSSARY["clustering_lab"],
+        ),
+    ),
+    DemoManifest(
+        id="pca_lab",
+        level=3,
+        title=LocalizedText(en="PCA Lab", pl="PCA Lab"),
+        summary=LocalizedText(
+            en=(
+                "Preview dimensionality reduction by comparing an original point cloud, "
+                "a one-component projection, and explained variance."
+            ),
+            pl=(
+                "Zobacz pierwszy szkic dimensionality reduction: oryginalną chmurę punktów, "
+                "projekcję na jedną komponentę i explained variance."
+            ),
+        ),
+        objectives=(
+            LocalizedText(
+                en=(
+                    "Connect PCA with the idea of keeping directions where the data "
+                    "has the largest spread."
+                ),
+                pl=(
+                    "Połącz PCA z intuicją zachowywania kierunków, w których dane "
+                    "mają największy rozrzut."
+                ),
+            ),
+            LocalizedText(
+                en=("Compare the original feature space with a compressed 1D projection."),
+                pl="Porównaj oryginalną przestrzeń cech ze skompresowaną projekcją 1D.",
+            ),
+            LocalizedText(
+                en=(
+                    "Read explained variance as a trade-off between compression "
+                    "and information loss."
+                ),
+                pl=(
+                    "Czytaj explained variance jako kompromis między kompresją a utratą informacji."
+                ),
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read the PCA lesson notes",
+                    pl="przeczytaj notatki lekcyjne o PCA",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(
+                    en="open the help overlay",
+                    pl="otwórz pomoc",
+                ),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_pca_lab_scene,
+        difficulty=LocalizedText(en="Advanced preview", pl="Zaawansowany podgląd"),
+        tags=("pca", "dimensionality-reduction", "projection", "visualization"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="Why reduce dimensions", pl="Po co redukować wymiary"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Many datasets have more features than people can inspect. "
+                                "Dimensionality reduction builds a smaller view that keeps "
+                                "important structure."
+                            ),
+                            pl=(
+                                "Wiele zbiorów ma więcej cech, niż da się wygodnie oglądać. "
+                                "Dimensionality reduction tworzy mniejszy widok, który nadal "
+                                "zachowuje ważną strukturę."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The useful question is not whether compression loses information, "
+                                "but which information it keeps and which it drops."
+                            ),
+                            pl=(
+                                "Najważniejsze pytanie nie brzmi, czy kompresja traci informację, "
+                                "tylko którą informację zachowuje, a którą odrzuca."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What PCA keeps", pl="Co zachowuje PCA"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "PCA finds linear directions ordered by variance. The first "
+                                "principal component is where the data spreads out most."
+                            ),
+                            pl=(
+                                "PCA znajduje liniowe kierunki uporządkowane według wariancji. "
+                                "Pierwsza principal component to kierunek, w którym dane mają "
+                                "największy rozrzut."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Projecting onto one component turns a cloud into a line. "
+                                "That can reveal the main trend, but it hides variation sideways."
+                            ),
+                            pl=(
+                                "Projekcja na jedną komponentę zamienia chmurę w linię. "
+                                "Może pokazać główny trend, ale ukrywa rozrzut w bok."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(
+                        en="How to read explained variance",
+                        pl="Jak czytać explained variance",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Explained variance estimates how much of the original spread "
+                                "is preserved by selected components."
+                            ),
+                            pl=(
+                                "Explained variance szacuje, jaka część pierwotnego rozrzutu "
+                                "zostaje zachowana przez wybrane komponenty."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A high number is useful, but it is not a guarantee that every "
+                                "task-relevant pattern survived the projection."
+                            ),
+                            pl=(
+                                "Wysoka wartość jest pomocna, ale nie gwarantuje, że każdy "
+                                "ważny dla zadania wzorzec przetrwał projekcję."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Next interaction", pl="Następna interakcja"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "This first slice is intentionally static. Next, students should "
+                                "rotate data, add noise, and choose how many components to keep."
+                            ),
+                            pl=(
+                                "Ten pierwszy slice jest celowo statyczny. Następny krok to "
+                                "obracanie danych, dodawanie szumu i wybór liczby komponentów."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["pca_lab"],
+            glossary=LESSON_GLOSSARY["pca_lab"],
         ),
     ),
     _placeholder_demo(
