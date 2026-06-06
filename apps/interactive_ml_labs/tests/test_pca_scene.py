@@ -135,6 +135,27 @@ def test_pca_scene_status_rows_report_variance(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_pca_scene_variance_panel_keeps_help_below_status(monkeypatch) -> None:
+    """Explained variance help text should not overlap the status rows."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.settings.language = "pl"
+        scene = create_pca_lab_scene(context)
+        panel_rect = pygame.Rect(960, 138, 260, 420)
+        status_bottom = (
+            scene._explained_variance_status_start_y(panel_rect) + len(scene._status_rows()) * 24
+        )
+        help_y = scene._explained_variance_help_y(panel_rect)
+
+        assert help_y >= status_bottom + 12
+        assert help_y <= panel_rect.bottom - 96
+    finally:
+        pygame.quit()
+
+
 def test_pca_scene_renders_to_shell_surface(monkeypatch) -> None:
     """The PCA preview should draw a non-empty frame."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
