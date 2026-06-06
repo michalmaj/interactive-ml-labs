@@ -6,6 +6,7 @@ from interactive_ml_labs.pca_scene import (
     ANGLE_STEP_DEGREES,
     DEFAULT_PROJECTION_ANGLE_DEGREES,
     PCALabScene,
+    PCAProjectionMode,
     create_pca_lab_scene,
 )
 from interactive_ml_labs.scene import FixedSizeScene, SceneCommandKind
@@ -70,6 +71,46 @@ def test_pca_scene_projection_controls_change_variance(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_pca_scene_fit_mode_uses_best_variance_direction(monkeypatch) -> None:
+    """F should switch to the fitted PCA direction."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_pca_lab_scene(AppContext())
+        fitted_angle = scene._fitted_pca_angle_degrees()
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_f))
+
+        assert scene.projection_mode == PCAProjectionMode.FIT
+        assert scene._active_projection_angle_degrees() == fitted_angle
+        assert scene._explained_variance_ratio() >= 0.95
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_f))
+
+        assert scene.projection_mode == PCAProjectionMode.MANUAL
+    finally:
+        pygame.quit()
+
+
+def test_pca_scene_manual_rotation_from_fit_mode(monkeypatch) -> None:
+    """Left and Right should leave fit mode and continue from the PCA direction."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_pca_lab_scene(AppContext())
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_f))
+        fitted_angle = scene._fitted_pca_angle_degrees()
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+
+        assert scene.projection_mode == PCAProjectionMode.MANUAL
+        assert scene.projection_angle_degrees == (fitted_angle + ANGLE_STEP_DEGREES) % 180
+    finally:
+        pygame.quit()
+
+
 def test_pca_scene_status_rows_report_variance(monkeypatch) -> None:
     """The status panel should expose angle, kept variance, and lost variance."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -81,9 +122,15 @@ def test_pca_scene_status_rows_report_variance(monkeypatch) -> None:
         scene = create_pca_lab_scene(context)
         rows = dict(scene._status_rows())
 
+        assert rows["tryb"] == "manual"
         assert rows["kąt"] == f"{DEFAULT_PROJECTION_ANGLE_DEGREES}°"
         assert rows["zachowana wariancja"].endswith("%")
         assert rows["utracona wariancja"].endswith("%")
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_f))
+        rows = dict(scene._status_rows())
+
+        assert rows["tryb"] == "fit PCA"
     finally:
         pygame.quit()
 

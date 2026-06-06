@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from enum import StrEnum
 from typing import Final
 
 import pygame
@@ -25,6 +26,13 @@ DEFAULT_PROJECTION_ANGLE_DEGREES: Final[int] = 31
 ANGLE_STEP_DEGREES: Final[int] = 5
 
 
+class PCAProjectionMode(StrEnum):
+    """Projection control mode used by the PCA scene."""
+
+    MANUAL = "manual"
+    FIT = "fit"
+
+
 class PCALabScene:
     """Interactive first slice for the PCA / dimensionality reduction lab."""
 
@@ -39,6 +47,7 @@ class PCALabScene:
         self._font_small = make_ui_font(15)
         self._points = self._build_preview_points()
         self.projection_angle_degrees = DEFAULT_PROJECTION_ANGLE_DEGREES
+        self.projection_mode = PCAProjectionMode.MANUAL
 
     def handle_event(self, event: object) -> SceneCommand:
         """Handle one input event."""
@@ -88,6 +97,16 @@ class PCALabScene:
         )
         plot_rect = pygame.Rect(rect.x + 34, rect.y + 72, rect.width - 68, rect.height - 112)
         self._draw_grid(surface, plot_rect)
+        fitted_direction = self._direction_for_angle(self._fitted_pca_angle_degrees())
+        fitted_start = self._to_screen(
+            (-fitted_direction[0] * 0.88, -fitted_direction[1] * 0.88),
+            plot_rect,
+        )
+        fitted_end = self._to_screen(
+            (fitted_direction[0] * 0.88, fitted_direction[1] * 0.88),
+            plot_rect,
+        )
+        pygame.draw.line(surface, SECONDARY, fitted_start, fitted_end, 2)
         direction = self._projection_direction()
         axis_start = self._to_screen((-direction[0] * 0.88, -direction[1] * 0.88), plot_rect)
         axis_end = self._to_screen((direction[0] * 0.88, direction[1] * 0.88), plot_rect)
@@ -103,7 +122,14 @@ class PCALabScene:
         )
         self._draw_text(
             surface,
-            f"{self.projection_angle_degrees}°",
+            self._label("PCA best", "PCA best"),
+            (plot_rect.x + 174, plot_rect.bottom + 16),
+            self._font_small,
+            SECONDARY,
+        )
+        self._draw_text(
+            surface,
+            f"{self._active_projection_angle_degrees()}°",
             (plot_rect.right - 48, plot_rect.bottom + 16),
             self._font_small,
             MUTED_TEXT,
@@ -180,8 +206,8 @@ class PCALabScene:
         self._draw_wrapped(
             surface,
             self._label(
-                "Left/Right rotates the projection. R resets the direction.",
-                "Left/Right obraca projekcję. R resetuje kierunek.",
+                "F fits PCA. Left/Right returns to manual rotation. R resets.",
+                "F dopasowuje PCA. Left/Right wraca do ręcznego obrotu. R resetuje.",
             ),
             (rect.x + 22, rect.y + 292),
             rect.width - 44,
@@ -210,11 +236,24 @@ class PCALabScene:
             self._rotate_projection(-ANGLE_STEP_DEGREES)
         elif key == pygame.K_RIGHT:
             self._rotate_projection(ANGLE_STEP_DEGREES)
+        elif key == pygame.K_f:
+            self._toggle_fit_mode()
         elif key == pygame.K_r:
+            self.projection_mode = PCAProjectionMode.MANUAL
             self.projection_angle_degrees = DEFAULT_PROJECTION_ANGLE_DEGREES
 
     def _rotate_projection(self, delta_degrees: int) -> None:
+        if self.projection_mode == PCAProjectionMode.FIT:
+            self.projection_angle_degrees = self._fitted_pca_angle_degrees()
+            self.projection_mode = PCAProjectionMode.MANUAL
         self.projection_angle_degrees = (self.projection_angle_degrees + delta_degrees) % 180
+
+    def _toggle_fit_mode(self) -> None:
+        if self.projection_mode == PCAProjectionMode.FIT:
+            self.projection_mode = PCAProjectionMode.MANUAL
+            return
+
+        self.projection_mode = PCAProjectionMode.FIT
 
     def _draw_grid(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         pygame.draw.rect(surface, PLOT_BG, rect, border_radius=6)
@@ -275,8 +314,25 @@ class PCALabScene:
         return direction_x * x + direction_y * y
 
     def _projection_direction(self) -> tuple[float, float]:
-        angle = math.radians(self.projection_angle_degrees)
+        return self._direction_for_angle(self._active_projection_angle_degrees())
+
+    def _direction_for_angle(self, angle_degrees: int) -> tuple[float, float]:
+        angle = math.radians(angle_degrees)
         return (math.cos(angle), math.sin(angle))
+
+    def _active_projection_angle_degrees(self) -> int:
+        if self.projection_mode == PCAProjectionMode.FIT:
+            return self._fitted_pca_angle_degrees()
+
+        return self.projection_angle_degrees
+
+    def _fitted_pca_angle_degrees(self) -> int:
+        centered = self._centered_points()
+        variance_x = sum(x * x for x, _y in centered)
+        variance_y = sum(y * y for _x, y in centered)
+        covariance_xy = sum(x * y for x, y in centered)
+        angle_radians = 0.5 * math.atan2(2.0 * covariance_xy, variance_x - variance_y)
+        return round(math.degrees(angle_radians)) % 180
 
     def _centered_points(self) -> tuple[tuple[float, float], ...]:
         mean_x = sum(point[0] for point in self._points) / len(self._points)
@@ -295,10 +351,17 @@ class PCALabScene:
     def _status_rows(self) -> tuple[tuple[str, str], ...]:
         kept = round(self._explained_variance_ratio() * 100)
         return (
-            (self._label("angle", "kąt"), f"{self.projection_angle_degrees}°"),
+            (self._label("mode", "tryb"), self._mode_label()),
+            (self._label("angle", "kąt"), f"{self._active_projection_angle_degrees()}°"),
             (self._label("kept variance", "zachowana wariancja"), f"{kept}%"),
             (self._label("lost variance", "utracona wariancja"), f"{100 - kept}%"),
         )
+
+    def _mode_label(self) -> str:
+        if self.projection_mode == PCAProjectionMode.FIT:
+            return "fit PCA"
+
+        return "manual"
 
     def _label(self, en: str, pl: str) -> str:
         if self._language == "pl":
