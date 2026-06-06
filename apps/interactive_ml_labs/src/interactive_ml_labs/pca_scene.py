@@ -193,7 +193,7 @@ class PCALabScene:
                 MUTED_TEXT,
             )
             y += 52
-        status_y = y + 18
+        status_y = self._explained_variance_status_start_y(rect)
         for label, value in self._status_rows():
             self._draw_text(
                 surface,
@@ -203,13 +203,14 @@ class PCALabScene:
                 TEXT,
             )
             status_y += 24
+        help_y = self._explained_variance_help_y(rect)
         self._draw_wrapped(
             surface,
             self._label(
                 "F fits PCA. Left/Right returns to manual rotation. R resets.",
                 "F dopasowuje PCA. Left/Right wraca do ręcznego obrotu. R resetuje.",
             ),
-            (rect.x + 22, rect.y + 292),
+            (rect.x + 22, help_y),
             rect.width - 44,
             self._font_small,
             MUTED_TEXT,
@@ -362,6 +363,13 @@ class PCALabScene:
             return "fit PCA"
 
         return "manual"
+
+    def _explained_variance_status_start_y(self, rect: pygame.Rect) -> int:
+        bars_bottom = rect.y + 90 + 2 * 52
+        return bars_bottom + 18
+
+    def _explained_variance_help_y(self, rect: pygame.Rect) -> int:
+        return self._explained_variance_status_start_y(rect) + len(self._status_rows()) * 24 + 14
 
     def _label(self, en: str, pl: str) -> str:
         if self._language == "pl":
