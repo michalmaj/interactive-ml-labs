@@ -282,12 +282,12 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
         ),
         LocalizedText(
             en=(
-                "Find a direction that keeps much less variance and explain what "
-                "changed in the projected line."
+                "Press F to fit PCA automatically. Compare that direction with "
+                "one manual direction that keeps much less variance."
             ),
             pl=(
-                "Znajdź kierunek, który zachowuje dużo mniej wariancji, i wyjaśnij, "
-                "co zmieniło się na linii projekcji."
+                "Wciśnij F, żeby automatycznie dopasować PCA. Porównaj ten kierunek "
+                "z ręcznym kierunkiem, który zachowuje dużo mniej wariancji."
             ),
         ),
     ),
@@ -2145,6 +2145,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
             ControlBinding(
+                key="F",
+                action=LocalizedText(
+                    en="toggle manual direction and fitted PCA direction",
+                    pl="przełącz ręczny kierunek i dopasowany kierunek PCA",
+                ),
+            ),
+            ControlBinding(
                 key="R",
                 action=LocalizedText(
                     en="reset the projection direction",
@@ -2264,14 +2271,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     body=(
                         LocalizedText(
                             en=(
-                                "This slice lets students rotate a projection direction. Next, "
-                                "the lab can fit true PCA automatically and compare it with "
-                                "manual directions."
+                                "This slice lets students rotate a projection direction, then "
+                                "fit PCA automatically to see the variance-maximizing direction."
                             ),
                             pl=(
-                                "Ten slice pozwala obracać kierunek projekcji. Następnie demo "
-                                "może automatycznie dopasować prawdziwe PCA i porównać je "
-                                "z kierunkami ręcznymi."
+                                "Ten slice pozwala obracać kierunek projekcji, a potem "
+                                "automatycznie dopasować PCA i zobaczyć kierunek "
+                                "maksymalizujący wariancję."
                             ),
                         ),
                     ),
