@@ -146,6 +146,8 @@ def test_pca_manifest_sets_second_level_three_demo_contract() -> None:
     assert "explained variance" in text
     assert "principal component" in text
     assert "Next interaction" in text
+    assert "Left / Right" in text
+    assert "R" in text
     assert "T" in text
 
 

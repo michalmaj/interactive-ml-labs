@@ -21,10 +21,12 @@ MUTED_TEXT: Final[tuple[int, int, int]] = (165, 172, 181)
 ACCENT: Final[tuple[int, int, int]] = (118, 205, 247)
 SECONDARY: Final[tuple[int, int, int]] = (246, 181, 111)
 POINT: Final[tuple[int, int, int]] = (146, 217, 150)
+DEFAULT_PROJECTION_ANGLE_DEGREES: Final[int] = 31
+ANGLE_STEP_DEGREES: Final[int] = 5
 
 
 class PCALabScene:
-    """Static first slice for the PCA / dimensionality reduction lab."""
+    """Interactive first slice for the PCA / dimensionality reduction lab."""
 
     fixed_scene_size: Size = DEFAULT_RESOLUTION
 
@@ -36,10 +38,13 @@ class PCALabScene:
         self._font_body = make_ui_font(18)
         self._font_small = make_ui_font(15)
         self._points = self._build_preview_points()
+        self.projection_angle_degrees = DEFAULT_PROJECTION_ANGLE_DEGREES
 
     def handle_event(self, event: object) -> SceneCommand:
         """Handle one input event."""
-        _ = event
+        if isinstance(event, pygame.event.Event) and event.type == pygame.KEYDOWN:
+            self._handle_keydown(event.key)
+
         return SceneCommand.none()
 
     def update(self, dt: float) -> SceneCommand:
@@ -64,8 +69,8 @@ class PCALabScene:
         self._draw_text(
             surface,
             self._label(
-                "First slice: compare original structure with a one-component projection.",
-                "Pierwszy slice: porównaj strukturę danych z projekcją na jedną komponentę.",
+                "Rotate the projection direction and watch explained variance change.",
+                "Obracaj kierunek projekcji i obserwuj zmianę explained variance.",
             ),
             (52, 88),
             self._font_body,
@@ -83,17 +88,25 @@ class PCALabScene:
         )
         plot_rect = pygame.Rect(rect.x + 34, rect.y + 72, rect.width - 68, rect.height - 112)
         self._draw_grid(surface, plot_rect)
-        axis_start = self._to_screen((-0.72, -0.44), plot_rect)
-        axis_end = self._to_screen((0.78, 0.48), plot_rect)
+        direction = self._projection_direction()
+        axis_start = self._to_screen((-direction[0] * 0.88, -direction[1] * 0.88), plot_rect)
+        axis_end = self._to_screen((direction[0] * 0.88, direction[1] * 0.88), plot_rect)
         pygame.draw.line(surface, ACCENT, axis_start, axis_end, 4)
         for point in self._points:
             pygame.draw.circle(surface, POINT, self._to_screen(point, plot_rect), 5)
         self._draw_text(
             surface,
-            self._label("principal direction", "główny kierunek"),
+            self._label("projection direction", "kierunek projekcji"),
             (plot_rect.x + 14, plot_rect.bottom + 16),
             self._font_small,
             ACCENT,
+        )
+        self._draw_text(
+            surface,
+            f"{self.projection_angle_degrees}°",
+            (plot_rect.right - 48, plot_rect.bottom + 16),
+            self._font_small,
+            MUTED_TEXT,
         )
 
     def _draw_projection(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
@@ -107,7 +120,7 @@ class PCALabScene:
         )
         track = pygame.Rect(rect.x + 38, rect.y + 230, rect.width - 76, 8)
         pygame.draw.rect(surface, GRID, track, border_radius=4)
-        sorted_scores = sorted(self._projection_score(point) for point in self._points)
+        sorted_scores = sorted(self._projection_score(point) for point in self._centered_points())
         minimum = sorted_scores[0]
         maximum = sorted_scores[-1]
         span = max(maximum - minimum, 0.001)
@@ -117,8 +130,8 @@ class PCALabScene:
         self._draw_wrapped(
             surface,
             self._label(
-                "PCA keeps the direction with the largest spread and drops the rest.",
-                "PCA zostawia kierunek z największym rozrzutem i odrzuca resztę.",
+                "The best projection keeps as much spread as possible on this line.",
+                "Najlepsza projekcja zachowuje na tej linii jak największy rozrzut.",
             ),
             (rect.x + 22, rect.y + 290),
             rect.width - 44,
@@ -136,7 +149,11 @@ class PCALabScene:
             self._font_heading,
             TEXT,
         )
-        bars = ((0.74, ACCENT, "PC1"), (0.18, SECONDARY, "PC2"), (0.08, MUTED_TEXT, "rest"))
+        kept_variance = self._explained_variance_ratio()
+        bars = (
+            (kept_variance, ACCENT, self._label("kept", "zostaje")),
+            (1.0 - kept_variance, SECONDARY, self._label("lost", "tracimy")),
+        )
         y = rect.y + 90
         for value, color, label in bars:
             self._draw_text(surface, label, (rect.x + 22, y + 4), self._font_small, TEXT)
@@ -150,11 +167,21 @@ class PCALabScene:
                 MUTED_TEXT,
             )
             y += 52
+        status_y = y + 18
+        for label, value in self._status_rows():
+            self._draw_text(
+                surface,
+                f"{label}: {value}",
+                (rect.x + 22, status_y),
+                self._font_small,
+                TEXT,
+            )
+            status_y += 24
         self._draw_wrapped(
             surface,
             self._label(
-                "Next PR will turn this preview into an interactive projection lab.",
-                "Kolejny PR zamieni ten podgląd w interaktywne demo projekcji.",
+                "Left/Right rotates the projection. R resets the direction.",
+                "Left/Right obraca projekcję. R resetuje kierunek.",
             ),
             (rect.x + 22, rect.y + 292),
             rect.width - 44,
@@ -177,6 +204,17 @@ class PCALabScene:
 
     def _draw_panel(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         pygame.draw.rect(surface, PANEL, rect, border_radius=8)
+
+    def _handle_keydown(self, key: int) -> None:
+        if key == pygame.K_LEFT:
+            self._rotate_projection(-ANGLE_STEP_DEGREES)
+        elif key == pygame.K_RIGHT:
+            self._rotate_projection(ANGLE_STEP_DEGREES)
+        elif key == pygame.K_r:
+            self.projection_angle_degrees = DEFAULT_PROJECTION_ANGLE_DEGREES
+
+    def _rotate_projection(self, delta_degrees: int) -> None:
+        self.projection_angle_degrees = (self.projection_angle_degrees + delta_degrees) % 180
 
     def _draw_grid(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         pygame.draw.rect(surface, PLOT_BG, rect, border_radius=6)
@@ -233,7 +271,34 @@ class PCALabScene:
 
     def _projection_score(self, point: tuple[float, float]) -> float:
         x, y = point
-        return 0.86 * x + 0.51 * y
+        direction_x, direction_y = self._projection_direction()
+        return direction_x * x + direction_y * y
+
+    def _projection_direction(self) -> tuple[float, float]:
+        angle = math.radians(self.projection_angle_degrees)
+        return (math.cos(angle), math.sin(angle))
+
+    def _centered_points(self) -> tuple[tuple[float, float], ...]:
+        mean_x = sum(point[0] for point in self._points) / len(self._points)
+        mean_y = sum(point[1] for point in self._points) / len(self._points)
+        return tuple((point[0] - mean_x, point[1] - mean_y) for point in self._points)
+
+    def _explained_variance_ratio(self) -> float:
+        centered = self._centered_points()
+        total_variance = sum(x * x + y * y for x, y in centered)
+        if total_variance <= 0.0:
+            return 0.0
+
+        projected_variance = sum(self._projection_score(point) ** 2 for point in centered)
+        return max(0.0, min(1.0, projected_variance / total_variance))
+
+    def _status_rows(self) -> tuple[tuple[str, str], ...]:
+        kept = round(self._explained_variance_ratio() * 100)
+        return (
+            (self._label("angle", "kąt"), f"{self.projection_angle_degrees}°"),
+            (self._label("kept variance", "zachowana wariancja"), f"{kept}%"),
+            (self._label("lost variance", "utracona wariancja"), f"{100 - kept}%"),
+        )
 
     def _label(self, en: str, pl: str) -> str:
         if self._language == "pl":

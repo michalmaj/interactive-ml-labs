@@ -262,12 +262,12 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
     "pca_lab": (
         LocalizedText(
             en=(
-                "Compare the wide 2D cloud with the 1D projection. Ask what structure "
-                "survives when PCA keeps only the strongest direction."
+                "Rotate the projection direction and compare how much variance "
+                "survives when the 2D cloud is compressed to 1D."
             ),
             pl=(
-                "Porównaj szeroką chmurę 2D z projekcją 1D. Sprawdź, jaka struktura "
-                "zostaje, gdy PCA zachowuje tylko najsilniejszy kierunek."
+                "Obracaj kierunek projekcji i porównuj, ile wariancji zostaje "
+                "po kompresji chmury 2D do 1D."
             ),
         ),
         LocalizedText(
@@ -282,12 +282,12 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
         ),
         LocalizedText(
             en=(
-                "Write down one question for the interactive version: should students "
-                "rotate data, change noise, or choose how many components to keep?"
+                "Find a direction that keeps much less variance and explain what "
+                "changed in the projected line."
             ),
             pl=(
-                "Zapisz pytanie do wersji interaktywnej: czy student powinien obracać dane, "
-                "zmieniać szum, czy wybierać liczbę komponentów?"
+                "Znajdź kierunek, który zachowuje dużo mniej wariancji, i wyjaśnij, "
+                "co zmieniło się na linii projekcji."
             ),
         ),
     ),
@@ -2138,6 +2138,20 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         ),
         controls=(
             ControlBinding(
+                key="Left / Right",
+                action=LocalizedText(
+                    en="rotate the projection direction",
+                    pl="obróć kierunek projekcji",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(
+                    en="reset the projection direction",
+                    pl="zresetuj kierunek projekcji",
+                ),
+            ),
+            ControlBinding(
                 key="T",
                 action=LocalizedText(
                     en="read the PCA lesson notes",
@@ -2250,12 +2264,14 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     body=(
                         LocalizedText(
                             en=(
-                                "This first slice is intentionally static. Next, students should "
-                                "rotate data, add noise, and choose how many components to keep."
+                                "This slice lets students rotate a projection direction. Next, "
+                                "the lab can fit true PCA automatically and compare it with "
+                                "manual directions."
                             ),
                             pl=(
-                                "Ten pierwszy slice jest celowo statyczny. Następny krok to "
-                                "obracanie danych, dodawanie szumu i wybór liczby komponentów."
+                                "Ten slice pozwala obracać kierunek projekcji. Następnie demo "
+                                "może automatycznie dopasować prawdziwe PCA i porównać je "
+                                "z kierunkami ręcznymi."
                             ),
                         ),
                     ),
