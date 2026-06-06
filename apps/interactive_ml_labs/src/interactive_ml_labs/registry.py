@@ -236,8 +236,8 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
                 "matches the visible groups and when it starts inventing structure."
             ),
             pl=(
-                "Zacznij od prostych blobs i zmieniaj k. Zobacz, kiedy K-Means "
-                "pasuje do widocznych grup, a kiedy zaczyna wymyślać strukturę."
+                "Zacznij od clean blobs i zmieniaj k. Zobacz, kiedy K-Means "
+                "pasuje do danych, a kiedy zaczyna tworzyć sztuczne podziały."
             ),
         ),
         LocalizedText(
@@ -247,7 +247,7 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
             pl=(
                 "Przełącz się na moons albo uneven blobs i sprawdź, jakie "
-                "założenie o kształcie klastrów robi K-Means."
+                "założenie o kształcie klastrów ma K-Means."
             ),
         ),
         LocalizedText(
@@ -256,8 +256,8 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
                 "pull centroids away from the dense regions."
             ),
             pl=(
-                "Dodaj albo pokaż outliery i zobacz, jak mocno kilka punktów "
-                "potrafi odciągnąć centroidy od gęstych obszarów."
+                "Pokaż outliery i zobacz, jak mocno kilka odległych punktów "
+                "potrafi przesunąć centroidy."
             ),
         ),
     ),
@@ -1657,7 +1657,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             pl=(
                 "Zobacz, jak K-Means grupuje punkty bez etykiet, dlaczego wybór k "
-                "ma znaczenie i kiedy clustering oparty na centroidach zaczyna zawodzić."
+                "ma znaczenie i kiedy clustering oparty na centroidach przestaje pasować."
             ),
         ),
         objectives=(
@@ -1666,7 +1666,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     "Connect K-Means assignments with the visible position of "
                     "centroids and data points."
                 ),
-                pl=("Połącz przypisania K-Means z położeniem centroidów i punktów na wykresie."),
+                pl=("Powiąż przypisania K-Means z położeniem centroidów i punktów na wykresie."),
             ),
             LocalizedText(
                 en=(
@@ -1674,7 +1674,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     "which data shapes fit K-Means assumptions."
                 ),
                 pl=(
-                    "Porównaj clean blobs, uneven blobs, moons i outliery, żeby "
+                    "Porównaj clean blobs, uneven blobs, moons i outliery, aby "
                     "zobaczyć, które kształty danych pasują do założeń K-Means."
                 ),
             ),
@@ -1684,7 +1684,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     "automatically by the algorithm."
                 ),
                 pl=(
-                    "Traktuj k jako decyzję modelującą, a nie fakt automatycznie "
+                    "Traktuj k jako decyzję projektową, a nie fakt automatycznie "
                     "odkrywany przez algorytm."
                 ),
             ),
@@ -1700,15 +1700,15 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ControlBinding(
                 key="- / =",
                 action=LocalizedText(
-                    en="decrease or increase k",
-                    pl="zmniejsz albo zwiększ k",
+                    en="decrease or increase k in K-Means, or eps in DBSCAN",
+                    pl="zmniejsz albo zwiększ k w K-Means albo eps w DBSCAN",
                 ),
             ),
             ControlBinding(
                 key="Space",
                 action=LocalizedText(
-                    en="advance one K-Means iteration",
-                    pl="wykonaj jedną iterację K-Means",
+                    en="advance one K-Means phase",
+                    pl="wykonaj kolejną fazę K-Means",
                 ),
             ),
             ControlBinding(
@@ -1723,6 +1723,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 action=LocalizedText(
                     en="show or hide point-to-centroid links",
                     pl="pokaż albo ukryj linie punkt-centroid",
+                ),
+            ),
+            ControlBinding(
+                key="M",
+                action=LocalizedText(
+                    en="switch between K-Means and DBSCAN",
+                    pl="przełącz między K-Means i DBSCAN",
                 ),
             ),
             ControlBinding(
@@ -1822,6 +1829,66 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             pl=(
                                 "Niższa inertia może wyglądać lepiej liczbowo, ale nadal "
                                 "dzielić naturalną grupę na sztuczne kawałki."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(
+                        en="What the interaction shows",
+                        pl="Co pokazuje interakcja",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Dragging a point changes the data, not only the display. "
+                                "After the move, K-Means recomputes assignments against the "
+                                "current centroids."
+                            ),
+                            pl=(
+                                "Przesuwanie punktu zmienia dane, a nie tylko obrazek. "
+                                "Po takim ruchu K-Means ponownie liczy przypisania względem "
+                                "aktualnych centroidów."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Point-to-centroid links make those assignments explicit: "
+                                "each point belongs to the closest centroid."
+                            ),
+                            pl=(
+                                "Linie punkt-centroid pokazują te przypisania wprost: "
+                                "każdy punkt należy do najbliższego centroidu."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(
+                        en="How to read inertia",
+                        pl="Jak czytać inertia",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "The inertia trend shows whether K-Means is reducing the "
+                                "sum of squared point-to-centroid distances."
+                            ),
+                            pl=(
+                                "Trend inertia pokazuje, czy K-Means zmniejsza sumę "
+                                "kwadratów odległości punktów od centroidów."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Lower inertia does not always mean a better explanation. "
+                                "A larger k can reduce the score while splitting a natural "
+                                "group into artificial pieces."
+                            ),
+                            pl=(
+                                "Niższa inertia nie zawsze oznacza lepsze wyjaśnienie danych. "
+                                "Większe k może poprawić wynik, a jednocześnie pociąć naturalną "
+                                "grupę na sztuczne kawałki."
                             ),
                         ),
                     ),
