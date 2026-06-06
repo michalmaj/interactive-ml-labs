@@ -242,22 +242,19 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
         ),
         LocalizedText(
             en=(
-                "Switch to moons or uneven blobs and ask what assumption K-Means "
-                "is making about cluster shape."
+                "Switch to moons, compare K-Means with DBSCAN, and find an eps "
+                "that follows the curved groups without merging everything."
             ),
             pl=(
-                "Przełącz się na moons albo uneven blobs i sprawdź, jakie "
-                "założenie o kształcie klastrów ma K-Means."
+                "Przełącz się na moons, porównaj K-Means z DBSCAN i znajdź eps, "
+                "który podąża za krzywymi grupami bez łączenia wszystkiego."
             ),
         ),
         LocalizedText(
-            en=(
-                "Add or reveal outliers and watch how strongly a few points can "
-                "pull centroids away from the dense regions."
-            ),
+            en=("Use outliers to compare centroid pull in K-Means with noise detection in DBSCAN."),
             pl=(
-                "Pokaż outliery i zobacz, jak mocno kilka odległych punktów "
-                "potrafi przesunąć centroidy."
+                "Użyj outlierów, żeby porównać przesuwanie centroidów w K-Means "
+                "z wykrywaniem noise w DBSCAN."
             ),
         ),
     ),
@@ -492,6 +489,33 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                     "Miara K-Means oparta na odległościach punktów od przypisanych "
                     "centroidów; niższa zwykle oznacza ciaśniejsze klastry."
                 ),
+            ),
+        ),
+        GlossaryTerm(
+            term="DBSCAN",
+            definition=LocalizedText(
+                en=(
+                    "A density-based clustering algorithm that groups points in dense "
+                    "neighborhoods and can mark sparse points as noise."
+                ),
+                pl=(
+                    "Algorytm clusteringu oparty na gęstości; grupuje punkty w gęstych "
+                    "sąsiedztwach i może oznaczać rzadkie punkty jako noise."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="eps",
+            definition=LocalizedText(
+                en="The DBSCAN neighborhood radius used to decide which points are close.",
+                pl="Promień sąsiedztwa w DBSCAN, który określa, które punkty są blisko.",
+            ),
+        ),
+        GlossaryTerm(
+            term="noise",
+            definition=LocalizedText(
+                en="A point that DBSCAN does not place inside any dense cluster.",
+                pl="Punkt, którego DBSCAN nie przypisuje do żadnego gęstego klastra.",
             ),
         ),
     ),
@@ -1652,12 +1676,12 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title=LocalizedText(en="Clustering Lab", pl="Clustering Lab"),
         summary=LocalizedText(
             en=(
-                "Explore how K-Means groups unlabeled points, why choosing k matters, "
-                "and where centroid-based clustering breaks down."
+                "Compare K-Means and DBSCAN on unlabeled points to see how "
+                "centroids, density, k, and eps shape clustering results."
             ),
             pl=(
-                "Zobacz, jak K-Means grupuje punkty bez etykiet, dlaczego wybór k "
-                "ma znaczenie i kiedy clustering oparty na centroidach przestaje pasować."
+                "Porównaj K-Means i DBSCAN na punktach bez etykiet, żeby zobaczyć, "
+                "jak centroidy, gęstość, k i eps wpływają na clustering."
             ),
         ),
         objectives=(
@@ -1670,22 +1694,22 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             LocalizedText(
                 en=(
-                    "Compare clean blobs, uneven blobs, moons, and outliers to see "
-                    "which data shapes fit K-Means assumptions."
+                    "Use DBSCAN to test whether density-based clustering handles "
+                    "moons and outliers differently than K-Means."
                 ),
                 pl=(
-                    "Porównaj clean blobs, uneven blobs, moons i outliery, aby "
-                    "zobaczyć, które kształty danych pasują do założeń K-Means."
+                    "Użyj DBSCAN, żeby sprawdzić, czy clustering oparty na gęstości "
+                    "inaczej radzi sobie z moons i outlierami niż K-Means."
                 ),
             ),
             LocalizedText(
                 en=(
-                    "Treat k as a modeling decision, not a fact discovered "
-                    "automatically by the algorithm."
+                    "Treat k and eps as modeling decisions that encode different "
+                    "assumptions about the data."
                 ),
                 pl=(
-                    "Traktuj k jako decyzję projektową, a nie fakt automatycznie "
-                    "odkrywany przez algorytm."
+                    "Traktuj k i eps jako decyzje projektowe, które zapisują różne "
+                    "założenia o danych."
                 ),
             ),
         ),
@@ -1707,8 +1731,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ControlBinding(
                 key="Space",
                 action=LocalizedText(
-                    en="advance one K-Means phase",
-                    pl="wykonaj kolejną fazę K-Means",
+                    en="advance one K-Means phase or rerun DBSCAN",
+                    pl="wykonaj kolejną fazę K-Means albo ponownie uruchom DBSCAN",
                 ),
             ),
             ControlBinding(
@@ -1735,8 +1759,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ControlBinding(
                 key="R",
                 action=LocalizedText(
-                    en="reset centroids",
-                    pl="zresetuj centroidy",
+                    en="reset the active algorithm",
+                    pl="zresetuj aktywny algorytm",
                 ),
             ),
             ControlBinding(
@@ -1756,7 +1780,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         ),
         create_scene=create_clustering_lab_scene,
         difficulty=LocalizedText(en="Advanced", pl="Zaawansowane"),
-        tags=("clustering", "k-means", "unsupervised", "visualization"),
+        tags=("clustering", "k-means", "dbscan", "unsupervised", "visualization"),
         theory=DemoTheory(
             sections=(
                 TheorySection(
@@ -1779,6 +1803,37 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             pl=(
                                 "To pomaga w eksploracji danych, ale wynik zależy od "
                                 "założeń zapisanych w algorytmie."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(
+                        en="Lesson path",
+                        pl="Ścieżka pracy",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Start in K-Means mode. Step through assignment and "
+                                "centroid-update phases so the algorithm feels mechanical, "
+                                "not magical."
+                            ),
+                            pl=(
+                                "Zacznij w trybie K-Means. Przejdź przez fazy przypisania "
+                                "punktów i przesunięcia centroidów, żeby algorytm był "
+                                "mechaniczny, a nie magiczny."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Then switch to DBSCAN and tune eps. Ask whether density "
+                                "explains the same data better than nearest-centroid distance."
+                            ),
+                            pl=(
+                                "Potem przełącz się na DBSCAN i dostrój eps. Sprawdź, "
+                                "czy gęstość lepiej wyjaśnia te same dane niż odległość "
+                                "od najbliższego centroidu."
                             ),
                         ),
                     ),
@@ -1809,16 +1864,44 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     ),
                 ),
                 TheorySection(
-                    title=LocalizedText(en="Why k is a choice", pl="Dlaczego k jest wyborem"),
+                    title=LocalizedText(en="What DBSCAN changes", pl="Co zmienia DBSCAN"),
                     body=(
                         LocalizedText(
                             en=(
-                                "The algorithm does not know how many groups are meaningful. "
-                                "The student or practitioner has to choose k."
+                                "DBSCAN does not ask for k. It grows clusters from dense "
+                                "neighborhoods and marks sparse points as noise."
                             ),
                             pl=(
-                                "Algorytm nie wie, ile grup ma sens. To student albo "
-                                "praktyk musi wybrać k."
+                                "DBSCAN nie pyta o k. Buduje klastry z gęstych sąsiedztw "
+                                "i oznacza rzadkie punkty jako noise."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The eps setting controls the neighborhood radius. Too small "
+                                "creates too much noise; too large can merge separate groups."
+                            ),
+                            pl=(
+                                "Ustawienie eps kontroluje promień sąsiedztwa. Zbyt małe eps "
+                                "tworzy za dużo noise; zbyt duże może połączyć osobne grupy."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(
+                        en="Why k and eps are choices",
+                        pl="Dlaczego k i eps są wyborami",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "K-Means does not know how many groups are meaningful. "
+                                "DBSCAN does not know which neighborhood radius is right."
+                            ),
+                            pl=(
+                                "K-Means nie wie, ile grup ma sens. DBSCAN nie wie, "
+                                "jaki promień sąsiedztwa jest właściwy."
                             ),
                         ),
                         LocalizedText(
@@ -1914,6 +1997,35 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             pl=(
                                 "W tym miejscu naturalnym kolejnym porównaniem stają się "
                                 "metody oparte na gęstości, takie jak DBSCAN."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(
+                        en="What to compare",
+                        pl="Co porównywać",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "On clean blobs, both algorithms can look reasonable. On moons, "
+                                "K-Means fights the shape while DBSCAN can follow the curve."
+                            ),
+                            pl=(
+                                "Na clean blobs oba algorytmy mogą wyglądać sensownie. "
+                                "Na moons K-Means walczy z kształtem, a DBSCAN może podążyć "
+                                "za krzywą."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "On outliers, compare whether the algorithm pulls a centroid "
+                                "toward lonely points or leaves them as noise."
+                            ),
+                            pl=(
+                                "Na outlierach sprawdź, czy algorytm przesuwa centroid w stronę "
+                                "samotnych punktów, czy zostawia je jako noise."
                             ),
                         ),
                     ),

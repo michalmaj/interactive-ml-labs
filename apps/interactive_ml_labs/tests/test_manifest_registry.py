@@ -92,14 +92,18 @@ def test_clustering_manifest_sets_first_level_three_demo_contract() -> None:
     assert manifest.level == 3
     assert manifest.difficulty is not None
     assert manifest.difficulty.pl == "Zaawansowane"
-    assert manifest.tags == ("clustering", "k-means", "unsupervised", "visualization")
+    assert manifest.tags == ("clustering", "k-means", "dbscan", "unsupervised", "visualization")
     assert manifest.create_scene is create_clustering_lab_scene
     assert "K-Means" in text
     assert "centroid" in text
     assert "inertia" in text
+    assert "Lesson path" in text
     assert "Dragging" in text
     assert "point-to-centroid" in text
     assert "DBSCAN" in text
+    assert "eps" in text
+    assert "noise" in text
+    assert "What to compare" in text
     assert "Space" in text
     assert "C" in text
     assert "M" in text
