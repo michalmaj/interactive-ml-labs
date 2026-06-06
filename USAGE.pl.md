@@ -36,7 +36,9 @@ wybór języka
 -> pauza / pomoc
 ```
 
-Kolejne dema będą podpinane stopniowo. Wszystkie obecne dema z Level 1 i Level 2 działają już w unified app, a każde demo nadal można uruchomić osobno.
+Kolejne dema będą podpinane stopniowo. Wszystkie obecne dema z Level 1 i Level 2 działają już w unified app, a każde z nich nadal można uruchomić osobno.
+
+Unified app zawiera też pierwsze laboratorium z Level 3: Clustering Lab. Na razie jest to demo dostępne tylko w aplikacji i pokazuje fazy K-Means, inertia, przesuwanie punktów oraz tryb porównawczy DBSCAN.
 
 Podstawowe sterowanie:
 
@@ -52,7 +54,7 @@ Podstawowe sterowanie:
 
 ## Osobne dema
 
-Każde demo nadal działa jako osobny pakiet i może być uruchamiane bez unified app.
+Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby dostępne tylko w aplikacji, takie jak Clustering Lab, uruchamia się z unified app.
 
 ### Gradient Descent Playground
 
