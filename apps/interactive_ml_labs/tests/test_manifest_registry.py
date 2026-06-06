@@ -151,6 +151,8 @@ def test_pca_manifest_sets_second_level_three_demo_contract() -> None:
     assert "N" in text
     assert "Left / Right" in text
     assert "F" in text
+    assert "C" in text
+    assert "residual" in text
     assert "R" in text
     assert "T" in text
 

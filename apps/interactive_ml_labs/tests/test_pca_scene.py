@@ -152,6 +152,44 @@ def test_pca_scene_new_sample_regenerates_points(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_pca_scene_toggles_residual_lines(monkeypatch) -> None:
+    """C should show or hide reconstruction residual helper lines."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_pca_lab_scene(AppContext())
+        assert scene.show_residuals is True
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_c))
+        assert scene.show_residuals is False
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_c))
+        assert scene.show_residuals is True
+    finally:
+        pygame.quit()
+
+
+def test_pca_scene_projects_points_to_active_axis(monkeypatch) -> None:
+    """Point projections should lie on the active projection axis."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_pca_lab_scene(AppContext())
+        point = scene._points[4]
+        projected = scene._project_point_to_active_axis(point)
+        mean_x, mean_y = scene._point_mean()
+        direction_x, direction_y = scene._projection_direction()
+        cross_product = (projected[0] - mean_x) * direction_y - (
+            projected[1] - mean_y
+        ) * direction_x
+
+        assert abs(cross_product) < 0.000001
+    finally:
+        pygame.quit()
+
+
 def test_pca_scene_manual_rotation_from_fit_mode(monkeypatch) -> None:
     """Left and Right should leave fit mode and continue from the PCA direction."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -184,9 +222,10 @@ def test_pca_scene_status_rows_report_variance(monkeypatch) -> None:
         assert rows["tryb"] == "manual"
         assert rows["dane"] == DATA_PRESETS[0].name_pl
         assert rows["noise"] == "1"
+        assert rows["residuals"] == "wł."
         assert rows["kąt"] == f"{DEFAULT_PROJECTION_ANGLE_DEGREES}°"
         assert rows["zachowana wariancja"].endswith("%")
-        assert rows["utracona wariancja"].endswith("%")
+        assert rows["błąd rekonstrukcji"].endswith("%")
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_f))
         rows = dict(scene._status_rows())
