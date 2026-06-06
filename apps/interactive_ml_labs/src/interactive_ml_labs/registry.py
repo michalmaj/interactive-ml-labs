@@ -262,22 +262,23 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
     "pca_lab": (
         LocalizedText(
             en=(
-                "Rotate the projection direction and compare how much variance "
-                "survives when the 2D cloud is compressed to 1D."
+                "Switch between dataset presets and compare how much variance "
+                "survives when each 2D cloud is compressed to 1D."
             ),
             pl=(
-                "Obracaj kierunek projekcji i porównuj, ile wariancji zostaje "
-                "po kompresji chmury 2D do 1D."
+                "Przełączaj presety danych i porównuj, ile wariancji zostaje "
+                "po kompresji każdej chmury 2D do 1D."
             ),
         ),
         LocalizedText(
             en=(
-                "Use explained variance as a warning label: high variance kept means "
-                "less information lost, not zero information lost."
+                "Increase noise and use explained variance as a warning label: "
+                "high variance kept means less information lost, not zero information lost."
             ),
             pl=(
-                "Traktuj explained variance jak etykietę ostrzegawczą: dużo zachowanej "
-                "wariancji oznacza mniejszą stratę informacji, nie brak straty."
+                "Zwiększ noise i traktuj explained variance jak etykietę ostrzegawczą: "
+                "dużo zachowanej wariancji oznacza mniejszą stratę informacji, "
+                "nie brak straty."
             ),
         ),
         LocalizedText(
@@ -2138,6 +2139,27 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         ),
         controls=(
             ControlBinding(
+                key="1-3",
+                action=LocalizedText(
+                    en="switch dataset preset",
+                    pl="zmień preset danych",
+                ),
+            ),
+            ControlBinding(
+                key="- / =",
+                action=LocalizedText(
+                    en="decrease or increase noise",
+                    pl="zmniejsz albo zwiększ noise",
+                ),
+            ),
+            ControlBinding(
+                key="N",
+                action=LocalizedText(
+                    en="generate a new sample",
+                    pl="wygeneruj nową próbkę",
+                ),
+            ),
+            ControlBinding(
                 key="Left / Right",
                 action=LocalizedText(
                     en="rotate the projection direction",
@@ -2271,13 +2293,12 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     body=(
                         LocalizedText(
                             en=(
-                                "This slice lets students rotate a projection direction, then "
-                                "fit PCA automatically to see the variance-maximizing direction."
+                                "This slice lets students change the data, add noise, rotate "
+                                "a projection direction, then fit PCA automatically."
                             ),
                             pl=(
-                                "Ten slice pozwala obracać kierunek projekcji, a potem "
-                                "automatycznie dopasować PCA i zobaczyć kierunek "
-                                "maksymalizujący wariancję."
+                                "Ten slice pozwala zmieniać dane, dodawać noise, obracać "
+                                "kierunek projekcji, a potem automatycznie dopasować PCA."
                             ),
                         ),
                     ),

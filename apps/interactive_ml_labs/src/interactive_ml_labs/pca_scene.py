@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import math
+import random
+from dataclasses import dataclass
 from enum import StrEnum
 from typing import Final
 
@@ -24,6 +26,24 @@ SECONDARY: Final[tuple[int, int, int]] = (246, 181, 111)
 POINT: Final[tuple[int, int, int]] = (146, 217, 150)
 DEFAULT_PROJECTION_ANGLE_DEGREES: Final[int] = 31
 ANGLE_STEP_DEGREES: Final[int] = 5
+MIN_NOISE_LEVEL: Final[int] = 0
+MAX_NOISE_LEVEL: Final[int] = 5
+
+
+@dataclass(frozen=True, slots=True)
+class PCADataPreset:
+    """Dataset preset for the PCA preview."""
+
+    name_en: str
+    name_pl: str
+    key: str
+
+    def for_language(self, language: str) -> str:
+        """Return a localized preset name."""
+        if language == "pl":
+            return self.name_pl
+
+        return self.name_en
 
 
 class PCAProjectionMode(StrEnum):
@@ -31,6 +51,13 @@ class PCAProjectionMode(StrEnum):
 
     MANUAL = "manual"
     FIT = "fit"
+
+
+DATA_PRESETS: Final[tuple[PCADataPreset, ...]] = (
+    PCADataPreset("Linear cloud", "Linear cloud", "linear"),
+    PCADataPreset("Noisy cloud", "Noisy cloud", "noisy"),
+    PCADataPreset("Two bands", "Two bands", "bands"),
+)
 
 
 class PCALabScene:
@@ -45,9 +72,17 @@ class PCALabScene:
         self._font_heading = make_ui_font(23, bold=True)
         self._font_body = make_ui_font(18)
         self._font_small = make_ui_font(15)
+        self.preset_index = 0
+        self.noise_level = 1
+        self.sample_seed = 11
         self._points = self._build_preview_points()
         self.projection_angle_degrees = DEFAULT_PROJECTION_ANGLE_DEGREES
         self.projection_mode = PCAProjectionMode.MANUAL
+
+    @property
+    def preset(self) -> PCADataPreset:
+        """Return the active dataset preset."""
+        return DATA_PRESETS[self.preset_index]
 
     def handle_event(self, event: object) -> SceneCommand:
         """Handle one input event."""
@@ -78,8 +113,8 @@ class PCALabScene:
         self._draw_text(
             surface,
             self._label(
-                "Rotate the projection direction and watch explained variance change.",
-                "Obracaj kierunek projekcji i obserwuj zmianę explained variance.",
+                "Change the data, rotate the projection, then fit PCA.",
+                "Zmieniaj dane, obracaj projekcję, a potem dopasuj PCA.",
             ),
             (52, 88),
             self._font_body,
@@ -90,7 +125,7 @@ class PCALabScene:
         self._draw_panel(surface, rect)
         self._draw_text(
             surface,
-            self._label("Original feature space", "Oryginalna przestrzeń cech"),
+            f"{self._label('Data', 'Dane')}: {self.preset.for_language(self._language)}",
             (rect.x + 22, rect.y + 18),
             self._font_heading,
             TEXT,
@@ -202,7 +237,7 @@ class PCALabScene:
                 self._font_small,
                 TEXT,
             )
-            status_y += 24
+            status_y += 18
         help_y = self._explained_variance_help_y(rect)
         self._draw_wrapped(
             surface,
@@ -233,7 +268,14 @@ class PCALabScene:
         pygame.draw.rect(surface, PANEL, rect, border_radius=8)
 
     def _handle_keydown(self, key: int) -> None:
-        if key == pygame.K_LEFT:
+        if key in {pygame.K_1, pygame.K_2, pygame.K_3}:
+            self.preset_index = key - pygame.K_1
+            self._generate_dataset()
+        elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
+            self._change_noise(-1)
+        elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
+            self._change_noise(1)
+        elif key == pygame.K_LEFT:
             self._rotate_projection(-ANGLE_STEP_DEGREES)
         elif key == pygame.K_RIGHT:
             self._rotate_projection(ANGLE_STEP_DEGREES)
@@ -242,6 +284,16 @@ class PCALabScene:
         elif key == pygame.K_r:
             self.projection_mode = PCAProjectionMode.MANUAL
             self.projection_angle_degrees = DEFAULT_PROJECTION_ANGLE_DEGREES
+        elif key == pygame.K_n:
+            self.sample_seed += 1
+            self._generate_dataset()
+
+    def _change_noise(self, delta: int) -> None:
+        self.noise_level = max(MIN_NOISE_LEVEL, min(MAX_NOISE_LEVEL, self.noise_level + delta))
+        self._generate_dataset()
+
+    def _generate_dataset(self) -> None:
+        self._points = self._build_preview_points()
 
     def _rotate_projection(self, delta_degrees: int) -> None:
         if self.projection_mode == PCAProjectionMode.FIT:
@@ -353,6 +405,8 @@ class PCALabScene:
         kept = round(self._explained_variance_ratio() * 100)
         return (
             (self._label("mode", "tryb"), self._mode_label()),
+            (self._label("data", "dane"), self.preset.for_language(self._language)),
+            (self._label("noise", "noise"), str(self.noise_level)),
             (self._label("angle", "kąt"), f"{self._active_projection_angle_degrees()}°"),
             (self._label("kept variance", "zachowana wariancja"), f"{kept}%"),
             (self._label("lost variance", "utracona wariancja"), f"{100 - kept}%"),
@@ -369,7 +423,7 @@ class PCALabScene:
         return bars_bottom + 18
 
     def _explained_variance_help_y(self, rect: pygame.Rect) -> int:
-        return self._explained_variance_status_start_y(rect) + len(self._status_rows()) * 24 + 14
+        return self._explained_variance_status_start_y(rect) + len(self._status_rows()) * 18 + 12
 
     def _label(self, en: str, pl: str) -> str:
         if self._language == "pl":
@@ -378,12 +432,28 @@ class PCALabScene:
         return en
 
     def _build_preview_points(self) -> tuple[tuple[float, float], ...]:
+        rng = random.Random(self.sample_seed + self.preset_index * 1009 + self.noise_level * 37)
+        noise_scale = self.noise_level * 0.035
         points: list[tuple[float, float]] = []
         for index in range(36):
             t = -0.92 + index * 1.84 / 35
-            wobble = 0.12 * math.sin(index * 1.7)
-            points.append((t, 0.56 * t + wobble))
+            base_noise = rng.gauss(0.0, noise_scale)
+            if self.preset.key == "bands":
+                band = -0.25 if index % 2 == 0 else 0.25
+                x = t + rng.gauss(0.0, noise_scale * 0.45)
+                y = 0.44 * t + band + base_noise
+            elif self.preset.key == "noisy":
+                x = t + rng.gauss(0.0, noise_scale)
+                y = 0.36 * t + 0.18 * math.sin(index * 1.3) + base_noise * 1.5
+            else:
+                x = t + rng.gauss(0.0, noise_scale * 0.45)
+                y = 0.56 * t + 0.12 * math.sin(index * 1.7) + base_noise
+            points.append((_clamp(x, -0.95, 0.95), _clamp(y, -0.95, 0.95)))
         return tuple(points)
+
+
+def _clamp(value: float, minimum: float, maximum: float) -> float:
+    return max(minimum, min(maximum, value))
 
 
 def create_pca_lab_scene(context: AppContext) -> PCALabScene:
