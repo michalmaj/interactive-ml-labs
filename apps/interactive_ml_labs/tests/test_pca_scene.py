@@ -4,7 +4,10 @@ import pygame
 from interactive_ml_labs.display import DEFAULT_RESOLUTION
 from interactive_ml_labs.pca_scene import (
     ANGLE_STEP_DEGREES,
+    DATA_PRESETS,
     DEFAULT_PROJECTION_ANGLE_DEGREES,
+    MAX_NOISE_LEVEL,
+    MIN_NOISE_LEVEL,
     PCALabScene,
     PCAProjectionMode,
     create_pca_lab_scene,
@@ -93,6 +96,62 @@ def test_pca_scene_fit_mode_uses_best_variance_direction(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_pca_scene_switches_dataset_presets(monkeypatch) -> None:
+    """Number keys should switch PCA dataset presets."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_pca_lab_scene(AppContext())
+        first_points = tuple(scene._points)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_3))
+
+        assert scene.preset_index == 2
+        assert scene.preset is DATA_PRESETS[2]
+        assert tuple(scene._points) != first_points
+    finally:
+        pygame.quit()
+
+
+def test_pca_scene_noise_controls_update_dataset(monkeypatch) -> None:
+    """Minus and equals should update noise within scene limits."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_pca_lab_scene(AppContext())
+        first_points = tuple(scene._points)
+
+        for _ in range(8):
+            scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+        assert scene.noise_level == MAX_NOISE_LEVEL
+        assert tuple(scene._points) != first_points
+
+        for _ in range(8):
+            scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
+        assert scene.noise_level == MIN_NOISE_LEVEL
+    finally:
+        pygame.quit()
+
+
+def test_pca_scene_new_sample_regenerates_points(monkeypatch) -> None:
+    """N should regenerate the active PCA dataset sample."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_pca_lab_scene(AppContext())
+        first_points = tuple(scene._points)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_n))
+
+        assert scene.sample_seed == 12
+        assert tuple(scene._points) != first_points
+    finally:
+        pygame.quit()
+
+
 def test_pca_scene_manual_rotation_from_fit_mode(monkeypatch) -> None:
     """Left and Right should leave fit mode and continue from the PCA direction."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -123,6 +182,8 @@ def test_pca_scene_status_rows_report_variance(monkeypatch) -> None:
         rows = dict(scene._status_rows())
 
         assert rows["tryb"] == "manual"
+        assert rows["dane"] == DATA_PRESETS[0].name_pl
+        assert rows["noise"] == "1"
         assert rows["kąt"] == f"{DEFAULT_PROJECTION_ANGLE_DEGREES}°"
         assert rows["zachowana wariancja"].endswith("%")
         assert rows["utracona wariancja"].endswith("%")
@@ -146,12 +207,12 @@ def test_pca_scene_variance_panel_keeps_help_below_status(monkeypatch) -> None:
         scene = create_pca_lab_scene(context)
         panel_rect = pygame.Rect(960, 138, 260, 420)
         status_bottom = (
-            scene._explained_variance_status_start_y(panel_rect) + len(scene._status_rows()) * 24
+            scene._explained_variance_status_start_y(panel_rect) + len(scene._status_rows()) * 18
         )
         help_y = scene._explained_variance_help_y(panel_rect)
 
         assert help_y >= status_bottom + 12
-        assert help_y <= panel_rect.bottom - 96
+        assert help_y <= panel_rect.bottom - 56
     finally:
         pygame.quit()
 
