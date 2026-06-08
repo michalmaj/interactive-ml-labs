@@ -2589,6 +2589,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
             ControlBinding(
+                key="D",
+                action=LocalizedText(
+                    en="cycle dataset preset",
+                    pl="zmień preset danych",
+                ),
+            ),
+            ControlBinding(
                 key="R",
                 action=LocalizedText(
                     en="reset the preview",
@@ -2728,13 +2735,14 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     body=(
                         LocalizedText(
                             en=(
-                                "This version is intentionally small: it focuses on boundary "
-                                "shape before adding dataset presets, metrics, or training "
-                                "controls."
+                                "This version stays intentionally small: it focuses on boundary "
+                                "shape, dataset presets, and a visible-point accuracy score "
+                                "before adding training controls."
                             ),
                             pl=(
                                 "Ta wersja jest celowo mała: skupia się na kształcie granicy, "
-                                "zanim dodamy presety danych, metryki i kontrolki treningu."
+                                "presetach danych i accuracy na widocznych punktach, zanim "
+                                "dodamy kontrolki treningu."
                             ),
                         ),
                         LocalizedText(
@@ -2757,12 +2765,12 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     body=(
                         LocalizedText(
                             en=(
-                                "A fuller lab can add dataset presets, train/test split, "
-                                "accuracy, precision/recall, and controls for model complexity."
+                                "A fuller lab can add train/test split, precision/recall, "
+                                "and controls for model complexity."
                             ),
                             pl=(
-                                "Pełniejszy lab może dodać presety danych, train/test split, "
-                                "accuracy, precision/recall i kontrolki złożoności modelu."
+                                "Pełniejszy lab może dodać train/test split, precision/recall "
+                                "i kontrolki złożoności modelu."
                             ),
                         ),
                         LocalizedText(

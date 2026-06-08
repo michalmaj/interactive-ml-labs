@@ -3,6 +3,7 @@
 import pygame
 from interactive_ml_labs.display import DEFAULT_RESOLUTION
 from interactive_ml_labs.model_comparison_scene import (
+    DATASETS,
     MODELS,
     ModelComparisonLabScene,
     create_model_comparison_lab_scene,
@@ -73,11 +74,58 @@ def test_model_comparison_scene_toggles_boundary_visibility(monkeypatch) -> None
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_a))
         assert scene.show_all_boundaries is False
 
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_d))
+        assert scene.selected_dataset_index == 1
+
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_3))
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_r))
 
         assert scene.selected_model_index == 0
+        assert scene.selected_dataset_index == 0
         assert scene.show_all_boundaries is True
+    finally:
+        pygame.quit()
+
+
+def test_model_comparison_scene_cycles_dataset_presets(monkeypatch) -> None:
+    """D should switch between comparison dataset presets."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_model_comparison_lab_scene(AppContext())
+        first_points = scene.points
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_d))
+
+        assert scene.selected_dataset_index == 1
+        assert scene.selected_dataset is DATASETS[1]
+        assert scene.points != first_points
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_d))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_d))
+
+        assert scene.selected_dataset_index == 0
+    finally:
+        pygame.quit()
+
+
+def test_model_comparison_scene_reports_model_accuracies(monkeypatch) -> None:
+    """Visible-point scores should change with model and dataset assumptions."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_model_comparison_lab_scene(AppContext())
+        curved_scores = tuple(scene._accuracy_for_model(index) for index in range(len(MODELS)))
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_d))
+        linear_scores = tuple(scene._accuracy_for_model(index) for index in range(len(MODELS)))
+
+        assert all(0.0 <= score <= 1.0 for score in curved_scores)
+        assert all(0.0 <= score <= 1.0 for score in linear_scores)
+        assert curved_scores != linear_scores
+        assert scene._predict_model(0, scene.points[0], 0) in {0, 1}
     finally:
         pygame.quit()
 

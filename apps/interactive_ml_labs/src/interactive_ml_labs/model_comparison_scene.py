@@ -63,6 +63,23 @@ class ComparisonModel:
         return self.risk_en
 
 
+@dataclass(frozen=True, slots=True)
+class ComparisonDataset:
+    """Static dataset preset for the comparison preview."""
+
+    name_en: str
+    name_pl: str
+    key: str
+    points: tuple[tuple[float, float, int], ...]
+
+    def name_for_language(self, language: str) -> str:
+        """Return a localized dataset name."""
+        if language == "pl":
+            return self.name_pl
+
+        return self.name_en
+
+
 MODELS: Final[tuple[ComparisonModel, ...]] = (
     ComparisonModel(
         name="Logistic Regression",
@@ -99,7 +116,7 @@ MODELS: Final[tuple[ComparisonModel, ...]] = (
     ),
 )
 
-POINTS: Final[tuple[tuple[float, float, int], ...]] = (
+CURVED_POINTS: Final[tuple[tuple[float, float, int], ...]] = (
     (-0.82, -0.36, 0),
     (-0.72, -0.12, 0),
     (-0.62, -0.52, 0),
@@ -126,6 +143,67 @@ POINTS: Final[tuple[tuple[float, float, int], ...]] = (
     (-0.04, -0.30, 1),
 )
 
+LINEAR_POINTS: Final[tuple[tuple[float, float, int], ...]] = (
+    (-0.86, -0.70, 0),
+    (-0.72, -0.48, 0),
+    (-0.62, -0.72, 0),
+    (-0.48, -0.30, 0),
+    (-0.32, -0.54, 0),
+    (-0.18, -0.18, 0),
+    (0.02, -0.34, 0),
+    (0.18, -0.08, 0),
+    (0.36, -0.22, 0),
+    (0.52, 0.04, 0),
+    (0.72, -0.02, 0),
+    (0.84, 0.18, 0),
+    (-0.84, -0.10, 1),
+    (-0.70, 0.18, 1),
+    (-0.54, 0.02, 1),
+    (-0.36, 0.34, 1),
+    (-0.18, 0.16, 1),
+    (0.00, 0.46, 1),
+    (0.18, 0.30, 1),
+    (0.34, 0.60, 1),
+    (0.52, 0.44, 1),
+    (0.66, 0.72, 1),
+    (0.80, 0.54, 1),
+    (0.90, 0.82, 1),
+)
+
+OVERLAP_POINTS: Final[tuple[tuple[float, float, int], ...]] = (
+    (-0.82, -0.28, 0),
+    (-0.68, 0.02, 0),
+    (-0.52, -0.44, 0),
+    (-0.42, 0.24, 0),
+    (-0.24, -0.10, 0),
+    (-0.08, 0.28, 0),
+    (0.08, -0.32, 0),
+    (0.22, 0.10, 0),
+    (0.38, -0.18, 0),
+    (0.54, 0.18, 0),
+    (0.70, -0.06, 0),
+    (0.82, 0.36, 0),
+    (-0.76, 0.34, 1),
+    (-0.58, 0.58, 1),
+    (-0.40, 0.06, 1),
+    (-0.22, 0.50, 1),
+    (-0.02, 0.00, 1),
+    (0.12, 0.52, 1),
+    (0.28, -0.02, 1),
+    (0.42, 0.44, 1),
+    (0.58, -0.34, 1),
+    (0.66, 0.62, 1),
+    (0.78, -0.46, 1),
+    (0.88, 0.08, 1),
+)
+
+DATASETS: Final[tuple[ComparisonDataset, ...]] = (
+    ComparisonDataset("Curved boundary", "Zakrzywiona granica", "curved", CURVED_POINTS),
+    ComparisonDataset("Linear signal", "Liniowy sygnał", "linear", LINEAR_POINTS),
+    ComparisonDataset("Noisy overlap", "Szum i overlap", "overlap", OVERLAP_POINTS),
+)
+POINTS: Final[tuple[tuple[float, float, int], ...]] = CURVED_POINTS
+
 
 class ModelComparisonLabScene:
     """First interactive slice for comparing classifier boundary shapes."""
@@ -140,12 +218,23 @@ class ModelComparisonLabScene:
         self._font_body = make_ui_font(18)
         self._font_small = make_ui_font(15)
         self.selected_model_index = 0
+        self.selected_dataset_index = 0
         self.show_all_boundaries = True
 
     @property
     def selected_model(self) -> ComparisonModel:
         """Return the active model preview."""
         return MODELS[self.selected_model_index]
+
+    @property
+    def selected_dataset(self) -> ComparisonDataset:
+        """Return the active dataset preset."""
+        return DATASETS[self.selected_dataset_index]
+
+    @property
+    def points(self) -> tuple[tuple[float, float, int], ...]:
+        """Return points for the active dataset."""
+        return self.selected_dataset.points
 
     def handle_event(self, event: object) -> SceneCommand:
         """Handle one input event."""
@@ -174,10 +263,13 @@ class ModelComparisonLabScene:
     def _handle_keydown(self, key: int) -> None:
         if key in {pygame.K_1, pygame.K_2, pygame.K_3}:
             self.selected_model_index = key - pygame.K_1
+        elif key == pygame.K_d:
+            self.selected_dataset_index = (self.selected_dataset_index + 1) % len(DATASETS)
         elif key == pygame.K_a:
             self.show_all_boundaries = not self.show_all_boundaries
         elif key == pygame.K_r:
             self.selected_model_index = 0
+            self.selected_dataset_index = 0
             self.show_all_boundaries = True
 
     def _draw_header(self, surface: pygame.Surface) -> None:
@@ -202,6 +294,14 @@ class ModelComparisonLabScene:
             self._font_heading,
             TEXT,
         )
+        self._draw_text(
+            surface,
+            f"{self._label('dataset', 'dataset')}: "
+            f"{self.selected_dataset.name_for_language(self._language)}",
+            (rect.right - 260, rect.y + 25),
+            self._font_small,
+            MUTED_TEXT,
+        )
         plot_rect = pygame.Rect(rect.x + 36, rect.y + 76, rect.width - 72, rect.height - 124)
         self._draw_grid(surface, plot_rect)
         self._draw_boundaries(surface, plot_rect)
@@ -212,15 +312,22 @@ class ModelComparisonLabScene:
         self._draw_panel(surface, rect)
         self._draw_text(
             surface,
-            self._label("Model preview", "Podgląd modelu"),
+            self._label("Models and score", "Modele i wynik"),
             (rect.x + 24, rect.y + 20),
             self._font_heading,
             TEXT,
         )
-        y = rect.y + 72
+        self._draw_text(
+            surface,
+            self.selected_dataset.name_for_language(self._language),
+            (rect.x + 24, rect.y + 52),
+            self._font_small,
+            MUTED_TEXT,
+        )
+        y = rect.y + 82
         for index, model in enumerate(MODELS):
             active = index == self.selected_model_index
-            item_rect = pygame.Rect(rect.x + 22, y, rect.width - 44, 86)
+            item_rect = pygame.Rect(rect.x + 22, y, rect.width - 44, 68)
             if active:
                 pygame.draw.rect(surface, (45, 53, 62), item_rect, border_radius=8)
                 pygame.draw.rect(surface, model.color, item_rect, width=2, border_radius=8)
@@ -233,6 +340,14 @@ class ModelComparisonLabScene:
                 self._font_body,
                 model.color if active else TEXT,
             )
+            score = round(self._accuracy_for_model(index) * 100)
+            self._draw_text(
+                surface,
+                f"{score}%",
+                (item_rect.right - 58, item_rect.y + 12),
+                self._font_body,
+                model.color if active else MUTED_TEXT,
+            )
             self._draw_wrapped(
                 surface,
                 model.assumption_for_language(self._language),
@@ -242,29 +357,45 @@ class ModelComparisonLabScene:
                 MUTED_TEXT,
                 line_height=18,
             )
-            y += 100
-        self._draw_selected_model_details(
-            surface, pygame.Rect(rect.x + 24, y + 8, rect.width - 48, 122)
-        )
+            y += 82
+        self._draw_scoreboard(surface, pygame.Rect(rect.x + 24, y + 8, rect.width - 48, 138))
 
-    def _draw_selected_model_details(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
+    def _draw_scoreboard(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         model = self.selected_model
         self._draw_text(
             surface,
-            self._label("Read the boundary", "Jak czytać granicę"),
+            self._label("Visible-point accuracy", "Accuracy na widocznych punktach"),
             (rect.x, rect.y),
             self._font_body,
             TEXT,
         )
+        y = rect.y + 34
+        for index, candidate in enumerate(MODELS):
+            accuracy = self._accuracy_for_model(index)
+            bar_rect = pygame.Rect(rect.x + 118, y + 3, round(180 * accuracy), 14)
+            label_color = candidate.color if index == self.selected_model_index else MUTED_TEXT
+            self._draw_text(
+                surface, candidate.name.split()[0], (rect.x, y), self._font_small, label_color
+            )
+            pygame.draw.rect(surface, GRID, (rect.x + 118, y + 3, 180, 14), border_radius=4)
+            pygame.draw.rect(surface, candidate.color, bar_rect, border_radius=4)
+            self._draw_text(
+                surface,
+                f"{round(accuracy * 100)}%",
+                (rect.right - 42, y),
+                self._font_small,
+                MUTED_TEXT,
+            )
+            y += 24
         details = (
             f"{self._label('Shape', 'Kształt')}: {model.boundary_for_language(self._language)}",
             f"{self._label('Watch for', 'Uważaj na')}: {model.risk_for_language(self._language)}",
             self._label(
-                "A toggles all boundaries. R resets the preview.",
-                "A przełącza wszystkie granice. R resetuje podgląd.",
+                "D changes dataset. A toggles inactive boundaries.",
+                "D zmienia dataset. A przełącza nieaktywne granice.",
             ),
         )
-        y = rect.y + 34
+        y += 8
         for line in details:
             self._draw_wrapped(
                 surface,
@@ -275,7 +406,7 @@ class ModelComparisonLabScene:
                 MUTED_TEXT,
                 line_height=18,
             )
-            y += 38
+            y += 20
 
     def _draw_footer(self, surface: pygame.Surface) -> None:
         self._draw_text(
@@ -354,7 +485,7 @@ class ModelComparisonLabScene:
         pygame.draw.lines(surface, color, False, points, width)
 
     def _draw_points(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
-        for x, y, class_id in POINTS:
+        for x, y, class_id in self.points:
             color = CLASS_A if class_id == 0 else CLASS_B
             pygame.draw.circle(surface, color, self._to_screen((x, y), rect), 7)
             pygame.draw.circle(surface, PLOT_BG, self._to_screen((x, y), rect), 7, width=1)
@@ -427,6 +558,43 @@ class ModelComparisonLabScene:
             rect.left + round((x + 1.0) * 0.5 * rect.width),
             rect.top + round((1.0 - (y + 1.0) * 0.5) * rect.height),
         )
+
+    def _accuracy_for_model(self, model_index: int) -> float:
+        correct = 0
+        for sample_index, point in enumerate(self.points):
+            prediction = self._predict_model(model_index, point, sample_index)
+            if prediction == point[2]:
+                correct += 1
+
+        return correct / len(self.points)
+
+    def _predict_model(
+        self,
+        model_index: int,
+        point: tuple[float, float, int],
+        sample_index: int,
+    ) -> int:
+        x, y, _class_id = point
+        if model_index == 0:
+            return int(y + 1.05 * x - 0.09 > 0.0)
+        if model_index == 1:
+            return self._predict_knn(point, sample_index)
+
+        return int((y > 0.55 and x > -0.55) or (x > 0.12 and y > -0.42) or x > 0.55)
+
+    def _predict_knn(self, point: tuple[float, float, int], sample_index: int) -> int:
+        x, y, _class_id = point
+        neighbors: list[tuple[float, int]] = []
+        for index, candidate in enumerate(self.points):
+            if index == sample_index:
+                continue
+            candidate_x, candidate_y, candidate_class = candidate
+            distance = (candidate_x - x) ** 2 + (candidate_y - y) ** 2
+            neighbors.append((distance, candidate_class))
+
+        nearest = sorted(neighbors)[:5]
+        votes = sum(class_id for _distance, class_id in nearest)
+        return int(votes >= 3)
 
     def _label(self, en: str, pl: str) -> str:
         if self._language == "pl":
