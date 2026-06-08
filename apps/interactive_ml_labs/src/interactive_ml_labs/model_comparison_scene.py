@@ -25,6 +25,12 @@ LOGISTIC: Final[tuple[int, int, int]] = (118, 205, 247)
 KNN: Final[tuple[int, int, int]] = (151, 219, 156)
 TREE: Final[tuple[int, int, int]] = (244, 131, 133)
 BOUNDARY_MUTED: Final[tuple[int, int, int]] = (82, 91, 103)
+DEFAULT_COMPLEXITY_LEVEL: Final[int] = 1
+MIN_COMPLEXITY_LEVEL: Final[int] = 0
+MAX_COMPLEXITY_LEVEL: Final[int] = 2
+KNN_K_VALUES: Final[tuple[int, int, int]] = (9, 5, 1)
+LOGISTIC_THRESHOLDS: Final[tuple[float, float, float]] = (0.35, 0.50, 0.65)
+TREE_DEPTHS: Final[tuple[int, int, int]] = (1, 2, 3)
 
 
 @dataclass(frozen=True, slots=True)
@@ -219,6 +225,7 @@ class ModelComparisonLabScene:
         self._font_small = make_ui_font(15)
         self.selected_model_index = 0
         self.selected_dataset_index = 0
+        self.complexity_levels = [DEFAULT_COMPLEXITY_LEVEL for _model in MODELS]
         self.show_all_boundaries = True
 
     @property
@@ -263,6 +270,10 @@ class ModelComparisonLabScene:
     def _handle_keydown(self, key: int) -> None:
         if key in {pygame.K_1, pygame.K_2, pygame.K_3}:
             self.selected_model_index = key - pygame.K_1
+        elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
+            self._change_selected_complexity(-1)
+        elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
+            self._change_selected_complexity(1)
         elif key == pygame.K_d:
             self.selected_dataset_index = (self.selected_dataset_index + 1) % len(DATASETS)
         elif key == pygame.K_a:
@@ -270,7 +281,15 @@ class ModelComparisonLabScene:
         elif key == pygame.K_r:
             self.selected_model_index = 0
             self.selected_dataset_index = 0
+            self.complexity_levels = [DEFAULT_COMPLEXITY_LEVEL for _model in MODELS]
             self.show_all_boundaries = True
+
+    def _change_selected_complexity(self, delta: int) -> None:
+        current_level = self.complexity_levels[self.selected_model_index]
+        self.complexity_levels[self.selected_model_index] = max(
+            MIN_COMPLEXITY_LEVEL,
+            min(MAX_COMPLEXITY_LEVEL, current_level + delta),
+        )
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "Model Comparison Lab", (58, 40), self._font_title, TEXT)
@@ -350,7 +369,8 @@ class ModelComparisonLabScene:
             )
             self._draw_wrapped(
                 surface,
-                model.assumption_for_language(self._language),
+                f"{self._complexity_label(index)} · "
+                f"{model.assumption_for_language(self._language)}",
                 (item_rect.x + 16, item_rect.y + 39),
                 item_rect.width - 32,
                 self._font_small,
@@ -388,11 +408,13 @@ class ModelComparisonLabScene:
             )
             y += 21
         details = (
+            f"{self._label('Param', 'Parametr')}: "
+            f"{self._complexity_label(self.selected_model_index)}",
             f"{self._label('Shape', 'Kształt')}: {model.boundary_for_language(self._language)}",
             f"{self._label('Watch for', 'Uważaj na')}: {model.risk_for_language(self._language)}",
             self._label(
-                "D: dataset  A: boundaries",
-                "D: dataset  A: granice",
+                "-/=: parameter  D: dataset",
+                "-/=: parametr  D: dataset",
             ),
         )
         y += 6
@@ -406,7 +428,7 @@ class ModelComparisonLabScene:
                 MUTED_TEXT,
                 line_height=16,
             )
-            y += self._wrapped_height(line, rect.width, self._font_small, line_height=16) + 2
+            y += self._wrapped_height(line, rect.width, self._font_small, line_height=16) + 1
 
     def _draw_footer(self, surface: pygame.Surface) -> None:
         self._draw_text(
@@ -434,7 +456,7 @@ class ModelComparisonLabScene:
             model = MODELS[index]
             color = model.color if index == active_index else BOUNDARY_MUTED
             width = 5 if index == active_index else 2
-            draw_boundary(surface, rect, color, width)
+            draw_boundary(surface, rect, color, width, self.complexity_levels[index])
 
     def _draw_logistic_boundary(
         self,
@@ -442,9 +464,11 @@ class ModelComparisonLabScene:
         rect: pygame.Rect,
         color: tuple[int, int, int],
         width: int,
+        complexity_level: int,
     ) -> None:
-        start = self._to_screen((-0.78, 0.92), rect)
-        end = self._to_screen((0.82, -0.78), rect)
+        offset = self._logistic_boundary_offset(complexity_level)
+        start = self._to_screen((-0.78, 1.05 * 0.78 + offset), rect)
+        end = self._to_screen((0.82, -1.05 * 0.82 + offset), rect)
         pygame.draw.line(surface, color, start, end, width)
 
     def _draw_knn_boundary(
@@ -453,12 +477,14 @@ class ModelComparisonLabScene:
         rect: pygame.Rect,
         color: tuple[int, int, int],
         width: int,
+        complexity_level: int,
     ) -> None:
+        wave = (0.18, 0.34, 0.48)[complexity_level]
         points = tuple(
             self._to_screen(
                 (
                     -0.78 + index * 0.18,
-                    0.34 * math.sin(index * 0.9) - 0.16 + index * 0.018,
+                    wave * math.sin(index * 0.9) - 0.16 + index * 0.018,
                 ),
                 rect,
             )
@@ -472,16 +498,35 @@ class ModelComparisonLabScene:
         rect: pygame.Rect,
         color: tuple[int, int, int],
         width: int,
+        complexity_level: int,
     ) -> None:
-        points = (
-            self._to_screen((-0.72, 0.68), rect),
-            self._to_screen((-0.36, 0.68), rect),
-            self._to_screen((-0.36, 0.18), rect),
-            self._to_screen((0.12, 0.18), rect),
-            self._to_screen((0.12, -0.34), rect),
-            self._to_screen((0.56, -0.34), rect),
-            self._to_screen((0.56, -0.76), rect),
-        )
+        if complexity_level == 0:
+            raw_points = ((-0.72, 0.22), (0.08, 0.22), (0.08, -0.76))
+        elif complexity_level == 1:
+            raw_points = (
+                (-0.72, 0.68),
+                (-0.36, 0.68),
+                (-0.36, 0.18),
+                (0.12, 0.18),
+                (0.12, -0.34),
+                (0.56, -0.34),
+                (0.56, -0.76),
+            )
+        else:
+            raw_points = (
+                (-0.78, 0.72),
+                (-0.48, 0.72),
+                (-0.48, 0.42),
+                (-0.18, 0.42),
+                (-0.18, 0.02),
+                (0.18, 0.02),
+                (0.18, -0.28),
+                (0.42, -0.28),
+                (0.42, -0.58),
+                (0.68, -0.58),
+                (0.68, -0.82),
+            )
+        points = tuple(self._to_screen(point, rect) for point in raw_points)
         pygame.draw.lines(surface, color, False, points, width)
 
     def _draw_points(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
@@ -588,12 +633,14 @@ class ModelComparisonLabScene:
         model = self.selected_model
         y = rect.y + 28 + len(MODELS) * 21 + 6
         details = (
+            f"{self._label('Param', 'Parametr')}: "
+            f"{self._complexity_label(self.selected_model_index)}",
             f"{self._label('Shape', 'Kształt')}: {model.boundary_for_language(self._language)}",
             f"{self._label('Watch for', 'Uważaj na')}: {model.risk_for_language(self._language)}",
-            self._label("D: dataset  A: boundaries", "D: dataset  A: granice"),
+            self._label("-/=: parameter  D: dataset", "-/=: parametr  D: dataset"),
         )
         for line in details:
-            y += self._wrapped_height(line, rect.width, self._font_small, line_height=16) + 2
+            y += self._wrapped_height(line, rect.width, self._font_small, line_height=16) + 1
         return y
 
     def _to_screen(self, point: tuple[float, float], rect: pygame.Rect) -> tuple[int, int]:
@@ -620,13 +667,19 @@ class ModelComparisonLabScene:
     ) -> int:
         x, y, _class_id = point
         if model_index == 0:
-            return int(y + 1.05 * x - 0.09 > 0.0)
+            offset = self._logistic_boundary_offset(self.complexity_levels[model_index])
+            return int(y + 1.05 * x - offset > 0.0)
         if model_index == 1:
-            return self._predict_knn(point, sample_index)
+            return self._predict_knn(point, sample_index, self.complexity_levels[model_index])
 
-        return int((y > 0.55 and x > -0.55) or (x > 0.12 and y > -0.42) or x > 0.55)
+        return self._predict_tree(point, self.complexity_levels[model_index])
 
-    def _predict_knn(self, point: tuple[float, float, int], sample_index: int) -> int:
+    def _predict_knn(
+        self,
+        point: tuple[float, float, int],
+        sample_index: int,
+        complexity_level: int,
+    ) -> int:
         x, y, _class_id = point
         neighbors: list[tuple[float, int]] = []
         for index, candidate in enumerate(self.points):
@@ -636,9 +689,38 @@ class ModelComparisonLabScene:
             distance = (candidate_x - x) ** 2 + (candidate_y - y) ** 2
             neighbors.append((distance, candidate_class))
 
-        nearest = sorted(neighbors)[:5]
+        k = KNN_K_VALUES[complexity_level]
+        nearest = sorted(neighbors)[:k]
         votes = sum(class_id for _distance, class_id in nearest)
-        return int(votes >= 3)
+        return int(votes >= math.ceil(k / 2))
+
+    def _predict_tree(self, point: tuple[float, float, int], complexity_level: int) -> int:
+        x, y, _class_id = point
+        if complexity_level == 0:
+            return int(y > 0.22 or x > 0.08)
+        if complexity_level == 1:
+            return int((y > 0.55 and x > -0.55) or (x > 0.12 and y > -0.42) or x > 0.55)
+
+        return int(
+            (y > 0.62 and x > -0.58)
+            or (-0.18 < x <= 0.18 and y > 0.02)
+            or (x > 0.18 and y > -0.28)
+            or (x > 0.42 and y > -0.58)
+            or x > 0.68
+        )
+
+    def _logistic_boundary_offset(self, complexity_level: int) -> float:
+        threshold = LOGISTIC_THRESHOLDS[complexity_level]
+        return (threshold - 0.50) * 1.2 - 0.09
+
+    def _complexity_label(self, model_index: int) -> str:
+        complexity_level = self.complexity_levels[model_index]
+        if model_index == 0:
+            return f"threshold={LOGISTIC_THRESHOLDS[complexity_level]:.2f}"
+        if model_index == 1:
+            return f"k={KNN_K_VALUES[complexity_level]}"
+
+        return f"depth={TREE_DEPTHS[complexity_level]}"
 
     def _label(self, en: str, pl: str) -> str:
         if self._language == "pl":

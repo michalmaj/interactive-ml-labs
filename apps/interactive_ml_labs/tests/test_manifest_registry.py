@@ -205,6 +205,7 @@ def test_model_comparison_manifest_sets_third_level_three_demo_contract() -> Non
     assert "1" in text
     assert "2" in text
     assert "3" in text
+    assert "- / =" in text
     assert "A" in text
     assert "D" in text
     assert "T" in text
