@@ -148,6 +148,28 @@ def test_model_comparison_scene_localizes_model_copy(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_model_comparison_side_panel_details_fit_inside_panel(monkeypatch) -> None:
+    """Scoreboard details should fit inside the right-side panel in both languages."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        for language in ("en", "pl"):
+            context = AppContext()
+            context.settings.language = language
+            scene = create_model_comparison_lab_scene(context)
+            side_panel_rect = pygame.Rect(818, 132, 390, 474)
+            scoreboard_rect = scene._side_panel_scoreboard_rect(side_panel_rect)
+
+            assert scoreboard_rect.bottom <= side_panel_rect.bottom
+
+            for model_index in range(len(MODELS)):
+                scene.selected_model_index = model_index
+                assert scene._scoreboard_content_bottom_y(scoreboard_rect) <= scoreboard_rect.bottom
+    finally:
+        pygame.quit()
+
+
 def test_model_comparison_scene_renders_to_shell_surface(monkeypatch) -> None:
     """The Model Comparison preview should draw a non-empty frame."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
