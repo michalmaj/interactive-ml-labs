@@ -324,10 +324,10 @@ class ModelComparisonLabScene:
             self._font_small,
             MUTED_TEXT,
         )
-        y = rect.y + 82
+        y = rect.y + 78
         for index, model in enumerate(MODELS):
             active = index == self.selected_model_index
-            item_rect = pygame.Rect(rect.x + 22, y, rect.width - 44, 68)
+            item_rect = pygame.Rect(rect.x + 22, y, rect.width - 44, 62)
             if active:
                 pygame.draw.rect(surface, (45, 53, 62), item_rect, border_radius=8)
                 pygame.draw.rect(surface, model.color, item_rect, width=2, border_radius=8)
@@ -351,14 +351,14 @@ class ModelComparisonLabScene:
             self._draw_wrapped(
                 surface,
                 model.assumption_for_language(self._language),
-                (item_rect.x + 16, item_rect.y + 42),
+                (item_rect.x + 16, item_rect.y + 39),
                 item_rect.width - 32,
                 self._font_small,
                 MUTED_TEXT,
-                line_height=18,
+                line_height=16,
             )
-            y += 82
-        self._draw_scoreboard(surface, pygame.Rect(rect.x + 24, y + 8, rect.width - 48, 138))
+            y += 74
+        self._draw_scoreboard(surface, self._side_panel_scoreboard_rect(rect))
 
     def _draw_scoreboard(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         model = self.selected_model
@@ -369,7 +369,7 @@ class ModelComparisonLabScene:
             self._font_body,
             TEXT,
         )
-        y = rect.y + 34
+        y = rect.y + 28
         for index, candidate in enumerate(MODELS):
             accuracy = self._accuracy_for_model(index)
             bar_rect = pygame.Rect(rect.x + 118, y + 3, round(180 * accuracy), 14)
@@ -386,16 +386,16 @@ class ModelComparisonLabScene:
                 self._font_small,
                 MUTED_TEXT,
             )
-            y += 24
+            y += 21
         details = (
             f"{self._label('Shape', 'Kształt')}: {model.boundary_for_language(self._language)}",
             f"{self._label('Watch for', 'Uważaj na')}: {model.risk_for_language(self._language)}",
             self._label(
-                "D changes dataset. A toggles inactive boundaries.",
-                "D zmienia dataset. A przełącza nieaktywne granice.",
+                "D: dataset  A: boundaries",
+                "D: dataset  A: granice",
             ),
         )
-        y += 8
+        y += 6
         for line in details:
             self._draw_wrapped(
                 surface,
@@ -404,9 +404,9 @@ class ModelComparisonLabScene:
                 rect.width,
                 self._font_small,
                 MUTED_TEXT,
-                line_height=18,
+                line_height=16,
             )
-            y += 20
+            y += self._wrapped_height(line, rect.width, self._font_small, line_height=16) + 2
 
     def _draw_footer(self, surface: pygame.Surface) -> None:
         self._draw_text(
@@ -551,6 +551,50 @@ class ModelComparisonLabScene:
 
         if current:
             self._draw_text(surface, current, (x, y), font, color)
+
+    def _wrapped_height(
+        self,
+        text: str,
+        width: int,
+        font: pygame.font.Font,
+        *,
+        line_height: int,
+    ) -> int:
+        lines = 1
+        current = ""
+        for word in text.split():
+            candidate = word if not current else f"{current} {word}"
+            if font.size(candidate)[0] <= width:
+                current = candidate
+                continue
+
+            if current:
+                lines += 1
+            current = word
+
+        return lines * line_height
+
+    def _side_panel_scoreboard_rect(self, side_panel_rect: pygame.Rect) -> pygame.Rect:
+        model_list_start_y = side_panel_rect.y + 78
+        model_list_bottom = model_list_start_y + len(MODELS) * 74
+        return pygame.Rect(
+            side_panel_rect.x + 24,
+            model_list_bottom + 6,
+            side_panel_rect.width - 48,
+            side_panel_rect.bottom - model_list_bottom - 6,
+        )
+
+    def _scoreboard_content_bottom_y(self, rect: pygame.Rect) -> int:
+        model = self.selected_model
+        y = rect.y + 28 + len(MODELS) * 21 + 6
+        details = (
+            f"{self._label('Shape', 'Kształt')}: {model.boundary_for_language(self._language)}",
+            f"{self._label('Watch for', 'Uważaj na')}: {model.risk_for_language(self._language)}",
+            self._label("D: dataset  A: boundaries", "D: dataset  A: granice"),
+        )
+        for line in details:
+            y += self._wrapped_height(line, rect.width, self._font_small, line_height=16) + 2
+        return y
 
     def _to_screen(self, point: tuple[float, float], rect: pygame.Rect) -> tuple[int, int]:
         x, y = point
