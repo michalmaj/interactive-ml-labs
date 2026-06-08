@@ -369,8 +369,7 @@ class ModelComparisonLabScene:
             )
             self._draw_wrapped(
                 surface,
-                f"{self._complexity_label(index)} · "
-                f"{model.assumption_for_language(self._language)}",
+                self._model_card_detail_text(index),
                 (item_rect.x + 16, item_rect.y + 39),
                 item_rect.width - 32,
                 self._font_small,
@@ -642,6 +641,26 @@ class ModelComparisonLabScene:
         for line in details:
             y += self._wrapped_height(line, rect.width, self._font_small, line_height=16) + 1
         return y
+
+    def _model_card_detail_text(self, model_index: int) -> str:
+        shape_labels = (
+            self._label("linear", "linear"),
+            self._label("local", "local"),
+            self._label("rules", "rules"),
+        )
+        return f"{self._complexity_label(model_index)} · {shape_labels[model_index]}"
+
+    def _model_card_detail_bottom_y(self, item_rect: pygame.Rect, model_index: int) -> int:
+        return (
+            item_rect.y
+            + 39
+            + self._wrapped_height(
+                self._model_card_detail_text(model_index),
+                item_rect.width - 32,
+                self._font_small,
+                line_height=16,
+            )
+        )
 
     def _to_screen(self, point: tuple[float, float], rect: pygame.Rect) -> tuple[int, int]:
         x, y = point
