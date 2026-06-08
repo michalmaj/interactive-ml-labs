@@ -216,6 +216,29 @@ def test_model_comparison_side_panel_details_fit_inside_panel(monkeypatch) -> No
         pygame.quit()
 
 
+def test_model_comparison_model_card_copy_fits_inside_cards(monkeypatch) -> None:
+    """Model card detail text should not overflow the card rectangle."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        for language in ("en", "pl"):
+            context = AppContext()
+            context.settings.language = language
+            scene = create_model_comparison_lab_scene(context)
+            side_panel_rect = pygame.Rect(818, 132, 390, 474)
+            y = side_panel_rect.y + 78
+
+            for model_index in range(len(MODELS)):
+                item_rect = pygame.Rect(side_panel_rect.x + 22, y, side_panel_rect.width - 44, 62)
+
+                assert scene._model_card_detail_bottom_y(item_rect, model_index) <= item_rect.bottom
+
+                y += 74
+    finally:
+        pygame.quit()
+
+
 def test_model_comparison_scene_renders_to_shell_surface(monkeypatch) -> None:
     """The Model Comparison preview should draw a non-empty frame."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
