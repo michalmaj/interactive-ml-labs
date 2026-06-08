@@ -124,11 +124,20 @@ def test_model_comparison_scene_reports_model_accuracies(monkeypatch) -> None:
     try:
         scene = create_model_comparison_lab_scene(AppContext())
         curved_scores = tuple(scene._accuracy_for_model(index) for index in range(len(MODELS)))
+        curved_train_scores = tuple(
+            scene._accuracy_for_model(index, split="train") for index in range(len(MODELS))
+        )
+        curved_test_scores = tuple(
+            scene._accuracy_for_model(index, split="test") for index in range(len(MODELS))
+        )
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_d))
         linear_scores = tuple(scene._accuracy_for_model(index) for index in range(len(MODELS)))
 
         assert all(0.0 <= score <= 1.0 for score in curved_scores)
+        assert all(0.0 <= score <= 1.0 for score in curved_train_scores)
+        assert all(0.0 <= score <= 1.0 for score in curved_test_scores)
+        assert curved_train_scores != curved_test_scores
         assert all(0.0 <= score <= 1.0 for score in linear_scores)
         assert curved_scores != linear_scores
         assert scene._predict_model(0, scene.points[0], 0) in {0, 1}
@@ -172,6 +181,31 @@ def test_model_comparison_scene_parameter_changes_scores(monkeypatch) -> None:
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
 
         assert scene._accuracy_for_model(1) != initial_score
+    finally:
+        pygame.quit()
+
+
+def test_model_comparison_scene_marks_train_and_test_points(monkeypatch) -> None:
+    """Each preset should expose a deterministic train/test split."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_model_comparison_lab_scene(AppContext())
+
+        for dataset_index in range(len(DATASETS)):
+            scene.selected_dataset_index = dataset_index
+            split_counts = {
+                "train": sum(
+                    1 for index in range(len(scene.points)) if scene._point_split(index) == "train"
+                ),
+                "test": sum(
+                    1 for index in range(len(scene.points)) if scene._point_split(index) == "test"
+                ),
+            }
+
+            assert split_counts["train"] > split_counts["test"] > 0
+            assert split_counts["train"] + split_counts["test"] == len(scene.points)
     finally:
         pygame.quit()
 

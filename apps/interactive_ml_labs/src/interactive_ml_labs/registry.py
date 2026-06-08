@@ -2743,24 +2743,24 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                         LocalizedText(
                             en=(
                                 "This version stays intentionally small: it focuses on boundary "
-                                "shape, dataset presets, and a visible-point accuracy score "
+                                "shape, dataset presets, and a simple train/test accuracy view "
                                 "before adding full training controls."
                             ),
                             pl=(
                                 "Ta wersja jest celowo mała: skupia się na kształcie granicy, "
-                                "presetach danych i accuracy na widocznych punktach, zanim "
+                                "presetach danych i prostym widoku train/test accuracy, zanim "
                                 "dodamy pełne kontrolki treningu."
                             ),
                         ),
                         LocalizedText(
                             en=(
                                 "Use - / = to change the active model parameter. Watch whether "
-                                "more flexibility improves the visible score or only bends the "
+                                "more flexibility improves the test score or only bends the "
                                 "boundary harder."
                             ),
                             pl=(
                                 "Użyj - / =, żeby zmienić parametr aktywnego modelu. Sprawdź, "
-                                "czy większa elastyczność poprawia widoczny wynik, czy tylko "
+                                "czy większa elastyczność poprawia test score, czy tylko "
                                 "mocniej wygina granicę."
                             ),
                         ),
@@ -2774,12 +2774,12 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     body=(
                         LocalizedText(
                             en=(
-                                "A fuller lab can add train/test split, precision/recall, "
-                                "and controls for model complexity."
+                                "A fuller lab can add precision/recall, richer confusion "
+                                "details, and real training controls."
                             ),
                             pl=(
-                                "Pełniejszy lab może dodać train/test split, precision/recall "
-                                "i kontrolki złożoności modelu."
+                                "Pełniejszy lab może dodać precision/recall, bogatsze "
+                                "szczegóły confusion matrix i prawdziwe kontrolki treningu."
                             ),
                         ),
                         LocalizedText(

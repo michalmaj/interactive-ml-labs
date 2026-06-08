@@ -199,6 +199,7 @@ def test_model_comparison_manifest_sets_third_level_three_demo_contract() -> Non
     assert "Decision Tree" in text
     assert "decision boundary" in text
     assert "model assumption" in text
+    assert "train/test accuracy" in text
     assert "Lesson path" in text
     assert "Same data" in text
     assert "dataset presets" in text

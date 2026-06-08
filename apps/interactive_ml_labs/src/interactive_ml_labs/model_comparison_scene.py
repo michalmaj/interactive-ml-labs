@@ -25,6 +25,7 @@ LOGISTIC: Final[tuple[int, int, int]] = (118, 205, 247)
 KNN: Final[tuple[int, int, int]] = (151, 219, 156)
 TREE: Final[tuple[int, int, int]] = (244, 131, 133)
 BOUNDARY_MUTED: Final[tuple[int, int, int]] = (82, 91, 103)
+TEST_POINT_OUTLINE: Final[tuple[int, int, int]] = (236, 239, 242)
 DEFAULT_COMPLEXITY_LEVEL: Final[int] = 1
 MIN_COMPLEXITY_LEVEL: Final[int] = 0
 MAX_COMPLEXITY_LEVEL: Final[int] = 2
@@ -359,12 +360,13 @@ class ModelComparisonLabScene:
                 self._font_body,
                 model.color if active else TEXT,
             )
-            score = round(self._accuracy_for_model(index) * 100)
+            train_score = round(self._accuracy_for_model(index, split="train") * 100)
+            test_score = round(self._accuracy_for_model(index, split="test") * 100)
             self._draw_text(
                 surface,
-                f"{score}%",
-                (item_rect.right - 58, item_rect.y + 12),
-                self._font_body,
+                f"{train_score}/{test_score}%",
+                (item_rect.right - 88, item_rect.y + 12),
+                self._font_small,
                 model.color if active else MUTED_TEXT,
             )
             self._draw_wrapped(
@@ -383,25 +385,29 @@ class ModelComparisonLabScene:
         model = self.selected_model
         self._draw_text(
             surface,
-            self._label("Visible-point accuracy", "Accuracy na widocznych punktach"),
+            self._label("Train / test accuracy", "Train / test accuracy"),
             (rect.x, rect.y),
             self._font_body,
             TEXT,
         )
         y = rect.y + 28
         for index, candidate in enumerate(MODELS):
-            accuracy = self._accuracy_for_model(index)
-            bar_rect = pygame.Rect(rect.x + 118, y + 3, round(180 * accuracy), 14)
+            train_accuracy = self._accuracy_for_model(index, split="train")
+            test_accuracy = self._accuracy_for_model(index, split="test")
+            train_rect = pygame.Rect(rect.x + 118, y + 2, round(130 * train_accuracy), 7)
+            test_rect = pygame.Rect(rect.x + 118, y + 11, round(130 * test_accuracy), 7)
             label_color = candidate.color if index == self.selected_model_index else MUTED_TEXT
             self._draw_text(
                 surface, candidate.name.split()[0], (rect.x, y), self._font_small, label_color
             )
-            pygame.draw.rect(surface, GRID, (rect.x + 118, y + 3, 180, 14), border_radius=4)
-            pygame.draw.rect(surface, candidate.color, bar_rect, border_radius=4)
+            pygame.draw.rect(surface, GRID, (rect.x + 118, y + 2, 130, 7), border_radius=3)
+            pygame.draw.rect(surface, GRID, (rect.x + 118, y + 11, 130, 7), border_radius=3)
+            pygame.draw.rect(surface, candidate.color, train_rect, border_radius=3)
+            pygame.draw.rect(surface, TEST_POINT_OUTLINE, test_rect, border_radius=3)
             self._draw_text(
                 surface,
-                f"{round(accuracy * 100)}%",
-                (rect.right - 42, y),
+                f"{round(train_accuracy * 100)}/{round(test_accuracy * 100)}",
+                (rect.right - 54, y),
                 self._font_small,
                 MUTED_TEXT,
             )
@@ -529,16 +535,20 @@ class ModelComparisonLabScene:
         pygame.draw.lines(surface, color, False, points, width)
 
     def _draw_points(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
-        for x, y, class_id in self.points:
+        for index, (x, y, class_id) in enumerate(self.points):
             color = CLASS_A if class_id == 0 else CLASS_B
-            pygame.draw.circle(surface, color, self._to_screen((x, y), rect), 7)
-            pygame.draw.circle(surface, PLOT_BG, self._to_screen((x, y), rect), 7, width=1)
+            position = self._to_screen((x, y), rect)
+            pygame.draw.circle(surface, color, position, 7)
+            pygame.draw.circle(surface, PLOT_BG, position, 7, width=1)
+            if self._point_split(index) == "test":
+                pygame.draw.circle(surface, TEST_POINT_OUTLINE, position, 10, width=2)
 
     def _draw_plot_legend(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         y = rect.bottom + 18
         labels = (
             (CLASS_A, self._label("class A", "klasa A")),
             (CLASS_B, self._label("class B", "klasa B")),
+            (TEST_POINT_OUTLINE, "test"),
             (self.selected_model.color, self.selected_model.name),
         )
         x = rect.x + 10
@@ -636,7 +646,7 @@ class ModelComparisonLabScene:
             f"{self._complexity_label(self.selected_model_index)}",
             f"{self._label('Shape', 'Kształt')}: {model.boundary_for_language(self._language)}",
             f"{self._label('Watch for', 'Uważaj na')}: {model.risk_for_language(self._language)}",
-            self._label("-/=: parameter  D: dataset", "-/=: parametr  D: dataset"),
+            self._label("outline = test points", "obwódka = punkty testowe"),
         )
         for line in details:
             y += self._wrapped_height(line, rect.width, self._font_small, line_height=16) + 1
@@ -669,14 +679,25 @@ class ModelComparisonLabScene:
             rect.top + round((1.0 - (y + 1.0) * 0.5) * rect.height),
         )
 
-    def _accuracy_for_model(self, model_index: int) -> float:
+    def _accuracy_for_model(self, model_index: int, *, split: str | None = None) -> float:
         correct = 0
+        total = 0
         for sample_index, point in enumerate(self.points):
+            if split is not None and self._point_split(sample_index) != split:
+                continue
+
             prediction = self._predict_model(model_index, point, sample_index)
             if prediction == point[2]:
                 correct += 1
+            total += 1
 
-        return correct / len(self.points)
+        return correct / total
+
+    def _point_split(self, sample_index: int) -> str:
+        if sample_index % 4 == 3:
+            return "test"
+
+        return "train"
 
     def _predict_model(
         self,
