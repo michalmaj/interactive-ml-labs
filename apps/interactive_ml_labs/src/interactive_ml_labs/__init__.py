@@ -42,6 +42,10 @@ from interactive_ml_labs.manifest import (
     LocalizedText,
     TheorySection,
 )
+from interactive_ml_labs.model_comparison_scene import (
+    ModelComparisonLabScene,
+    create_model_comparison_lab_scene,
+)
 from interactive_ml_labs.pca_scene import PCALabScene, create_pca_lab_scene
 from interactive_ml_labs.random_forest_scene import (
     RandomForestSceneAdapter,
@@ -99,6 +103,7 @@ __all__ = [
     "LevelManifest",
     "LocalizedText",
     "LogisticRegressionSceneAdapter",
+    "ModelComparisonLabScene",
     "PCALabScene",
     "RandomForestSceneAdapter",
     "RectTuple",
@@ -116,6 +121,7 @@ __all__ = [
     "create_gradient_descent_scene",
     "create_knn_vote_map_scene",
     "create_logistic_regression_scene",
+    "create_model_comparison_lab_scene",
     "create_pca_lab_scene",
     "create_random_forest_scene",
     "default_settings_path",
