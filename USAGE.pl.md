@@ -38,7 +38,10 @@ wybór języka
 
 Kolejne dema będą podpinane stopniowo. Wszystkie obecne dema z Level 1 i Level 2 działają już w unified app, a każde z nich nadal można uruchomić osobno.
 
-Unified app zawiera też pierwsze laboratorium z Level 3: Clustering Lab. Na razie jest to demo dostępne tylko w aplikacji i pokazuje fazy K-Means, inertia, przesuwanie punktów oraz tryb porównawczy DBSCAN.
+Unified app zawiera też natywne laboratoria z Level 3:
+
+- Clustering Lab pokazuje fazy K-Means, inertia, przesuwanie punktów oraz tryb porównawczy DBSCAN.
+- PCA Lab pokazuje presety danych, noise, ręczne obracanie projekcji, dopasowany kierunek PCA, explained variance, residuals rekonstrukcji i reconstruction error.
 
 Podstawowe sterowanie:
 
@@ -54,7 +57,31 @@ Podstawowe sterowanie:
 
 ## Osobne dema
 
-Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby dostępne tylko w aplikacji, takie jak Clustering Lab, uruchamia się z unified app.
+Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby dostępne tylko w aplikacji, takie jak Clustering Lab i PCA Lab, uruchamia się z unified app.
+
+### Natywne laby Level 3
+
+Sterowanie w Clustering Lab:
+
+| Klawisz / wejście | Akcja |
+| ----------------- | ----- |
+| `1-4` | Zmień preset danych |
+| `-` / `=` | Zmień `k` w K-Means albo `eps` w DBSCAN |
+| `Space` | Wykonaj fazę K-Means albo ponownie uruchom DBSCAN |
+| `M` | Przełącz K-Means / DBSCAN |
+| `C` | Pokaż lub ukryj linie punkt-centroid |
+| Przeciąganie myszy | Przesuń punkt danych |
+
+Sterowanie w PCA Lab:
+
+| Klawisz / wejście | Akcja |
+| ----------------- | ----- |
+| `1-3` | Zmień preset danych |
+| `-` / `=` | Zmień noise |
+| `N` | Wygeneruj nową próbkę |
+| `Left` / `Right` | Obróć kierunek projekcji |
+| `F` | Przełącz dopasowany kierunek PCA |
+| `C` | Pokaż lub ukryj residual lines rekonstrukcji |
 
 ### Gradient Descent Playground
 
