@@ -38,7 +38,10 @@ language selection
 
 Real demo integrations are being added gradually. All current Level 1 and Level 2 demos are available through the unified app, and individual demos can still be run directly.
 
-The unified app also includes the first Level 3 lab, Clustering Lab. It is currently app-only and demonstrates K-Means phases, inertia, draggable points, and a DBSCAN comparison mode.
+The unified app also includes app-only Level 3 labs:
+
+- Clustering Lab demonstrates K-Means phases, inertia, draggable points, and a DBSCAN comparison mode.
+- PCA Lab demonstrates dataset/noise controls, manual projection rotation, fitted PCA direction, explained variance, reconstruction residuals, and reconstruction error.
 
 Common shell controls:
 
@@ -54,7 +57,31 @@ Common shell controls:
 
 ## Standalone Demos
 
-Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Clustering Lab, are launched from the unified app.
+Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Clustering Lab and PCA Lab, are launched from the unified app.
+
+### App-only Level 3 Labs
+
+Clustering Lab controls:
+
+| Key / input | Action |
+| ----------- | ------ |
+| `1-4` | Switch dataset preset |
+| `-` / `=` | Change `k` in K-Means or `eps` in DBSCAN |
+| `Space` | Advance K-Means phase or rerun DBSCAN |
+| `M` | Switch K-Means / DBSCAN |
+| `C` | Toggle point-to-centroid links |
+| Mouse drag | Move a data point |
+
+PCA Lab controls:
+
+| Key / input | Action |
+| ----------- | ------ |
+| `1-3` | Switch dataset preset |
+| `-` / `=` | Change noise |
+| `N` | Generate a new sample |
+| `Left` / `Right` | Rotate projection direction |
+| `F` | Toggle fitted PCA direction |
+| `C` | Toggle reconstruction residual lines |
 
 ### Gradient Descent Playground
 
