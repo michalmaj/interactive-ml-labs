@@ -145,7 +145,10 @@ def test_pca_manifest_sets_second_level_three_demo_contract() -> None:
     assert "projection" in text
     assert "explained variance" in text
     assert "principal component" in text
-    assert "Next interaction" in text
+    assert "Lesson path" in text
+    assert "Data and noise" in text
+    assert "Residuals and reconstruction" in text
+    assert "What to compare" in text
     assert "1-3" in text
     assert "- / =" in text
     assert "N" in text
@@ -153,6 +156,7 @@ def test_pca_manifest_sets_second_level_three_demo_contract() -> None:
     assert "F" in text
     assert "C" in text
     assert "residual" in text
+    assert "reconstruction error" in text
     assert "R" in text
     assert "T" in text
 

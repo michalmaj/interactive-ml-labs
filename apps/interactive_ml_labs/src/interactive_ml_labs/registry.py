@@ -262,33 +262,33 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
     "pca_lab": (
         LocalizedText(
             en=(
-                "Switch between dataset presets and compare how much variance "
-                "survives when each 2D cloud is compressed to 1D."
+                "Start with fit PCA, then rotate manually. Watch when the projection "
+                "keeps the trend and when residual lines grow."
             ),
             pl=(
-                "Przełączaj presety danych i porównuj, ile wariancji zostaje "
-                "po kompresji każdej chmury 2D do 1D."
+                "Zacznij od fit PCA, potem obracaj ręcznie. Obserwuj, kiedy projekcja "
+                "zachowuje trend, a kiedy residual lines robią się długie."
             ),
         ),
         LocalizedText(
             en=(
-                "Increase noise and use explained variance as a warning label: "
-                "high variance kept means less information lost, not zero information lost."
+                "Switch between Linear cloud, Noisy cloud, and Two bands. Ask which "
+                "patterns PCA can summarize with one line and which it flattens."
+            ),
+            pl=(
+                "Przełączaj Linear cloud, Noisy cloud i Two bands. Sprawdź, które "
+                "wzorce PCA umie streścić jedną linią, a które spłaszcza."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Increase noise and use explained variance as a warning label: high "
+                "variance kept means less information lost, not zero information lost."
             ),
             pl=(
                 "Zwiększ noise i traktuj explained variance jak etykietę ostrzegawczą: "
                 "dużo zachowanej wariancji oznacza mniejszą stratę informacji, "
                 "nie brak straty."
-            ),
-        ),
-        LocalizedText(
-            en=(
-                "Press F to fit PCA automatically. Compare that direction with "
-                "one manual direction that keeps much less variance."
-            ),
-            pl=(
-                "Wciśnij F, żeby automatycznie dopasować PCA. Porównaj ten kierunek "
-                "z ręcznym kierunkiem, który zachowuje dużo mniej wariancji."
             ),
         ),
         LocalizedText(
@@ -589,6 +589,26 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             definition=LocalizedText(
                 en="The share of data spread preserved by selected PCA components.",
                 pl="Część rozrzutu danych zachowana przez wybrane komponenty PCA.",
+            ),
+        ),
+        GlossaryTerm(
+            term="reconstruction error",
+            definition=LocalizedText(
+                en=(
+                    "The part of a point that is lost when it is projected and rebuilt "
+                    "from fewer dimensions."
+                ),
+                pl=(
+                    "Część punktu utracona po projekcji i odtworzeniu go z mniejszej "
+                    "liczby wymiarów."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="residual",
+            definition=LocalizedText(
+                en="The visual leftover between the original point and its reconstruction.",
+                pl="Wizualna reszta między oryginalnym punktem a jego rekonstrukcją.",
             ),
         ),
     ),
@@ -2114,37 +2134,41 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title=LocalizedText(en="PCA Lab", pl="PCA Lab"),
         summary=LocalizedText(
             en=(
-                "Preview dimensionality reduction by comparing an original point cloud, "
-                "a one-component projection, and explained variance."
+                "Explore PCA by changing datasets and noise, rotating a manual "
+                "projection, fitting PCA, and inspecting reconstruction residuals."
             ),
             pl=(
-                "Zobacz pierwszy szkic dimensionality reduction: oryginalną chmurę punktów, "
-                "projekcję na jedną komponentę i explained variance."
+                "Eksperymentuj z PCA: zmieniaj dane i noise, obracaj ręczną projekcję, "
+                "dopasuj PCA i analizuj residuals rekonstrukcji."
             ),
         ),
         objectives=(
             LocalizedText(
                 en=(
-                    "Connect PCA with the idea of keeping directions where the data "
-                    "has the largest spread."
+                    "Use manual projection to see why PCA chooses the direction with "
+                    "the largest spread."
                 ),
                 pl=(
-                    "Połącz PCA z intuicją zachowywania kierunków, w których dane "
-                    "mają największy rozrzut."
+                    "Użyj ręcznej projekcji, żeby zobaczyć, dlaczego PCA wybiera "
+                    "kierunek o największym rozrzucie."
                 ),
-            ),
-            LocalizedText(
-                en=("Compare the original feature space with a compressed 1D projection."),
-                pl="Porównaj oryginalną przestrzeń cech ze skompresowaną projekcją 1D.",
             ),
             LocalizedText(
                 en=(
-                    "Read explained variance as a trade-off between compression "
-                    "and information loss."
+                    "Compare dataset presets and noise levels to see when one component "
+                    "is a good summary."
                 ),
                 pl=(
-                    "Czytaj explained variance jako kompromis między kompresją a utratą informacji."
+                    "Porównaj presety danych i poziomy noise, żeby zobaczyć, kiedy "
+                    "jedna komponenta jest dobrym streszczeniem."
                 ),
+            ),
+            LocalizedText(
+                en=(
+                    "Read residual lines and reconstruction error as the visible cost "
+                    "of compression."
+                ),
+                pl=("Czytaj residual lines i reconstruction error jako widoczny koszt kompresji."),
             ),
         ),
         controls=(
@@ -2252,6 +2276,31 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     ),
                 ),
                 TheorySection(
+                    title=LocalizedText(en="Lesson path", pl="Ścieżka pracy"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Start by pressing F. The fitted PCA direction is the line that "
+                                "keeps the most variance for the current dataset."
+                            ),
+                            pl=(
+                                "Zacznij od F. Dopasowany kierunek PCA to linia, która zachowuje "
+                                "najwięcej wariancji dla aktualnego zbioru."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Then rotate manually with Left/Right and watch kept variance, "
+                                "reconstruction error, and residual lines change together."
+                            ),
+                            pl=(
+                                "Potem obracaj ręcznie przez Left/Right i obserwuj, jak razem "
+                                "zmieniają się wariancja, błąd rekonstrukcji i residual lines."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
                     title=LocalizedText(en="What PCA keeps", pl="Co zachowuje PCA"),
                     body=(
                         LocalizedText(
@@ -2289,6 +2338,34 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
                 TheorySection(
                     title=LocalizedText(
+                        en="Data and noise",
+                        pl="Dane i noise",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Linear cloud is the friendly case: one direction explains most "
+                                "of the structure. Noisy cloud makes the trade-off less clean."
+                            ),
+                            pl=(
+                                "Linear cloud to przyjazny przypadek: jeden kierunek wyjaśnia "
+                                "większość struktury. Noisy cloud zaciemnia kompromis."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Two bands is useful because PCA can keep spread while flattening "
+                                "a pattern that still matters visually."
+                            ),
+                            pl=(
+                                "Two bands jest przydatne, bo PCA może zachować rozrzut, ale "
+                                "spłaszczyć wzorzec, który wizualnie nadal ma znaczenie."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(
                         en="How to read explained variance",
                         pl="Jak czytać explained variance",
                     ),
@@ -2316,16 +2393,44 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     ),
                 ),
                 TheorySection(
-                    title=LocalizedText(en="Next interaction", pl="Następna interakcja"),
+                    title=LocalizedText(
+                        en="Residuals and reconstruction",
+                        pl="Residuals i rekonstrukcja",
+                    ),
                     body=(
                         LocalizedText(
                             en=(
-                                "This slice lets students change the data, add noise, rotate "
-                                "a projection direction, then fit PCA automatically."
+                                "A residual line connects an original point with the point rebuilt "
+                                "from the 1D projection. Long lines show what the projection lost."
                             ),
                             pl=(
-                                "Ten slice pozwala zmieniać dane, dodawać noise, obracać "
-                                "kierunek projekcji, a potem automatycznie dopasować PCA."
+                                "Residual line łączy oryginalny punkt z punktem odtworzonym "
+                                "z projekcji 1D. Długie linie pokazują, co projekcja zgubiła."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Reconstruction error is the same idea as a summary number: "
+                                "how much variation is left outside the chosen direction."
+                            ),
+                            pl=(
+                                "Reconstruction error to ta sama intuicja zapisana liczbą: "
+                                "ile zmienności zostaje poza wybranym kierunkiem."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to compare", pl="Co porównywać"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Compare manual and fitted directions on every preset. A good "
+                                "explanation should match the plot, not only a high percentage."
+                            ),
+                            pl=(
+                                "Porównuj ręczne i dopasowane kierunki na każdym presecie. Dobre "
+                                "wyjaśnienie ma pasować do wykresu, nie tylko do procentu."
                             ),
                         ),
                     ),
