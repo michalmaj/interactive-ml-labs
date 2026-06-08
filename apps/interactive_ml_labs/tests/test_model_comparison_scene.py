@@ -210,6 +210,30 @@ def test_model_comparison_scene_marks_train_and_test_points(monkeypatch) -> None
         pygame.quit()
 
 
+def test_model_comparison_scene_reports_confusion_details(monkeypatch) -> None:
+    """The active test split should expose compact confusion and P/R details."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_model_comparison_lab_scene(AppContext())
+        counts = scene._confusion_counts(0, split="test")
+        precision, recall = scene._precision_recall_for_model(0, split="test")
+        test_total = sum(
+            1 for index in range(len(scene.points)) if scene._point_split(index) == "test"
+        )
+
+        assert set(counts) == {"tp", "fp", "fn", "tn"}
+        assert sum(counts.values()) == test_total
+        assert 0.0 <= precision <= 1.0
+        assert 0.0 <= recall <= 1.0
+        assert "TP" in scene._confusion_summary_label(0, split="test")
+        assert scene._precision_recall_label(0, split="test").startswith("precision/recall")
+        assert "P/R" in scene._test_details_label(0)
+    finally:
+        pygame.quit()
+
+
 def test_model_comparison_scene_localizes_model_copy(monkeypatch) -> None:
     """Model details should use the global language from AppContext."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")

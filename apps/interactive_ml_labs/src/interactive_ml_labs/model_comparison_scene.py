@@ -382,7 +382,6 @@ class ModelComparisonLabScene:
         self._draw_scoreboard(surface, self._side_panel_scoreboard_rect(rect))
 
     def _draw_scoreboard(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
-        model = self.selected_model
         self._draw_text(
             surface,
             self._label("Train / test accuracy", "Train / test accuracy"),
@@ -415,8 +414,7 @@ class ModelComparisonLabScene:
         details = (
             f"{self._label('Param', 'Parametr')}: "
             f"{self._complexity_label(self.selected_model_index)}",
-            f"{self._label('Shape', 'Kształt')}: {model.boundary_for_language(self._language)}",
-            f"{self._label('Watch for', 'Uważaj na')}: {model.risk_for_language(self._language)}",
+            self._test_details_label(self.selected_model_index),
             self._label(
                 "-/=: parameter  D: dataset",
                 "-/=: parametr  D: dataset",
@@ -639,13 +637,11 @@ class ModelComparisonLabScene:
         )
 
     def _scoreboard_content_bottom_y(self, rect: pygame.Rect) -> int:
-        model = self.selected_model
         y = rect.y + 28 + len(MODELS) * 21 + 6
         details = (
             f"{self._label('Param', 'Parametr')}: "
             f"{self._complexity_label(self.selected_model_index)}",
-            f"{self._label('Shape', 'Kształt')}: {model.boundary_for_language(self._language)}",
-            f"{self._label('Watch for', 'Uważaj na')}: {model.risk_for_language(self._language)}",
+            self._test_details_label(self.selected_model_index),
             self._label("outline = test points", "obwódka = punkty testowe"),
         )
         for line in details:
@@ -692,6 +688,59 @@ class ModelComparisonLabScene:
             total += 1
 
         return correct / total
+
+    def _confusion_counts(
+        self,
+        model_index: int,
+        *,
+        split: str | None = None,
+    ) -> dict[str, int]:
+        counts = {"tp": 0, "fp": 0, "fn": 0, "tn": 0}
+        for sample_index, point in enumerate(self.points):
+            if split is not None and self._point_split(sample_index) != split:
+                continue
+
+            prediction = self._predict_model(model_index, point, sample_index)
+            actual = point[2]
+            if prediction == 1 and actual == 1:
+                counts["tp"] += 1
+            elif prediction == 1 and actual == 0:
+                counts["fp"] += 1
+            elif prediction == 0 and actual == 1:
+                counts["fn"] += 1
+            else:
+                counts["tn"] += 1
+
+        return counts
+
+    def _precision_recall_for_model(
+        self,
+        model_index: int,
+        *,
+        split: str | None = None,
+    ) -> tuple[float, float]:
+        counts = self._confusion_counts(model_index, split=split)
+        precision_denominator = counts["tp"] + counts["fp"]
+        recall_denominator = counts["tp"] + counts["fn"]
+        precision = counts["tp"] / precision_denominator if precision_denominator else 0.0
+        recall = counts["tp"] / recall_denominator if recall_denominator else 0.0
+        return (precision, recall)
+
+    def _confusion_summary_label(self, model_index: int, *, split: str) -> str:
+        counts = self._confusion_counts(model_index, split=split)
+        return f"{split}: TP {counts['tp']} FP {counts['fp']} FN {counts['fn']} TN {counts['tn']}"
+
+    def _precision_recall_label(self, model_index: int, *, split: str) -> str:
+        precision, recall = self._precision_recall_for_model(model_index, split=split)
+        return f"precision/recall {round(precision * 100)}/{round(recall * 100)}"
+
+    def _test_details_label(self, model_index: int) -> str:
+        counts = self._confusion_counts(model_index, split="test")
+        precision, recall = self._precision_recall_for_model(model_index, split="test")
+        return (
+            f"test TP/FP/FN/TN {counts['tp']}/{counts['fp']}/{counts['fn']}/{counts['tn']} "
+            f"P/R {round(precision * 100)}/{round(recall * 100)}"
+        )
 
     def _point_split(self, sample_index: int) -> str:
         if sample_index % 4 == 3:

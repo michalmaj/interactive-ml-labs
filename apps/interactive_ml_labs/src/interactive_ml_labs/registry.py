@@ -2743,13 +2743,15 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                         LocalizedText(
                             en=(
                                 "This version stays intentionally small: it focuses on boundary "
-                                "shape, dataset presets, and a simple train/test accuracy view "
+                                "shape, dataset presets, train/test accuracy, and compact "
+                                "confusion details with precision/recall "
                                 "before adding full training controls."
                             ),
                             pl=(
                                 "Ta wersja jest celowo mała: skupia się na kształcie granicy, "
-                                "presetach danych i prostym widoku train/test accuracy, zanim "
-                                "dodamy pełne kontrolki treningu."
+                                "presetach danych, train/test accuracy i kompaktowych "
+                                "confusion details z precision/recall, zanim dodamy pełne "
+                                "kontrolki treningu."
                             ),
                         ),
                         LocalizedText(
@@ -2774,12 +2776,12 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     body=(
                         LocalizedText(
                             en=(
-                                "A fuller lab can add precision/recall, richer confusion "
-                                "details, and real training controls."
+                                "A fuller lab can add richer confusion matrix views, class "
+                                "threshold controls, and real training controls."
                             ),
                             pl=(
-                                "Pełniejszy lab może dodać precision/recall, bogatsze "
-                                "szczegóły confusion matrix i prawdziwe kontrolki treningu."
+                                "Pełniejszy lab może dodać bogatszy widok confusion matrix, "
+                                "kontrolki threshold dla klas i prawdziwe kontrolki treningu."
                             ),
                         ),
                         LocalizedText(
