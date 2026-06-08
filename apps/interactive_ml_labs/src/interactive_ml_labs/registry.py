@@ -2589,6 +2589,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
             ControlBinding(
+                key="- / =",
+                action=LocalizedText(
+                    en="decrease or increase the active model parameter",
+                    pl="zmniejsz albo zwiększ parametr aktywnego modelu",
+                ),
+            ),
+            ControlBinding(
                 key="D",
                 action=LocalizedText(
                     en="cycle dataset preset",
@@ -2737,22 +2744,24 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             en=(
                                 "This version stays intentionally small: it focuses on boundary "
                                 "shape, dataset presets, and a visible-point accuracy score "
-                                "before adding training controls."
+                                "before adding full training controls."
                             ),
                             pl=(
                                 "Ta wersja jest celowo mała: skupia się na kształcie granicy, "
                                 "presetach danych i accuracy na widocznych punktach, zanim "
-                                "dodamy kontrolki treningu."
+                                "dodamy pełne kontrolki treningu."
                             ),
                         ),
                         LocalizedText(
                             en=(
-                                "The useful habit is to ask what a model can represent before "
-                                "asking whether it scored well on one sample."
+                                "Use - / = to change the active model parameter. Watch whether "
+                                "more flexibility improves the visible score or only bends the "
+                                "boundary harder."
                             ),
                             pl=(
-                                "Dobry nawyk to zapytać, co model potrafi reprezentować, zanim "
-                                "zapytamy, czy dobrze wypadł na jednej próbce."
+                                "Użyj - / =, żeby zmienić parametr aktywnego modelu. Sprawdź, "
+                                "czy większa elastyczność poprawia widoczny wynik, czy tylko "
+                                "mocniej wygina granicę."
                             ),
                         ),
                     ),

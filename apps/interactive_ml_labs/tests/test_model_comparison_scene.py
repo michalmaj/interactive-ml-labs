@@ -4,6 +4,10 @@ import pygame
 from interactive_ml_labs.display import DEFAULT_RESOLUTION
 from interactive_ml_labs.model_comparison_scene import (
     DATASETS,
+    DEFAULT_COMPLEXITY_LEVEL,
+    KNN_K_VALUES,
+    MAX_COMPLEXITY_LEVEL,
+    MIN_COMPLEXITY_LEVEL,
     MODELS,
     ModelComparisonLabScene,
     create_model_comparison_lab_scene,
@@ -78,10 +82,12 @@ def test_model_comparison_scene_toggles_boundary_visibility(monkeypatch) -> None
         assert scene.selected_dataset_index == 1
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_3))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_r))
 
         assert scene.selected_model_index == 0
         assert scene.selected_dataset_index == 0
+        assert scene.complexity_levels == [DEFAULT_COMPLEXITY_LEVEL for _model in MODELS]
         assert scene.show_all_boundaries is True
     finally:
         pygame.quit()
@@ -126,6 +132,46 @@ def test_model_comparison_scene_reports_model_accuracies(monkeypatch) -> None:
         assert all(0.0 <= score <= 1.0 for score in linear_scores)
         assert curved_scores != linear_scores
         assert scene._predict_model(0, scene.points[0], 0) in {0, 1}
+    finally:
+        pygame.quit()
+
+
+def test_model_comparison_scene_adjusts_active_model_parameter(monkeypatch) -> None:
+    """Minus and equals should tune only the active model parameter."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_model_comparison_lab_scene(AppContext())
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
+
+        assert scene.complexity_levels[1] == MIN_COMPLEXITY_LEVEL
+        assert scene.complexity_levels[0] == DEFAULT_COMPLEXITY_LEVEL
+        assert scene._complexity_label(1) == f"k={KNN_K_VALUES[MIN_COMPLEXITY_LEVEL]}"
+
+        for _ in range(5):
+            scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+
+        assert scene.complexity_levels[1] == MAX_COMPLEXITY_LEVEL
+    finally:
+        pygame.quit()
+
+
+def test_model_comparison_scene_parameter_changes_scores(monkeypatch) -> None:
+    """Changing a parameter should affect at least one model score."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_model_comparison_lab_scene(AppContext())
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+        initial_score = scene._accuracy_for_model(1)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
+
+        assert scene._accuracy_for_model(1) != initial_score
     finally:
         pygame.quit()
 
