@@ -19,6 +19,7 @@ from interactive_ml_labs.manifest import (
     LocalizedText,
     TheorySection,
 )
+from interactive_ml_labs.model_comparison_scene import create_model_comparison_lab_scene
 from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
@@ -299,6 +300,39 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             pl=(
                 "Włącz residual lines i połącz błąd rekonstrukcji z odległością "
                 "każdego punktu od jego projekcji."
+            ),
+        ),
+    ),
+    "model_comparison_lab": (
+        LocalizedText(
+            en=(
+                "Switch between Logistic Regression, k-NN, and Decision Tree. "
+                "Describe how each model draws a different decision boundary "
+                "for the same points."
+            ),
+            pl=(
+                "Przełączaj Logistic Regression, k-NN i Decision Tree. Opisz, "
+                "jak każdy model rysuje inną decision boundary dla tych samych punktów."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Hide the inactive boundaries, inspect one model, then turn all "
+                "boundaries back on and compare the shapes again."
+            ),
+            pl=(
+                "Ukryj nieaktywne granice, obejrzyj jeden model, a potem włącz "
+                "wszystkie granice i ponownie porównaj ich kształty."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Find the model whose boundary looks simplest. Ask where that "
+                "simplicity helps and where it might miss the pattern."
+            ),
+            pl=(
+                "Znajdź model z najprostszą granicą. Zastanów się, gdzie ta prostota "
+                "pomaga, a gdzie może przegapić wzorzec."
             ),
         ),
     ),
@@ -609,6 +643,48 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             definition=LocalizedText(
                 en="The visual leftover between the original point and its reconstruction.",
                 pl="Wizualna reszta między oryginalnym punktem a jego rekonstrukcją.",
+            ),
+        ),
+    ),
+    "model_comparison_lab": (
+        GlossaryTerm(
+            term="model comparison",
+            definition=LocalizedText(
+                en=(
+                    "A workflow for inspecting multiple models on the same data "
+                    "before choosing which behavior is useful."
+                ),
+                pl=(
+                    "Workflow porównywania kilku modeli na tych samych danych, "
+                    "zanim wybierzemy zachowanie przydatne w zadaniu."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="decision boundary",
+            definition=LocalizedText(
+                en="The line, curve, or region edge where a classifier changes its prediction.",
+                pl=("Linia, krzywa albo krawędź regionu, w której klasyfikator zmienia predykcję."),
+            ),
+        ),
+        GlossaryTerm(
+            term="model assumption",
+            definition=LocalizedText(
+                en=("A built-in idea about what patterns should be easy for a model to represent."),
+                pl=("Wbudowane założenie o tym, jakie wzorce model powinien łatwo reprezentować."),
+            ),
+        ),
+        GlossaryTerm(
+            term="bias / variance",
+            definition=LocalizedText(
+                en=(
+                    "A practical trade-off between simple, stable models and flexible "
+                    "models that can follow more detail."
+                ),
+                pl=(
+                    "Praktyczny kompromis między prostymi, stabilnymi modelami "
+                    "a elastycznymi modelami, które śledzą więcej szczegółów."
+                ),
             ),
         ),
     ),
@@ -2438,6 +2514,272 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["pca_lab"],
             glossary=LESSON_GLOSSARY["pca_lab"],
+        ),
+    ),
+    DemoManifest(
+        id="model_comparison_lab",
+        level=3,
+        title=LocalizedText(en="Model Comparison Lab", pl="Model Comparison Lab"),
+        summary=LocalizedText(
+            en=(
+                "Compare Logistic Regression, k-NN, and Decision Tree on one "
+                "classification dataset to see how assumptions shape decision boundaries."
+            ),
+            pl=(
+                "Porównaj Logistic Regression, k-NN i Decision Tree na jednym "
+                "zbiorze klasyfikacyjnym, żeby zobaczyć, jak założenia modeli "
+                "kształtują decision boundary."
+            ),
+        ),
+        objectives=(
+            LocalizedText(
+                en=("Compare three classifiers on the same points before judging their metrics."),
+                pl=(
+                    "Porównaj trzy klasyfikatory na tych samych punktach, zanim "
+                    "zaczniesz oceniać ich metryki."
+                ),
+            ),
+            LocalizedText(
+                en=(
+                    "Connect each decision boundary shape with a model assumption: "
+                    "linear, local, or rule-based."
+                ),
+                pl=(
+                    "Połącz kształt każdej decision boundary z założeniem modelu: "
+                    "liniowym, lokalnym albo regułowym."
+                ),
+            ),
+            LocalizedText(
+                en=(
+                    "Treat visual comparison as the first step before richer evaluation workflows."
+                ),
+                pl=(
+                    "Potraktuj porównanie wizualne jako pierwszy krok przed "
+                    "pełniejszą ewaluacją modeli."
+                ),
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1",
+                action=LocalizedText(
+                    en="focus Logistic Regression",
+                    pl="wybierz Logistic Regression",
+                ),
+            ),
+            ControlBinding(
+                key="2",
+                action=LocalizedText(
+                    en="focus k-NN",
+                    pl="wybierz k-NN",
+                ),
+            ),
+            ControlBinding(
+                key="3",
+                action=LocalizedText(
+                    en="focus Decision Tree",
+                    pl="wybierz Decision Tree",
+                ),
+            ),
+            ControlBinding(
+                key="A",
+                action=LocalizedText(
+                    en="show or hide inactive boundaries",
+                    pl="pokaż albo ukryj nieaktywne granice",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(
+                    en="reset the preview",
+                    pl="zresetuj podgląd",
+                ),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read the model comparison lesson notes",
+                    pl="przeczytaj notatki o porównywaniu modeli",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(
+                    en="open the help overlay",
+                    pl="otwórz pomoc",
+                ),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_model_comparison_lab_scene,
+        difficulty=LocalizedText(en="Advanced preview", pl="Zaawansowany podgląd"),
+        tags=(
+            "model-comparison",
+            "classification",
+            "decision-boundary",
+            "visualization",
+        ),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(
+                        en="Why compare models",
+                        pl="Po co porównywać modele",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Different models can see the same data through very different "
+                                "assumptions. A metric alone often hides that difference."
+                            ),
+                            pl=(
+                                "Różne modele mogą patrzeć na te same dane przez bardzo różne "
+                                "założenia. Sama metryka często ukrywa tę różnicę."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "This lab starts with the visible part: how each model divides "
+                                "the feature space."
+                            ),
+                            pl=(
+                                "Ten lab zaczyna od rzeczy widocznej: jak każdy model dzieli "
+                                "przestrzeń cech."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Lesson path", pl="Ścieżka pracy"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Start with Logistic Regression and read the straight boundary. "
+                                "Ask which points it explains well and which it cuts too simply."
+                            ),
+                            pl=(
+                                "Zacznij od Logistic Regression i obejrzyj prostą granicę. "
+                                "Sprawdź, które punkty wyjaśnia dobrze, a które tnie zbyt prosto."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Then switch to k-NN and Decision Tree. Compare local flexibility "
+                                "with axis-aligned rules."
+                            ),
+                            pl=(
+                                "Potem przełącz się na k-NN i Decision Tree. Porównaj lokalną "
+                                "elastyczność z regułami ustawionymi wzdłuż osi."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(
+                        en="Same data, different assumptions",
+                        pl="Te same dane, różne założenia",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Logistic Regression prefers one smooth global split. That makes "
+                                "it stable and readable, but limited when the real pattern bends."
+                            ),
+                            pl=(
+                                "Logistic Regression preferuje jeden gładki, globalny podział. "
+                                "Dzięki temu jest stabilna i czytelna, ale ograniczona, gdy "
+                                "prawdziwy wzorzec się wygina."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "k-NN lets nearby examples vote. Its boundary can bend around "
+                                "local detail, but noise can also influence the vote."
+                            ),
+                            pl=(
+                                "k-NN pozwala głosować najbliższym przykładom. Jego granica "
+                                "może wyginać się wokół lokalnych szczegółów, ale noise też "
+                                "może wpływać na głosowanie."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Decision Tree builds rules that cut the space into rectangles. "
+                                "That is interpretable, but the boundary can become blocky."
+                            ),
+                            pl=(
+                                "Decision Tree buduje reguły, które tną przestrzeń na prostokąty. "
+                                "To jest interpretowalne, ale granica może robić się blokowa."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(
+                        en="What the first slice shows",
+                        pl="Co pokazuje pierwszy wycinek",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "This version is intentionally small: it focuses on boundary "
+                                "shape before adding dataset presets, metrics, or training "
+                                "controls."
+                            ),
+                            pl=(
+                                "Ta wersja jest celowo mała: skupia się na kształcie granicy, "
+                                "zanim dodamy presety danych, metryki i kontrolki treningu."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The useful habit is to ask what a model can represent before "
+                                "asking whether it scored well on one sample."
+                            ),
+                            pl=(
+                                "Dobry nawyk to zapytać, co model potrafi reprezentować, zanim "
+                                "zapytamy, czy dobrze wypadł na jednej próbce."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(
+                        en="What to add next",
+                        pl="Co dodać później",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "A fuller lab can add dataset presets, train/test split, "
+                                "accuracy, precision/recall, and controls for model complexity."
+                            ),
+                            pl=(
+                                "Pełniejszy lab może dodać presety danych, train/test split, "
+                                "accuracy, precision/recall i kontrolki złożoności modelu."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The comparison should still stay visual: metrics are easier "
+                                "to trust when students can see what changed."
+                            ),
+                            pl=(
+                                "Porównanie nadal powinno zostać wizualne: metrykom łatwiej "
+                                "zaufać, gdy student widzi, co się zmieniło."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["model_comparison_lab"],
+            glossary=LESSON_GLOSSARY["model_comparison_lab"],
         ),
     ),
     _placeholder_demo(

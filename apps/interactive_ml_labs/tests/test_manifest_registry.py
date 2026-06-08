@@ -18,6 +18,7 @@ from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
 from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
+from interactive_ml_labs.model_comparison_scene import create_model_comparison_lab_scene
 from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 
@@ -42,9 +43,11 @@ def test_registry_groups_demos_by_level() -> None:
     assert {demo.level for demo in level_three_demos} == {3}
     assert len(level_one_demos) >= 4
     assert len(level_two_demos) >= 2
-    assert len(level_three_demos) == 3
+    assert len(level_three_demos) == 4
     assert level_three_demos[0].id == "clustering_lab"
     assert level_three_demos[1].id == "pca_lab"
+    assert level_three_demos[2].id == "model_comparison_lab"
+    assert level_three_demos[3].id == "level_3_coming_soon"
 
 
 def test_level_three_placeholder_describes_future_advanced_demos() -> None:
@@ -161,6 +164,50 @@ def test_pca_manifest_sets_second_level_three_demo_contract() -> None:
     assert "T" in text
 
 
+def test_model_comparison_manifest_sets_third_level_three_demo_contract() -> None:
+    """Model Comparison Lab should define the first classifier comparison contract."""
+    manifest = DEMO_BY_ID["model_comparison_lab"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(entry.term for entry in manifest.theory.glossary),
+        ],
+    )
+
+    assert manifest.level == 3
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Zaawansowany podgląd"
+    assert manifest.tags == (
+        "model-comparison",
+        "classification",
+        "decision-boundary",
+        "visualization",
+    )
+    assert manifest.create_scene is create_model_comparison_lab_scene
+    assert "Model Comparison Lab" in text
+    assert "Logistic Regression" in text
+    assert "k-NN" in text
+    assert "Decision Tree" in text
+    assert "decision boundary" in text
+    assert "model assumption" in text
+    assert "Lesson path" in text
+    assert "Same data" in text
+    assert "1" in text
+    assert "2" in text
+    assert "3" in text
+    assert "A" in text
+    assert "T" in text
+
+
 def test_manifests_have_required_teaching_content() -> None:
     """Every manifest should include content used by generated intro screens."""
     for manifest in DEMO_MANIFESTS:
@@ -244,6 +291,10 @@ def test_manifests_have_in_app_theory_content() -> None:
         ("decision_tree_splitter", ("Decision tree", "manual split", "impurity")),
         ("random_forest_bagging_lab", ("Random forest", "bootstrap", "confidence view")),
         ("boosting_mistake_lab", ("Boosting", "weak learner", "staged train/test accuracy")),
+        (
+            "model_comparison_lab",
+            ("model comparison", "decision boundary", "model assumption"),
+        ),
     ],
 )
 def test_demo_theory_contains_key_terms(demo_id: str, expected_terms: tuple[str, ...]) -> None:
