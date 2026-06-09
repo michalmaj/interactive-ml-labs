@@ -763,6 +763,19 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             ),
         ),
         GlossaryTerm(
+            term="worst gap",
+            definition=LocalizedText(
+                en=(
+                    "The bin where confidence and observed frequency differ the most; "
+                    "a useful place to inspect first."
+                ),
+                pl=(
+                    "Bin, w którym confidence i obserwowana częstość różnią się najbardziej; "
+                    "dobre miejsce do pierwszej inspekcji."
+                ),
+            ),
+        ),
+        GlossaryTerm(
             term="temperature scaling",
             definition=LocalizedText(
                 en=(
@@ -3114,6 +3127,18 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             pl=(
                                 "Warto czytać je razem: jedna liczba rzadko wyjaśnia całe "
                                 "zachowanie probability scores."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Worst gap points to the bin with the largest "
+                                "confidence-vs-outcome difference, so it is a good "
+                                "first diagnostic target."
+                            ),
+                            pl=(
+                                "Worst gap wskazuje bin z największą różnicą "
+                                "confidence-vs-outcome, więc jest dobrym pierwszym "
+                                "celem diagnostycznym."
                             ),
                         ),
                     ),

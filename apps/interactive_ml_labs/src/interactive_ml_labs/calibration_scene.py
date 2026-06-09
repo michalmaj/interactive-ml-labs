@@ -224,6 +224,7 @@ class CalibrationLabScene:
         pygame.draw.line(surface, REFERENCE, plot_rect.bottomleft, plot_rect.topright, 2)
 
         bins = self._calibration_bins()
+        worst_gap_index, _worst_gap = self._worst_calibration_gap()
         bar_width = max(22, round(plot_rect.width / len(bins)) - 12)
         for index, calibration_bin in enumerate(bins):
             center_x = plot_rect.left + round((index + 0.5) * plot_rect.width / len(bins))
@@ -239,6 +240,8 @@ class CalibrationLabScene:
                 plot_rect.bottom - observed_y,
             )
             pygame.draw.rect(surface, color, bar_rect, border_radius=5)
+            if index == worst_gap_index:
+                pygame.draw.rect(surface, TEXT, bar_rect.inflate(8, 8), width=2, border_radius=6)
             if self.show_error_bars:
                 pygame.draw.line(
                     surface, WARNING, (center_x, expected_y), (center_x, observed_y), 3
@@ -361,6 +364,7 @@ class CalibrationLabScene:
             ("Brier", f"{self._brier_score():.3f}"),
             ("ECE", f"{self._expected_calibration_error():.3f}"),
             ("accuracy@0.5", f"{self._accuracy_at_threshold():.0%}"),
+            (self._label("worst gap", "najw. luka"), self._worst_gap_label()),
             ("temperature", f"{self.temperature:.2f}"),
             (self._label("samples", "próbki"), str(len(self.preset.samples))),
             (
@@ -378,8 +382,8 @@ class CalibrationLabScene:
         self._draw_wrapped(
             surface,
             self._label(
-                "ECE summarizes the average gap between confidence and observed frequency.",
-                "ECE streszcza średnią różnicę między confidence a obserwowaną częstością.",
+                "ECE averages bin-level confidence gaps.",
+                "ECE uśrednia luki confidence po binach.",
             ),
             (rect.x + 22, self._side_note_top_y(rect)),
             rect.width - 44,
@@ -430,6 +434,22 @@ class CalibrationLabScene:
             * abs(calibration_bin["accuracy"] - calibration_bin["confidence"])
             for calibration_bin in self._calibration_bins()
         )
+
+    def _worst_calibration_gap(self) -> tuple[int, float]:
+        """Return index and size of the largest bin-level calibration gap."""
+        gaps = tuple(
+            abs(calibration_bin["accuracy"] - calibration_bin["confidence"])
+            for calibration_bin in self._calibration_bins()
+        )
+        worst_index = max(range(len(gaps)), key=lambda index: gaps[index])
+        return worst_index, gaps[worst_index]
+
+    def _worst_gap_label(self) -> str:
+        """Return a compact label for the largest calibration gap."""
+        worst_index, gap = self._worst_calibration_gap()
+        lower = worst_index * 20
+        upper = lower + 20
+        return f"{gap:.0%} @ {lower}-{upper}%"
 
     def _accuracy_at_threshold(self) -> float:
         """Return classification accuracy when probabilities are thresholded at 0.5."""
@@ -484,13 +504,13 @@ class CalibrationLabScene:
 
     def _side_rows_bottom_y(self, rect: pygame.Rect) -> int:
         """Return the bottom y position after the side-panel metric rows."""
-        row_count = 7
+        row_count = 8
         rows_top_y = rect.y + 70 + len(PRESETS) * 38 + 16
         return rows_top_y + row_count * SIDE_ROW_STEP
 
     def _side_note_top_y(self, rect: pygame.Rect) -> int:
         """Return a stable top position for the side-panel explanatory note."""
-        return rect.bottom - 70
+        return rect.bottom - 54
 
     def _wrapped_text_bottom_y(
         self,

@@ -171,6 +171,30 @@ def test_calibration_scene_reports_valid_bin_metrics(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_calibration_scene_reports_largest_calibration_gap(monkeypatch) -> None:
+    """The scene should identify the largest bin-level calibration gap."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_calibration_lab_scene(AppContext())
+        worst_index, worst_gap = scene._worst_calibration_gap()
+        gaps = tuple(
+            abs(calibration_bin["accuracy"] - calibration_bin["confidence"])
+            for calibration_bin in scene._calibration_bins()
+        )
+
+        assert worst_index == max(range(len(gaps)), key=lambda index: gaps[index])
+        assert worst_gap == gaps[worst_index]
+        assert "@" in scene._worst_gap_label()
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+
+        assert scene._worst_calibration_gap() != (worst_index, worst_gap)
+    finally:
+        pygame.quit()
+
+
 def test_calibration_scene_reports_threshold_accuracy(monkeypatch) -> None:
     """Calibration Lab should connect probability scores with a 0.5 classifier decision."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -256,8 +280,8 @@ def test_calibration_side_panel_note_does_not_overlap_metrics(monkeypatch) -> No
             rows_bottom_y = scene._side_rows_bottom_y(side_panel_rect)
             note_top_y = scene._side_note_top_y(side_panel_rect)
             note_text = scene._label(
-                "ECE summarizes the average gap between confidence and observed frequency.",
-                "ECE streszcza średnią różnicę między confidence a obserwowaną częstością.",
+                "ECE averages bin-level confidence gaps.",
+                "ECE uśrednia luki confidence po binach.",
             )
             note_bottom_y = scene._wrapped_text_bottom_y(
                 note_text,
