@@ -242,6 +242,37 @@ def test_calibration_score_summary_does_not_overlap_plot(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_calibration_side_panel_note_does_not_overlap_metrics(monkeypatch) -> None:
+    """Side-panel metrics should leave room for the explanatory note."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        for language in ("en", "pl"):
+            context = AppContext()
+            context.settings.language = language
+            scene = create_calibration_lab_scene(context)
+            side_panel_rect = pygame.Rect(960, 132, 260, 474)
+            rows_bottom_y = scene._side_rows_bottom_y(side_panel_rect)
+            note_top_y = scene._side_note_top_y(side_panel_rect)
+            note_text = scene._label(
+                "ECE summarizes the average gap between confidence and observed frequency.",
+                "ECE streszcza średnią różnicę między confidence a obserwowaną częstością.",
+            )
+            note_bottom_y = scene._wrapped_text_bottom_y(
+                note_text,
+                side_panel_rect.width - 44,
+                scene._font_small,
+                top_y=note_top_y,
+                line_height=16,
+            )
+
+            assert rows_bottom_y <= note_top_y - 10
+            assert note_bottom_y <= side_panel_rect.bottom - 12
+    finally:
+        pygame.quit()
+
+
 def test_calibration_scene_renders_to_shell_surface(monkeypatch) -> None:
     """The Calibration preview should draw a non-empty frame."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")

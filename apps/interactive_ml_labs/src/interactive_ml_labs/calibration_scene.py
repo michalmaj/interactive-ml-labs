@@ -27,6 +27,8 @@ SECONDARY: Final[tuple[int, int, int]] = (247, 179, 101)
 TEMPERATURE_VALUES: Final[tuple[float, ...]] = (0.50, 0.75, 1.00, 1.50, 2.00, 3.00)
 DEFAULT_TEMPERATURE_INDEX: Final[int] = 2
 DECISION_THRESHOLD: Final[float] = 0.50
+SIDE_ROW_STEP: Final[int] = 24
+SIDE_NOTE_LINE_HEIGHT: Final[int] = 16
 
 
 @dataclass(frozen=True, slots=True)
@@ -372,18 +374,18 @@ class CalibrationLabScene:
         )
         for label, value in rows:
             self._draw_text(surface, f"{label}: {value}", (rect.x + 22, y), self._font_small, TEXT)
-            y += 28
+            y += SIDE_ROW_STEP
         self._draw_wrapped(
             surface,
             self._label(
                 "ECE summarizes the average gap between confidence and observed frequency.",
                 "ECE streszcza średnią różnicę między confidence a obserwowaną częstością.",
             ),
-            (rect.x + 22, rect.bottom - 96),
+            (rect.x + 22, self._side_note_top_y(rect)),
             rect.width - 44,
             self._font_small,
             MUTED_TEXT,
-            line_height=18,
+            line_height=SIDE_NOTE_LINE_HEIGHT,
         )
 
     def _draw_footer(self, surface: pygame.Surface) -> None:
@@ -479,6 +481,16 @@ class CalibrationLabScene:
     def _score_summary_top_y(self, rect: pygame.Rect) -> int:
         """Return a stable top position for the score summary copy."""
         return rect.bottom - 76
+
+    def _side_rows_bottom_y(self, rect: pygame.Rect) -> int:
+        """Return the bottom y position after the side-panel metric rows."""
+        row_count = 7
+        rows_top_y = rect.y + 70 + len(PRESETS) * 38 + 16
+        return rows_top_y + row_count * SIDE_ROW_STEP
+
+    def _side_note_top_y(self, rect: pygame.Rect) -> int:
+        """Return a stable top position for the side-panel explanatory note."""
+        return rect.bottom - 70
 
     def _wrapped_text_bottom_y(
         self,
