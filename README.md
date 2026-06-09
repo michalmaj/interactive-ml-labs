@@ -70,6 +70,7 @@ Advanced and visually rich topics:
 - Clustering Lab: K-Means phases and DBSCAN comparison,
 - PCA Lab: manual projection, fitted PCA direction, noise, and reconstruction residuals,
 - Model Comparison Lab: classifier assumptions, train/test scores, confusion details, and highlighted test errors,
+- Calibration Lab: reliability diagrams, score distributions, Brier score, and Expected Calibration Error,
 - Naive Bayes spam detection,
 - CNN filter visualization,
 - t-SNE / UMAP,
@@ -109,6 +110,7 @@ It also includes the first real Level 3 labs:
 - Clustering Lab, with K-Means assignment/update phases, point-to-centroid links, inertia trend, draggable points, and a DBSCAN comparison mode.
 - PCA Lab, with dataset presets, noise controls, manual projection rotation, fitted PCA direction, explained variance, reconstruction residuals, and reconstruction error.
 - Model Comparison Lab, with Logistic Regression, k-NN, and Decision Tree previews on shared datasets, active model parameters, train/test accuracy, compact confusion details, and highlighted misclassified test points.
+- Calibration Lab, with overconfident, underconfident, and better calibrated presets, a reliability diagram, score distribution, Brier score, ECE, and calibration gap error bars.
 
 The original Level 1 and Level 2 demos can still be run as standalone commands. The unified app is the recommended path for students, while standalone entry points remain part of the supported development and teaching workflow.
 
@@ -117,8 +119,9 @@ The original Level 1 and Level 2 demos can still be run as standalone commands. 
 Near-term work focuses on turning Level 3 into a stronger guided learning track while keeping the shell stable:
 
 - collect review feedback on Clustering Lab, PCA Lab, and Model Comparison Lab after classroom-style use,
+- collect review feedback on Calibration Lab and decide whether the next slice should add real model outputs or post-hoc calibration methods,
 - keep improving the Level 3 flow from theory to interaction to mini-challenges,
-- decide the next Level 3 demo candidate, likely calibration, t-SNE / UMAP, or a richer model monitoring workflow,
+- decide the next Level 3 demo candidate after calibration, likely t-SNE / UMAP or a richer model monitoring workflow,
 - continue polishing Polish copy inside demos without forcing translations of standard ML terms,
 - keep app settings, scaling, and help overlays stable as new Level 3 scenes are added.
 
