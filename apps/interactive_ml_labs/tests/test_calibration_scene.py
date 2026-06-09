@@ -128,6 +128,37 @@ def test_calibration_scene_localizes_preset_copy(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_calibration_score_summary_does_not_overlap_plot(monkeypatch) -> None:
+    """Score summary copy should fit below the plot in both languages."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        for language in ("en", "pl"):
+            context = AppContext()
+            context.settings.language = language
+            scene = create_calibration_lab_scene(context)
+            score_panel_rect = pygame.Rect(620, 132, 300, 474)
+            plot_rect = scene._score_distribution_plot_rect(score_panel_rect)
+            summary_top_y = scene._score_summary_top_y(score_panel_rect)
+
+            assert summary_top_y >= plot_rect.bottom + 18
+
+            for preset_index in range(len(PRESETS)):
+                scene.preset_index = preset_index
+                summary_bottom_y = scene._wrapped_text_bottom_y(
+                    scene.preset.summary_for_language(language),
+                    score_panel_rect.width - 48,
+                    scene._font_small,
+                    top_y=summary_top_y,
+                    line_height=18,
+                )
+
+                assert summary_bottom_y <= score_panel_rect.bottom - 18
+    finally:
+        pygame.quit()
+
+
 def test_calibration_scene_renders_to_shell_surface(monkeypatch) -> None:
     """The Calibration preview should draw a non-empty frame."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
