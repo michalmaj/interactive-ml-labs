@@ -2603,6 +2603,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
             ControlBinding(
+                key="E",
+                action=LocalizedText(
+                    en="show or hide misclassified test points",
+                    pl="pokaż albo ukryj błędnie sklasyfikowane punkty testowe",
+                ),
+            ),
+            ControlBinding(
                 key="R",
                 action=LocalizedText(
                     en="reset the preview",
@@ -2758,12 +2765,14 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             en=(
                                 "Use - / = to change the active model parameter. Watch whether "
                                 "more flexibility improves the test score or only bends the "
-                                "boundary harder."
+                                "boundary harder. Use E to connect the metric with the actual "
+                                "misclassified test points."
                             ),
                             pl=(
                                 "Użyj - / =, żeby zmienić parametr aktywnego modelu. Sprawdź, "
                                 "czy większa elastyczność poprawia test score, czy tylko "
-                                "mocniej wygina granicę."
+                                "mocniej wygina granicę. Użyj E, żeby połączyć metrykę "
+                                "z konkretnymi błędnie sklasyfikowanymi punktami testowymi."
                             ),
                         ),
                     ),

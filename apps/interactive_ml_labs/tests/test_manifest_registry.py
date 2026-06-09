@@ -202,6 +202,7 @@ def test_model_comparison_manifest_sets_third_level_three_demo_contract() -> Non
     assert "train/test accuracy" in text
     assert "confusion" in text
     assert "precision/recall" in text
+    assert "misclassified test points" in text
     assert "Lesson path" in text
     assert "Same data" in text
     assert "dataset presets" in text
@@ -211,6 +212,7 @@ def test_model_comparison_manifest_sets_third_level_three_demo_contract() -> Non
     assert "- / =" in text
     assert "A" in text
     assert "D" in text
+    assert "E" in text
     assert "T" in text
 
 
