@@ -2968,6 +2968,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
             ControlBinding(
+                key="O",
+                action=LocalizedText(
+                    en="show or hide raw pre-temperature scores",
+                    pl="pokaż albo ukryj raw score sprzed temperature scaling",
+                ),
+            ),
+            ControlBinding(
                 key="R",
                 action=LocalizedText(
                     en="reset the preview",
@@ -3135,6 +3142,16 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             pl=(
                                 "Wyższa temperatura zmiękcza score w stronę 0.5. Niższa "
                                 "wypycha je bliżej 0 albo 1."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Use O to compare raw pre-temperature scores with the active "
+                                "scaled scores."
+                            ),
+                            pl=(
+                                "Użyj O, żeby porównać raw score sprzed temperature scaling "
+                                "z aktywnymi, przeskalowanymi score."
                             ),
                         ),
                     ),

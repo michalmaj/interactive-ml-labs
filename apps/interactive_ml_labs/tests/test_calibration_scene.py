@@ -74,18 +74,40 @@ def test_calibration_scene_toggles_error_bars_and_resets(monkeypatch) -> None:
         scene = create_calibration_lab_scene(AppContext())
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_e))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_o))
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_3))
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
 
         assert scene.show_error_bars is False
+        assert scene.show_raw_scores is False
         assert scene.preset_index == 2
         assert scene.temperature_index == DEFAULT_TEMPERATURE_INDEX + 1
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_r))
 
         assert scene.show_error_bars is True
+        assert scene.show_raw_scores is True
         assert scene.preset_index == 0
         assert scene.temperature_index == DEFAULT_TEMPERATURE_INDEX
+    finally:
+        pygame.quit()
+
+
+def test_calibration_scene_toggles_raw_score_reference(monkeypatch) -> None:
+    """O should show or hide the raw pre-temperature score reference."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_calibration_lab_scene(AppContext())
+
+        assert scene.show_raw_scores is True
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_o))
+        assert scene.show_raw_scores is False
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_o))
+        assert scene.show_raw_scores is True
     finally:
         pygame.quit()
 

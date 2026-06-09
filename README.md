@@ -70,7 +70,7 @@ Advanced and visually rich topics:
 - Clustering Lab: K-Means phases and DBSCAN comparison,
 - PCA Lab: manual projection, fitted PCA direction, noise, and reconstruction residuals,
 - Model Comparison Lab: classifier assumptions, train/test scores, confusion details, and highlighted test errors,
-- Calibration Lab: reliability diagrams, score distributions, accuracy@0.5, Brier score, Expected Calibration Error, and temperature scaling,
+- Calibration Lab: reliability diagrams, score distributions, raw-vs-scaled scores, accuracy@0.5, Brier score, Expected Calibration Error, and temperature scaling,
 - Naive Bayes spam detection,
 - CNN filter visualization,
 - t-SNE / UMAP,
@@ -110,7 +110,7 @@ It also includes the first real Level 3 labs:
 - Clustering Lab, with K-Means assignment/update phases, point-to-centroid links, inertia trend, draggable points, and a DBSCAN comparison mode.
 - PCA Lab, with dataset presets, noise controls, manual projection rotation, fitted PCA direction, explained variance, reconstruction residuals, and reconstruction error.
 - Model Comparison Lab, with Logistic Regression, k-NN, and Decision Tree previews on shared datasets, active model parameters, train/test accuracy, compact confusion details, and highlighted misclassified test points.
-- Calibration Lab, with overconfident, underconfident, and better calibrated presets, a reliability diagram, score distribution, accuracy@0.5, Brier score, ECE, calibration gap error bars, and temperature scaling.
+- Calibration Lab, with overconfident, underconfident, and better calibrated presets, a reliability diagram, score distribution, raw-vs-scaled score reference, accuracy@0.5, Brier score, ECE, calibration gap error bars, and temperature scaling.
 
 The original Level 1 and Level 2 demos can still be run as standalone commands. The unified app is the recommended path for students, while standalone entry points remain part of the supported development and teaching workflow.
 
