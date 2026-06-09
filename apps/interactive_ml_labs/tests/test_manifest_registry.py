@@ -252,6 +252,8 @@ def test_calibration_manifest_sets_fourth_level_three_demo_contract() -> None:
     assert "1-3" in text
     assert "- / =" in text
     assert "temperature scaling" in text
+    assert "accuracy@0.5" in text
+    assert "threshold" in text
     assert "E" in text
     assert "R" in text
     assert "T" in text
@@ -346,7 +348,14 @@ def test_manifests_have_in_app_theory_content() -> None:
         ),
         (
             "calibration_lab",
-            ("calibration", "reliability diagram", "Brier score", "ECE", "temperature scaling"),
+            (
+                "calibration",
+                "reliability diagram",
+                "Brier score",
+                "ECE",
+                "temperature scaling",
+                "accuracy@0.5",
+            ),
         ),
     ],
 )

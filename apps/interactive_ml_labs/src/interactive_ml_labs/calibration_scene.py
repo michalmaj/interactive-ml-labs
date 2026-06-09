@@ -26,6 +26,7 @@ GOOD: Final[tuple[int, int, int]] = (151, 219, 156)
 SECONDARY: Final[tuple[int, int, int]] = (247, 179, 101)
 TEMPERATURE_VALUES: Final[tuple[float, ...]] = (0.50, 0.75, 1.00, 1.50, 2.00, 3.00)
 DEFAULT_TEMPERATURE_INDEX: Final[int] = 2
+DECISION_THRESHOLD: Final[float] = 0.50
 
 
 @dataclass(frozen=True, slots=True)
@@ -271,6 +272,17 @@ class CalibrationLabScene:
         plot_rect = self._score_distribution_plot_rect(rect)
         pygame.draw.rect(surface, PLOT_BG, plot_rect, border_radius=6)
         pygame.draw.rect(surface, GRID, plot_rect, width=1, border_radius=6)
+        threshold_x = plot_rect.left + round(DECISION_THRESHOLD * plot_rect.width)
+        pygame.draw.line(
+            surface, REFERENCE, (threshold_x, plot_rect.top), (threshold_x, plot_rect.bottom), 2
+        )
+        self._draw_text(
+            surface,
+            self._label("threshold 0.5", "threshold 0.5"),
+            (threshold_x - 42, plot_rect.top + 10),
+            self._font_small,
+            MUTED_TEXT,
+        )
         for index, (probability, outcome) in enumerate(self._active_samples()):
             x = plot_rect.left + round(probability * plot_rect.width)
             y = plot_rect.bottom - 20 - (index % 5) * 30
@@ -312,6 +324,7 @@ class CalibrationLabScene:
         rows = (
             ("Brier", f"{self._brier_score():.3f}"),
             ("ECE", f"{self._expected_calibration_error():.3f}"),
+            ("accuracy@0.5", f"{self._accuracy_at_threshold():.0%}"),
             ("temperature", f"{self.temperature:.2f}"),
             (self._label("samples", "próbki"), str(len(self.preset.samples))),
             (
@@ -377,6 +390,16 @@ class CalibrationLabScene:
             * abs(calibration_bin["accuracy"] - calibration_bin["confidence"])
             for calibration_bin in self._calibration_bins()
         )
+
+    def _accuracy_at_threshold(self) -> float:
+        """Return classification accuracy when probabilities are thresholded at 0.5."""
+        samples = self._active_samples()
+        correct = sum(
+            1
+            for probability, outcome in samples
+            if int(probability >= DECISION_THRESHOLD) == outcome
+        )
+        return correct / len(samples)
 
     def _active_samples(self) -> tuple[tuple[float, int], ...]:
         """Return samples after applying the current temperature scaling."""
