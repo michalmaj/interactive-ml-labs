@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from math import exp, log
 from typing import Final
 
 import pygame
@@ -23,6 +24,8 @@ REFERENCE: Final[tuple[int, int, int]] = (128, 136, 148)
 WARNING: Final[tuple[int, int, int]] = (244, 131, 133)
 GOOD: Final[tuple[int, int, int]] = (151, 219, 156)
 SECONDARY: Final[tuple[int, int, int]] = (247, 179, 101)
+TEMPERATURE_VALUES: Final[tuple[float, ...]] = (0.50, 0.75, 1.00, 1.50, 2.00, 3.00)
+DEFAULT_TEMPERATURE_INDEX: Final[int] = 2
 
 
 @dataclass(frozen=True, slots=True)
@@ -136,12 +139,18 @@ class CalibrationLabScene:
         self._font_body = make_ui_font(18)
         self._font_small = make_ui_font(15)
         self.preset_index = 0
+        self.temperature_index = DEFAULT_TEMPERATURE_INDEX
         self.show_error_bars = True
 
     @property
     def preset(self) -> CalibrationPreset:
         """Return the active calibration preset."""
         return PRESETS[self.preset_index]
+
+    @property
+    def temperature(self) -> float:
+        """Return the active post-hoc temperature value."""
+        return TEMPERATURE_VALUES[self.temperature_index]
 
     def handle_event(self, event: object) -> SceneCommand:
         """Handle one input event."""
@@ -170,10 +179,15 @@ class CalibrationLabScene:
     def _handle_keydown(self, key: int) -> None:
         if key in {pygame.K_1, pygame.K_2, pygame.K_3}:
             self.preset_index = key - pygame.K_1
+        elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
+            self.temperature_index = max(0, self.temperature_index - 1)
+        elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
+            self.temperature_index = min(len(TEMPERATURE_VALUES) - 1, self.temperature_index + 1)
         elif key == pygame.K_e:
             self.show_error_bars = not self.show_error_bars
         elif key == pygame.K_r:
             self.preset_index = 0
+            self.temperature_index = DEFAULT_TEMPERATURE_INDEX
             self.show_error_bars = True
 
     def _draw_header(self, surface: pygame.Surface) -> None:
@@ -257,7 +271,7 @@ class CalibrationLabScene:
         plot_rect = self._score_distribution_plot_rect(rect)
         pygame.draw.rect(surface, PLOT_BG, plot_rect, border_radius=6)
         pygame.draw.rect(surface, GRID, plot_rect, width=1, border_radius=6)
-        for index, (probability, outcome) in enumerate(self.preset.samples):
+        for index, (probability, outcome) in enumerate(self._active_samples()):
             x = plot_rect.left + round(probability * plot_rect.width)
             y = plot_rect.bottom - 20 - (index % 5) * 30
             color = GOOD if outcome == 1 else SECONDARY
@@ -298,6 +312,7 @@ class CalibrationLabScene:
         rows = (
             ("Brier", f"{self._brier_score():.3f}"),
             ("ECE", f"{self._expected_calibration_error():.3f}"),
+            ("temperature", f"{self.temperature:.2f}"),
             (self._label("samples", "próbki"), str(len(self.preset.samples))),
             (
                 self._label("error bars", "error bars"),
@@ -338,7 +353,7 @@ class CalibrationLabScene:
             upper = lower + 0.2
             samples = tuple(
                 sample
-                for sample in self.preset.samples
+                for sample in self._active_samples()
                 if (lower <= sample[0] < upper) or (upper >= 1.0 and lower <= sample[0] <= upper)
             )
             if samples:
@@ -351,16 +366,31 @@ class CalibrationLabScene:
         return tuple(bins)
 
     def _brier_score(self) -> float:
-        errors = ((probability - outcome) ** 2 for probability, outcome in self.preset.samples)
-        return sum(errors) / len(self.preset.samples)
+        samples = self._active_samples()
+        errors = ((probability - outcome) ** 2 for probability, outcome in samples)
+        return sum(errors) / len(samples)
 
     def _expected_calibration_error(self) -> float:
-        total = len(self.preset.samples)
+        total = len(self._active_samples())
         return sum(
             (calibration_bin["count"] / total)
             * abs(calibration_bin["accuracy"] - calibration_bin["confidence"])
             for calibration_bin in self._calibration_bins()
         )
+
+    def _active_samples(self) -> tuple[tuple[float, int], ...]:
+        """Return samples after applying the current temperature scaling."""
+        return tuple(
+            (self._apply_temperature(probability), outcome)
+            for probability, outcome in self.preset.samples
+        )
+
+    def _apply_temperature(self, probability: float) -> float:
+        """Apply post-hoc temperature scaling to one probability score."""
+        clipped = min(0.999, max(0.001, probability))
+        logit = log(clipped / (1.0 - clipped))
+        scaled = 1.0 / (1.0 + exp(-(logit / self.temperature)))
+        return min(0.999, max(0.001, scaled))
 
     def _draw_calibration_grid(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         pygame.draw.rect(surface, PLOT_BG, rect, border_radius=6)
