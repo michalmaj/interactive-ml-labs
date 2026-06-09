@@ -26,6 +26,7 @@ KNN: Final[tuple[int, int, int]] = (151, 219, 156)
 TREE: Final[tuple[int, int, int]] = (244, 131, 133)
 BOUNDARY_MUTED: Final[tuple[int, int, int]] = (82, 91, 103)
 TEST_POINT_OUTLINE: Final[tuple[int, int, int]] = (236, 239, 242)
+ERROR_HIGHLIGHT: Final[tuple[int, int, int]] = (255, 99, 99)
 DEFAULT_COMPLEXITY_LEVEL: Final[int] = 1
 MIN_COMPLEXITY_LEVEL: Final[int] = 0
 MAX_COMPLEXITY_LEVEL: Final[int] = 2
@@ -228,6 +229,7 @@ class ModelComparisonLabScene:
         self.selected_dataset_index = 0
         self.complexity_levels = [DEFAULT_COMPLEXITY_LEVEL for _model in MODELS]
         self.show_all_boundaries = True
+        self.show_error_highlights = True
 
     @property
     def selected_model(self) -> ComparisonModel:
@@ -279,11 +281,14 @@ class ModelComparisonLabScene:
             self.selected_dataset_index = (self.selected_dataset_index + 1) % len(DATASETS)
         elif key == pygame.K_a:
             self.show_all_boundaries = not self.show_all_boundaries
+        elif key == pygame.K_e:
+            self.show_error_highlights = not self.show_error_highlights
         elif key == pygame.K_r:
             self.selected_model_index = 0
             self.selected_dataset_index = 0
             self.complexity_levels = [DEFAULT_COMPLEXITY_LEVEL for _model in MODELS]
             self.show_all_boundaries = True
+            self.show_error_highlights = True
 
     def _change_selected_complexity(self, delta: int) -> None:
         current_level = self.complexity_levels[self.selected_model_index]
@@ -416,8 +421,8 @@ class ModelComparisonLabScene:
             f"{self._complexity_label(self.selected_model_index)}",
             self._test_details_label(self.selected_model_index),
             self._label(
-                "-/=: parameter  D: dataset",
-                "-/=: parametr  D: dataset",
+                "E: errors  D: dataset",
+                "E: błędy  D: dataset",
             ),
         )
         y += 6
@@ -540,6 +545,8 @@ class ModelComparisonLabScene:
             pygame.draw.circle(surface, PLOT_BG, position, 7, width=1)
             if self._point_split(index) == "test":
                 pygame.draw.circle(surface, TEST_POINT_OUTLINE, position, 10, width=2)
+            if self.show_error_highlights and self._is_misclassified(index):
+                self._draw_error_marker(surface, position)
 
     def _draw_plot_legend(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         y = rect.bottom + 18
@@ -547,6 +554,7 @@ class ModelComparisonLabScene:
             (CLASS_A, self._label("class A", "klasa A")),
             (CLASS_B, self._label("class B", "klasa B")),
             (TEST_POINT_OUTLINE, "test"),
+            (ERROR_HIGHLIGHT, self._label("error", "błąd")),
             (self.selected_model.color, self.selected_model.name),
         )
         x = rect.x + 10
@@ -642,11 +650,16 @@ class ModelComparisonLabScene:
             f"{self._label('Param', 'Parametr')}: "
             f"{self._complexity_label(self.selected_model_index)}",
             self._test_details_label(self.selected_model_index),
-            self._label("outline = test points", "obwódka = punkty testowe"),
+            self._label("E toggles test errors", "E przełącza błędy testowe"),
         )
         for line in details:
             y += self._wrapped_height(line, rect.width, self._font_small, line_height=16) + 1
         return y
+
+    def _draw_error_marker(self, surface: pygame.Surface, position: tuple[int, int]) -> None:
+        x, y = position
+        pygame.draw.line(surface, ERROR_HIGHLIGHT, (x - 8, y - 8), (x + 8, y + 8), 3)
+        pygame.draw.line(surface, ERROR_HIGHLIGHT, (x - 8, y + 8), (x + 8, y - 8), 3)
 
     def _model_card_detail_text(self, model_index: int) -> str:
         shape_labels = (
@@ -688,6 +701,14 @@ class ModelComparisonLabScene:
             total += 1
 
         return correct / total
+
+    def _is_misclassified(self, sample_index: int) -> bool:
+        if self._point_split(sample_index) != "test":
+            return False
+
+        point = self.points[sample_index]
+        prediction = self._predict_model(self.selected_model_index, point, sample_index)
+        return prediction != point[2]
 
     def _confusion_counts(
         self,

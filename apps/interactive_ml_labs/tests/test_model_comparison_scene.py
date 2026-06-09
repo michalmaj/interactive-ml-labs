@@ -77,6 +77,8 @@ def test_model_comparison_scene_toggles_boundary_visibility(monkeypatch) -> None
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_a))
         assert scene.show_all_boundaries is False
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_e))
+        assert scene.show_error_highlights is False
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_d))
         assert scene.selected_dataset_index == 1
@@ -89,6 +91,7 @@ def test_model_comparison_scene_toggles_boundary_visibility(monkeypatch) -> None
         assert scene.selected_dataset_index == 0
         assert scene.complexity_levels == [DEFAULT_COMPLEXITY_LEVEL for _model in MODELS]
         assert scene.show_all_boundaries is True
+        assert scene.show_error_highlights is True
     finally:
         pygame.quit()
 
@@ -230,6 +233,22 @@ def test_model_comparison_scene_reports_confusion_details(monkeypatch) -> None:
         assert "TP" in scene._confusion_summary_label(0, split="test")
         assert scene._precision_recall_label(0, split="test").startswith("precision/recall")
         assert "P/R" in scene._test_details_label(0)
+    finally:
+        pygame.quit()
+
+
+def test_model_comparison_scene_highlights_misclassified_test_points(monkeypatch) -> None:
+    """Error highlights should match FP + FN on the active test split."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_model_comparison_lab_scene(AppContext())
+        counts = scene._confusion_counts(scene.selected_model_index, split="test")
+        highlighted = sum(1 for index in range(len(scene.points)) if scene._is_misclassified(index))
+
+        assert highlighted == counts["fp"] + counts["fn"]
+        assert not scene._is_misclassified(0)
     finally:
         pygame.quit()
 
