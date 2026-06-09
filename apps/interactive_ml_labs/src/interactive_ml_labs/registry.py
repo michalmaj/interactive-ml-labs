@@ -775,6 +775,19 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                 ),
             ),
         ),
+        GlossaryTerm(
+            term="accuracy@0.5",
+            definition=LocalizedText(
+                en=(
+                    "Classification accuracy after converting probability scores into labels "
+                    "with a 0.5 decision threshold."
+                ),
+                pl=(
+                    "Accuracy klasyfikacji po zamianie probability scores na etykiety "
+                    "przez decision threshold 0.5."
+                ),
+            ),
+        ),
     ),
     "level_3_coming_soon": (
         GlossaryTerm(
@@ -3009,6 +3022,16 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             pl=(
                                 "Kalibracja pyta, czy predykcja 70% trafia mniej więcej "
                                 "w 70% przypadków."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The side panel also shows accuracy@0.5: the classifier decision "
+                                "after turning probabilities into labels with a threshold."
+                            ),
+                            pl=(
+                                "Panel boczny pokazuje też accuracy@0.5: decyzję klasyfikatora "
+                                "po zamianie prawdopodobieństw na etykiety przez threshold."
                             ),
                         ),
                     ),

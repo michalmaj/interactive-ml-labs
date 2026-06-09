@@ -43,7 +43,7 @@ The unified app also includes app-only Level 3 labs:
 - Clustering Lab demonstrates K-Means phases, inertia, draggable points, and a DBSCAN comparison mode.
 - PCA Lab demonstrates dataset/noise controls, manual projection rotation, fitted PCA direction, explained variance, reconstruction residuals, and reconstruction error.
 - Model Comparison Lab demonstrates Logistic Regression, k-NN, and Decision Tree assumptions on shared datasets, with train/test scores, compact confusion details, and highlighted test errors.
-- Calibration Lab demonstrates probability calibration with reliability diagrams, score distributions, Brier score, ECE, calibration gap error bars, and temperature scaling.
+- Calibration Lab demonstrates probability calibration with reliability diagrams, score distributions, accuracy@0.5, Brier score, ECE, calibration gap error bars, and temperature scaling.
 
 Common shell controls:
 

@@ -2,6 +2,7 @@
 
 import pygame
 from interactive_ml_labs.calibration_scene import (
+    DECISION_THRESHOLD,
     DEFAULT_TEMPERATURE_INDEX,
     PRESETS,
     TEMPERATURE_VALUES,
@@ -144,6 +145,30 @@ def test_calibration_scene_reports_valid_bin_metrics(monkeypatch) -> None:
 
         assert scene._brier_score() != brier
         assert scene._expected_calibration_error() != ece
+    finally:
+        pygame.quit()
+
+
+def test_calibration_scene_reports_threshold_accuracy(monkeypatch) -> None:
+    """Calibration Lab should connect probability scores with a 0.5 classifier decision."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_calibration_lab_scene(AppContext())
+        accuracy = scene._accuracy_at_threshold()
+        manual_accuracy = sum(
+            1
+            for probability, outcome in scene._active_samples()
+            if int(probability >= DECISION_THRESHOLD) == outcome
+        ) / len(scene._active_samples())
+
+        assert 0.0 <= accuracy <= 1.0
+        assert accuracy == manual_accuracy
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+
+        assert scene._accuracy_at_threshold() != accuracy
     finally:
         pygame.quit()
 
