@@ -42,6 +42,7 @@ The unified app also includes app-only Level 3 labs:
 
 - Clustering Lab demonstrates K-Means phases, inertia, draggable points, and a DBSCAN comparison mode.
 - PCA Lab demonstrates dataset/noise controls, manual projection rotation, fitted PCA direction, explained variance, reconstruction residuals, and reconstruction error.
+- Model Comparison Lab demonstrates Logistic Regression, k-NN, and Decision Tree assumptions on shared datasets, with train/test scores, compact confusion details, and highlighted test errors.
 
 Common shell controls:
 
@@ -57,7 +58,7 @@ Common shell controls:
 
 ## Standalone Demos
 
-Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Clustering Lab and PCA Lab, are launched from the unified app.
+Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Clustering Lab, PCA Lab, and Model Comparison Lab, are launched from the unified app.
 
 ### App-only Level 3 Labs
 
@@ -82,6 +83,17 @@ PCA Lab controls:
 | `Left` / `Right` | Rotate projection direction |
 | `F` | Toggle fitted PCA direction |
 | `C` | Toggle reconstruction residual lines |
+
+Model Comparison Lab controls:
+
+| Key / input | Action |
+| ----------- | ------ |
+| `1-3` | Focus Logistic Regression, k-NN, or Decision Tree |
+| `D` | Cycle dataset preset |
+| `-` / `=` | Change the active model parameter |
+| `A` | Show or hide inactive boundaries |
+| `E` | Show or hide misclassified test points |
+| `R` | Reset the preview |
 
 ### Gradient Descent Playground
 

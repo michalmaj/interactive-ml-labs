@@ -42,6 +42,7 @@ Unified app zawiera też natywne laboratoria z Level 3:
 
 - Clustering Lab pokazuje fazy K-Means, inertia, przesuwanie punktów oraz tryb porównawczy DBSCAN.
 - PCA Lab pokazuje presety danych, noise, ręczne obracanie projekcji, dopasowany kierunek PCA, explained variance, residuals rekonstrukcji i reconstruction error.
+- Model Comparison Lab pokazuje założenia Logistic Regression, k-NN i Decision Tree na tych samych datasetach, z train/test score, kompaktowym confusion summary i podświetlaniem błędów testowych.
 
 Podstawowe sterowanie:
 
@@ -57,7 +58,7 @@ Podstawowe sterowanie:
 
 ## Osobne dema
 
-Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby dostępne tylko w aplikacji, takie jak Clustering Lab i PCA Lab, uruchamia się z unified app.
+Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby dostępne tylko w aplikacji, takie jak Clustering Lab, PCA Lab i Model Comparison Lab, uruchamia się z unified app.
 
 ### Natywne laby Level 3
 
@@ -82,6 +83,17 @@ Sterowanie w PCA Lab:
 | `Left` / `Right` | Obróć kierunek projekcji |
 | `F` | Przełącz dopasowany kierunek PCA |
 | `C` | Pokaż lub ukryj residual lines rekonstrukcji |
+
+Sterowanie w Model Comparison Lab:
+
+| Klawisz / wejście | Akcja |
+| ----------------- | ----- |
+| `1-3` | Wybierz Logistic Regression, k-NN albo Decision Tree |
+| `D` | Zmień preset danych |
+| `-` / `=` | Zmień parametr aktywnego modelu |
+| `A` | Pokaż albo ukryj nieaktywne granice |
+| `E` | Pokaż albo ukryj błędnie sklasyfikowane punkty testowe |
+| `R` | Zresetuj podgląd |
 
 ### Gradient Descent Playground
 
