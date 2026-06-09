@@ -254,6 +254,8 @@ def test_calibration_manifest_sets_fourth_level_three_demo_contract() -> None:
     assert "temperature scaling" in text
     assert "accuracy@0.5" in text
     assert "threshold" in text
+    assert "O" in text
+    assert "raw" in text
     assert "E" in text
     assert "R" in text
     assert "T" in text

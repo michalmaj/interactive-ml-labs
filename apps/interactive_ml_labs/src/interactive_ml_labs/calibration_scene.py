@@ -142,6 +142,7 @@ class CalibrationLabScene:
         self.preset_index = 0
         self.temperature_index = DEFAULT_TEMPERATURE_INDEX
         self.show_error_bars = True
+        self.show_raw_scores = True
 
     @property
     def preset(self) -> CalibrationPreset:
@@ -186,10 +187,13 @@ class CalibrationLabScene:
             self.temperature_index = min(len(TEMPERATURE_VALUES) - 1, self.temperature_index + 1)
         elif key == pygame.K_e:
             self.show_error_bars = not self.show_error_bars
+        elif key == pygame.K_o:
+            self.show_raw_scores = not self.show_raw_scores
         elif key == pygame.K_r:
             self.preset_index = 0
             self.temperature_index = DEFAULT_TEMPERATURE_INDEX
             self.show_error_bars = True
+            self.show_raw_scores = True
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "Calibration Lab", (58, 40), self._font_title, TEXT)
@@ -283,12 +287,22 @@ class CalibrationLabScene:
             self._font_small,
             MUTED_TEXT,
         )
-        for index, (probability, outcome) in enumerate(self._active_samples()):
-            x = plot_rect.left + round(probability * plot_rect.width)
-            y = plot_rect.bottom - 20 - (index % 5) * 30
-            color = GOOD if outcome == 1 else SECONDARY
-            pygame.draw.circle(surface, color, (x, y), 7)
-            pygame.draw.circle(surface, PLOT_BG, (x, y), 7, width=1)
+        if self.show_raw_scores:
+            self._draw_score_points(
+                surface,
+                plot_rect,
+                self.preset.samples,
+                filled=False,
+                y_offset=12,
+            )
+        self._draw_score_points(
+            surface,
+            plot_rect,
+            self._active_samples(),
+            filled=True,
+            y_offset=0,
+        )
+
         self._draw_wrapped(
             surface,
             self.preset.summary_for_language(self._language),
@@ -298,6 +312,26 @@ class CalibrationLabScene:
             MUTED_TEXT,
             line_height=18,
         )
+
+    def _draw_score_points(
+        self,
+        surface: pygame.Surface,
+        plot_rect: pygame.Rect,
+        samples: tuple[tuple[float, int], ...],
+        *,
+        filled: bool,
+        y_offset: int,
+    ) -> None:
+        for index, (probability, outcome) in enumerate(samples):
+            x = plot_rect.left + round(probability * plot_rect.width)
+            y = plot_rect.bottom - 20 - (index % 5) * 30 - y_offset
+            color = GOOD if outcome == 1 else SECONDARY
+            if filled:
+                pygame.draw.circle(surface, color, (x, y), 7)
+                pygame.draw.circle(surface, PLOT_BG, (x, y), 7, width=1)
+                continue
+
+            pygame.draw.circle(surface, color, (x, y), 9, width=2)
 
     def _draw_side_panel(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         self._draw_panel(surface, rect)
@@ -330,6 +364,10 @@ class CalibrationLabScene:
             (
                 self._label("error bars", "error bars"),
                 self._label("on", "wł.") if self.show_error_bars else self._label("off", "wył."),
+            ),
+            (
+                self._label("raw scores", "raw score"),
+                self._label("on", "wł.") if self.show_raw_scores else self._label("off", "wył."),
             ),
         )
         for label, value in rows:

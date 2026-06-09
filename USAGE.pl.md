@@ -43,7 +43,7 @@ Unified app zawiera też natywne laboratoria z Level 3:
 - Clustering Lab pokazuje fazy K-Means, inertia, przesuwanie punktów oraz tryb porównawczy DBSCAN.
 - PCA Lab pokazuje presety danych, noise, ręczne obracanie projekcji, dopasowany kierunek PCA, explained variance, residuals rekonstrukcji i reconstruction error.
 - Model Comparison Lab pokazuje założenia Logistic Regression, k-NN i Decision Tree na tych samych datasetach, z train/test score, kompaktowym confusion summary i podświetlaniem błędów testowych.
-- Calibration Lab pokazuje calibration prawdopodobieństw przez reliability diagram, rozkład score, accuracy@0.5, Brier score, ECE, error bars kalibracji i temperature scaling.
+- Calibration Lab pokazuje calibration prawdopodobieństw przez reliability diagram, rozkład score, raw-vs-scaled score, accuracy@0.5, Brier score, ECE, error bars kalibracji i temperature scaling.
 
 Podstawowe sterowanie:
 
@@ -102,6 +102,7 @@ Sterowanie w Calibration Lab:
 | ----------------- | ----- |
 | `1-3` | Zmień preset kalibracji |
 | `-` / `=` | Zmień temperature scaling |
+| `O` | Pokaż albo ukryj raw score sprzed temperature scaling |
 | `E` | Pokaż albo ukryj error bars kalibracji |
 | `R` | Zresetuj podgląd |
 
