@@ -254,7 +254,7 @@ class CalibrationLabScene:
             self._font_heading,
             TEXT,
         )
-        plot_rect = pygame.Rect(rect.x + 34, rect.y + 86, rect.width - 68, rect.height - 144)
+        plot_rect = self._score_distribution_plot_rect(rect)
         pygame.draw.rect(surface, PLOT_BG, plot_rect, border_radius=6)
         pygame.draw.rect(surface, GRID, plot_rect, width=1, border_radius=6)
         for index, (probability, outcome) in enumerate(self.preset.samples):
@@ -266,7 +266,7 @@ class CalibrationLabScene:
         self._draw_wrapped(
             surface,
             self.preset.summary_for_language(self._language),
-            (rect.x + 24, rect.bottom - 86),
+            (rect.x + 24, self._score_summary_top_y(rect)),
             rect.width - 48,
             self._font_small,
             MUTED_TEXT,
@@ -380,6 +380,38 @@ class CalibrationLabScene:
         if gap < 0.22:
             return SECONDARY
         return WARNING
+
+    def _score_distribution_plot_rect(self, rect: pygame.Rect) -> pygame.Rect:
+        """Return the chart area for score samples."""
+        return pygame.Rect(rect.x + 34, rect.y + 86, rect.width - 68, rect.height - 196)
+
+    def _score_summary_top_y(self, rect: pygame.Rect) -> int:
+        """Return a stable top position for the score summary copy."""
+        return rect.bottom - 76
+
+    def _wrapped_text_bottom_y(
+        self,
+        text: str,
+        width: int,
+        font: pygame.font.Font,
+        *,
+        top_y: int,
+        line_height: int,
+    ) -> int:
+        """Estimate wrapped text bottom for layout tests."""
+        lines = 1
+        current = ""
+        for word in text.split():
+            candidate = word if not current else f"{current} {word}"
+            if font.size(candidate)[0] <= width:
+                current = candidate
+                continue
+
+            if current:
+                lines += 1
+            current = word
+
+        return top_y + lines * line_height
 
     def _draw_panel(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         pygame.draw.rect(surface, PANEL, rect, border_radius=8)
