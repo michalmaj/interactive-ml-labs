@@ -307,6 +307,7 @@ class CalibrationLabScene:
             filled=True,
             y_offset=0,
         )
+        self._draw_score_legend(surface, self._score_legend_rect(rect))
 
         self._draw_wrapped(
             surface,
@@ -337,6 +338,29 @@ class CalibrationLabScene:
                 continue
 
             pygame.draw.circle(surface, color, (x, y), 9, width=2)
+
+    def _draw_score_legend(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
+        """Draw a compact raw-vs-scaled score legend."""
+        baseline_y = rect.centery
+        raw_x = rect.x + 10
+        scaled_x = rect.x + 126
+        pygame.draw.circle(surface, ACCENT, (raw_x, baseline_y), 7, width=2)
+        self._draw_text(
+            surface,
+            self._label("raw", "raw"),
+            (raw_x + 14, baseline_y - 8),
+            self._font_small,
+            MUTED_TEXT,
+        )
+        pygame.draw.circle(surface, ACCENT, (scaled_x, baseline_y), 6)
+        pygame.draw.circle(surface, PLOT_BG, (scaled_x, baseline_y), 6, width=1)
+        self._draw_text(
+            surface,
+            self._label("scaled", "scaled"),
+            (scaled_x + 14, baseline_y - 8),
+            self._font_small,
+            MUTED_TEXT,
+        )
 
     def _draw_side_panel(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         self._draw_panel(surface, rect)
@@ -496,11 +520,15 @@ class CalibrationLabScene:
 
     def _score_distribution_plot_rect(self, rect: pygame.Rect) -> pygame.Rect:
         """Return the chart area for score samples."""
-        return pygame.Rect(rect.x + 34, rect.y + 86, rect.width - 68, rect.height - 196)
+        return pygame.Rect(rect.x + 34, rect.y + 86, rect.width - 68, rect.height - 220)
 
     def _score_summary_top_y(self, rect: pygame.Rect) -> int:
         """Return a stable top position for the score summary copy."""
         return rect.bottom - 76
+
+    def _score_legend_rect(self, rect: pygame.Rect) -> pygame.Rect:
+        """Return the raw-vs-scaled legend rectangle."""
+        return pygame.Rect(rect.x + 24, rect.bottom - 112, rect.width - 48, 24)
 
     def _side_rows_bottom_y(self, rect: pygame.Rect) -> int:
         """Return the bottom y position after the side-panel metric rows."""

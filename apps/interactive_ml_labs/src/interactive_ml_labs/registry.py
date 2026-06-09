@@ -3172,11 +3172,12 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                         LocalizedText(
                             en=(
                                 "Use O to compare raw pre-temperature scores with the active "
-                                "scaled scores."
+                                "scaled scores. The score legend shows which marker is which."
                             ),
                             pl=(
                                 "Użyj O, żeby porównać raw score sprzed temperature scaling "
-                                "z aktywnymi, przeskalowanymi score."
+                                "z aktywnymi, przeskalowanymi score. Legenda pokazuje, "
+                                "który marker jest który."
                             ),
                         ),
                     ),
