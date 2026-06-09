@@ -13,6 +13,7 @@ from interactive_ml_labs import (
     validate_demo_registry,
 )
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
+from interactive_ml_labs.calibration_scene import create_calibration_lab_scene
 from interactive_ml_labs.clustering_scene import create_clustering_lab_scene
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
@@ -43,11 +44,12 @@ def test_registry_groups_demos_by_level() -> None:
     assert {demo.level for demo in level_three_demos} == {3}
     assert len(level_one_demos) >= 4
     assert len(level_two_demos) >= 2
-    assert len(level_three_demos) == 4
+    assert len(level_three_demos) == 5
     assert level_three_demos[0].id == "clustering_lab"
     assert level_three_demos[1].id == "pca_lab"
     assert level_three_demos[2].id == "model_comparison_lab"
-    assert level_three_demos[3].id == "level_3_coming_soon"
+    assert level_three_demos[3].id == "calibration_lab"
+    assert level_three_demos[4].id == "level_3_coming_soon"
 
 
 def test_level_three_placeholder_describes_future_advanced_demos() -> None:
@@ -216,6 +218,43 @@ def test_model_comparison_manifest_sets_third_level_three_demo_contract() -> Non
     assert "T" in text
 
 
+def test_calibration_manifest_sets_fourth_level_three_demo_contract() -> None:
+    """Calibration Lab should define the first probability calibration contract."""
+    manifest = DEMO_BY_ID["calibration_lab"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(entry.term for entry in manifest.theory.glossary),
+        ],
+    )
+
+    assert manifest.level == 3
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Zaawansowany podgląd"
+    assert manifest.tags == ("calibration", "probability", "evaluation", "visualization")
+    assert manifest.create_scene is create_calibration_lab_scene
+    assert "Calibration Lab" in text
+    assert "calibration" in text
+    assert "reliability diagram" in text
+    assert "Brier score" in text
+    assert "ECE" in text
+    assert "confidence" in text
+    assert "observed frequenc" in text
+    assert "1-3" in text
+    assert "E" in text
+    assert "R" in text
+    assert "T" in text
+
+
 def test_manifests_have_required_teaching_content() -> None:
     """Every manifest should include content used by generated intro screens."""
     for manifest in DEMO_MANIFESTS:
@@ -303,6 +342,7 @@ def test_manifests_have_in_app_theory_content() -> None:
             "model_comparison_lab",
             ("model comparison", "decision boundary", "model assumption"),
         ),
+        ("calibration_lab", ("calibration", "reliability diagram", "Brier score", "ECE")),
     ],
 )
 def test_demo_theory_contains_key_terms(demo_id: str, expected_terms: tuple[str, ...]) -> None:

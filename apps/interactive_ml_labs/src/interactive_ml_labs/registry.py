@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
+from interactive_ml_labs.calibration_scene import create_calibration_lab_scene
 from interactive_ml_labs.clustering_scene import create_clustering_lab_scene
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
@@ -333,6 +334,38 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             pl=(
                 "Znajdź model z najprostszą granicą. Zastanów się, gdzie ta prostota "
                 "pomaga, a gdzie może przegapić wzorzec."
+            ),
+        ),
+    ),
+    "calibration_lab": (
+        LocalizedText(
+            en=(
+                "Compare overconfident, underconfident, and better calibrated score "
+                "sets. Ask whether high confidence really means high observed frequency."
+            ),
+            pl=(
+                "Porównaj overconfident, underconfident i lepiej skalibrowane score. "
+                "Sprawdź, czy wysokie confidence naprawdę oznacza wysoką częstość trafień."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Use the error bars to find bins where confidence and observed frequency "
+                "disagree the most."
+            ),
+            pl=(
+                "Użyj error bars, żeby znaleźć biny, w których confidence i obserwowana "
+                "częstość najbardziej się rozmijają."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Compare Brier score with ECE. Notice that both are useful, but they "
+                "answer slightly different questions."
+            ),
+            pl=(
+                "Porównaj Brier score z ECE. Zobacz, że oba są przydatne, ale odpowiadają "
+                "na trochę inne pytania."
             ),
         ),
     ),
@@ -685,6 +718,48 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                     "Praktyczny kompromis między prostymi, stabilnymi modelami "
                     "a elastycznymi modelami, które śledzą więcej szczegółów."
                 ),
+            ),
+        ),
+    ),
+    "calibration_lab": (
+        GlossaryTerm(
+            term="calibration",
+            definition=LocalizedText(
+                en=(
+                    "How well predicted probabilities match observed frequencies. "
+                    "A calibrated 70% score should be right about 70% of the time."
+                ),
+                pl=(
+                    "Dopasowanie predicted probabilities do obserwowanych częstości. "
+                    "Skalibrowany score 70% powinien trafiać mniej więcej w 70% przypadków."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="reliability diagram",
+            definition=LocalizedText(
+                en=(
+                    "A plot comparing average confidence in each bin with the actual "
+                    "frequency of positive outcomes."
+                ),
+                pl=(
+                    "Wykres porównujący średnie confidence w binie z rzeczywistą "
+                    "częstością pozytywnych wyników."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="Brier score",
+            definition=LocalizedText(
+                en="A mean squared error for probabilistic predictions; lower is better.",
+                pl="Mean squared error dla predykcji probabilistycznych; niżej znaczy lepiej.",
+            ),
+        ),
+        GlossaryTerm(
+            term="ECE",
+            definition=LocalizedText(
+                en="Expected Calibration Error; an average bin-level calibration gap.",
+                pl="Expected Calibration Error; średnia luka kalibracji liczona po binach.",
             ),
         ),
     ),
@@ -2808,6 +2883,194 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["model_comparison_lab"],
             glossary=LESSON_GLOSSARY["model_comparison_lab"],
+        ),
+    ),
+    DemoManifest(
+        id="calibration_lab",
+        level=3,
+        title=LocalizedText(en="Calibration Lab", pl="Calibration Lab"),
+        summary=LocalizedText(
+            en=(
+                "Compare confidence scores with observed frequencies using a reliability "
+                "diagram, Brier score, and Expected Calibration Error."
+            ),
+            pl=(
+                "Porównaj confidence scores z obserwowanymi częstościami przez reliability "
+                "diagram, Brier score i Expected Calibration Error."
+            ),
+        ),
+        objectives=(
+            LocalizedText(
+                en="See why a model can be accurate but still poorly calibrated.",
+                pl="Zobacz, dlaczego model może mieć dobrą accuracy, ale słabą kalibrację.",
+            ),
+            LocalizedText(
+                en=(
+                    "Compare overconfident, underconfident, and better calibrated "
+                    "probability scores."
+                ),
+                pl=(
+                    "Porównaj overconfident, underconfident i lepiej skalibrowane "
+                    "probability scores."
+                ),
+            ),
+            LocalizedText(
+                en="Use Brier score and ECE as complementary calibration signals.",
+                pl="Użyj Brier score i ECE jako uzupełniających sygnałów kalibracji.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(
+                    en="switch calibration preset",
+                    pl="zmień preset kalibracji",
+                ),
+            ),
+            ControlBinding(
+                key="E",
+                action=LocalizedText(
+                    en="show or hide calibration error bars",
+                    pl="pokaż albo ukryj error bars kalibracji",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(
+                    en="reset the preview",
+                    pl="zresetuj podgląd",
+                ),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read the calibration lesson notes",
+                    pl="przeczytaj notatki o kalibracji",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(
+                    en="open the help overlay",
+                    pl="otwórz pomoc",
+                ),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_calibration_lab_scene,
+        difficulty=LocalizedText(en="Advanced preview", pl="Zaawansowany podgląd"),
+        tags=("calibration", "probability", "evaluation", "visualization"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="Why calibration matters", pl="Po co kalibracja"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "A classifier can rank examples well and still give probability "
+                                "scores that are too bold or too cautious."
+                            ),
+                            pl=(
+                                "Klasyfikator może dobrze porządkować przypadki, a mimo to "
+                                "dawać probability scores zbyt odważne albo zbyt ostrożne."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Calibration asks whether a 70% prediction is correct about "
+                                "70% of the time."
+                            ),
+                            pl=(
+                                "Kalibracja pyta, czy predykcja 70% trafia mniej więcej "
+                                "w 70% przypadków."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Lesson path", pl="Ścieżka pracy"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Start with Overconfident. Look for bins where confidence is "
+                                "higher than observed frequency."
+                            ),
+                            pl=(
+                                "Zacznij od Overconfident. Szukaj binów, w których confidence "
+                                "jest wyższe niż obserwowana częstość."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Then compare Underconfident and Better calibrated. Ask which "
+                                "preset makes the bars stay closer to the diagonal."
+                            ),
+                            pl=(
+                                "Potem porównaj Underconfident i Lepiej skalibrowane. Sprawdź, "
+                                "w którym presecie słupki są bliżej przekątnej."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="How to read the diagram", pl="Jak czytać diagram"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "The diagonal is perfect calibration. A bar above or below it "
+                                "means observed outcomes disagree with predicted confidence."
+                            ),
+                            pl=(
+                                "Przekątna oznacza idealną kalibrację. Słupek nad albo pod nią "
+                                "oznacza, że obserwowane wyniki rozmijają się z confidence."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Error bars make the gap visible. Larger gaps mean the score "
+                                "needs more caution before it is used as a probability."
+                            ),
+                            pl=(
+                                "Error bars pokazują tę lukę. Większa luka oznacza, że score "
+                                "wymaga ostrożności, zanim potraktujemy go jak probability."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Brier score and ECE", pl="Brier score i ECE"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Brier score punishes probability errors sample by sample. "
+                                "ECE summarizes bin-level calibration gaps."
+                            ),
+                            pl=(
+                                "Brier score karze błędy probabilistyczne próbka po próbce. "
+                                "ECE streszcza luki kalibracji na poziomie binów."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "They should be read together: one number rarely explains the "
+                                "whole behavior of probability scores."
+                            ),
+                            pl=(
+                                "Warto czytać je razem: jedna liczba rzadko wyjaśnia całe "
+                                "zachowanie probability scores."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["calibration_lab"],
+            glossary=LESSON_GLOSSARY["calibration_lab"],
         ),
     ),
     _placeholder_demo(

@@ -4,6 +4,7 @@ from interactive_ml_labs.boosting_scene import (
     BoostingMistakeLabSceneAdapter,
     create_boosting_mistake_lab_scene,
 )
+from interactive_ml_labs.calibration_scene import CalibrationLabScene, create_calibration_lab_scene
 from interactive_ml_labs.clustering_scene import (
     AlgorithmMode,
     ClusteringLabScene,
@@ -92,6 +93,7 @@ __all__ = [
     "AppContext",
     "AppSettings",
     "BoostingMistakeLabSceneAdapter",
+    "CalibrationLabScene",
     "ClusteringLabScene",
     "ControlBinding",
     "DecisionTreeSceneAdapter",
@@ -116,6 +118,7 @@ __all__ = [
     "center_rect",
     "choose_adaptive_window_size",
     "create_boosting_mistake_lab_scene",
+    "create_calibration_lab_scene",
     "create_clustering_lab_scene",
     "create_decision_tree_scene",
     "create_gradient_descent_scene",
