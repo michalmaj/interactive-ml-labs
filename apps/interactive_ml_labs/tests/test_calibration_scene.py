@@ -247,9 +247,11 @@ def test_calibration_score_summary_does_not_overlap_plot(monkeypatch) -> None:
             scene = create_calibration_lab_scene(context)
             score_panel_rect = pygame.Rect(620, 132, 300, 474)
             plot_rect = scene._score_distribution_plot_rect(score_panel_rect)
+            legend_rect = scene._score_legend_rect(score_panel_rect)
             summary_top_y = scene._score_summary_top_y(score_panel_rect)
 
-            assert summary_top_y >= plot_rect.bottom + 18
+            assert legend_rect.top >= plot_rect.bottom + 14
+            assert summary_top_y >= legend_rect.bottom + 10
 
             for preset_index in range(len(PRESETS)):
                 scene.preset_index = preset_index
