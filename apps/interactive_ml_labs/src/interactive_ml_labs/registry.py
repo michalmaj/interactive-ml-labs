@@ -762,6 +762,19 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                 pl="Expected Calibration Error; średnia luka kalibracji liczona po binach.",
             ),
         ),
+        GlossaryTerm(
+            term="temperature scaling",
+            definition=LocalizedText(
+                en=(
+                    "A post-hoc calibration method that softens or sharpens probability "
+                    "scores while preserving their ranking."
+                ),
+                pl=(
+                    "Metoda post-hoc calibration, która zmiękcza albo wyostrza "
+                    "probability scores, zachowując ich kolejność."
+                ),
+            ),
+        ),
     ),
     "level_3_coming_soon": (
         GlossaryTerm(
@@ -2935,6 +2948,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
             ControlBinding(
+                key="- / =",
+                action=LocalizedText(
+                    en="decrease or increase temperature scaling",
+                    pl="zmniejsz albo zwiększ temperature scaling",
+                ),
+            ),
+            ControlBinding(
                 key="R",
                 action=LocalizedText(
                     en="reset the preview",
@@ -3064,6 +3084,34 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             pl=(
                                 "Warto czytać je razem: jedna liczba rzadko wyjaśnia całe "
                                 "zachowanie probability scores."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(
+                        en="Temperature scaling",
+                        pl="Temperature scaling",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Temperature scaling is a post-hoc calibration trick: it changes "
+                                "how sharp probability scores are without changing their order."
+                            ),
+                            pl=(
+                                "Temperature scaling to prosta metoda post-hoc calibration: "
+                                "zmienia ostrość probability scores bez zmiany ich kolejności."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Higher temperature softens scores toward 0.5. Lower temperature "
+                                "pushes them closer to 0 or 1."
+                            ),
+                            pl=(
+                                "Wyższa temperatura zmiękcza score w stronę 0.5. Niższa "
+                                "wypycha je bliżej 0 albo 1."
                             ),
                         ),
                     ),

@@ -250,6 +250,8 @@ def test_calibration_manifest_sets_fourth_level_three_demo_contract() -> None:
     assert "confidence" in text
     assert "observed frequenc" in text
     assert "1-3" in text
+    assert "- / =" in text
+    assert "temperature scaling" in text
     assert "E" in text
     assert "R" in text
     assert "T" in text
@@ -342,7 +344,10 @@ def test_manifests_have_in_app_theory_content() -> None:
             "model_comparison_lab",
             ("model comparison", "decision boundary", "model assumption"),
         ),
-        ("calibration_lab", ("calibration", "reliability diagram", "Brier score", "ECE")),
+        (
+            "calibration_lab",
+            ("calibration", "reliability diagram", "Brier score", "ECE", "temperature scaling"),
+        ),
     ],
 )
 def test_demo_theory_contains_key_terms(demo_id: str, expected_terms: tuple[str, ...]) -> None:

@@ -2,7 +2,9 @@
 
 import pygame
 from interactive_ml_labs.calibration_scene import (
+    DEFAULT_TEMPERATURE_INDEX,
     PRESETS,
+    TEMPERATURE_VALUES,
     CalibrationLabScene,
     create_calibration_lab_scene,
 )
@@ -63,7 +65,7 @@ def test_calibration_scene_switches_between_presets(monkeypatch) -> None:
 
 
 def test_calibration_scene_toggles_error_bars_and_resets(monkeypatch) -> None:
-    """E should toggle error bars and R should restore the first preset."""
+    """E should toggle error bars and R should restore the default preview."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     pygame.init()
 
@@ -72,14 +74,48 @@ def test_calibration_scene_toggles_error_bars_and_resets(monkeypatch) -> None:
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_e))
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_3))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
 
         assert scene.show_error_bars is False
         assert scene.preset_index == 2
+        assert scene.temperature_index == DEFAULT_TEMPERATURE_INDEX + 1
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_r))
 
         assert scene.show_error_bars is True
         assert scene.preset_index == 0
+        assert scene.temperature_index == DEFAULT_TEMPERATURE_INDEX
+    finally:
+        pygame.quit()
+
+
+def test_calibration_scene_adjusts_temperature_scaling(monkeypatch) -> None:
+    """Minus and equals should tune the post-hoc calibration temperature."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_calibration_lab_scene(AppContext())
+        initial_probability = scene._active_samples()[0][0]
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+        softer_probability = scene._active_samples()[0][0]
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
+        sharper_probability = scene._active_samples()[0][0]
+
+        assert scene.temperature == TEMPERATURE_VALUES[DEFAULT_TEMPERATURE_INDEX - 1]
+        assert softer_probability > initial_probability
+        assert sharper_probability < initial_probability
+
+        for _ in range(10):
+            scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
+        assert scene.temperature_index == 0
+
+        for _ in range(10):
+            scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+        assert scene.temperature_index == len(TEMPERATURE_VALUES) - 1
     finally:
         pygame.quit()
 
