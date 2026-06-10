@@ -290,6 +290,7 @@ class TSNEUMAPExplorationScene:
                 self._font_small,
                 label_color,
             )
+        caption_rect = self._comparison_caption_rect(rect)
         self._draw_wrapped(
             surface,
             self._label(
@@ -297,8 +298,8 @@ class TSNEUMAPExplorationScene:
                 "Te same etykiety mogą tworzyć inną historię 2D, "
                 "gdy zmieniają się założenia sąsiedztwa.",
             ),
-            (rect.x + 22, rect.bottom - 70),
-            rect.width - 44,
+            caption_rect.topleft,
+            caption_rect.width,
             self._font_small,
             MUTED_TEXT,
             line_height=17,
@@ -468,8 +469,12 @@ class TSNEUMAPExplorationScene:
         return (
             pygame.Rect(rect.x + 30, rect.y + 78, rect.width - 60, 86),
             pygame.Rect(rect.x + 30, rect.y + 206, rect.width - 60, 86),
-            pygame.Rect(rect.x + 30, rect.y + 334, rect.width - 60, 86),
+            pygame.Rect(rect.x + 30, rect.y + 302, rect.width - 60, 78),
         )
+
+    def _comparison_caption_rect(self, rect: pygame.Rect) -> pygame.Rect:
+        """Return the caption area below comparison mini plots."""
+        return pygame.Rect(rect.x + 22, rect.bottom - 62, rect.width - 44, 44)
 
     def _draw_neighbor_links(
         self,
