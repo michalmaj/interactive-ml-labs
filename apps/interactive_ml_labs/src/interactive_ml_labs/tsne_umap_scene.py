@@ -248,7 +248,24 @@ class TSNEUMAPExplorationScene:
             self._font_heading,
             TEXT,
         )
-        plot_rect = pygame.Rect(rect.x + 44, rect.y + 78, rect.width - 88, rect.height - 136)
+        cue_rect = self._dataset_cue_rect(rect)
+        self._draw_text(
+            surface,
+            self.preset.name_for_language(self._language),
+            cue_rect.topleft,
+            self._font_small,
+            ACCENT,
+        )
+        self._draw_wrapped(
+            surface,
+            self._active_dataset_cue(),
+            (cue_rect.x, cue_rect.y + 22),
+            cue_rect.width,
+            self._font_small,
+            MUTED_TEXT,
+            line_height=17,
+        )
+        plot_rect = self._embedding_plot_rect(rect)
         self._draw_plot_frame(surface, plot_rect)
         embedded_points = self._active_embedding()
         if self.show_links:
@@ -432,6 +449,24 @@ class TSNEUMAPExplorationScene:
         spread = ((max(xs) - min(xs)) + (max(ys) - min(ys))) / 4
         return max(0.0, min(1.0, spread))
 
+    def _active_dataset_cue(self) -> str:
+        if self.preset_index == 0:
+            return self._label(
+                "Stable baseline: look for clear group separation and few surprising links.",
+                "Stabilny punkt odniesienia: szukaj wyraźnego podziału grup "
+                "i niewielu zaskakujących połączeń.",
+            )
+        if self.preset_index == 1:
+            return self._label(
+                "Bridge case: watch whether the transition points split or pull groups together.",
+                "Przypadek z mostem: sprawdź, czy punkty przejściowe "
+                "rozdzielają grupy, czy je przyciągają.",
+            )
+        return self._label(
+            "Nested case: local neighborhoods matter more than the big visual outline.",
+            "Przypadek zagnieżdżony: lokalne sąsiedztwa są ważniejsze niż ogólny kształt wykresu.",
+        )
+
     def _format_score(self, score: float) -> str:
         return f"{score:.0%} · {self._score_label(score)}"
 
@@ -483,6 +518,14 @@ class TSNEUMAPExplorationScene:
     def _comparison_caption_rect(self, rect: pygame.Rect) -> pygame.Rect:
         """Return the caption area below comparison mini plots."""
         return pygame.Rect(rect.x + 22, rect.bottom - 62, rect.width - 44, 44)
+
+    def _dataset_cue_rect(self, rect: pygame.Rect) -> pygame.Rect:
+        """Return the dataset cue area in the active embedding panel."""
+        return pygame.Rect(rect.x + 44, rect.y + 58, rect.width - 88, 42)
+
+    def _embedding_plot_rect(self, rect: pygame.Rect) -> pygame.Rect:
+        """Return the active embedding plot area."""
+        return pygame.Rect(rect.x + 44, rect.y + 118, rect.width - 88, rect.height - 176)
 
     def _draw_neighbor_links(
         self,

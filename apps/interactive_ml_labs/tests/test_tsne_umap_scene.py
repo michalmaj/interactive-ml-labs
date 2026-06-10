@@ -85,6 +85,25 @@ def test_tsne_umap_scene_switches_dataset_presets(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_tsne_umap_scene_explains_active_dataset(monkeypatch) -> None:
+    """Active embedding panel should explain what to inspect in each dataset."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_tsne_umap_exploration_scene(AppContext())
+
+        assert "Stable baseline" in scene._active_dataset_cue()
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+        assert "Bridge case" in scene._active_dataset_cue()
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_3))
+        assert "Nested case" in scene._active_dataset_cue()
+    finally:
+        pygame.quit()
+
+
 def test_tsne_umap_scene_tunes_neighbors_and_seed(monkeypatch) -> None:
     """Minus/equal and S should change deterministic embedding parameters."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -207,6 +226,24 @@ def test_tsne_umap_comparison_panel_has_three_non_overlapping_plots(monkeypatch)
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_o))
         assert scene.show_raw_layout is False
+    finally:
+        pygame.quit()
+
+
+def test_tsne_umap_active_panel_reserves_dataset_cue_space(monkeypatch) -> None:
+    """Dataset cue and active embedding plot should have non-overlapping regions."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_tsne_umap_exploration_scene(AppContext())
+        panel_rect = pygame.Rect(58, 132, 540, 474)
+        cue_rect = scene._dataset_cue_rect(panel_rect)
+        plot_rect = scene._embedding_plot_rect(panel_rect)
+
+        assert cue_rect.top > panel_rect.top + 48
+        assert cue_rect.bottom + 18 <= plot_rect.top
+        assert plot_rect.bottom <= panel_rect.bottom - 52
     finally:
         pygame.quit()
 
