@@ -114,7 +114,7 @@ Sterowanie w t-SNE / UMAP Exploration Lab:
 | `1-3` | Zmień preset danych |
 | `M` | Przełącz podgląd t-SNE / UMAP |
 | `-` / `=` | Zmień perplexity / neighbors |
-| `S` | Zmień deterministyczny seed |
+| `S` | Zmień wariant seed i sprawdź drift |
 | `L` | Pokaż albo ukryj lokalne połączenia sąsiadów |
 | `O` | Pokaż albo ukryj raw high-dimensional layout |
 | `R` | Zresetuj podgląd |

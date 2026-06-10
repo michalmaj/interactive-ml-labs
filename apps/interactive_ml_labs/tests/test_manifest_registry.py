@@ -302,6 +302,7 @@ def test_tsne_umap_manifest_sets_fifth_level_three_demo_contract() -> None:
     assert "perplexity" in text
     assert "neighbors" in text
     assert "seed" in text
+    assert "seed variant" in text
     assert "local neighborhoods" in text
     assert "Local trust" in text
     assert "Global spread" in text
