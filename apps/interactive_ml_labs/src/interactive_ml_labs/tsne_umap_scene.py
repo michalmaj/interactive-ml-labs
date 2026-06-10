@@ -370,11 +370,22 @@ class TSNEUMAPExplorationScene:
                 color,
             )
             y += 30
+        parameter_note_rect = self._parameter_note_rect(rect)
+        self._draw_wrapped(
+            surface,
+            self._active_parameter_note(),
+            parameter_note_rect.topleft,
+            parameter_note_rect.width,
+            self._font_small,
+            SECONDARY,
+            line_height=17,
+        )
+        summary_rect = self._preset_summary_rect(rect)
         self._draw_wrapped(
             surface,
             self.preset.summary_for_language(self._language),
-            (rect.x + 22, rect.bottom - 76),
-            rect.width - 44,
+            summary_rect.topleft,
+            summary_rect.width,
             self._font_small,
             MUTED_TEXT,
             line_height=17,
@@ -468,6 +479,17 @@ class TSNEUMAPExplorationScene:
             "Przypadek zagnieżdżony: lokalne sąsiedztwa są ważniejsze niż ogólny kształt wykresu.",
         )
 
+    def _active_parameter_note(self) -> str:
+        if self.algorithm == "t-SNE":
+            return self._label(
+                "Perplexity controls how many nearby points shape each local cluster.",
+                "Perplexity kontroluje, ile bliskich punktów kształtuje lokalny klaster.",
+            )
+        return self._label(
+            "Neighbors controls how strongly UMAP smooths local detail into broader structure.",
+            "Neighbors kontroluje, jak mocno UMAP wygładza lokalny detal w szerszą strukturę.",
+        )
+
     def _format_score(self, score: float) -> str:
         return f"{score:.0%} · {self._score_label(score)}"
 
@@ -523,6 +545,14 @@ class TSNEUMAPExplorationScene:
     def _class_legend_rect(self, rect: pygame.Rect) -> pygame.Rect:
         """Return the class legend area below the active embedding plot."""
         return pygame.Rect(rect.x + 44, rect.bottom - 78, rect.width - 88, 24)
+
+    def _parameter_note_rect(self, rect: pygame.Rect) -> pygame.Rect:
+        """Return the parameter note area in the controls panel."""
+        return pygame.Rect(rect.x + 22, rect.bottom - 124, rect.width - 44, 40)
+
+    def _preset_summary_rect(self, rect: pygame.Rect) -> pygame.Rect:
+        """Return the active preset summary area in the controls panel."""
+        return pygame.Rect(rect.x + 22, rect.bottom - 66, rect.width - 44, 46)
 
     def _dataset_cue_rect(self, rect: pygame.Rect) -> pygame.Rect:
         """Return the dataset cue area in the active embedding panel."""

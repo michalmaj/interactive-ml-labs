@@ -67,6 +67,25 @@ def test_tsne_umap_scene_labels_active_parameter(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_tsne_umap_scene_explains_active_parameter(monkeypatch) -> None:
+    """The side panel note should explain the active parameter."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_tsne_umap_exploration_scene(AppContext())
+
+        assert "Perplexity" in scene._active_parameter_note()
+        assert "local cluster" in scene._active_parameter_note()
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        assert "Neighbors" in scene._active_parameter_note()
+        assert "UMAP" in scene._active_parameter_note()
+    finally:
+        pygame.quit()
+
+
 def test_tsne_umap_scene_switches_dataset_presets(monkeypatch) -> None:
     """Number keys should switch deterministic data presets."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -246,6 +265,25 @@ def test_tsne_umap_active_panel_reserves_dataset_cue_space(monkeypatch) -> None:
         assert cue_rect.bottom + 18 <= plot_rect.top
         assert plot_rect.bottom + 10 <= legend_rect.top
         assert legend_rect.bottom <= panel_rect.bottom - 48
+    finally:
+        pygame.quit()
+
+
+def test_tsne_umap_side_panel_reserves_parameter_note_space(monkeypatch) -> None:
+    """Controls panel should reserve separate space for preset list, parameter note, and summary."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_tsne_umap_exploration_scene(AppContext())
+        panel_rect = pygame.Rect(960, 132, 260, 474)
+        last_preset_baseline = panel_rect.y + 68 + 7 * 26 + 12 + 2 * 30
+        note_rect = scene._parameter_note_rect(panel_rect)
+        summary_rect = scene._preset_summary_rect(panel_rect)
+
+        assert last_preset_baseline + 18 <= note_rect.top
+        assert note_rect.bottom + 12 <= summary_rect.top
+        assert summary_rect.bottom < panel_rect.bottom
     finally:
         pygame.quit()
 
