@@ -401,6 +401,16 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
                 "random seed i sposób porównywania embeddingów."
             ),
         ),
+        LocalizedText(
+            en=(
+                "Use seed drift and the raw layout to explain when a projection "
+                "changed the story and when it only changed the drawing."
+            ),
+            pl=(
+                "Użyj seed drift i raw layout, żeby wyjaśnić, kiedy projekcja "
+                "zmieniła opowieść, a kiedy tylko sposób rysowania."
+            ),
+        ),
     ),
     "level_3_coming_soon": (
         LocalizedText(
@@ -872,6 +882,84 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                 pl=(
                     "Nieliniowa metoda embeddingu, która często lepiej zachowuje "
                     "globalną strukturę niż t-SNE, nadal skupiając się na sąsiedztwach."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="perplexity",
+            definition=LocalizedText(
+                en=(
+                    "The t-SNE neighborhood scale. Larger values make each point listen "
+                    "to more nearby points when shaping the embedding."
+                ),
+                pl=(
+                    "Skala sąsiedztwa w t-SNE. Większe wartości sprawiają, że każdy punkt "
+                    "uwzględnia więcej bliskich punktów przy budowaniu embeddingu."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="neighbors",
+            definition=LocalizedText(
+                en=(
+                    "The UMAP neighborhood scale. It controls how much local detail is "
+                    "smoothed into broader structure."
+                ),
+                pl=(
+                    "Skala sąsiedztwa w UMAP. Kontroluje, jak mocno lokalny detal "
+                    "jest wygładzany w szerszą strukturę."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="local trust",
+            definition=LocalizedText(
+                en=(
+                    "A quick cue for whether nearest-neighbor links mostly stay inside "
+                    "the same synthetic label."
+                ),
+                pl=(
+                    "Szybka wskazówka, czy połączenia najbliższych sąsiadów najczęściej "
+                    "zostają w tej samej syntetycznej etykiecie."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="global spread",
+            definition=LocalizedText(
+                en=(
+                    "A reading cue for how much of the 2D canvas the embedding uses; "
+                    "it is not proof that global distances are faithful."
+                ),
+                pl=(
+                    "Wskazówka, jak mocno embedding wykorzystuje przestrzeń 2D; "
+                    "to nie jest dowód, że globalne odległości są wierne."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="seed drift",
+            definition=LocalizedText(
+                en=(
+                    "How far the current seed variant moved points away from the seed 0 "
+                    "baseline for the same settings."
+                ),
+                pl=(
+                    "Miara tego, jak daleko wariant seeda przesunął punkty względem "
+                    "baseline seed 0 przy tych samych ustawieniach."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="raw layout",
+            definition=LocalizedText(
+                en=(
+                    "A simplified reference view of the toy data before comparing the "
+                    "t-SNE and UMAP embeddings."
+                ),
+                pl=(
+                    "Uproszczony widok referencyjny toy danych przed porównaniem "
+                    "embeddingów t-SNE i UMAP."
                 ),
             ),
         ),
