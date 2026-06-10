@@ -44,7 +44,7 @@ The unified app also includes app-only Level 3 labs:
 - PCA Lab demonstrates dataset/noise controls, manual projection rotation, fitted PCA direction, explained variance, reconstruction residuals, and reconstruction error.
 - Model Comparison Lab demonstrates Logistic Regression, k-NN, and Decision Tree assumptions on shared datasets, with train/test scores, compact confusion details, and highlighted test errors.
 - Calibration Lab demonstrates probability calibration with reliability diagrams, score distributions, a raw-vs-scaled score legend, accuracy@0.5, Brier score, ECE, worst-gap highlighting, calibration gap error bars, and temperature scaling.
-- t-SNE / UMAP Exploration Lab is currently a planning placeholder with objectives, lesson notes, glossary, and mini-challenges for the next native Level 3 slice.
+- t-SNE / UMAP Exploration Lab demonstrates deterministic toy embeddings, t-SNE/UMAP comparison, seed changes, neighborhood tuning, and local-neighbor links.
 
 Common shell controls:
 
@@ -60,7 +60,7 @@ Common shell controls:
 
 ## Standalone Demos
 
-Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs and planning placeholders, such as Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, and t-SNE / UMAP Exploration Lab, are launched from the unified app.
+Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, and t-SNE / UMAP Exploration Lab, are launched from the unified app.
 
 ### App-only Level 3 Labs
 
@@ -105,6 +105,17 @@ Calibration Lab controls:
 | `-` / `=` | Change temperature scaling |
 | `O` | Show or hide raw pre-temperature scores |
 | `E` | Show or hide calibration error bars |
+| `R` | Reset the preview |
+
+t-SNE / UMAP Exploration Lab controls:
+
+| Key / input | Action |
+| ----------- | ------ |
+| `1-3` | Switch dataset preset |
+| `M` | Switch t-SNE / UMAP preview |
+| `-` / `=` | Change neighborhood parameter |
+| `S` | Change deterministic seed |
+| `L` | Show or hide local-neighbor links |
 | `R` | Reset the preview |
 
 ### Gradient Descent Playground
