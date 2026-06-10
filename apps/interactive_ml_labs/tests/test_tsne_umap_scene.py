@@ -139,6 +139,26 @@ def test_tsne_umap_scene_reports_embedding_scores(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_tsne_umap_scene_formats_reading_cues(monkeypatch) -> None:
+    """Metric labels and reading cues should explain how to interpret the view."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_tsne_umap_exploration_scene(AppContext())
+
+        assert scene._format_score(0.82) == "82% · strong"
+        assert scene._format_score(0.62) == "62% · mixed"
+        assert scene._format_score(0.24) == "24% · weak"
+        assert "Reading cue:" in scene._active_takeaway()
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        assert "Reading cue:" in scene._active_takeaway()
+    finally:
+        pygame.quit()
+
+
 def test_tsne_umap_comparison_panel_has_three_non_overlapping_plots(monkeypatch) -> None:
     """Comparison panel should reserve space for raw, t-SNE, and UMAP mini plots."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")

@@ -318,8 +318,14 @@ class TSNEUMAPExplorationScene:
             (self._label("algorithm", "algorytm"), self.algorithm),
             (self._label("neighbors", "neighbors"), str(self.neighbors)),
             ("seed", str(self.seed_index)),
-            (self._label("local trust", "local trust"), f"{self._local_trust_score():.0%}"),
-            (self._label("global spread", "global spread"), f"{self._global_spread_score():.0%}"),
+            (
+                self._label("local trust", "local trust"),
+                self._format_score(self._local_trust_score()),
+            ),
+            (
+                self._label("global spread", "global spread"),
+                self._format_score(self._global_spread_score()),
+            ),
             (
                 self._label("raw layout", "raw layout"),
                 self._label("on", "wł.") if self.show_raw_layout else self._label("off", "wył."),
@@ -363,6 +369,15 @@ class TSNEUMAPExplorationScene:
             (58, 635),
             self._font_body,
             TEXT,
+        )
+        self._draw_wrapped(
+            surface,
+            self._active_takeaway(),
+            (58, 665),
+            980,
+            self._font_small,
+            MUTED_TEXT,
+            line_height=17,
         )
 
     def _active_embedding(self) -> tuple[tuple[float, float, int], ...]:
@@ -413,6 +428,38 @@ class TSNEUMAPExplorationScene:
         ys = [point[1] for point in points]
         spread = ((max(xs) - min(xs)) + (max(ys) - min(ys))) / 4
         return max(0.0, min(1.0, spread))
+
+    def _format_score(self, score: float) -> str:
+        return f"{score:.0%} · {self._score_label(score)}"
+
+    def _score_label(self, score: float) -> str:
+        if score >= 0.75:
+            return self._label("strong", "mocny")
+        if score >= 0.50:
+            return self._label("mixed", "mieszany")
+        return self._label("weak", "słaby")
+
+    def _active_takeaway(self) -> str:
+        local_trust = self._local_trust_score()
+        global_spread = self._global_spread_score()
+        if local_trust >= 0.75 and global_spread >= 0.55:
+            return self._label(
+                "Reading cue: this view keeps local neighbors clear while still "
+                "spreading groups apart.",
+                "Wskazówka: ten widok dobrze trzyma lokalne sąsiedztwa i nadal rozsuwa grupy.",
+            )
+        if local_trust >= 0.75:
+            return self._label(
+                "Reading cue: local neighborhoods look reliable, but broad distances "
+                "may be compressed.",
+                "Wskazówka: lokalne sąsiedztwa wyglądają wiarygodnie, ale większe "
+                "odległości mogą być ściśnięte.",
+            )
+        return self._label(
+            "Reading cue: treat this projection cautiously and compare it with the "
+            "other algorithm.",
+            "Wskazówka: traktuj tę projekcję ostrożnie i porównaj ją z drugim algorytmem.",
+        )
 
     def _comparison_plot_rects(
         self, rect: pygame.Rect
