@@ -418,13 +418,18 @@ class TSNEUMAPExplorationScene:
     def _embedding_for_algorithm(
         self, algorithm_index: int
     ) -> tuple[tuple[float, float, int], ...]:
+        return self._embedding_for_state(algorithm_index, self.seed_index)
+
+    def _embedding_for_state(
+        self, algorithm_index: int, seed_index: int
+    ) -> tuple[tuple[float, float, int], ...]:
         raw_points = self.preset.points
         shaped: list[tuple[float, float, int]] = []
         for point_index, (x, y, label) in enumerate(raw_points):
-            seed_shift = (self.seed_index - 1.5) * 0.035
+            seed_shift = (seed_index - 1.5) * 0.035
             neighbor_shift = (self.neighbors - 15) / 70
             if algorithm_index == 0:
-                angle = (point_index % 6) * pi / 18 + self.seed_index * 0.08
+                angle = (point_index % 6) * pi / 18 + seed_index * 0.08
                 new_x = x * (1.0 + neighbor_shift * 0.18) + sin(angle) * 0.045 + seed_shift
                 new_y = y * (0.86 - neighbor_shift * 0.08) + cos(angle) * 0.045 - seed_shift
             else:
@@ -461,6 +466,17 @@ class TSNEUMAPExplorationScene:
         spread = ((max(xs) - min(xs)) + (max(ys) - min(ys))) / 4
         return max(0.0, min(1.0, spread))
 
+    def _seed_drift_score(self) -> float:
+        if self.seed_index == 0:
+            return 0.0
+        baseline_points = self._embedding_for_state(self.algorithm_index, 0)
+        active_points = self._active_embedding()
+        drift = sum(
+            self._squared_distance(active_point, baseline_point) ** 0.5
+            for active_point, baseline_point in zip(active_points, baseline_points, strict=True)
+        ) / len(active_points)
+        return max(0.0, min(1.0, drift / 0.24))
+
     def _active_dataset_cue(self) -> str:
         if self.preset_index == 0:
             return self._label(
@@ -493,9 +509,10 @@ class TSNEUMAPExplorationScene:
     def _seed_label(self) -> str:
         if self.seed_index == 0:
             return self._label("0 · baseline", "0 · baseline")
+        drift = self._seed_drift_score()
         return self._label(
-            f"{self.seed_index} · variant {self.seed_index}",
-            f"{self.seed_index} · wariant {self.seed_index}",
+            f"{self.seed_index} · variant {self.seed_index} · drift {drift:.0%}",
+            f"{self.seed_index} · wariant {self.seed_index} · drift {drift:.0%}",
         )
 
     def _format_score(self, score: float) -> str:
