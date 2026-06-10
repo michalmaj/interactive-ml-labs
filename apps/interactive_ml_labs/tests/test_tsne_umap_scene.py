@@ -168,10 +168,12 @@ def test_tsne_umap_comparison_panel_has_three_non_overlapping_plots(monkeypatch)
         scene = create_tsne_umap_exploration_scene(AppContext())
         panel_rect = pygame.Rect(638, 132, 286, 474)
         raw_rect, tsne_rect, umap_rect = scene._comparison_plot_rects(panel_rect)
+        caption_rect = scene._comparison_caption_rect(panel_rect)
 
         assert raw_rect.bottom < tsne_rect.top
         assert tsne_rect.bottom < umap_rect.top
-        assert umap_rect.bottom <= panel_rect.bottom - 54
+        assert umap_rect.bottom + 32 <= caption_rect.top
+        assert caption_rect.bottom < panel_rect.bottom
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_o))
         assert scene.show_raw_layout is False
