@@ -25,6 +25,7 @@ from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 from interactive_ml_labs.scene import Scene
+from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
 
 LEVEL_MANIFESTS: tuple[LevelManifest, ...] = (
     LevelManifest(
@@ -3307,10 +3308,45 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         ),
         controls=(
             ControlBinding(
-                key="Enter",
+                key="1-3",
                 action=LocalizedText(
-                    en="open the planning placeholder",
-                    pl="otwórz placeholder planu",
+                    en="switch dataset preset",
+                    pl="zmień preset danych",
+                ),
+            ),
+            ControlBinding(
+                key="M",
+                action=LocalizedText(
+                    en="switch t-SNE / UMAP preview",
+                    pl="przełącz podgląd t-SNE / UMAP",
+                ),
+            ),
+            ControlBinding(
+                key="- / =",
+                action=LocalizedText(
+                    en="decrease or increase neighborhood parameter",
+                    pl="zmniejsz albo zwiększ parametr sąsiedztwa",
+                ),
+            ),
+            ControlBinding(
+                key="S",
+                action=LocalizedText(
+                    en="change deterministic seed",
+                    pl="zmień deterministyczny seed",
+                ),
+            ),
+            ControlBinding(
+                key="L",
+                action=LocalizedText(
+                    en="show or hide local neighbor links",
+                    pl="pokaż albo ukryj lokalne połączenia sąsiadów",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(
+                    en="reset the preview",
+                    pl="zresetuj podgląd",
                 ),
             ),
             ControlBinding(
@@ -3332,6 +3368,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
         ),
+        create_scene=create_tsne_umap_exploration_scene,
         difficulty=LocalizedText(en="Planned advanced lab", pl="Planowany lab zaawansowany"),
         tags=("tsne", "umap", "embedding", "dimensionality-reduction", "visualization"),
         theory=DemoTheory(

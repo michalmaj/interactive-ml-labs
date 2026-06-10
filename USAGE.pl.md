@@ -44,7 +44,7 @@ Unified app zawiera też natywne laboratoria z Level 3:
 - PCA Lab pokazuje presety danych, noise, ręczne obracanie projekcji, dopasowany kierunek PCA, explained variance, residuals rekonstrukcji i reconstruction error.
 - Model Comparison Lab pokazuje założenia Logistic Regression, k-NN i Decision Tree na tych samych datasetach, z train/test score, kompaktowym confusion summary i podświetlaniem błędów testowych.
 - Calibration Lab pokazuje calibration prawdopodobieństw przez reliability diagram, rozkład score, legendę raw-vs-scaled score, accuracy@0.5, Brier score, ECE, podświetlenie worst gap, error bars kalibracji i temperature scaling.
-- t-SNE / UMAP Exploration Lab jest na razie placeholderem planu z celami, teorią, glossary i mini-challenges pod następny natywny wycinek Level 3.
+- t-SNE / UMAP Exploration Lab pokazuje deterministyczne toy embeddingi, porównanie t-SNE/UMAP, zmianę seed, strojenie sąsiedztwa i lokalne połączenia sąsiadów.
 
 Podstawowe sterowanie:
 
@@ -60,7 +60,7 @@ Podstawowe sterowanie:
 
 ## Osobne dema
 
-Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby i planowane placeholdery, takie jak Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
+Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
 
 ### Natywne laby Level 3
 
@@ -105,6 +105,17 @@ Sterowanie w Calibration Lab:
 | `-` / `=` | Zmień temperature scaling |
 | `O` | Pokaż albo ukryj raw score sprzed temperature scaling |
 | `E` | Pokaż albo ukryj error bars kalibracji |
+| `R` | Zresetuj podgląd |
+
+Sterowanie w t-SNE / UMAP Exploration Lab:
+
+| Klawisz / wejście | Akcja |
+| ----------------- | ----- |
+| `1-3` | Zmień preset danych |
+| `M` | Przełącz podgląd t-SNE / UMAP |
+| `-` / `=` | Zmień parametr sąsiedztwa |
+| `S` | Zmień deterministyczny seed |
+| `L` | Pokaż albo ukryj lokalne połączenia sąsiadów |
 | `R` | Zresetuj podgląd |
 
 ### Gradient Descent Playground

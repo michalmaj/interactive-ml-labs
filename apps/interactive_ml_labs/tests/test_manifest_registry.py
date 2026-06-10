@@ -22,6 +22,7 @@ from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
 from interactive_ml_labs.model_comparison_scene import create_model_comparison_lab_scene
 from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
+from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
 
 
 def test_registry_contains_current_demo_levels() -> None:
@@ -293,6 +294,7 @@ def test_tsne_umap_manifest_sets_fifth_level_three_demo_contract() -> None:
         "dimensionality-reduction",
         "visualization",
     )
+    assert manifest.create_scene is create_tsne_umap_exploration_scene
     assert "t-SNE / UMAP Exploration Lab" in text
     assert "embedding" in text
     assert "perplexity" in text
@@ -300,7 +302,12 @@ def test_tsne_umap_manifest_sets_fifth_level_three_demo_contract() -> None:
     assert "seed" in text
     assert "local neighborhoods" in text
     assert "global structure" in text
-    assert "Enter" in text
+    assert "1-3" in text
+    assert "M" in text
+    assert "- / =" in text
+    assert "S" in text
+    assert "L" in text
+    assert "R" in text
     assert "T" in text
 
 
