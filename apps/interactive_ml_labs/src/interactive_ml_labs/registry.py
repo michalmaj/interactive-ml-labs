@@ -3355,12 +3355,12 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title_en="t-SNE / UMAP Exploration Lab",
         title_pl="t-SNE / UMAP Exploration Lab",
         summary_en=(
-            "Plan an interactive embedding lab for comparing local neighborhoods, "
+            "Explore an interactive embedding prototype for comparing local neighborhoods, "
             "global structure, and projection stability."
         ),
         summary_pl=(
-            "Plan interaktywnego labu embeddingów do porównywania lokalnych sąsiedztw, "
-            "globalnej struktury i stabilności projekcji."
+            "Eksploruj interaktywny prototyp embeddingów do porównywania lokalnych "
+            "sąsiedztw, globalnej struktury i stabilności projekcji."
         ),
         objectives=(
             LocalizedText(
@@ -3374,14 +3374,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
             LocalizedText(
-                en=(
-                    "Decide which controls should come first: perplexity, neighbors, "
-                    "seed, and dataset preset."
-                ),
-                pl=(
-                    "Ustal, które kontrolki powinny wejść jako pierwsze: perplexity, "
-                    "neighbors, seed i preset danych."
-                ),
+                en=("Tune the first controls: perplexity, neighbors, seed, and dataset preset."),
+                pl=("Dostrajaj pierwsze kontrolki: perplexity, neighbors, seed i preset danych."),
             ),
             LocalizedText(
                 en=(
@@ -3447,8 +3441,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ControlBinding(
                 key="T",
                 action=LocalizedText(
-                    en="read the t-SNE / UMAP planning lesson",
-                    pl="przeczytaj lekcję planowania t-SNE / UMAP",
+                    en="read the t-SNE / UMAP exploration lesson",
+                    pl="przeczytaj lekcję eksploracji t-SNE / UMAP",
                 ),
             ),
             ControlBinding(
@@ -3464,7 +3458,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
         ),
         create_scene=create_tsne_umap_exploration_scene,
-        difficulty=LocalizedText(en="Planned advanced lab", pl="Planowany lab zaawansowany"),
+        difficulty=LocalizedText(en="Advanced prototype", pl="Prototyp zaawansowany"),
         tags=("tsne", "umap", "embedding", "dimensionality-reduction", "visualization"),
         theory=DemoTheory(
             sections=(

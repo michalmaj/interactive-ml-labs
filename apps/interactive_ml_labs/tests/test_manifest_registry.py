@@ -266,7 +266,7 @@ def test_calibration_manifest_sets_fourth_level_three_demo_contract() -> None:
 
 
 def test_tsne_umap_manifest_sets_fifth_level_three_demo_contract() -> None:
-    """t-SNE / UMAP Exploration Lab should define the next planned Level 3 contract."""
+    """t-SNE / UMAP Exploration Lab should define the Level 3 prototype contract."""
     manifest = DEMO_BY_ID["tsne_umap_exploration_lab"]
     text = " ".join(
         [
@@ -286,7 +286,7 @@ def test_tsne_umap_manifest_sets_fifth_level_three_demo_contract() -> None:
 
     assert manifest.level == 3
     assert manifest.difficulty is not None
-    assert manifest.difficulty.pl == "Planowany lab zaawansowany"
+    assert manifest.difficulty.pl == "Prototyp zaawansowany"
     assert manifest.tags == (
         "tsne",
         "umap",
@@ -296,6 +296,8 @@ def test_tsne_umap_manifest_sets_fifth_level_three_demo_contract() -> None:
     )
     assert manifest.create_scene is create_tsne_umap_exploration_scene
     assert "t-SNE / UMAP Exploration Lab" in text
+    assert "Explore an interactive embedding prototype" in text
+    assert "exploration lesson" in text
     assert "embedding" in text
     assert "perplexity" in text
     assert "neighbors" in text

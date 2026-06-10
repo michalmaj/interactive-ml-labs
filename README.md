@@ -112,7 +112,7 @@ It also includes the first real Level 3 labs:
 - Model Comparison Lab, with Logistic Regression, k-NN, and Decision Tree previews on shared datasets, active model parameters, train/test accuracy, compact confusion details, and highlighted misclassified test points.
 - Calibration Lab, with overconfident, underconfident, and better calibrated presets, a reliability diagram, score distribution, raw-vs-scaled score reference with a compact legend, accuracy@0.5, Brier score, ECE, worst-gap highlighting, calibration gap error bars, and temperature scaling.
 
-It also includes the first native slice for the next Level 3 prototype:
+It also includes the first native t-SNE / UMAP prototype:
 
 - t-SNE / UMAP Exploration Lab, with deterministic toy embeddings, raw-vs-embedding comparison, dataset cues, a compact class legend, seed drift, t-SNE/UMAP comparison, and neighborhood tuning.
 
@@ -123,7 +123,7 @@ The original Level 1 and Level 2 demos can still be run as standalone commands. 
 Near-term work focuses on turning Level 3 into a stronger guided learning track while keeping the shell stable:
 
 - collect review feedback on Clustering Lab, PCA Lab, Model Comparison Lab, and Calibration Lab after classroom-style use,
-- prototype the next Level 3 candidate: t-SNE / UMAP Exploration Lab,
+- iterate on the t-SNE / UMAP Exploration Lab prototype with richer projection behavior,
 - keep a later Calibration Lab slice in mind for real model outputs and post-hoc calibration workflows,
 - keep improving the Level 3 flow from theory to interaction to mini-challenges,
 - decide whether the following Level 3 track should be model monitoring, drift, or richer evaluation workflows,
