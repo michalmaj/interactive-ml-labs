@@ -3411,18 +3411,16 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     ),
                 ),
                 TheorySection(
-                    title=LocalizedText(
-                        en="Planned first controls", pl="Plan pierwszych kontrolek"
-                    ),
+                    title=LocalizedText(en="Current controls", pl="Obecne kontrolki"),
                     body=(
                         LocalizedText(
                             en=(
-                                "A narrow first slice can start with fixed synthetic datasets, "
-                                "a seed control, and one main neighborhood parameter."
+                                "This slice uses fixed synthetic datasets, a seed control, "
+                                "and one main neighborhood parameter."
                             ),
                             pl=(
-                                "Wąski pierwszy wycinek może zacząć od stałych syntetycznych "
-                                "datasetów, kontroli seed i jednego głównego parametru sąsiedztwa."
+                                "Ten wycinek używa stałych syntetycznych datasetów, kontroli "
+                                "seed i jednego głównego parametru sąsiedztwa."
                             ),
                         ),
                         LocalizedText(
@@ -3433,6 +3431,33 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             pl=(
                                 "Dla t-SNE tym parametrem może być perplexity; dla UMAP liczba "
                                 "neighbors."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Reading the metrics", pl="Jak czytać metryki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Local trust is a quick cue for whether nearby points mostly "
+                                "keep neighbors with the same label."
+                            ),
+                            pl=(
+                                "Local trust szybko pokazuje, czy bliskie punkty najczęściej "
+                                "trzymają sąsiadów z tą samą etykietą."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Global spread describes how much of the 2D canvas the embedding "
+                                "uses. It is useful as a reading cue, not as a proof that global "
+                                "distances are faithful."
+                            ),
+                            pl=(
+                                "Global spread mówi, jak mocno embedding wykorzystuje przestrzeń "
+                                "2D. To dobra wskazówka do czytania wykresu, ale nie dowód, "
+                                "że globalne odległości są wierne."
                             ),
                         ),
                     ),
@@ -3479,13 +3504,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     body=(
                         LocalizedText(
                             en=(
-                                "The next PR can add the native scene skeleton with deterministic "
-                                "toy embeddings before pulling in any heavier algorithm dependency."
+                                "A later PR can replace the deterministic toy embeddings with "
+                                "real algorithm output once the teaching interface is stable."
                             ),
                             pl=(
-                                "Następny PR może dodać szkielet natywnej sceny "
-                                "z deterministycznymi toy embeddingami, zanim dołożymy "
-                                "cięższe dependency algorytmiczne."
+                                "Późniejszy PR może zastąpić deterministyczne toy embeddingi "
+                                "prawdziwym wynikiem algorytmów, gdy interfejs dydaktyczny "
+                                "będzie już stabilny."
                             ),
                         ),
                     ),
