@@ -420,7 +420,17 @@ def test_manifests_have_in_app_theory_content() -> None:
         ),
         (
             "tsne_umap_exploration_lab",
-            ("t-SNE", "UMAP", "embedding", "perplexity", "neighbors"),
+            (
+                "t-SNE",
+                "UMAP",
+                "embedding",
+                "perplexity",
+                "neighbors",
+                "local trust",
+                "global spread",
+                "seed drift",
+                "raw layout",
+            ),
         ),
     ],
 )
