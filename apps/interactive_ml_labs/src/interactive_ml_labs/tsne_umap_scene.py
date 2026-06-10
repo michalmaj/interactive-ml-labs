@@ -271,6 +271,7 @@ class TSNEUMAPExplorationScene:
         if self.show_links:
             self._draw_neighbor_links(surface, plot_rect, embedded_points)
         self._draw_points(surface, plot_rect, embedded_points)
+        self._draw_class_legend(surface, self._class_legend_rect(rect))
         self._draw_text(
             surface,
             self._label(
@@ -519,13 +520,38 @@ class TSNEUMAPExplorationScene:
         """Return the caption area below comparison mini plots."""
         return pygame.Rect(rect.x + 22, rect.bottom - 62, rect.width - 44, 44)
 
+    def _class_legend_rect(self, rect: pygame.Rect) -> pygame.Rect:
+        """Return the class legend area below the active embedding plot."""
+        return pygame.Rect(rect.x + 44, rect.bottom - 78, rect.width - 88, 24)
+
     def _dataset_cue_rect(self, rect: pygame.Rect) -> pygame.Rect:
         """Return the dataset cue area in the active embedding panel."""
         return pygame.Rect(rect.x + 44, rect.y + 58, rect.width - 88, 42)
 
     def _embedding_plot_rect(self, rect: pygame.Rect) -> pygame.Rect:
         """Return the active embedding plot area."""
-        return pygame.Rect(rect.x + 44, rect.y + 118, rect.width - 88, rect.height - 176)
+        return pygame.Rect(rect.x + 44, rect.y + 118, rect.width - 88, rect.height - 210)
+
+    def _draw_class_legend(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
+        pygame.draw.rect(surface, PLOT_BG, rect, border_radius=6)
+        pygame.draw.rect(surface, GRID, rect, width=1, border_radius=6)
+        labels = (
+            self._label("label 0", "etykieta 0"),
+            self._label("label 1", "etykieta 1"),
+            self._label("label 2", "etykieta 2"),
+        )
+        item_width = rect.width // len(labels)
+        for index, label in enumerate(labels):
+            x = rect.x + index * item_width + 16
+            y = rect.centery
+            pygame.draw.circle(surface, CLASS_COLORS[index], (x, y), 5)
+            self._draw_text(
+                surface,
+                label,
+                (x + 12, rect.y + 4),
+                self._font_small,
+                MUTED_TEXT,
+            )
 
     def _draw_neighbor_links(
         self,

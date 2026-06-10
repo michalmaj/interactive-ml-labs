@@ -240,10 +240,12 @@ def test_tsne_umap_active_panel_reserves_dataset_cue_space(monkeypatch) -> None:
         panel_rect = pygame.Rect(58, 132, 540, 474)
         cue_rect = scene._dataset_cue_rect(panel_rect)
         plot_rect = scene._embedding_plot_rect(panel_rect)
+        legend_rect = scene._class_legend_rect(panel_rect)
 
         assert cue_rect.top > panel_rect.top + 48
         assert cue_rect.bottom + 18 <= plot_rect.top
-        assert plot_rect.bottom <= panel_rect.bottom - 52
+        assert plot_rect.bottom + 10 <= legend_rect.top
+        assert legend_rect.bottom <= panel_rect.bottom - 48
     finally:
         pygame.quit()
 
