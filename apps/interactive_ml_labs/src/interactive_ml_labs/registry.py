@@ -3413,8 +3413,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ControlBinding(
                 key="S",
                 action=LocalizedText(
-                    en="change deterministic seed",
-                    pl="zmień deterministyczny seed",
+                    en="change seed variant and inspect drift",
+                    pl="zmień wariant seed i sprawdź drift",
                 ),
             ),
             ControlBinding(
