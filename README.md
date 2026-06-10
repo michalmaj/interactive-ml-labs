@@ -73,7 +73,7 @@ Advanced and visually rich topics:
 - Calibration Lab: reliability diagrams, score distributions, raw-vs-scaled score legend, accuracy@0.5, Brier score, Expected Calibration Error, worst gap, and temperature scaling,
 - Naive Bayes spam detection,
 - CNN filter visualization,
-- t-SNE / UMAP,
+- t-SNE / UMAP Exploration Lab,
 - association rules,
 - recommender systems,
 - time-series forecasting,
@@ -118,10 +118,11 @@ The original Level 1 and Level 2 demos can still be run as standalone commands. 
 
 Near-term work focuses on turning Level 3 into a stronger guided learning track while keeping the shell stable:
 
-- collect review feedback on Clustering Lab, PCA Lab, and Model Comparison Lab after classroom-style use,
-- collect review feedback on Calibration Lab and decide whether the next slice should connect calibration to real model outputs,
+- collect review feedback on Clustering Lab, PCA Lab, Model Comparison Lab, and Calibration Lab after classroom-style use,
+- prototype the next Level 3 candidate: t-SNE / UMAP Exploration Lab,
+- keep a later Calibration Lab slice in mind for real model outputs and post-hoc calibration workflows,
 - keep improving the Level 3 flow from theory to interaction to mini-challenges,
-- decide the next Level 3 demo candidate after calibration, likely t-SNE / UMAP or a richer model monitoring workflow,
+- decide whether the following Level 3 track should be model monitoring, drift, or richer evaluation workflows,
 - continue polishing Polish copy inside demos without forcing translations of standard ML terms,
 - keep app settings, scaling, and help overlays stable as new Level 3 scenes are added.
 
