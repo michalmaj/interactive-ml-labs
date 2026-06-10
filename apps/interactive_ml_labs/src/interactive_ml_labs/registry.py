@@ -3343,6 +3343,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
             ControlBinding(
+                key="O",
+                action=LocalizedText(
+                    en="show or hide raw high-dimensional layout",
+                    pl="pokaż albo ukryj raw high-dimensional layout",
+                ),
+            ),
+            ControlBinding(
                 key="R",
                 action=LocalizedText(
                     en="reset the preview",
@@ -3453,6 +3460,16 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             pl=(
                                 "Lab nie powinien sugerować, że każda odległość 2D odpowiada "
                                 "prawdziwej odległości w wielu wymiarach."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Use the raw layout only as a reference: it is a simplified "
+                                "projection of the toy data, not ground truth."
+                            ),
+                            pl=(
+                                "Traktuj raw layout tylko jako punkt odniesienia: to uproszczona "
+                                "projekcja toy danych, a nie ground truth."
                             ),
                         ),
                     ),

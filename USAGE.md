@@ -116,6 +116,7 @@ t-SNE / UMAP Exploration Lab controls:
 | `-` / `=` | Change neighborhood parameter |
 | `S` | Change deterministic seed |
 | `L` | Show or hide local-neighbor links |
+| `O` | Show or hide raw high-dimensional layout |
 | `R` | Reset the preview |
 
 ### Gradient Descent Playground

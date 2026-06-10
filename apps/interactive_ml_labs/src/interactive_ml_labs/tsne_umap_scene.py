@@ -155,6 +155,7 @@ class TSNEUMAPExplorationScene:
         self.neighbor_index = DEFAULT_NEIGHBOR_INDEX
         self.seed_index = 0
         self.show_links = True
+        self.show_raw_layout = True
 
     @property
     def preset(self) -> EmbeddingPreset:
@@ -208,12 +209,15 @@ class TSNEUMAPExplorationScene:
             self.seed_index = (self.seed_index + 1) % 4
         elif key == pygame.K_l:
             self.show_links = not self.show_links
+        elif key == pygame.K_o:
+            self.show_raw_layout = not self.show_raw_layout
         elif key == pygame.K_r:
             self.preset_index = 0
             self.algorithm_index = 0
             self.neighbor_index = DEFAULT_NEIGHBOR_INDEX
             self.seed_index = 0
             self.show_links = True
+            self.show_raw_layout = True
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "t-SNE / UMAP Exploration Lab", (58, 40), self._font_title, TEXT)
@@ -263,16 +267,25 @@ class TSNEUMAPExplorationScene:
             self._font_heading,
             TEXT,
         )
-        first_rect = pygame.Rect(rect.x + 30, rect.y + 78, rect.width - 60, 132)
-        second_rect = pygame.Rect(rect.x + 30, rect.y + 248, rect.width - 60, 132)
-        for algorithm_index, plot_rect in enumerate((first_rect, second_rect)):
+        plot_rects = self._comparison_plot_rects(rect)
+        comparison_items = (
+            ("Raw", self.preset.points, self.show_raw_layout),
+            ("t-SNE", self._embedding_for_algorithm(0), True),
+            ("UMAP", self._embedding_for_algorithm(1), True),
+        )
+        for item_index, (label, points, visible) in enumerate(comparison_items):
+            plot_rect = plot_rects[item_index]
             self._draw_plot_frame(surface, plot_rect)
-            points = self._embedding_for_algorithm(algorithm_index)
-            self._draw_points(surface, plot_rect, points, radius=5)
-            label_color = ACCENT if algorithm_index == self.algorithm_index else MUTED_TEXT
+            if visible:
+                self._draw_points(surface, plot_rect, points, radius=5)
+            label_color = (
+                ACCENT
+                if label == self.algorithm or (label == "Raw" and self.show_raw_layout)
+                else MUTED_TEXT
+            )
             self._draw_text(
                 surface,
-                ALGORITHMS[algorithm_index],
+                label,
                 (plot_rect.x, plot_rect.y - 24),
                 self._font_small,
                 label_color,
@@ -307,6 +320,10 @@ class TSNEUMAPExplorationScene:
             ("seed", str(self.seed_index)),
             (self._label("local trust", "local trust"), f"{self._local_trust_score():.0%}"),
             (self._label("global spread", "global spread"), f"{self._global_spread_score():.0%}"),
+            (
+                self._label("raw layout", "raw layout"),
+                self._label("on", "wł.") if self.show_raw_layout else self._label("off", "wył."),
+            ),
             (
                 self._label("links", "linie"),
                 self._label("on", "wł.") if self.show_links else self._label("off", "wył."),
@@ -396,6 +413,16 @@ class TSNEUMAPExplorationScene:
         ys = [point[1] for point in points]
         spread = ((max(xs) - min(xs)) + (max(ys) - min(ys))) / 4
         return max(0.0, min(1.0, spread))
+
+    def _comparison_plot_rects(
+        self, rect: pygame.Rect
+    ) -> tuple[pygame.Rect, pygame.Rect, pygame.Rect]:
+        """Return mini plot rectangles for raw, t-SNE, and UMAP comparisons."""
+        return (
+            pygame.Rect(rect.x + 30, rect.y + 78, rect.width - 60, 86),
+            pygame.Rect(rect.x + 30, rect.y + 206, rect.width - 60, 86),
+            pygame.Rect(rect.x + 30, rect.y + 334, rect.width - 60, 86),
+        )
 
     def _draw_neighbor_links(
         self,
