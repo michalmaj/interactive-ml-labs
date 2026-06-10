@@ -44,12 +44,13 @@ def test_registry_groups_demos_by_level() -> None:
     assert {demo.level for demo in level_three_demos} == {3}
     assert len(level_one_demos) >= 4
     assert len(level_two_demos) >= 2
-    assert len(level_three_demos) == 5
+    assert len(level_three_demos) == 6
     assert level_three_demos[0].id == "clustering_lab"
     assert level_three_demos[1].id == "pca_lab"
     assert level_three_demos[2].id == "model_comparison_lab"
     assert level_three_demos[3].id == "calibration_lab"
-    assert level_three_demos[4].id == "level_3_coming_soon"
+    assert level_three_demos[4].id == "tsne_umap_exploration_lab"
+    assert level_three_demos[5].id == "level_3_coming_soon"
 
 
 def test_level_three_placeholder_describes_future_advanced_demos() -> None:
@@ -263,6 +264,46 @@ def test_calibration_manifest_sets_fourth_level_three_demo_contract() -> None:
     assert "T" in text
 
 
+def test_tsne_umap_manifest_sets_fifth_level_three_demo_contract() -> None:
+    """t-SNE / UMAP Exploration Lab should define the next planned Level 3 contract."""
+    manifest = DEMO_BY_ID["tsne_umap_exploration_lab"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(entry.term for entry in manifest.theory.glossary),
+        ],
+    )
+
+    assert manifest.level == 3
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Planowany lab zaawansowany"
+    assert manifest.tags == (
+        "tsne",
+        "umap",
+        "embedding",
+        "dimensionality-reduction",
+        "visualization",
+    )
+    assert "t-SNE / UMAP Exploration Lab" in text
+    assert "embedding" in text
+    assert "perplexity" in text
+    assert "neighbors" in text
+    assert "seed" in text
+    assert "local neighborhoods" in text
+    assert "global structure" in text
+    assert "Enter" in text
+    assert "T" in text
+
+
 def test_manifests_have_required_teaching_content() -> None:
     """Every manifest should include content used by generated intro screens."""
     for manifest in DEMO_MANIFESTS:
@@ -361,6 +402,10 @@ def test_manifests_have_in_app_theory_content() -> None:
                 "accuracy@0.5",
                 "worst gap",
             ),
+        ),
+        (
+            "tsne_umap_exploration_lab",
+            ("t-SNE", "UMAP", "embedding", "perplexity", "neighbors"),
         ),
     ],
 )

@@ -112,6 +112,10 @@ It also includes the first real Level 3 labs:
 - Model Comparison Lab, with Logistic Regression, k-NN, and Decision Tree previews on shared datasets, active model parameters, train/test accuracy, compact confusion details, and highlighted misclassified test points.
 - Calibration Lab, with overconfident, underconfident, and better calibrated presets, a reliability diagram, score distribution, raw-vs-scaled score reference with a compact legend, accuracy@0.5, Brier score, ECE, worst-gap highlighting, calibration gap error bars, and temperature scaling.
 
+It also includes a planning placeholder for the next Level 3 prototype:
+
+- t-SNE / UMAP Exploration Lab, with objectives, controls, lesson notes, glossary, and mini-challenges ready for the first native scene slice.
+
 The original Level 1 and Level 2 demos can still be run as standalone commands. The unified app is the recommended path for students, while standalone entry points remain part of the supported development and teaching workflow.
 
 ## Next milestones
