@@ -89,7 +89,7 @@ def test_tsne_umap_scene_tunes_neighbors_and_seed(monkeypatch) -> None:
 
 
 def test_tsne_umap_scene_toggles_links_and_resets(monkeypatch) -> None:
-    """L should toggle links and R should restore defaults."""
+    """L/O should toggle helpers and R should restore defaults."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     pygame.init()
 
@@ -97,16 +97,19 @@ def test_tsne_umap_scene_toggles_links_and_resets(monkeypatch) -> None:
         scene = create_tsne_umap_exploration_scene(AppContext())
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_l))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_o))
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
 
         assert scene.show_links is False
+        assert scene.show_raw_layout is False
         assert scene.algorithm == "UMAP"
         assert scene.preset_index == 1
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_r))
 
         assert scene.show_links is True
+        assert scene.show_raw_layout is True
         assert scene.algorithm == "t-SNE"
         assert scene.preset_index == 0
         assert scene.neighbor_index == DEFAULT_NEIGHBOR_INDEX
@@ -132,6 +135,26 @@ def test_tsne_umap_scene_reports_embedding_scores(monkeypatch) -> None:
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
 
         assert scene._global_spread_score() != spread
+    finally:
+        pygame.quit()
+
+
+def test_tsne_umap_comparison_panel_has_three_non_overlapping_plots(monkeypatch) -> None:
+    """Comparison panel should reserve space for raw, t-SNE, and UMAP mini plots."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_tsne_umap_exploration_scene(AppContext())
+        panel_rect = pygame.Rect(638, 132, 286, 474)
+        raw_rect, tsne_rect, umap_rect = scene._comparison_plot_rects(panel_rect)
+
+        assert raw_rect.bottom < tsne_rect.top
+        assert tsne_rect.bottom < umap_rect.top
+        assert umap_rect.bottom <= panel_rect.bottom - 54
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_o))
+        assert scene.show_raw_layout is False
     finally:
         pygame.quit()
 

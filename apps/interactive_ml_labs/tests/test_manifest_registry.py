@@ -307,6 +307,9 @@ def test_tsne_umap_manifest_sets_fifth_level_three_demo_contract() -> None:
     assert "- / =" in text
     assert "S" in text
     assert "L" in text
+    assert "O" in text
+    assert "raw" in text
+    assert "high-dimensional" in text
     assert "R" in text
     assert "T" in text
 

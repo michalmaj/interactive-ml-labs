@@ -114,7 +114,7 @@ It also includes the first real Level 3 labs:
 
 It also includes the first native slice for the next Level 3 prototype:
 
-- t-SNE / UMAP Exploration Lab, with deterministic toy embeddings, dataset presets, t-SNE/UMAP comparison, seed control, neighborhood tuning, and local-neighbor links.
+- t-SNE / UMAP Exploration Lab, with deterministic toy embeddings, raw-vs-embedding comparison, dataset presets, t-SNE/UMAP comparison, seed control, neighborhood tuning, and local-neighbor links.
 
 The original Level 1 and Level 2 demos can still be run as standalone commands. The unified app is the recommended path for students, while standalone entry points remain part of the supported development and teaching workflow.
 
