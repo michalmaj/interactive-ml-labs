@@ -48,6 +48,25 @@ def test_tsne_umap_scene_handles_events_without_navigation(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_tsne_umap_scene_labels_active_parameter(monkeypatch) -> None:
+    """The side panel should name the parameter used by the active algorithm."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_tsne_umap_exploration_scene(AppContext())
+
+        assert scene.algorithm == "t-SNE"
+        assert scene.parameter_label == "perplexity"
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        assert scene.algorithm == "UMAP"
+        assert scene.parameter_label == "neighbors"
+    finally:
+        pygame.quit()
+
+
 def test_tsne_umap_scene_switches_dataset_presets(monkeypatch) -> None:
     """Number keys should switch deterministic data presets."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")

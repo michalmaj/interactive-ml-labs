@@ -3324,8 +3324,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ControlBinding(
                 key="- / =",
                 action=LocalizedText(
-                    en="decrease or increase neighborhood parameter",
-                    pl="zmniejsz albo zwiększ parametr sąsiedztwa",
+                    en="decrease or increase perplexity / neighbors",
+                    pl="zmniejsz albo zwiększ perplexity / neighbors",
                 ),
             ),
             ControlBinding(
