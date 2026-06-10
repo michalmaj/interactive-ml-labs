@@ -278,17 +278,12 @@ class TSNEUMAPExplorationScene:
             self._draw_plot_frame(surface, plot_rect)
             if visible:
                 self._draw_points(surface, plot_rect, points, radius=5)
-            label_color = (
-                ACCENT
-                if label == self.algorithm or (label == "Raw" and self.show_raw_layout)
-                else MUTED_TEXT
-            )
             self._draw_text(
                 surface,
                 label,
                 (plot_rect.x, plot_rect.y - 24),
                 self._font_small,
-                label_color,
+                self._comparison_label_color(label),
             )
         caption_rect = self._comparison_caption_rect(rect)
         self._draw_wrapped(
@@ -467,10 +462,16 @@ class TSNEUMAPExplorationScene:
     ) -> tuple[pygame.Rect, pygame.Rect, pygame.Rect]:
         """Return mini plot rectangles for raw, t-SNE, and UMAP comparisons."""
         return (
-            pygame.Rect(rect.x + 30, rect.y + 78, rect.width - 60, 86),
-            pygame.Rect(rect.x + 30, rect.y + 206, rect.width - 60, 86),
-            pygame.Rect(rect.x + 30, rect.y + 302, rect.width - 60, 78),
+            pygame.Rect(rect.x + 30, rect.y + 78, rect.width - 60, 76),
+            pygame.Rect(rect.x + 30, rect.y + 194, rect.width - 60, 76),
+            pygame.Rect(rect.x + 30, rect.y + 310, rect.width - 60, 68),
         )
+
+    def _comparison_label_color(self, label: str) -> tuple[int, int, int]:
+        """Return label color for comparison mini plots."""
+        if label == self.algorithm:
+            return ACCENT
+        return MUTED_TEXT
 
     def _comparison_caption_rect(self, rect: pygame.Rect) -> pygame.Rect:
         """Return the caption area below comparison mini plots."""
