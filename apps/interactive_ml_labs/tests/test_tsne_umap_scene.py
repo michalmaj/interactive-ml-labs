@@ -5,7 +5,9 @@ from interactive_ml_labs.display import DEFAULT_RESOLUTION
 from interactive_ml_labs.scene import FixedSizeScene, SceneCommandKind
 from interactive_ml_labs.settings import AppContext
 from interactive_ml_labs.tsne_umap_scene import (
+    ACCENT,
     DEFAULT_NEIGHBOR_INDEX,
+    MUTED_TEXT,
     NEIGHBOR_VALUES,
     PRESETS,
     TSNEUMAPExplorationScene,
@@ -169,11 +171,20 @@ def test_tsne_umap_comparison_panel_has_three_non_overlapping_plots(monkeypatch)
         panel_rect = pygame.Rect(638, 132, 286, 474)
         raw_rect, tsne_rect, umap_rect = scene._comparison_plot_rects(panel_rect)
         caption_rect = scene._comparison_caption_rect(panel_rect)
+        raw_label_y = raw_rect.y - 24
+        tsne_label_y = tsne_rect.y - 24
+        umap_label_y = umap_rect.y - 24
 
+        assert raw_label_y > panel_rect.y + 48
         assert raw_rect.bottom < tsne_rect.top
+        assert raw_rect.bottom + 16 <= tsne_label_y
         assert tsne_rect.bottom < umap_rect.top
+        assert tsne_rect.bottom + 16 <= umap_label_y
         assert umap_rect.bottom + 32 <= caption_rect.top
         assert caption_rect.bottom < panel_rect.bottom
+        assert scene._comparison_label_color("Raw") == MUTED_TEXT
+        assert scene._comparison_label_color("t-SNE") == ACCENT
+        assert scene._comparison_label_color("UMAP") == MUTED_TEXT
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_o))
         assert scene.show_raw_layout is False
