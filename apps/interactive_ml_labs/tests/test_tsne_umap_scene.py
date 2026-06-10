@@ -139,6 +139,7 @@ def test_tsne_umap_scene_tunes_neighbors_and_seed(monkeypatch) -> None:
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_s))
         assert scene.seed_index == 1
+        assert scene._seed_label() == "1 · variant 1"
 
         for _ in range(10):
             scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
@@ -173,6 +174,7 @@ def test_tsne_umap_scene_toggles_links_and_resets(monkeypatch) -> None:
         assert scene.preset_index == 0
         assert scene.neighbor_index == DEFAULT_NEIGHBOR_INDEX
         assert scene.seed_index == 0
+        assert scene._seed_label() == "0 · baseline"
     finally:
         pygame.quit()
 

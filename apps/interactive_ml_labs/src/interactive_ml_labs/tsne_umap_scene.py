@@ -338,7 +338,7 @@ class TSNEUMAPExplorationScene:
         rows = (
             (self._label("algorithm", "algorytm"), self.algorithm),
             (self.parameter_label, str(self.neighbors)),
-            ("seed", str(self.seed_index)),
+            ("seed", self._seed_label()),
             (
                 self._label("local trust", "local trust"),
                 self._format_score(self._local_trust_score()),
@@ -488,6 +488,14 @@ class TSNEUMAPExplorationScene:
         return self._label(
             "Neighbors controls how strongly UMAP smooths local detail into broader structure.",
             "Neighbors kontroluje, jak mocno UMAP wygładza lokalny detal w szerszą strukturę.",
+        )
+
+    def _seed_label(self) -> str:
+        if self.seed_index == 0:
+            return self._label("0 · baseline", "0 · baseline")
+        return self._label(
+            f"{self.seed_index} · variant {self.seed_index}",
+            f"{self.seed_index} · wariant {self.seed_index}",
         )
 
     def _format_score(self, score: float) -> str:
