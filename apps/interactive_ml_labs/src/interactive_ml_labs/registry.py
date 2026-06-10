@@ -369,6 +369,38 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
         ),
     ),
+    "tsne_umap_exploration_lab": (
+        LocalizedText(
+            en=(
+                "Sketch which high-dimensional structure should stay visible after "
+                "projection: local neighborhoods, clusters, or broad separation."
+            ),
+            pl=(
+                "Naszkicuj, która struktura z wielu wymiarów powinna zostać widoczna "
+                "po projekcji: lokalne sąsiedztwa, klastry czy szeroki podział."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Compare what t-SNE and UMAP are usually trusted for, and where "
+                "students should avoid over-reading distances."
+            ),
+            pl=(
+                "Porównaj, do czego zwykle ufa się t-SNE i UMAP, a gdzie studenci "
+                "nie powinni nadinterpretować odległości."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Plan the first controls: dataset preset, perplexity or neighbors, "
+                "random seed, and a way to compare embeddings."
+            ),
+            pl=(
+                "Zaplanuj pierwsze kontrolki: preset danych, perplexity albo neighbors, "
+                "random seed i sposób porównywania embeddingów."
+            ),
+        ),
+    ),
     "level_3_coming_soon": (
         LocalizedText(
             en=(
@@ -798,6 +830,47 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                 pl=(
                     "Accuracy klasyfikacji po zamianie probability scores na etykiety "
                     "przez decision threshold 0.5."
+                ),
+            ),
+        ),
+    ),
+    "tsne_umap_exploration_lab": (
+        GlossaryTerm(
+            term="embedding",
+            definition=LocalizedText(
+                en=(
+                    "A lower-dimensional representation that tries to preserve useful "
+                    "relationships from the original feature space."
+                ),
+                pl=(
+                    "Reprezentacja w mniejszej liczbie wymiarów, która próbuje zachować "
+                    "przydatne relacje z oryginalnej przestrzeni cech."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="t-SNE",
+            definition=LocalizedText(
+                en=(
+                    "A nonlinear dimensionality reduction method often used to inspect "
+                    "local neighborhoods in high-dimensional data."
+                ),
+                pl=(
+                    "Nieliniowa metoda dimensionality reduction, często używana do "
+                    "oglądania lokalnych sąsiedztw w danych wielowymiarowych."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="UMAP",
+            definition=LocalizedText(
+                en=(
+                    "A nonlinear embedding method that often preserves more global "
+                    "structure than t-SNE while still focusing on neighborhoods."
+                ),
+                pl=(
+                    "Nieliniowa metoda embeddingu, która często lepiej zachowuje "
+                    "globalną strukturę niż t-SNE, nadal skupiając się na sąsiedztwach."
                 ),
             ),
         ),
@@ -3188,6 +3261,187 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         ),
     ),
     _placeholder_demo(
+        demo_id="tsne_umap_exploration_lab",
+        level=3,
+        title_en="t-SNE / UMAP Exploration Lab",
+        title_pl="t-SNE / UMAP Exploration Lab",
+        summary_en=(
+            "Plan an interactive embedding lab for comparing local neighborhoods, "
+            "global structure, and projection stability."
+        ),
+        summary_pl=(
+            "Plan interaktywnego labu embeddingów do porównywania lokalnych sąsiedztw, "
+            "globalnej struktury i stabilności projekcji."
+        ),
+        objectives=(
+            LocalizedText(
+                en=(
+                    "Compare how nonlinear embeddings can reveal neighborhoods in "
+                    "high-dimensional data."
+                ),
+                pl=(
+                    "Porównaj, jak nieliniowe embeddingi mogą pokazywać sąsiedztwa "
+                    "w danych wielowymiarowych."
+                ),
+            ),
+            LocalizedText(
+                en=(
+                    "Decide which controls should come first: perplexity, neighbors, "
+                    "seed, and dataset preset."
+                ),
+                pl=(
+                    "Ustal, które kontrolki powinny wejść jako pierwsze: perplexity, "
+                    "neighbors, seed i preset danych."
+                ),
+            ),
+            LocalizedText(
+                en=(
+                    "Keep the lesson honest about what distances and clusters in a "
+                    "2D embedding can and cannot prove."
+                ),
+                pl=(
+                    "Pilnuj, żeby lekcja uczciwie mówiła, co odległości i klastry "
+                    "w embeddingu 2D mogą, a czego nie mogą dowodzić."
+                ),
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="Enter",
+                action=LocalizedText(
+                    en="open the planning placeholder",
+                    pl="otwórz placeholder planu",
+                ),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read the t-SNE / UMAP planning lesson",
+                    pl="przeczytaj lekcję planowania t-SNE / UMAP",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(en="open the help overlay", pl="otwórz pomoc"),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        difficulty=LocalizedText(en="Planned advanced lab", pl="Planowany lab zaawansowany"),
+        tags=("tsne", "umap", "embedding", "dimensionality-reduction", "visualization"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(
+                        en="Why this lab belongs in Level 3", pl="Dlaczego Level 3"
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "t-SNE and UMAP are useful precisely because they are not "
+                                "simple linear projections. That power also makes them easy "
+                                "to misread."
+                            ),
+                            pl=(
+                                "t-SNE i UMAP są użyteczne właśnie dlatego, że nie są prostą "
+                                "projekcją liniową. Ta siła sprawia też, że łatwo je źle odczytać."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The first real slice should make the trade-off visible: "
+                                "local neighborhoods can look clear even when global distances "
+                                "are not directly comparable."
+                            ),
+                            pl=(
+                                "Pierwszy prawdziwy wycinek powinien pokazać kompromis: "
+                                "lokalne sąsiedztwa mogą być czytelne, nawet gdy globalnych "
+                                "odległości nie da się porównywać wprost."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(
+                        en="Planned first controls", pl="Plan pierwszych kontrolek"
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "A narrow first slice can start with fixed synthetic datasets, "
+                                "a seed control, and one main neighborhood parameter."
+                            ),
+                            pl=(
+                                "Wąski pierwszy wycinek może zacząć od stałych syntetycznych "
+                                "datasetów, kontroli seed i jednego głównego parametru sąsiedztwa."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "For t-SNE that parameter can be perplexity; for UMAP it can "
+                                "be number of neighbors."
+                            ),
+                            pl=(
+                                "Dla t-SNE tym parametrem może być perplexity; dla UMAP liczba "
+                                "neighbors."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What students should compare", pl="Co porównywać"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Students should compare whether nearby points stay nearby, "
+                                "whether clusters split or merge, and whether a different seed "
+                                "changes the story."
+                            ),
+                            pl=(
+                                "Studenci powinni porównywać, czy bliskie punkty pozostają "
+                                "blisko, czy klastry się dzielą lub łączą oraz czy inny seed "
+                                "zmienia opowieść."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The lab should avoid claiming that every 2D distance reflects "
+                                "a true high-dimensional distance."
+                            ),
+                            pl=(
+                                "Lab nie powinien sugerować, że każda odległość 2D odpowiada "
+                                "prawdziwej odległości w wielu wymiarach."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to add next", pl="Co dodać później"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "The next PR can add the native scene skeleton with deterministic "
+                                "toy embeddings before pulling in any heavier algorithm dependency."
+                            ),
+                            pl=(
+                                "Następny PR może dodać szkielet natywnej sceny "
+                                "z deterministycznymi toy embeddingami, zanim dołożymy "
+                                "cięższe dependency algorytmiczne."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["tsne_umap_exploration_lab"],
+            glossary=LESSON_GLOSSARY["tsne_umap_exploration_lab"],
+        ),
+    ),
+    _placeholder_demo(
         demo_id="level_3_coming_soon",
         level=3,
         title_en="Coming Soon: Advanced Experiments",
@@ -3209,10 +3463,9 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
             LocalizedText(
-                en="Keep the guided app shape visible before the first Level 3 demo lands.",
+                en="Keep the guided app shape visible as more focused Level 3 demos land.",
                 pl=(
-                    "Pokaż docelowy kształt aplikacji, zanim pojawi się "
-                    "pierwsze właściwe demo Level 3."
+                    "Pokaż docelowy kształt aplikacji, gdy dochodzą kolejne konkretne dema Level 3."
                 ),
             ),
             LocalizedText(
