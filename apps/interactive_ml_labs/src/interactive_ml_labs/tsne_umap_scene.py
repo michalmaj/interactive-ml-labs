@@ -172,6 +172,13 @@ class TSNEUMAPExplorationScene:
         """Return the active neighborhood parameter."""
         return NEIGHBOR_VALUES[self.neighbor_index]
 
+    @property
+    def parameter_label(self) -> str:
+        """Return the active algorithm parameter name."""
+        if self.algorithm == "t-SNE":
+            return "perplexity"
+        return "neighbors"
+
     def handle_event(self, event: object) -> SceneCommand:
         """Handle one input event."""
         if isinstance(event, pygame.event.Event) and event.type == pygame.KEYDOWN:
@@ -312,7 +319,7 @@ class TSNEUMAPExplorationScene:
         y = rect.y + 68
         rows = (
             (self._label("algorithm", "algorytm"), self.algorithm),
-            (self._label("neighbors", "neighbors"), str(self.neighbors)),
+            (self.parameter_label, str(self.neighbors)),
             ("seed", str(self.seed_index)),
             (
                 self._label("local trust", "local trust"),

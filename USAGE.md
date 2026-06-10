@@ -113,7 +113,7 @@ t-SNE / UMAP Exploration Lab controls:
 | ----------- | ------ |
 | `1-3` | Switch dataset preset |
 | `M` | Switch t-SNE / UMAP preview |
-| `-` / `=` | Change neighborhood parameter |
+| `-` / `=` | Change perplexity / neighbors |
 | `S` | Change deterministic seed |
 | `L` | Show or hide local-neighbor links |
 | `O` | Show or hide raw high-dimensional layout |
