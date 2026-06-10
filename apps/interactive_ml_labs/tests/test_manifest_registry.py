@@ -303,6 +303,9 @@ def test_tsne_umap_manifest_sets_fifth_level_three_demo_contract() -> None:
     assert "local neighborhoods" in text
     assert "Local trust" in text
     assert "Global spread" in text
+    assert "seed drift" in text
+    assert "color legend" in text
+    assert "Dataset cues" in text
     assert "global structure" in text
     assert "1-3" in text
     assert "M" in text

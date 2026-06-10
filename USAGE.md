@@ -44,7 +44,7 @@ The unified app also includes app-only Level 3 labs:
 - PCA Lab demonstrates dataset/noise controls, manual projection rotation, fitted PCA direction, explained variance, reconstruction residuals, and reconstruction error.
 - Model Comparison Lab demonstrates Logistic Regression, k-NN, and Decision Tree assumptions on shared datasets, with train/test scores, compact confusion details, and highlighted test errors.
 - Calibration Lab demonstrates probability calibration with reliability diagrams, score distributions, a raw-vs-scaled score legend, accuracy@0.5, Brier score, ECE, worst-gap highlighting, calibration gap error bars, and temperature scaling.
-- t-SNE / UMAP Exploration Lab demonstrates deterministic toy embeddings, t-SNE/UMAP comparison, seed changes, neighborhood tuning, and local-neighbor links.
+- t-SNE / UMAP Exploration Lab demonstrates deterministic toy embeddings, raw-vs-embedding comparison, dataset cues, class labels, seed drift, neighborhood tuning, and local-neighbor links.
 
 Common shell controls:
 

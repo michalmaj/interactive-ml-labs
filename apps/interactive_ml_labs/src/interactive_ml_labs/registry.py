@@ -3433,6 +3433,16 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "neighbors."
                             ),
                         ),
+                        LocalizedText(
+                            en=(
+                                "The scene now labels seed 0 as the baseline and reports seed "
+                                "drift for variant layouts."
+                            ),
+                            pl=(
+                                "Scena opisuje seed 0 jako baseline i pokazuje seed drift "
+                                "dla wariantów układu."
+                            ),
+                        ),
                     ),
                 ),
                 TheorySection(
@@ -3458,6 +3468,17 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "Global spread mówi, jak mocno embedding wykorzystuje przestrzeń "
                                 "2D. To dobra wskazówka do czytania wykresu, ale nie dowód, "
                                 "że globalne odległości są wierne."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The color legend names the synthetic labels. It helps students "
+                                "separate label information from the geometry created by the "
+                                "embedding."
+                            ),
+                            pl=(
+                                "Legenda kolorów nazywa syntetyczne etykiety. Pomaga oddzielić "
+                                "informację o labelach od geometrii tworzonej przez embedding."
                             ),
                         ),
                     ),
@@ -3495,6 +3516,16 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             pl=(
                                 "Traktuj raw layout tylko jako punkt odniesienia: to uproszczona "
                                 "projekcja toy danych, a nie ground truth."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Dataset cues point to the intended question for each preset: "
+                                "clean separation, bridge points, or nested neighborhoods."
+                            ),
+                            pl=(
+                                "Wskazówki datasetów pokazują pytanie dla każdego presetu: "
+                                "czysty podział, punkty mostu albo zagnieżdżone sąsiedztwa."
                             ),
                         ),
                     ),
