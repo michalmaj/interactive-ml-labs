@@ -1050,6 +1050,19 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                 ),
             ),
         ),
+        GlossaryTerm(
+            term="first alert",
+            definition=LocalizedText(
+                en=(
+                    "The first time step where a monitored signal crosses the alert "
+                    "threshold and deserves a closer look."
+                ),
+                pl=(
+                    "Pierwszy moment, w którym monitorowany sygnał przekracza alert "
+                    "threshold i warto mu się przyjrzeć."
+                ),
+            ),
+        ),
     ),
     "level_3_coming_soon": (
         GlossaryTerm(
@@ -3873,11 +3886,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                         LocalizedText(
                             en=(
                                 "The goal is to teach inspection before automation: "
-                                "students should explain why an alert fired."
+                                "students should explain why an alert fired and where "
+                                "the first alert appeared."
                             ),
                             pl=(
                                 "Celem jest uczenie inspekcji przed automatyzacją: "
-                                "student powinien umieć wyjaśnić, dlaczego alert zadziałał."
+                                "student powinien umieć wyjaśnić, dlaczego alert zadziałał "
+                                "i gdzie pojawił się pierwszy alert."
                             ),
                         ),
                     ),
