@@ -1063,6 +1063,19 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                 ),
             ),
         ),
+        GlossaryTerm(
+            term="severity",
+            definition=LocalizedText(
+                en=(
+                    "A rough label for how far the current window has moved away from "
+                    "baseline after an alert fires."
+                ),
+                pl=(
+                    "Prosta etykieta mówiąca, jak mocno current window odjechało "
+                    "od baseline po uruchomieniu alertu."
+                ),
+            ),
+        ),
     ),
     "level_3_coming_soon": (
         GlossaryTerm(
@@ -3883,11 +3896,12 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                         LocalizedText(
                             en=(
                                 "A first slice can show a time series, a baseline window, "
-                                "a current window, and one alert threshold."
+                                "a current window, one alert threshold, and a simple "
+                                "severity label."
                             ),
                             pl=(
                                 "Pierwszy wycinek może pokazać szereg czasowy, baseline window, "
-                                "current window i jeden alert threshold."
+                                "current window, jeden alert threshold i prostą etykietę severity."
                             ),
                         ),
                         LocalizedText(
