@@ -45,6 +45,7 @@ The unified app also includes app-only Level 3 labs:
 - Model Comparison Lab demonstrates Logistic Regression, k-NN, and Decision Tree assumptions on shared datasets, with train/test scores, compact confusion details, and highlighted test errors.
 - Calibration Lab demonstrates probability calibration with reliability diagrams, score distributions, a raw-vs-scaled score legend, accuracy@0.5, Brier score, ECE, worst-gap highlighting, calibration gap error bars, and temperature scaling.
 - t-SNE / UMAP Exploration Lab demonstrates deterministic toy embeddings, raw-vs-embedding comparison, dataset cues, class labels, seed drift, neighborhood tuning, and local-neighbor links.
+- Model Monitoring Drift Lab is a coming-soon Level 3 planning slot for data drift, metric drift, monitoring windows, and alert thresholds.
 
 Common shell controls:
 

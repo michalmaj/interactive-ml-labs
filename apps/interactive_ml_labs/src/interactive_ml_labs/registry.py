@@ -412,6 +412,38 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
         ),
     ),
+    "model_monitoring_drift_lab": (
+        LocalizedText(
+            en=(
+                "Describe one signal that would make you distrust a model that still "
+                "looked good during training."
+            ),
+            pl=(
+                "Opisz jeden sygnał, przez który przestałbyś ufać modelowi, "
+                "mimo że dobrze wyglądał podczas treningu."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Compare data drift with metric drift. Decide which one would be visible "
+                "first in a dashboard."
+            ),
+            pl=(
+                "Porównaj data drift z metric drift. Ustal, który z nich byłby "
+                "widoczny jako pierwszy w dashboardzie."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Sketch a monitoring window and mark where an alert should become "
+                "useful instead of noisy."
+            ),
+            pl=(
+                "Naszkicuj monitoring window i zaznacz, kiedy alert staje się "
+                "użyteczny zamiast szumieć."
+            ),
+        ),
+    ),
     "level_3_coming_soon": (
         LocalizedText(
             en=(
@@ -960,6 +992,60 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                 pl=(
                     "Uproszczony widok referencyjny toy danych przed porównaniem "
                     "embeddingów t-SNE i UMAP."
+                ),
+            ),
+        ),
+    ),
+    "model_monitoring_drift_lab": (
+        GlossaryTerm(
+            term="data drift",
+            definition=LocalizedText(
+                en=(
+                    "A change in the input data distribution after deployment; "
+                    "it can make old model assumptions stale."
+                ),
+                pl=(
+                    "Zmiana rozkładu danych wejściowych po wdrożeniu; może sprawić, "
+                    "że stare założenia modelu przestaną pasować."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="metric drift",
+            definition=LocalizedText(
+                en=(
+                    "A change in model quality metrics over time, such as accuracy, "
+                    "error rate, calibration, or latency."
+                ),
+                pl=(
+                    "Zmiana metryk jakości modelu w czasie, na przykład accuracy, "
+                    "error rate, calibration albo latency."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="monitoring window",
+            definition=LocalizedText(
+                en=(
+                    "The recent slice of production data used to compare current behavior "
+                    "with a baseline period."
+                ),
+                pl=(
+                    "Najnowszy wycinek danych produkcyjnych używany do porównania "
+                    "obecnego zachowania z okresem baseline."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="alert threshold",
+            definition=LocalizedText(
+                en=(
+                    "A boundary where a monitored signal becomes large enough to deserve "
+                    "attention or investigation."
+                ),
+                pl=(
+                    "Granica, przy której monitorowany sygnał jest na tyle duży, "
+                    "że warto go sprawdzić."
                 ),
             ),
         ),
@@ -3631,6 +3717,147 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["tsne_umap_exploration_lab"],
             glossary=LESSON_GLOSSARY["tsne_umap_exploration_lab"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="model_monitoring_drift_lab",
+        level=3,
+        title_en="Coming Soon: Model Monitoring Drift Lab",
+        title_pl="Coming soon: Model Monitoring Drift Lab",
+        summary_en=("A planned Level 3 lab for watching model behavior change after deployment."),
+        summary_pl=(
+            "Planowany lab Level 3 o obserwowaniu, jak zachowanie modelu zmienia się po wdrożeniu."
+        ),
+        objectives=(
+            LocalizedText(
+                en="Compare data drift with metric drift in a production-style workflow.",
+                pl="Porównaj data drift z metric drift w workflow podobnym do produkcji.",
+            ),
+            LocalizedText(
+                en=(
+                    "Decide which signals should become alerts and which should remain "
+                    "context for investigation."
+                ),
+                pl=(
+                    "Ustal, które sygnały powinny stać się alertami, a które tylko "
+                    "kontekstem do analizy."
+                ),
+            ),
+            LocalizedText(
+                en="Plan a visual dashboard that explains change over time without panic.",
+                pl="Zaplanuj dashboard, który pokazuje zmianę w czasie bez siania paniki.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="Enter",
+                action=LocalizedText(
+                    en="open the monitoring placeholder scene",
+                    pl="otwórz placeholder monitoringu",
+                ),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read model monitoring planning notes",
+                    pl="przeczytaj notatki o planie monitoringu modeli",
+                ),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="go back to the demo list",
+                    pl="wróć do listy dem",
+                ),
+            ),
+        ),
+        difficulty=LocalizedText(en="Planned advanced lab", pl="Planowany lab zaawansowany"),
+        tags=("monitoring", "drift", "production-ml", "evaluation", "level-3"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(
+                        en="Why monitoring belongs in Level 3",
+                        pl="Dlaczego monitoring pasuje do Level 3",
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Training metrics tell only the beginning of the story. "
+                                "After deployment, data and behavior can change."
+                            ),
+                            pl=(
+                                "Metryki treningowe opowiadają tylko początek historii. "
+                                "Po wdrożeniu dane i zachowanie modelu mogą się zmieniać."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A good monitoring lab should make time, baselines, and "
+                                "alerts visible without pretending every wiggle is a crisis."
+                            ),
+                            pl=(
+                                "Dobry lab monitoringu powinien pokazywać czas, baseline "
+                                "i alerty bez udawania, że każde drgnięcie jest kryzysem."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to watch", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Data drift asks whether production inputs still resemble "
+                                "the baseline period."
+                            ),
+                            pl=(
+                                "Data drift pyta, czy wejścia produkcyjne nadal przypominają "
+                                "okres baseline."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Metric drift asks whether model behavior is changing: "
+                                "quality, calibration, latency, or error mix."
+                            ),
+                            pl=(
+                                "Metric drift pyta, czy zmienia się zachowanie modelu: "
+                                "jakość, calibration, latency albo struktura błędów."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(
+                        en="First prototype shape", pl="Kształt pierwszego prototypu"
+                    ),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "A first slice can show a time series, a baseline window, "
+                                "a current window, and one alert threshold."
+                            ),
+                            pl=(
+                                "Pierwszy wycinek może pokazać szereg czasowy, baseline window, "
+                                "current window i jeden alert threshold."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The goal is to teach inspection before automation: "
+                                "students should explain why an alert fired."
+                            ),
+                            pl=(
+                                "Celem jest uczenie inspekcji przed automatyzacją: "
+                                "student powinien umieć wyjaśnić, dlaczego alert zadziałał."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["model_monitoring_drift_lab"],
+            glossary=LESSON_GLOSSARY["model_monitoring_drift_lab"],
         ),
     ),
     _placeholder_demo(

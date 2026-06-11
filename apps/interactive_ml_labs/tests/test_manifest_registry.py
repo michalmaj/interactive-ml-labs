@@ -45,13 +45,14 @@ def test_registry_groups_demos_by_level() -> None:
     assert {demo.level for demo in level_three_demos} == {3}
     assert len(level_one_demos) >= 4
     assert len(level_two_demos) >= 2
-    assert len(level_three_demos) == 6
+    assert len(level_three_demos) == 7
     assert level_three_demos[0].id == "clustering_lab"
     assert level_three_demos[1].id == "pca_lab"
     assert level_three_demos[2].id == "model_comparison_lab"
     assert level_three_demos[3].id == "calibration_lab"
     assert level_three_demos[4].id == "tsne_umap_exploration_lab"
-    assert level_three_demos[5].id == "level_3_coming_soon"
+    assert level_three_demos[5].id == "model_monitoring_drift_lab"
+    assert level_three_demos[6].id == "level_3_coming_soon"
 
 
 def test_level_three_placeholder_describes_future_advanced_demos() -> None:
@@ -77,6 +78,39 @@ def test_level_three_placeholder_describes_future_advanced_demos() -> None:
     assert "Coming soon" in text
     assert manifest.difficulty.pl == "W przygotowaniu"
     assert manifest.tags == ("level-3", "showcase", "planning")
+
+
+def test_model_monitoring_placeholder_describes_next_level_three_candidate() -> None:
+    """Model Monitoring Drift Lab should define the next planned Level 3 direction."""
+    manifest = DEMO_BY_ID["model_monitoring_drift_lab"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(challenge.en for challenge in manifest.theory.mini_challenges),
+            *(entry.term for entry in manifest.theory.glossary),
+        ],
+    )
+
+    assert manifest.level == 3
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Planowany lab zaawansowany"
+    assert manifest.tags == ("monitoring", "drift", "production-ml", "evaluation", "level-3")
+    assert "Model Monitoring Drift Lab" in text
+    assert "data drift" in text
+    assert "metric drift" in text
+    assert "monitoring window" in text
+    assert "alert threshold" in text
+    assert "baseline" in text
+    assert "T" in text
 
 
 def test_clustering_manifest_sets_first_level_three_demo_contract() -> None:
