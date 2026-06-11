@@ -231,7 +231,7 @@ class ModelMonitoringDriftScene:
             (self._label("first alert", "pierwszy alert"), self._first_alert_label()),
             (self._label("baseline mean", "baseline mean"), f"{self._window_mean(0):.0%}"),
             (self._label("current mean", "current mean"), f"{self._window_mean(-1):.0%}"),
-            (self._label("alert", "alert"), self._alert_state_label()),
+            (self._label("severity", "severity"), self._severity_label()),
             (self._label("investigation", "analiza"), self._investigation_state_label()),
         )
         y = rect.y + 68
@@ -299,10 +299,20 @@ class ModelMonitoringDriftScene:
             return self._label("none", "brak")
         return f"t{first_alert_index}"
 
-    def _alert_state_label(self) -> str:
-        if self._alert_active():
-            return self._label("on", "wł.")
-        return self._label("off", "wył.")
+    def _severity_label(self) -> str:
+        severity = self._severity_key()
+        if severity == "high":
+            return self._label("high", "wysoka")
+        if severity == "watch":
+            return self._label("watch", "obserwuj")
+        return self._label("normal", "normal")
+
+    def _severity_key(self) -> str:
+        if not self._alert_active():
+            return "normal"
+        if self._drift_gap() >= self.threshold * 1.5:
+            return "high"
+        return "watch"
 
     def _investigation_state_label(self) -> str:
         if self.investigation_acknowledged:
@@ -316,6 +326,11 @@ class ModelMonitoringDriftScene:
             return self._label(
                 "Investigation acknowledged: now compare data, metric, and business context.",
                 "Analiza potwierdzona: porównaj data, metric i kontekst biznesowy.",
+            )
+        if self._severity_key() == "high":
+            return self._label(
+                "High severity: the current window is far from baseline, so investigate soon.",
+                "Wysoka severity: current window jest daleko od baseline, więc sprawdź to szybko.",
             )
         if self._alert_active():
             return self._label(

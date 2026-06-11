@@ -125,6 +125,33 @@ def test_monitoring_scene_reports_window_metrics_and_alerts(monkeypatch) -> None
         pygame.quit()
 
 
+def test_monitoring_scene_reports_alert_severity(monkeypatch) -> None:
+    """Severity should distinguish normal drift from watch and high alert states."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_model_monitoring_drift_scene(AppContext())
+
+        assert scene._severity_key() == "normal"
+        assert scene._severity_label() == "normal"
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+
+        assert scene._severity_key() == "watch"
+        assert scene._severity_label() == "watch"
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
+
+        assert scene.threshold == 0.10
+        assert scene._severity_key() == "high"
+        assert scene._severity_label() == "high"
+        assert "High severity" in scene._active_takeaway()
+    finally:
+        pygame.quit()
+
+
 def test_monitoring_scene_localizes_preset_copy(monkeypatch) -> None:
     """Preset copy should use the global language from AppContext."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
