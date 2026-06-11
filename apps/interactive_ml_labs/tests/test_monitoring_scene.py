@@ -71,6 +71,35 @@ def test_monitoring_scene_switches_signal_threshold_and_resets(monkeypatch) -> N
         pygame.quit()
 
 
+def test_monitoring_scene_acknowledges_only_active_alerts(monkeypatch) -> None:
+    """A should mark investigation only when the current alert is active."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_model_monitoring_drift_scene(AppContext())
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_a))
+
+        assert scene.investigation_acknowledged is False
+        assert scene._investigation_state_label() == "not needed"
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_a))
+
+        assert scene._alert_active() is True
+        assert scene.investigation_acknowledged is True
+        assert scene._investigation_state_label() == "acknowledged"
+        assert "acknowledged" in scene._active_takeaway()
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        assert scene.investigation_acknowledged is False
+        assert scene._investigation_state_label() == "not needed"
+    finally:
+        pygame.quit()
+
+
 def test_monitoring_scene_reports_window_metrics_and_alerts(monkeypatch) -> None:
     """Window means and alerts should reflect baseline vs current drift."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
