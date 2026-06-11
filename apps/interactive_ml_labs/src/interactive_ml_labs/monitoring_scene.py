@@ -218,6 +218,7 @@ class ModelMonitoringDriftScene:
         rows = (
             (self._label("signal", "sygnał"), self.signal),
             (self._label("threshold", "threshold"), f"{self.threshold:.0%}"),
+            (self._label("first alert", "pierwszy alert"), self._first_alert_label()),
             (self._label("baseline mean", "baseline mean"), f"{self._window_mean(0):.0%}"),
             (self._label("current mean", "current mean"), f"{self._window_mean(-1):.0%}"),
             (self._label("alert", "alert"), self._alert_state_label()),
@@ -275,6 +276,18 @@ class ModelMonitoringDriftScene:
     def _alert_active(self) -> bool:
         return self._drift_gap() >= self.threshold
 
+    def _first_alert_index(self) -> int | None:
+        for index, value in enumerate(self._active_series()):
+            if value >= self.threshold:
+                return index
+        return None
+
+    def _first_alert_label(self) -> str:
+        first_alert_index = self._first_alert_index()
+        if first_alert_index is None:
+            return self._label("none", "brak")
+        return f"t{first_alert_index}"
+
     def _alert_state_label(self) -> str:
         if self._alert_active():
             return self._label("on", "wł.")
@@ -301,9 +314,19 @@ class ModelMonitoringDriftScene:
         points = [self._series_position(rect, index, value) for index, value in enumerate(series)]
         if len(points) >= 2:
             pygame.draw.lines(surface, ACCENT, False, points, 3)
+        first_alert_index = self._first_alert_index()
         for index, point in enumerate(points):
             color = WARNING if series[index] >= self.threshold else ACCENT
             pygame.draw.circle(surface, color, point, 5)
+            if index == first_alert_index:
+                pygame.draw.circle(surface, WARNING, point, 11, width=2)
+                self._draw_text(
+                    surface,
+                    self._label("first alert", "pierwszy alert"),
+                    (min(point[0] + 10, rect.right - 108), max(rect.top + 8, point[1] - 32)),
+                    self._font_small,
+                    WARNING,
+                )
 
     def _draw_threshold(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         y = self._series_position(rect, 0, self.threshold)[1]

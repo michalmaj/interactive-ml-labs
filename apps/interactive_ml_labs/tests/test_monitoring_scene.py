@@ -82,11 +82,15 @@ def test_monitoring_scene_reports_window_metrics_and_alerts(monkeypatch) -> None
         assert scene._window_mean(-1) >= scene._window_mean(0)
         assert scene._drift_gap() < scene.threshold
         assert scene._alert_active() is False
+        assert scene._first_alert_index() is None
+        assert scene._first_alert_label() == "none"
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
 
         assert scene._drift_gap() >= scene.threshold
         assert scene._alert_active() is True
+        assert scene._first_alert_index() == 6
+        assert scene._first_alert_label() == "t6"
         assert "Alert" in scene._active_takeaway()
     finally:
         pygame.quit()
