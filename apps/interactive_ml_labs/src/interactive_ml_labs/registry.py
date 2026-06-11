@@ -21,6 +21,7 @@ from interactive_ml_labs.manifest import (
     TheorySection,
 )
 from interactive_ml_labs.model_comparison_scene import create_model_comparison_lab_scene
+from interactive_ml_labs.monitoring_scene import create_model_monitoring_drift_scene
 from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
@@ -3722,11 +3723,11 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
     _placeholder_demo(
         demo_id="model_monitoring_drift_lab",
         level=3,
-        title_en="Coming Soon: Model Monitoring Drift Lab",
-        title_pl="Coming soon: Model Monitoring Drift Lab",
-        summary_en=("A planned Level 3 lab for watching model behavior change after deployment."),
+        title_en="Model Monitoring Drift Lab",
+        title_pl="Model Monitoring Drift Lab",
+        summary_en=("A Level 3 prototype for watching model behavior change after deployment."),
         summary_pl=(
-            "Planowany lab Level 3 o obserwowaniu, jak zachowanie modelu zmienia się po wdrożeniu."
+            "Prototyp Level 3 o obserwowaniu, jak zachowanie modelu zmienia się po wdrożeniu."
         ),
         objectives=(
             LocalizedText(
@@ -3750,10 +3751,31 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         ),
         controls=(
             ControlBinding(
-                key="Enter",
+                key="1-3",
                 action=LocalizedText(
-                    en="open the monitoring placeholder scene",
-                    pl="otwórz placeholder monitoringu",
+                    en="switch monitoring preset",
+                    pl="zmień preset monitoringu",
+                ),
+            ),
+            ControlBinding(
+                key="D / M",
+                action=LocalizedText(
+                    en="switch data drift / metric drift signal",
+                    pl="przełącz sygnał data drift / metric drift",
+                ),
+            ),
+            ControlBinding(
+                key="- / =",
+                action=LocalizedText(
+                    en="decrease or increase alert threshold",
+                    pl="zmniejsz albo zwiększ alert threshold",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(
+                    en="reset the preview",
+                    pl="zresetuj podgląd",
                 ),
             ),
             ControlBinding(
@@ -3764,14 +3786,19 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
             ControlBinding(
+                key="H",
+                action=LocalizedText(en="open the help overlay", pl="otwórz pomoc"),
+            ),
+            ControlBinding(
                 key="Esc",
                 action=LocalizedText(
-                    en="go back to the demo list",
-                    pl="wróć do listy dem",
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
                 ),
             ),
         ),
-        difficulty=LocalizedText(en="Planned advanced lab", pl="Planowany lab zaawansowany"),
+        create_scene=create_model_monitoring_drift_scene,
+        difficulty=LocalizedText(en="Advanced prototype", pl="Prototyp zaawansowany"),
         tags=("monitoring", "drift", "production-ml", "evaluation", "level-3"),
         theory=DemoTheory(
             sections=(

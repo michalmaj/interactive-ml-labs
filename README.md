@@ -112,10 +112,10 @@ It also includes the first real Level 3 labs:
 - Model Comparison Lab, with Logistic Regression, k-NN, and Decision Tree previews on shared datasets, active model parameters, train/test accuracy, compact confusion details, and highlighted misclassified test points.
 - Calibration Lab, with overconfident, underconfident, and better calibrated presets, a reliability diagram, score distribution, raw-vs-scaled score reference with a compact legend, accuracy@0.5, Brier score, ECE, worst-gap highlighting, calibration gap error bars, and temperature scaling.
 
-It also includes the next Level 3 prototype and planning slot:
+It also includes the next Level 3 prototypes:
 
 - t-SNE / UMAP Exploration Lab, with deterministic toy embeddings, raw-vs-embedding comparison, dataset cues, a compact class legend, seed drift, t-SNE/UMAP comparison, and neighborhood tuning.
-- Model Monitoring Drift Lab, a coming-soon Level 3 planning slot for production-style data drift, metric drift, and alert threshold workflows.
+- Model Monitoring Drift Lab, a native Level 3 prototype for production-style data drift, metric drift, and alert threshold workflows.
 
 The original Level 1 and Level 2 demos can still be run as standalone commands. The unified app is the recommended path for students, while standalone entry points remain part of the supported development and teaching workflow.
 

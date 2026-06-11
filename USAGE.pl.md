@@ -45,7 +45,7 @@ Unified app zawiera też natywne laboratoria z Level 3:
 - Model Comparison Lab pokazuje założenia Logistic Regression, k-NN i Decision Tree na tych samych datasetach, z train/test score, kompaktowym confusion summary i podświetlaniem błędów testowych.
 - Calibration Lab pokazuje calibration prawdopodobieństw przez reliability diagram, rozkład score, legendę raw-vs-scaled score, accuracy@0.5, Brier score, ECE, podświetlenie worst gap, error bars kalibracji i temperature scaling.
 - t-SNE / UMAP Exploration Lab pokazuje deterministyczne toy embeddingi, porównanie raw-vs-embedding, wskazówki datasetów, etykiety klas, seed drift, strojenie sąsiedztwa i lokalne połączenia sąsiadów.
-- Model Monitoring Drift Lab to planowany slot Level 3 dla data drift, metric drift, monitoring windows i alert thresholds.
+- Model Monitoring Drift Lab to natywny prototyp Level 3 dla data drift, metric drift, monitoring windows i alert thresholds.
 
 Podstawowe sterowanie:
 
@@ -118,6 +118,15 @@ Sterowanie w t-SNE / UMAP Exploration Lab:
 | `S` | Zmień wariant seed i sprawdź drift |
 | `L` | Pokaż albo ukryj lokalne połączenia sąsiadów |
 | `O` | Pokaż albo ukryj raw high-dimensional layout |
+| `R` | Zresetuj podgląd |
+
+Sterowanie w Model Monitoring Drift Lab:
+
+| Klawisz / wejście | Akcja |
+| ----------------- | ----- |
+| `1-3` | Zmień preset monitoringu |
+| `D` / `M` | Przełącz sygnał data drift / metric drift |
+| `-` / `=` | Zmień alert threshold |
 | `R` | Zresetuj podgląd |
 
 ### Gradient Descent Playground

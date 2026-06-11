@@ -20,6 +20,7 @@ from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
 from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
 from interactive_ml_labs.model_comparison_scene import create_model_comparison_lab_scene
+from interactive_ml_labs.monitoring_scene import create_model_monitoring_drift_scene
 from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
@@ -80,8 +81,8 @@ def test_level_three_placeholder_describes_future_advanced_demos() -> None:
     assert manifest.tags == ("level-3", "showcase", "planning")
 
 
-def test_model_monitoring_placeholder_describes_next_level_three_candidate() -> None:
-    """Model Monitoring Drift Lab should define the next planned Level 3 direction."""
+def test_model_monitoring_manifest_describes_next_level_three_candidate() -> None:
+    """Model Monitoring Drift Lab should define the next Level 3 prototype direction."""
     manifest = DEMO_BY_ID["model_monitoring_drift_lab"]
     text = " ".join(
         [
@@ -102,14 +103,18 @@ def test_model_monitoring_placeholder_describes_next_level_three_candidate() -> 
 
     assert manifest.level == 3
     assert manifest.difficulty is not None
-    assert manifest.difficulty.pl == "Planowany lab zaawansowany"
+    assert manifest.difficulty.pl == "Prototyp zaawansowany"
     assert manifest.tags == ("monitoring", "drift", "production-ml", "evaluation", "level-3")
+    assert manifest.create_scene is create_model_monitoring_drift_scene
     assert "Model Monitoring Drift Lab" in text
     assert "data drift" in text
     assert "metric drift" in text
     assert "monitoring window" in text
     assert "alert threshold" in text
     assert "baseline" in text
+    assert "D / M" in text
+    assert "- / =" in text
+    assert "R" in text
     assert "T" in text
 
 

@@ -47,6 +47,10 @@ from interactive_ml_labs.model_comparison_scene import (
     ModelComparisonLabScene,
     create_model_comparison_lab_scene,
 )
+from interactive_ml_labs.monitoring_scene import (
+    ModelMonitoringDriftScene,
+    create_model_monitoring_drift_scene,
+)
 from interactive_ml_labs.pca_scene import PCALabScene, create_pca_lab_scene
 from interactive_ml_labs.random_forest_scene import (
     RandomForestSceneAdapter,
@@ -110,6 +114,7 @@ __all__ = [
     "LocalizedText",
     "LogisticRegressionSceneAdapter",
     "ModelComparisonLabScene",
+    "ModelMonitoringDriftScene",
     "PCALabScene",
     "RandomForestSceneAdapter",
     "RectTuple",
@@ -130,6 +135,7 @@ __all__ = [
     "create_knn_vote_map_scene",
     "create_logistic_regression_scene",
     "create_model_comparison_lab_scene",
+    "create_model_monitoring_drift_scene",
     "create_pca_lab_scene",
     "create_random_forest_scene",
     "create_tsne_umap_exploration_scene",
