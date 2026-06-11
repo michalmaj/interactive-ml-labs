@@ -3785,6 +3785,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
             ControlBinding(
+                key="A",
+                action=LocalizedText(
+                    en="acknowledge an active alert for investigation",
+                    pl="potwierdź aktywny alert do analizy",
+                ),
+            ),
+            ControlBinding(
                 key="R",
                 action=LocalizedText(
                     en="reset the preview",
@@ -3887,12 +3894,12 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             en=(
                                 "The goal is to teach inspection before automation: "
                                 "students should explain why an alert fired and where "
-                                "the first alert appeared."
+                                "the first alert appeared before acknowledging it."
                             ),
                             pl=(
                                 "Celem jest uczenie inspekcji przed automatyzacją: "
                                 "student powinien umieć wyjaśnić, dlaczego alert zadziałał "
-                                "i gdzie pojawił się pierwszy alert."
+                                "i gdzie pojawił się pierwszy alert, zanim go potwierdzi."
                             ),
                         ),
                     ),

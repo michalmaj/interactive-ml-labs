@@ -127,6 +127,7 @@ Sterowanie w Model Monitoring Drift Lab:
 | `1-3` | Zmień preset monitoringu |
 | `D` / `M` | Przełącz sygnał data drift / metric drift |
 | `-` / `=` | Zmień alert threshold |
+| `A` | Potwierdź aktywny alert do analizy |
 | `R` | Zresetuj podgląd |
 
 ### Gradient Descent Playground

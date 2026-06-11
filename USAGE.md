@@ -127,6 +127,7 @@ Model Monitoring Drift Lab controls:
 | `1-3` | Switch monitoring preset |
 | `D` / `M` | Switch data drift / metric drift signal |
 | `-` / `=` | Change alert threshold |
+| `A` | Acknowledge an active alert for investigation |
 | `R` | Reset the preview |
 
 ### Gradient Descent Playground

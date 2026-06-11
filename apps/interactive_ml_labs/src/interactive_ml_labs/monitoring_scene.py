@@ -96,6 +96,7 @@ class ModelMonitoringDriftScene:
         self.preset_index = 0
         self.signal_index = 0
         self.threshold_index = DEFAULT_THRESHOLD_INDEX
+        self.investigation_acknowledged = False
 
     @property
     def preset(self) -> MonitoringPreset:
@@ -137,16 +138,25 @@ class ModelMonitoringDriftScene:
     def _handle_keydown(self, key: int) -> None:
         if key in {pygame.K_1, pygame.K_2, pygame.K_3}:
             self.preset_index = key - pygame.K_1
+            self.investigation_acknowledged = False
         elif key in {pygame.K_m, pygame.K_d}:
             self.signal_index = (self.signal_index + 1) % len(SIGNALS)
+            self.investigation_acknowledged = False
         elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
             self.threshold_index = max(0, self.threshold_index - 1)
+            self.investigation_acknowledged = False
         elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
             self.threshold_index = min(len(THRESHOLDS) - 1, self.threshold_index + 1)
+            self.investigation_acknowledged = False
+        elif key == pygame.K_a:
+            self.investigation_acknowledged = (
+                self._alert_active() and not self.investigation_acknowledged
+            )
         elif key == pygame.K_r:
             self.preset_index = 0
             self.signal_index = 0
             self.threshold_index = DEFAULT_THRESHOLD_INDEX
+            self.investigation_acknowledged = False
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "Model Monitoring Drift Lab", (58, 40), self._font_title, TEXT)
@@ -222,6 +232,7 @@ class ModelMonitoringDriftScene:
             (self._label("baseline mean", "baseline mean"), f"{self._window_mean(0):.0%}"),
             (self._label("current mean", "current mean"), f"{self._window_mean(-1):.0%}"),
             (self._label("alert", "alert"), self._alert_state_label()),
+            (self._label("investigation", "analiza"), self._investigation_state_label()),
         )
         y = rect.y + 68
         for label, value in rows:
@@ -293,11 +304,23 @@ class ModelMonitoringDriftScene:
             return self._label("on", "wł.")
         return self._label("off", "wył.")
 
+    def _investigation_state_label(self) -> str:
+        if self.investigation_acknowledged:
+            return self._label("acknowledged", "potwierdzona")
+        if self._alert_active():
+            return self._label("needs review", "do sprawdzenia")
+        return self._label("not needed", "niepotrzebna")
+
     def _active_takeaway(self) -> str:
+        if self.investigation_acknowledged:
+            return self._label(
+                "Investigation acknowledged: now compare data, metric, and business context.",
+                "Analiza potwierdzona: porównaj data, metric i kontekst biznesowy.",
+            )
         if self._alert_active():
             return self._label(
-                "Alert fired: compare the current window with the baseline before acting.",
-                "Alert zadziałał: porównaj current window z baseline, zanim zareagujesz.",
+                "Alert fired: press A once you are ready to investigate the change.",
+                "Alert zadziałał: naciśnij A, gdy chcesz przejść do analizy zmiany.",
             )
         return self._label(
             "No alert yet: keep watching whether the gap becomes persistent.",
