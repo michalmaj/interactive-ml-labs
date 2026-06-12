@@ -113,6 +113,7 @@ def test_monitoring_scene_reports_window_metrics_and_alerts(monkeypatch) -> None
         assert scene._alert_active() is False
         assert scene._first_alert_index() is None
         assert scene._alert_count() == 0
+        assert scene._persistence_key() == "none"
         assert scene._first_alert_label() == "none"
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
@@ -121,7 +122,8 @@ def test_monitoring_scene_reports_window_metrics_and_alerts(monkeypatch) -> None
         assert scene._alert_active() is True
         assert scene._first_alert_index() == 6
         assert scene._alert_count() == 6
-        assert scene._first_alert_label() == "t6 / 6 pts"
+        assert scene._persistence_key() == "persistent"
+        assert scene._first_alert_label() == "t6 / 6 pts / persistent"
         assert "compare signals" in scene._active_takeaway()
     finally:
         pygame.quit()
