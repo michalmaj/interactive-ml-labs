@@ -1073,6 +1073,19 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             ),
         ),
         GlossaryTerm(
+            term="persistence",
+            definition=LocalizedText(
+                en=(
+                    "A simple hint that an alert is repeated across enough recent "
+                    "points to look more persistent than a one-off spike."
+                ),
+                pl=(
+                    "Prosta wskazówka, że alert powtarza się w tylu ostatnich punktach, "
+                    "że wygląda bardziej trwale niż jak pojedynczy pik."
+                ),
+            ),
+        ),
+        GlossaryTerm(
             term="lead signal",
             definition=LocalizedText(
                 en=(

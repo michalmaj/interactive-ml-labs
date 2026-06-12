@@ -306,11 +306,30 @@ class ModelMonitoringDriftScene:
     def _alert_count(self) -> int:
         return sum(1 for value in self._active_series() if value >= self.threshold)
 
+    def _persistence_key(self) -> str:
+        alert_count = self._alert_count()
+        if alert_count == 0:
+            return "none"
+        if alert_count >= WINDOW_SIZE // 2:
+            return "persistent"
+        return "transient"
+
+    def _persistence_label(self) -> str:
+        persistence = self._persistence_key()
+        if persistence == "persistent":
+            return self._label("persistent", "trwały")
+        if persistence == "transient":
+            return self._label("transient", "chwilowy")
+        return self._label("none", "brak")
+
     def _first_alert_label(self) -> str:
         first_alert_index = self._first_alert_index()
         if first_alert_index is None:
             return self._label("none", "brak")
-        return f"{self._first_alert_label_for(first_alert_index)} / {self._alert_count()} pts"
+        return (
+            f"{self._first_alert_label_for(first_alert_index)} / "
+            f"{self._alert_count()} pts / {self._persistence_label()}"
+        )
 
     def _first_alert_label_for(self, first_alert_index: int | None) -> str:
         if first_alert_index is None:
