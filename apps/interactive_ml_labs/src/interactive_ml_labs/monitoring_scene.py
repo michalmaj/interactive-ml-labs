@@ -303,8 +303,14 @@ class ModelMonitoringDriftScene:
                 return index
         return None
 
+    def _alert_count(self) -> int:
+        return sum(1 for value in self._active_series() if value >= self.threshold)
+
     def _first_alert_label(self) -> str:
-        return self._first_alert_label_for(self._first_alert_index())
+        first_alert_index = self._first_alert_index()
+        if first_alert_index is None:
+            return self._label("none", "brak")
+        return f"{self._first_alert_label_for(first_alert_index)} / {self._alert_count()} pts"
 
     def _first_alert_label_for(self, first_alert_index: int | None) -> str:
         if first_alert_index is None:
