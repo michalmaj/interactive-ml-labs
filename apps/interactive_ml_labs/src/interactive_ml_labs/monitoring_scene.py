@@ -304,7 +304,9 @@ class ModelMonitoringDriftScene:
         return None
 
     def _first_alert_label(self) -> str:
-        first_alert_index = self._first_alert_index()
+        return self._first_alert_label_for(self._first_alert_index())
+
+    def _first_alert_label_for(self, first_alert_index: int | None) -> str:
         if first_alert_index is None:
             return self._label("none", "brak")
         return f"t{first_alert_index}"
@@ -325,8 +327,10 @@ class ModelMonitoringDriftScene:
         if lead_signal == "none":
             return self._label("none", "brak")
         if lead_signal == "tie":
-            return self._label("tie", "remis")
-        return lead_signal
+            data_index = self._first_alert_index_for(self.preset.data_drift)
+            return f"{self._label('tie', 'remis')} @ {self._first_alert_label_for(data_index)}"
+        series = self.preset.data_drift if lead_signal == "data drift" else self.preset.metric_drift
+        return f"{lead_signal} @ {self._first_alert_label_for(self._first_alert_index_for(series))}"
 
     def _severity_label(self) -> str:
         severity = self._severity_key()
