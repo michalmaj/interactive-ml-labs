@@ -286,7 +286,16 @@ class ModelMonitoringDriftScene:
         return max(0.0, self._window_mean(-1) - self._window_mean(0))
 
     def _gap_label(self) -> str:
-        return f"+{self._drift_gap():.0%}"
+        return f"+{self._drift_gap():.0%} ({self._threshold_margin_label()})"
+
+    def _threshold_margin(self) -> float:
+        return self._drift_gap() - self.threshold
+
+    def _threshold_margin_label(self) -> str:
+        margin = self._threshold_margin()
+        if margin >= 0:
+            return self._label(f"+{margin:.0%} over", f"+{margin:.0%} ponad")
+        return self._label(f"{abs(margin):.0%} under", f"{abs(margin):.0%} poniżej")
 
     def _window_summary_label(self) -> str:
         return f"{self._window_mean(0):.0%} -> {self._window_mean(-1):.0%}"

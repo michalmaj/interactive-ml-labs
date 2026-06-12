@@ -1106,6 +1106,16 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             ),
         ),
         GlossaryTerm(
+            term="threshold margin",
+            definition=LocalizedText(
+                en=("How far the current gap sits below or above the selected alert threshold."),
+                pl=(
+                    "Informacja, jak daleko obecna luka jest poniżej albo powyżej "
+                    "wybranego alert threshold."
+                ),
+            ),
+        ),
+        GlossaryTerm(
             term="severity",
             definition=LocalizedText(
                 en=(
