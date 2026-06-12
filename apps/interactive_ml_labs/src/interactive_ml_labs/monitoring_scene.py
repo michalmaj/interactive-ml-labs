@@ -78,6 +78,14 @@ PRESETS: Final[tuple[MonitoringPreset, ...]] = (
         data_drift=(0.05, 0.06, 0.06, 0.07, 0.08, 0.10, 0.11, 0.13, 0.14, 0.16, 0.17, 0.18),
         metric_drift=(0.05, 0.06, 0.08, 0.10, 0.14, 0.19, 0.24, 0.30, 0.35, 0.39, 0.42, 0.46),
     ),
+    MonitoringPreset(
+        name_en="Single spike",
+        name_pl="Jednorazowy pik",
+        summary_en="One sharp point crosses the threshold, but the window gap stays small.",
+        summary_pl="Jeden ostry punkt przekracza threshold, ale luka okna pozostaje mała.",
+        data_drift=(0.05, 0.06, 0.05, 0.07, 0.06, 0.05, 0.06, 0.07, 0.35, 0.08, 0.07, 0.06),
+        metric_drift=(0.04, 0.05, 0.05, 0.06, 0.05, 0.06, 0.05, 0.06, 0.07, 0.06, 0.07, 0.06),
+    ),
 )
 
 
@@ -136,7 +144,7 @@ class ModelMonitoringDriftScene:
         self._draw_footer(surface)
 
     def _handle_keydown(self, key: int) -> None:
-        if key in {pygame.K_1, pygame.K_2, pygame.K_3}:
+        if key in {pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4}:
             self.preset_index = key - pygame.K_1
             self.investigation_acknowledged = False
         elif key in {pygame.K_m, pygame.K_d}:
@@ -238,8 +246,8 @@ class ModelMonitoringDriftScene:
         y = rect.y + 68
         for label, value in rows:
             self._draw_text(surface, f"{label}: {value}", (rect.x + 22, y), self._font_small, TEXT)
-            y += 28
-        y += 12
+            y += 24
+        y += 10
         for index, preset in enumerate(PRESETS):
             color = ACCENT if index == self.preset_index else MUTED_TEXT
             self._draw_text(
@@ -249,7 +257,7 @@ class ModelMonitoringDriftScene:
                 self._font_small,
                 color,
             )
-            y += 30
+            y += 24
         self._draw_wrapped(
             surface,
             self._active_takeaway(),
