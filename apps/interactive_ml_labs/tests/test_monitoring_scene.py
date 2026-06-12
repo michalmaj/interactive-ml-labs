@@ -90,7 +90,7 @@ def test_monitoring_scene_acknowledges_only_active_alerts(monkeypatch) -> None:
         assert scene._alert_active() is True
         assert scene.investigation_acknowledged is True
         assert scene._investigation_state_label() == "acknowledged"
-        assert "acknowledged" in scene._active_takeaway()
+        assert "document finding" in scene._active_takeaway()
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
 
@@ -120,7 +120,7 @@ def test_monitoring_scene_reports_window_metrics_and_alerts(monkeypatch) -> None
         assert scene._alert_active() is True
         assert scene._first_alert_index() == 6
         assert scene._first_alert_label() == "t6"
-        assert "Alert" in scene._active_takeaway()
+        assert "compare signals" in scene._active_takeaway()
     finally:
         pygame.quit()
 
@@ -147,7 +147,7 @@ def test_monitoring_scene_reports_alert_severity(monkeypatch) -> None:
         assert scene.threshold == 0.10
         assert scene._severity_key() == "high"
         assert scene._severity_label() == "high"
-        assert "High severity" in scene._active_takeaway()
+        assert "investigate now" in scene._active_takeaway()
     finally:
         pygame.quit()
 
@@ -172,6 +172,36 @@ def test_monitoring_scene_reports_lead_signal(monkeypatch) -> None:
 
         assert scene._lead_signal_key() == "metric drift"
         assert scene._lead_signal_label() == "metric drift"
+    finally:
+        pygame.quit()
+
+
+def test_monitoring_scene_reports_next_recommendation(monkeypatch) -> None:
+    """Recommendation should describe the next investigation step."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_model_monitoring_drift_scene(AppContext())
+
+        assert scene._recommendation_label() == "watch"
+        assert "Next: watch" in scene._active_takeaway()
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+
+        assert scene._recommendation_label() == "compare signals"
+        assert "Next: compare signals" in scene._active_takeaway()
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
+
+        assert scene._recommendation_label() == "investigate now"
+        assert "Next: investigate now" in scene._active_takeaway()
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_a))
+
+        assert scene._recommendation_label() == "document finding"
+        assert "Next: document finding" in scene._active_takeaway()
     finally:
         pygame.quit()
 
