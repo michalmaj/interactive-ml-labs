@@ -1064,6 +1064,15 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             ),
         ),
         GlossaryTerm(
+            term="alert count",
+            definition=LocalizedText(
+                en=("The number of time-series points that cross the current alert threshold."),
+                pl=(
+                    "Liczba punktów szeregu czasowego, które przekraczają aktualny alert threshold."
+                ),
+            ),
+        ),
+        GlossaryTerm(
             term="lead signal",
             definition=LocalizedText(
                 en=(
