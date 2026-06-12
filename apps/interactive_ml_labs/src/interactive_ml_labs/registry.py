@@ -1086,6 +1086,19 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             ),
         ),
         GlossaryTerm(
+            term="spike",
+            definition=LocalizedText(
+                en=(
+                    "A short, sharp threshold crossing that may deserve a look, "
+                    "but should not automatically be treated as sustained drift."
+                ),
+                pl=(
+                    "Krótki, ostry skok ponad threshold, któremu warto się przyjrzeć, "
+                    "ale nie należy go automatycznie traktować jak trwały drift."
+                ),
+            ),
+        ),
+        GlossaryTerm(
             term="lead signal",
             definition=LocalizedText(
                 en=(
@@ -3842,7 +3855,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         ),
         controls=(
             ControlBinding(
-                key="1-3",
+                key="1-4",
                 action=LocalizedText(
                     en="switch monitoring preset",
                     pl="zmień preset monitoringu",
