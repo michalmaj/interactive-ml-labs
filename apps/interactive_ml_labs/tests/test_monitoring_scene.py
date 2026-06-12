@@ -185,12 +185,12 @@ def test_monitoring_scene_reports_lead_signal(monkeypatch) -> None:
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
 
         assert scene._lead_signal_key() == "data drift"
-        assert scene._lead_signal_label() == "data drift"
+        assert scene._lead_signal_label() == "data drift @ t6"
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_3))
 
         assert scene._lead_signal_key() == "metric drift"
-        assert scene._lead_signal_label() == "metric drift"
+        assert scene._lead_signal_label() == "metric drift @ t6"
     finally:
         pygame.quit()
 
