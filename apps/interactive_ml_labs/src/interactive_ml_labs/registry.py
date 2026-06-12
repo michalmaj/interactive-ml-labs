@@ -1089,6 +1089,19 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                 ),
             ),
         ),
+        GlossaryTerm(
+            term="recommendation",
+            definition=LocalizedText(
+                en=(
+                    "A suggested next step that turns a monitoring signal into an "
+                    "investigation workflow."
+                ),
+                pl=(
+                    "Sugestia następnego kroku, która zamienia sygnał monitoringu "
+                    "w workflow analizy."
+                ),
+            ),
+        ),
     ),
     "level_3_coming_soon": (
         GlossaryTerm(
@@ -3922,12 +3935,14 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             en=(
                                 "The goal is to teach inspection before automation: "
                                 "students should explain why an alert fired and where "
-                                "the first alert appeared before acknowledging it."
+                                "the first alert appeared before acknowledging it or "
+                                "following a recommendation."
                             ),
                             pl=(
                                 "Celem jest uczenie inspekcji przed automatyzacją: "
                                 "student powinien umieć wyjaśnić, dlaczego alert zadziałał "
-                                "i gdzie pojawił się pierwszy alert, zanim go potwierdzi."
+                                "i gdzie pojawił się pierwszy alert, zanim go potwierdzi "
+                                "albo pójdzie za rekomendacją."
                             ),
                         ),
                     ),

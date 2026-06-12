@@ -344,25 +344,35 @@ class ModelMonitoringDriftScene:
             return self._label("needs review", "do sprawdzenia")
         return self._label("not needed", "niepotrzebna")
 
+    def _recommendation_label(self) -> str:
+        if self.investigation_acknowledged:
+            return self._label("document finding", "opisz wniosek")
+        if self._severity_key() == "high":
+            return self._label("investigate now", "sprawdź teraz")
+        if self._alert_active():
+            return self._label("compare signals", "porównaj sygnały")
+        return self._label("watch", "obserwuj")
+
     def _active_takeaway(self) -> str:
+        recommendation = self._recommendation_label()
         if self.investigation_acknowledged:
             return self._label(
-                "Investigation acknowledged: now compare data, metric, and business context.",
-                "Analiza potwierdzona: porównaj data, metric i kontekst biznesowy.",
+                f"Next: {recommendation}. Compare data, metric, and business context.",
+                f"Dalej: {recommendation}. Porównaj data, metric i kontekst biznesowy.",
             )
         if self._severity_key() == "high":
             return self._label(
-                "High severity: the current window is far from baseline, so investigate soon.",
-                "Wysoka severity: current window jest daleko od baseline, więc sprawdź to szybko.",
+                f"Next: {recommendation}. Current window is far from baseline.",
+                f"Dalej: {recommendation}. Current window jest daleko od baseline.",
             )
         if self._alert_active():
             return self._label(
-                "Alert fired: press A once you are ready to investigate the change.",
-                "Alert zadziałał: naciśnij A, gdy chcesz przejść do analizy zmiany.",
+                f"Next: {recommendation}. Press A when ready to investigate.",
+                f"Dalej: {recommendation}. Naciśnij A, gdy chcesz przejść do analizy.",
             )
         return self._label(
-            "No alert yet: keep watching whether the gap becomes persistent.",
-            "Brak alertu: obserwuj, czy luka staje się trwała.",
+            f"Next: {recommendation}. Keep watching whether the gap becomes persistent.",
+            f"Dalej: {recommendation}. Obserwuj, czy luka staje się trwała.",
         )
 
     def _timeline_plot_rect(self, rect: pygame.Rect) -> pygame.Rect:
