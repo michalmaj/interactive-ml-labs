@@ -1064,6 +1064,19 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             ),
         ),
         GlossaryTerm(
+            term="lead signal",
+            definition=LocalizedText(
+                en=(
+                    "The monitored signal that crosses the alert threshold first in "
+                    "the current scenario."
+                ),
+                pl=(
+                    "Monitorowany sygnał, który w danym scenariuszu jako pierwszy "
+                    "przekracza alert threshold."
+                ),
+            ),
+        ),
+        GlossaryTerm(
             term="severity",
             definition=LocalizedText(
                 en=(
@@ -3897,11 +3910,12 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                             en=(
                                 "A first slice can show a time series, a baseline window, "
                                 "a current window, one alert threshold, and a simple "
-                                "severity label."
+                                "lead signal and severity label."
                             ),
                             pl=(
                                 "Pierwszy wycinek może pokazać szereg czasowy, baseline window, "
-                                "current window, jeden alert threshold i prostą etykietę severity."
+                                "current window, jeden alert threshold, lead signal "
+                                "i prostą etykietę severity."
                             ),
                         ),
                         LocalizedText(

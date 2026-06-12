@@ -152,6 +152,30 @@ def test_monitoring_scene_reports_alert_severity(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_monitoring_scene_reports_lead_signal(monkeypatch) -> None:
+    """Lead signal should compare data drift and metric drift first-alert timing."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_model_monitoring_drift_scene(AppContext())
+
+        assert scene._lead_signal_key() == "none"
+        assert scene._lead_signal_label() == "none"
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+
+        assert scene._lead_signal_key() == "data drift"
+        assert scene._lead_signal_label() == "data drift"
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_3))
+
+        assert scene._lead_signal_key() == "metric drift"
+        assert scene._lead_signal_label() == "metric drift"
+    finally:
+        pygame.quit()
+
+
 def test_monitoring_scene_localizes_preset_copy(monkeypatch) -> None:
     """Preset copy should use the global language from AppContext."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
