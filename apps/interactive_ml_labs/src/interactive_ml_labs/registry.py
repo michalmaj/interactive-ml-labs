@@ -1077,6 +1077,13 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             ),
         ),
         GlossaryTerm(
+            term="gap",
+            definition=LocalizedText(
+                en=("The difference between the current window mean and the baseline window mean."),
+                pl=("Różnica między średnią current window a średnią baseline window."),
+            ),
+        ),
+        GlossaryTerm(
             term="severity",
             definition=LocalizedText(
                 en=(
@@ -3922,13 +3929,13 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                         LocalizedText(
                             en=(
                                 "A first slice can show a time series, a baseline window, "
-                                "a current window, one alert threshold, and a simple "
-                                "lead signal and severity label."
+                                "a current window, the gap between them, one alert threshold, "
+                                "and a simple lead signal and severity label."
                             ),
                             pl=(
                                 "Pierwszy wycinek może pokazać szereg czasowy, baseline window, "
-                                "current window, jeden alert threshold, lead signal "
-                                "i prostą etykietę severity."
+                                "current window, lukę między nimi, jeden alert threshold, "
+                                "lead signal i prostą etykietę severity."
                             ),
                         ),
                         LocalizedText(

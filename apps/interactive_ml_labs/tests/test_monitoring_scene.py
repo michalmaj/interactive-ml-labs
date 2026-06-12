@@ -125,6 +125,25 @@ def test_monitoring_scene_reports_window_metrics_and_alerts(monkeypatch) -> None
         pygame.quit()
 
 
+def test_monitoring_scene_formats_window_gap_readout(monkeypatch) -> None:
+    """Window summary and gap should explain the severity input."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_model_monitoring_drift_scene(AppContext())
+
+        assert scene._window_summary_label() == "6% -> 7%"
+        assert scene._gap_label() == "+1%"
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+
+        assert scene._window_summary_label() == "13% -> 35%"
+        assert scene._gap_label() == "+22%"
+    finally:
+        pygame.quit()
+
+
 def test_monitoring_scene_reports_alert_severity(monkeypatch) -> None:
     """Severity should distinguish normal drift from watch and high alert states."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
