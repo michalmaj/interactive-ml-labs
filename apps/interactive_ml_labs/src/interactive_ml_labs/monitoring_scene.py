@@ -229,6 +229,7 @@ class ModelMonitoringDriftScene:
             (self._label("signal", "sygnał"), self.signal),
             (self._label("threshold", "threshold"), f"{self.threshold:.0%}"),
             (self._label("first alert", "pierwszy alert"), self._first_alert_label()),
+            (self._label("lead signal", "lead signal"), self._lead_signal_label()),
             (self._label("baseline mean", "baseline mean"), f"{self._window_mean(0):.0%}"),
             (self._label("current mean", "current mean"), f"{self._window_mean(-1):.0%}"),
             (self._label("severity", "severity"), self._severity_label()),
@@ -288,7 +289,10 @@ class ModelMonitoringDriftScene:
         return self._drift_gap() >= self.threshold
 
     def _first_alert_index(self) -> int | None:
-        for index, value in enumerate(self._active_series()):
+        return self._first_alert_index_for(self._active_series())
+
+    def _first_alert_index_for(self, series: tuple[float, ...]) -> int | None:
+        for index, value in enumerate(series):
             if value >= self.threshold:
                 return index
         return None
@@ -298,6 +302,25 @@ class ModelMonitoringDriftScene:
         if first_alert_index is None:
             return self._label("none", "brak")
         return f"t{first_alert_index}"
+
+    def _lead_signal_key(self) -> str:
+        data_index = self._first_alert_index_for(self.preset.data_drift)
+        metric_index = self._first_alert_index_for(self.preset.metric_drift)
+        if data_index is None and metric_index is None:
+            return "none"
+        if data_index == metric_index:
+            return "tie"
+        if metric_index is None or (data_index is not None and data_index < metric_index):
+            return "data drift"
+        return "metric drift"
+
+    def _lead_signal_label(self) -> str:
+        lead_signal = self._lead_signal_key()
+        if lead_signal == "none":
+            return self._label("none", "brak")
+        if lead_signal == "tie":
+            return self._label("tie", "remis")
+        return lead_signal
 
     def _severity_label(self) -> str:
         severity = self._severity_key()
