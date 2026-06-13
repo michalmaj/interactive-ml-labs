@@ -126,7 +126,7 @@ Sterowanie w Model Monitoring Drift Lab:
 | ----------------- | ----- |
 | `1-4` | Zmień preset monitoringu |
 | `D` / `M` | Wybierz sygnał data drift / metric drift |
-| `-` / `=` | Zmień alert threshold |
+| `-` / `=` / `0` | Zmień albo zresetuj alert threshold |
 | `A` | Potwierdź aktywny alert do analizy |
 | `R` | Zresetuj podgląd |
 

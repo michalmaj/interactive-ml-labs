@@ -3869,10 +3869,10 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
             ControlBinding(
-                key="- / =",
+                key="- / = / 0",
                 action=LocalizedText(
-                    en="decrease or increase alert threshold",
-                    pl="zmniejsz albo zwiększ alert threshold",
+                    en="decrease, increase, or reset alert threshold",
+                    pl="zmniejsz, zwiększ albo zresetuj alert threshold",
                 ),
             ),
             ControlBinding(
