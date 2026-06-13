@@ -3864,8 +3864,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ControlBinding(
                 key="D / M",
                 action=LocalizedText(
-                    en="switch data drift / metric drift signal",
-                    pl="przełącz sygnał data drift / metric drift",
+                    en="select data drift / metric drift signal",
+                    pl="wybierz sygnał data drift / metric drift",
                 ),
             ),
             ControlBinding(
