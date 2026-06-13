@@ -1073,6 +1073,15 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             ),
         ),
         GlossaryTerm(
+            term="alert rate",
+            definition=LocalizedText(
+                en="The share of time-series points that cross the current alert threshold.",
+                pl=(
+                    "Udział punktów szeregu czasowego, które przekraczają aktualny alert threshold."
+                ),
+            ),
+        ),
+        GlossaryTerm(
             term="persistence",
             definition=LocalizedText(
                 en=(
