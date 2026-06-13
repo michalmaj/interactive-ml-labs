@@ -159,6 +159,9 @@ class ModelMonitoringDriftScene:
         elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
             self.threshold_index = min(len(THRESHOLDS) - 1, self.threshold_index + 1)
             self.investigation_acknowledged = False
+        elif key in {pygame.K_0, pygame.K_KP0}:
+            self.threshold_index = DEFAULT_THRESHOLD_INDEX
+            self.investigation_acknowledged = False
         elif key == pygame.K_a:
             self.investigation_acknowledged = (
                 self._alert_active() and not self.investigation_acknowledged

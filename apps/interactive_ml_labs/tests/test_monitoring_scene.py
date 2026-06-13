@@ -74,6 +74,13 @@ def test_monitoring_scene_selects_signal_threshold_and_resets(monkeypatch) -> No
         assert scene._threshold_label() == "25% (4/5)"
         assert scene.preset_index == 2
 
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_0))
+
+        assert scene.signal == "metric drift"
+        assert scene.threshold_index == DEFAULT_THRESHOLD_INDEX
+        assert scene._threshold_label() == "20% (3/5)"
+        assert scene.preset_index == 2
+
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_r))
 
         assert scene.signal == "data drift"
