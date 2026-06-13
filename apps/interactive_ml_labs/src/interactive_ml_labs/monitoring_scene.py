@@ -323,6 +323,13 @@ class ModelMonitoringDriftScene:
     def _alert_count(self) -> int:
         return sum(1 for value in self._active_series() if value >= self.threshold)
 
+    def _alert_count_label(self) -> str:
+        count = self._alert_count()
+        if self._language == "pl":
+            return f"{count} pkt"
+        suffix = "pt" if count == 1 else "pts"
+        return f"{count} {suffix}"
+
     def _persistence_key(self) -> str:
         alert_count = self._alert_count()
         if alert_count == 0:
@@ -345,7 +352,7 @@ class ModelMonitoringDriftScene:
             return self._label("none", "brak")
         return (
             f"{self._first_alert_label_for(first_alert_index)} / "
-            f"{self._alert_count()} pts / {self._persistence_label()}"
+            f"{self._alert_count_label()} / {self._persistence_label()}"
         )
 
     def _first_alert_label_for(self, first_alert_index: int | None) -> str:

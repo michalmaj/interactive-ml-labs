@@ -122,6 +122,7 @@ def test_monitoring_scene_reports_window_metrics_and_alerts(monkeypatch) -> None
         assert scene._alert_active() is True
         assert scene._first_alert_index() == 6
         assert scene._alert_count() == 6
+        assert scene._alert_count_label() == "6 pts"
         assert scene._persistence_key() == "persistent"
         assert scene._first_alert_label() == "t6 / 6 pts / persistent"
         assert "compare signals" in scene._active_takeaway()
@@ -190,11 +191,30 @@ def test_monitoring_scene_reports_transient_spike_preset(monkeypatch) -> None:
         assert scene.preset.name_en == "Single spike"
         assert scene._first_alert_index() == 8
         assert scene._alert_count() == 1
+        assert scene._alert_count_label() == "1 pt"
         assert scene._persistence_key() == "transient"
-        assert scene._first_alert_label() == "t8 / 1 pts / transient"
+        assert scene._first_alert_label() == "t8 / 1 pt / transient"
         assert scene._alert_active() is False
         assert scene._severity_key() == "normal"
         assert scene._lead_signal_label() == "data drift @ t8"
+    finally:
+        pygame.quit()
+
+
+def test_monitoring_scene_localizes_alert_count_label(monkeypatch) -> None:
+    """Alert count should avoid English-only labels in Polish mode."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.settings.language = "pl"
+        scene = create_model_monitoring_drift_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_4))
+
+        assert scene._alert_count_label() == "1 pkt"
+        assert scene._first_alert_label() == "t8 / 1 pkt / chwilowy"
     finally:
         pygame.quit()
 
