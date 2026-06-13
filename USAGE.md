@@ -45,7 +45,7 @@ The unified app also includes app-only Level 3 labs:
 - Model Comparison Lab demonstrates Logistic Regression, k-NN, and Decision Tree assumptions on shared datasets, with train/test scores, compact confusion details, and highlighted test errors.
 - Calibration Lab demonstrates probability calibration with reliability diagrams, score distributions, a raw-vs-scaled score legend, accuracy@0.5, Brier score, ECE, worst-gap highlighting, calibration gap error bars, and temperature scaling.
 - t-SNE / UMAP Exploration Lab demonstrates deterministic toy embeddings, raw-vs-embedding comparison, dataset cues, class labels, seed drift, neighborhood tuning, and local-neighbor links.
-- Model Monitoring Drift Lab is a native Level 3 prototype for data drift, metric drift, monitoring windows, and alert thresholds.
+- Model Monitoring Drift Lab demonstrates data drift, metric drift, monitoring windows, alert thresholds, lead signals, alert rate, persistence, trend readouts, and investigation acknowledgements.
 
 Common shell controls:
 
@@ -129,6 +129,13 @@ Model Monitoring Drift Lab controls:
 | `-` / `=` / `0` | Change or reset alert threshold |
 | `A` | Acknowledge an active alert for investigation |
 | `R` | Reset the preview |
+
+What to watch in Model Monitoring Drift Lab:
+
+- `windows` compares the baseline window with the current window and adds a compact trend label.
+- `gap`, `threshold`, and `severity` explain whether the current change is below, near, or above the selected alert threshold.
+- `first alert`, `alert rate`, `persistence`, and `lead signal` help separate a one-off spike from a repeated production signal.
+- `investigation` changes after pressing `A`, so the lab models a small monitoring workflow instead of treating every alert as automatic panic.
 
 ### Gradient Descent Playground
 
