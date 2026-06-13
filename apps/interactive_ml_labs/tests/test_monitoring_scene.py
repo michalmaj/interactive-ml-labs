@@ -54,6 +54,8 @@ def test_monitoring_scene_selects_signal_threshold_and_resets(monkeypatch) -> No
     try:
         scene = create_model_monitoring_drift_scene(AppContext())
 
+        assert scene._threshold_label() == "20% (3/5)"
+
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
 
@@ -69,6 +71,7 @@ def test_monitoring_scene_selects_signal_threshold_and_resets(monkeypatch) -> No
 
         assert scene.signal == "metric drift"
         assert scene.threshold_index == DEFAULT_THRESHOLD_INDEX + 1
+        assert scene._threshold_label() == "25% (4/5)"
         assert scene.preset_index == 2
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_r))

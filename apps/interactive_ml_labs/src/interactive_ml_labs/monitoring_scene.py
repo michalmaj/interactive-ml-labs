@@ -238,7 +238,7 @@ class ModelMonitoringDriftScene:
         )
         rows = (
             (self._label("signal", "sygnał"), self.signal),
-            (self._label("threshold", "threshold"), f"{self.threshold:.0%}"),
+            (self._label("threshold", "threshold"), self._threshold_label()),
             (self._label("first alert", "pierwszy alert"), self._first_alert_label()),
             (self._label("lead signal", "lead signal"), self._lead_signal_label()),
             (self._label("windows", "okna"), self._window_summary_label()),
@@ -310,6 +310,9 @@ class ModelMonitoringDriftScene:
 
     def _window_summary_label(self) -> str:
         return f"{self._window_mean(0):.0%} -> {self._window_mean(-1):.0%}"
+
+    def _threshold_label(self) -> str:
+        return f"{self.threshold:.0%} ({self.threshold_index + 1}/{len(THRESHOLDS)})"
 
     def _alert_active(self) -> bool:
         return self._drift_gap() >= self.threshold
