@@ -158,13 +158,15 @@ def test_monitoring_scene_formats_window_gap_readout(monkeypatch) -> None:
     try:
         scene = create_model_monitoring_drift_scene(AppContext())
 
-        assert scene._window_summary_label() == "6% -> 7%"
+        assert scene._window_trend_key() == "flat"
+        assert scene._window_summary_label() == "6% -> 7% (flat)"
         assert scene._threshold_margin_label() == "19% under"
         assert scene._gap_label() == "+1% (19% under)"
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
 
-        assert scene._window_summary_label() == "13% -> 35%"
+        assert scene._window_trend_key() == "up"
+        assert scene._window_summary_label() == "13% -> 35% (up)"
         assert scene._threshold_margin_label() == "+2% over"
         assert scene._gap_label() == "+22% (+2% over)"
     finally:
@@ -236,6 +238,7 @@ def test_monitoring_scene_localizes_alert_count_label(monkeypatch) -> None:
 
         assert scene._alert_count_label() == "1 pkt"
         assert scene._alert_rate_label() == "8%"
+        assert scene._window_trend_label() == "w górę"
         assert scene._first_alert_label() == "t8 / 1 pkt / 8% / chwilowy"
     finally:
         pygame.quit()

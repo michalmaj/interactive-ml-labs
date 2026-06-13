@@ -312,7 +312,26 @@ class ModelMonitoringDriftScene:
         return self._label(f"{abs(margin):.0%} under", f"{abs(margin):.0%} poniżej")
 
     def _window_summary_label(self) -> str:
-        return f"{self._window_mean(0):.0%} -> {self._window_mean(-1):.0%}"
+        return (
+            f"{self._window_mean(0):.0%} -> {self._window_mean(-1):.0%} "
+            f"({self._window_trend_label()})"
+        )
+
+    def _window_trend_key(self) -> str:
+        delta = self._window_mean(-1) - self._window_mean(0)
+        if abs(delta) < 0.02:
+            return "flat"
+        if delta > 0:
+            return "up"
+        return "down"
+
+    def _window_trend_label(self) -> str:
+        trend = self._window_trend_key()
+        if trend == "up":
+            return self._label("up", "w górę")
+        if trend == "down":
+            return self._label("down", "w dół")
+        return self._label("flat", "stabilnie")
 
     def _threshold_label(self) -> str:
         return f"{self.threshold:.0%} ({self.threshold_index + 1}/{len(THRESHOLDS)})"
