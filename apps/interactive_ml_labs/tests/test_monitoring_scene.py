@@ -46,13 +46,22 @@ def test_monitoring_scene_handles_events_without_navigation(monkeypatch) -> None
         pygame.quit()
 
 
-def test_monitoring_scene_switches_signal_threshold_and_resets(monkeypatch) -> None:
+def test_monitoring_scene_selects_signal_threshold_and_resets(monkeypatch) -> None:
     """D/M, threshold keys, and R should update monitoring state."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     pygame.init()
 
     try:
         scene = create_model_monitoring_drift_scene(AppContext())
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        assert scene.signal == "metric drift"
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_d))
+
+        assert scene.signal == "data drift"
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))

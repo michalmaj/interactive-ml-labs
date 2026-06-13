@@ -147,8 +147,11 @@ class ModelMonitoringDriftScene:
         if key in {pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4}:
             self.preset_index = key - pygame.K_1
             self.investigation_acknowledged = False
-        elif key in {pygame.K_m, pygame.K_d}:
-            self.signal_index = (self.signal_index + 1) % len(SIGNALS)
+        elif key == pygame.K_d:
+            self.signal_index = 0
+            self.investigation_acknowledged = False
+        elif key == pygame.K_m:
+            self.signal_index = 1
             self.investigation_acknowledged = False
         elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
             self.threshold_index = max(0, self.threshold_index - 1)

@@ -125,7 +125,7 @@ Model Monitoring Drift Lab controls:
 | Key / input | Action |
 | ----------- | ------ |
 | `1-4` | Switch monitoring preset |
-| `D` / `M` | Switch data drift / metric drift signal |
+| `D` / `M` | Select data drift / metric drift signal |
 | `-` / `=` | Change alert threshold |
 | `A` | Acknowledge an active alert for investigation |
 | `R` | Reset the preview |
