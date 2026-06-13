@@ -142,8 +142,9 @@ def test_monitoring_scene_reports_window_metrics_and_alerts(monkeypatch) -> None
         assert scene._first_alert_index() == 6
         assert scene._alert_count() == 6
         assert scene._alert_count_label() == "6 pts"
+        assert scene._alert_rate_label() == "50%"
         assert scene._persistence_key() == "persistent"
-        assert scene._first_alert_label() == "t6 / 6 pts / persistent"
+        assert scene._first_alert_label() == "t6 / 6 pts / 50% / persistent"
         assert "compare signals" in scene._active_takeaway()
     finally:
         pygame.quit()
@@ -211,8 +212,9 @@ def test_monitoring_scene_reports_transient_spike_preset(monkeypatch) -> None:
         assert scene._first_alert_index() == 8
         assert scene._alert_count() == 1
         assert scene._alert_count_label() == "1 pt"
+        assert scene._alert_rate_label() == "8%"
         assert scene._persistence_key() == "transient"
-        assert scene._first_alert_label() == "t8 / 1 pt / transient"
+        assert scene._first_alert_label() == "t8 / 1 pt / 8% / transient"
         assert scene._alert_active() is False
         assert scene._severity_key() == "normal"
         assert scene._lead_signal_label() == "data drift @ t8"
@@ -233,7 +235,8 @@ def test_monitoring_scene_localizes_alert_count_label(monkeypatch) -> None:
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_4))
 
         assert scene._alert_count_label() == "1 pkt"
-        assert scene._first_alert_label() == "t8 / 1 pkt / chwilowy"
+        assert scene._alert_rate_label() == "8%"
+        assert scene._first_alert_label() == "t8 / 1 pkt / 8% / chwilowy"
     finally:
         pygame.quit()
 

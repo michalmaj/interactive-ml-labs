@@ -339,6 +339,9 @@ class ModelMonitoringDriftScene:
         suffix = "pt" if count == 1 else "pts"
         return f"{count} {suffix}"
 
+    def _alert_rate_label(self) -> str:
+        return f"{self._alert_count() / len(self._active_series()):.0%}"
+
     def _persistence_key(self) -> str:
         alert_count = self._alert_count()
         if alert_count == 0:
@@ -361,7 +364,8 @@ class ModelMonitoringDriftScene:
             return self._label("none", "brak")
         return (
             f"{self._first_alert_label_for(first_alert_index)} / "
-            f"{self._alert_count_label()} / {self._persistence_label()}"
+            f"{self._alert_count_label()} / {self._alert_rate_label()} / "
+            f"{self._persistence_label()}"
         )
 
     def _first_alert_label_for(self, first_alert_index: int | None) -> str:
