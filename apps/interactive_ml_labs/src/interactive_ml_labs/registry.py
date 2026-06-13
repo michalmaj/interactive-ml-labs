@@ -1128,6 +1128,16 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             ),
         ),
         GlossaryTerm(
+            term="trend",
+            definition=LocalizedText(
+                en=(
+                    "The direction of change between the baseline window mean "
+                    "and the current window mean."
+                ),
+                pl=("Kierunek zmiany między średnią baseline window a średnią current window."),
+            ),
+        ),
+        GlossaryTerm(
             term="threshold margin",
             definition=LocalizedText(
                 en=("How far the current gap sits below or above the selected alert threshold."),
