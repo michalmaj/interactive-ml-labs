@@ -55,6 +55,7 @@ def test_monitoring_scene_selects_signal_threshold_and_resets(monkeypatch) -> No
         scene = create_model_monitoring_drift_scene(AppContext())
 
         assert scene._threshold_label() == "20% (3/5)"
+        assert scene._threshold_plot_label() == "threshold 20%"
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
@@ -72,6 +73,7 @@ def test_monitoring_scene_selects_signal_threshold_and_resets(monkeypatch) -> No
         assert scene.signal == "metric drift"
         assert scene.threshold_index == DEFAULT_THRESHOLD_INDEX + 1
         assert scene._threshold_label() == "25% (4/5)"
+        assert scene._threshold_plot_label() == "threshold 25%"
         assert scene.preset_index == 2
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_0))
@@ -135,6 +137,8 @@ def test_monitoring_scene_acknowledges_only_active_alerts(monkeypatch) -> None:
         assert scene.investigation_acknowledged is True
         assert scene._investigation_state_label() == "acknowledged"
         assert "document finding" in scene._active_takeaway()
+        assert "lead signal" in scene._active_takeaway()
+        assert "alert rate" in scene._active_takeaway()
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
 
@@ -321,6 +325,8 @@ def test_monitoring_scene_reports_next_recommendation(monkeypatch) -> None:
 
         assert scene._recommendation_label() == "document finding"
         assert "Next: document finding" in scene._active_takeaway()
+        assert "first alert" in scene._active_takeaway()
+        assert "severity" in scene._active_takeaway()
     finally:
         pygame.quit()
 

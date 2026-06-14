@@ -383,6 +383,9 @@ class ModelMonitoringDriftScene:
     def _threshold_label(self) -> str:
         return f"{self.threshold:.0%} ({self.threshold_index + 1}/{len(THRESHOLDS)})"
 
+    def _threshold_plot_label(self) -> str:
+        return f"threshold {self.threshold:.0%}"
+
     def _alert_active(self) -> bool:
         return self._drift_gap() >= self.threshold
 
@@ -495,8 +498,10 @@ class ModelMonitoringDriftScene:
         recommendation = self._recommendation_label()
         if self.investigation_acknowledged:
             return self._label(
-                f"Next: {recommendation}. Compare data, metric, and business context.",
-                f"Dalej: {recommendation}. Porównaj data, metric i kontekst biznesowy.",
+                f"Next: {recommendation}. "
+                "Record lead signal, first alert, alert rate, and severity.",
+                f"Dalej: {recommendation}. "
+                "Zapisz lead signal, pierwszy alert, alert rate i severity.",
             )
         if self._severity_key() == "high":
             return self._label(
@@ -546,7 +551,13 @@ class ModelMonitoringDriftScene:
     def _draw_threshold(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         y = self._series_position(rect, 0, self.threshold)[1]
         pygame.draw.line(surface, SECONDARY, (rect.left, y), (rect.right, y), 2)
-        self._draw_text(surface, "threshold", (rect.x + 10, y - 22), self._font_small, SECONDARY)
+        self._draw_text(
+            surface,
+            self._threshold_plot_label(),
+            (rect.x + 10, y - 22),
+            self._font_small,
+            SECONDARY,
+        )
 
     def _draw_window_band(
         self,
