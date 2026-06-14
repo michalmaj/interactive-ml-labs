@@ -132,6 +132,7 @@ Model Monitoring Drift Lab controls:
 
 What to watch in Model Monitoring Drift Lab:
 
+- The bright line is the active signal; the muted line keeps the other signal visible for comparison.
 - `windows` compares the baseline window with the current window and adds a compact trend label.
 - `gap`, `threshold`, and `severity` explain whether the current change is below, near, or above the selected alert threshold.
 - `first alert`, `alert rate`, `persistence`, and `lead signal` help separate a one-off spike from a repeated production signal.

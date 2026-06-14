@@ -132,6 +132,7 @@ Sterowanie w Model Monitoring Drift Lab:
 
 Na co patrzeć w Model Monitoring Drift Lab:
 
+- Jasna linia to aktywny sygnał; przygaszona linia pokazuje drugi sygnał do porównania.
 - `okna` porównują baseline window z current window i dodają krótką etykietę trendu.
 - `luka`, `threshold` i `severity` pokazują, czy obecna zmiana jest poniżej, blisko czy powyżej wybranego alert threshold.
 - `pierwszy alert`, `alert rate`, `persistence` i `lead signal` pomagają odróżnić jednorazowy pik od powtarzalnego sygnału produkcyjnego.

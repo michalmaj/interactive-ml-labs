@@ -19,6 +19,7 @@ GRID: Final[tuple[int, int, int]] = (51, 58, 67)
 TEXT: Final[tuple[int, int, int]] = (236, 239, 242)
 MUTED_TEXT: Final[tuple[int, int, int]] = (164, 173, 184)
 ACCENT: Final[tuple[int, int, int]] = (118, 205, 247)
+COMPARISON: Final[tuple[int, int, int]] = (103, 113, 126)
 SECONDARY: Final[tuple[int, int, int]] = (248, 183, 96)
 GOOD: Final[tuple[int, int, int]] = (147, 218, 155)
 WARNING: Final[tuple[int, int, int]] = (246, 132, 134)
@@ -194,6 +195,20 @@ class ModelMonitoringDriftScene:
             self._font_heading,
             TEXT,
         )
+        self._draw_text(
+            surface,
+            self._active_signal_legend_label(),
+            (rect.x + 24, rect.y + 54),
+            self._font_small,
+            ACCENT,
+        )
+        self._draw_text(
+            surface,
+            self._comparison_signal_legend_label(),
+            (rect.x + 232, rect.y + 54),
+            self._font_small,
+            COMPARISON,
+        )
         plot_rect = self._timeline_plot_rect(rect)
         self._draw_plot_frame(surface, plot_rect)
         self._draw_window_band(surface, plot_rect, 0, WINDOW_SIZE, GOOD)
@@ -205,7 +220,20 @@ class ModelMonitoringDriftScene:
             WARNING,
         )
         self._draw_threshold(surface, plot_rect)
-        self._draw_series(surface, plot_rect, self._active_series())
+        self._draw_series(
+            surface,
+            plot_rect,
+            self._comparison_series(),
+            color=COMPARISON,
+            show_alerts=False,
+        )
+        self._draw_series(
+            surface,
+            plot_rect,
+            self._active_series(),
+            color=ACCENT,
+            show_alerts=True,
+        )
         self._draw_text(
             surface,
             self._label("baseline", "baseline"),
@@ -290,6 +318,25 @@ class ModelMonitoringDriftScene:
         if self.signal_index == 0:
             return self.preset.data_drift
         return self.preset.metric_drift
+
+    def _comparison_series(self) -> tuple[float, ...]:
+        if self.signal_index == 0:
+            return self.preset.metric_drift
+        return self.preset.data_drift
+
+    def _comparison_signal(self) -> str:
+        if self.signal_index == 0:
+            return SIGNALS[1]
+        return SIGNALS[0]
+
+    def _active_signal_legend_label(self) -> str:
+        return self._label(f"active: {self.signal}", f"aktywne: {self.signal}")
+
+    def _comparison_signal_legend_label(self) -> str:
+        return self._label(
+            f"compare: {self._comparison_signal()}",
+            f"porównaj: {self._comparison_signal()}",
+        )
 
     def _window_mean(self, window: int) -> float:
         series = self._active_series()
@@ -471,15 +518,21 @@ class ModelMonitoringDriftScene:
         return pygame.Rect(rect.x + 52, rect.y + 92, rect.width - 104, rect.height - 188)
 
     def _draw_series(
-        self, surface: pygame.Surface, rect: pygame.Rect, series: tuple[float, ...]
+        self,
+        surface: pygame.Surface,
+        rect: pygame.Rect,
+        series: tuple[float, ...],
+        *,
+        color: tuple[int, int, int],
+        show_alerts: bool,
     ) -> None:
         points = [self._series_position(rect, index, value) for index, value in enumerate(series)]
         if len(points) >= 2:
-            pygame.draw.lines(surface, ACCENT, False, points, 3)
-        first_alert_index = self._first_alert_index()
+            pygame.draw.lines(surface, color, False, points, 3 if show_alerts else 2)
+        first_alert_index = self._first_alert_index() if show_alerts else None
         for index, point in enumerate(points):
-            color = WARNING if series[index] >= self.threshold else ACCENT
-            pygame.draw.circle(surface, color, point, 5)
+            point_color = WARNING if show_alerts and series[index] >= self.threshold else color
+            pygame.draw.circle(surface, point_color, point, 5 if show_alerts else 3)
             if index == first_alert_index:
                 pygame.draw.circle(surface, WARNING, point, 11, width=2)
                 self._draw_text(
