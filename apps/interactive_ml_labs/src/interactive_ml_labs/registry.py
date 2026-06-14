@@ -6,6 +6,7 @@ from collections.abc import Callable
 
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
 from interactive_ml_labs.calibration_scene import create_calibration_lab_scene
+from interactive_ml_labs.class_imbalance_scene import create_class_imbalance_lab_scene
 from interactive_ml_labs.clustering_scene import create_clustering_lab_scene
 from interactive_ml_labs.data_leakage_scene import create_data_leakage_lab_scene
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
@@ -204,6 +205,38 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
                 "at prediction time."
             ),
             pl=("Dla każdego presetu ustal, czy podejrzana cecha istniałaby w czasie predykcji."),
+        ),
+    ),
+    "class_imbalance_lab": (
+        LocalizedText(
+            en=(
+                "Start with the default threshold and explain why high accuracy "
+                "does not guarantee good minority-class performance."
+            ),
+            pl=(
+                "Zacznij od domyślnego threshold i wyjaśnij, czemu wysokie accuracy "
+                "nie gwarantuje dobrego wyniku dla klasy mniejszościowej."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Lower the threshold and watch recall improve. Decide whether "
+                "the extra false positives are acceptable."
+            ),
+            pl=(
+                "Obniż threshold i obserwuj poprawę recall. Ustal, czy dodatkowe "
+                "false positives są akceptowalne."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Raise the threshold and inspect false negatives. Name the business "
+                "risk of missing the positive class."
+            ),
+            pl=(
+                "Podnieś threshold i sprawdź false negatives. Nazwij ryzyko biznesowe "
+                "przeoczenia klasy pozytywnej."
+            ),
         ),
     ),
     "random_forest_bagging_lab": (
@@ -659,6 +692,49 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                     "Walidacja używająca tylko informacji dostępnych wtedy, "
                     "gdy model naprawdę będzie działał."
                 ),
+            ),
+        ),
+    ),
+    "class_imbalance_lab": (
+        GlossaryTerm(
+            term="class imbalance",
+            definition=LocalizedText(
+                en=(
+                    "A dataset where one class is much more common than another, "
+                    "so accuracy can hide minority-class mistakes."
+                ),
+                pl=(
+                    "Dataset, w którym jedna klasa jest dużo częstsza od drugiej, "
+                    "więc accuracy może ukrywać błędy klasy mniejszościowej."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="precision",
+            definition=LocalizedText(
+                en="Among predicted positives, the share that really are positive.",
+                pl="Wśród predykcji pozytywnych: udział tych, które naprawdę są pozytywne.",
+            ),
+        ),
+        GlossaryTerm(
+            term="recall",
+            definition=LocalizedText(
+                en="Among real positives, the share that the model successfully found.",
+                pl="Wśród prawdziwych pozytywów: udział tych, które model odnalazł.",
+            ),
+        ),
+        GlossaryTerm(
+            term="false negative",
+            definition=LocalizedText(
+                en="A positive case that the model misses.",
+                pl="Pozytywny przypadek, którego model nie wykrywa.",
+            ),
+        ),
+        GlossaryTerm(
+            term="decision threshold",
+            definition=LocalizedText(
+                en="The score cutoff used to turn probabilities into predicted labels.",
+                pl="Próg score używany do zamiany probability na etykietę predykcji.",
             ),
         ),
     ),
@@ -2202,6 +2278,155 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["data_leakage_lab"],
             glossary=LESSON_GLOSSARY["data_leakage_lab"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="class_imbalance_lab",
+        level=2,
+        title_en="Class Imbalance Lab",
+        title_pl="Class Imbalance Lab",
+        summary_en=(
+            "Compare accuracy, precision, recall, false negatives, and threshold "
+            "trade-offs when one class is rare."
+        ),
+        summary_pl=(
+            "Porównuj accuracy, precision, recall, false negatives i threshold "
+            "trade-offs, gdy jedna klasa jest rzadka."
+        ),
+        objectives=(
+            LocalizedText(
+                en="See how high accuracy can hide weak recall on the minority class.",
+                pl="Zobacz, jak wysokie accuracy może ukrywać słaby recall klasy mniejszościowej.",
+            ),
+            LocalizedText(
+                en="Move the decision threshold and compare false positives with false negatives.",
+                pl="Przesuwaj decision threshold i porównuj false positives z false negatives.",
+            ),
+            LocalizedText(
+                en="Choose a threshold based on the cost of mistakes, not accuracy alone.",
+                pl="Wybieraj threshold według kosztu błędów, nie tylko według accuracy.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(
+                    en="switch imbalance scenario", pl="zmień scenariusz imbalance"
+                ),
+            ),
+            ControlBinding(
+                key="- / = / 0",
+                action=LocalizedText(
+                    en="decrease, increase, or reset decision threshold",
+                    pl="zmniejsz, zwiększ albo zresetuj decision threshold",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the preview", pl="zresetuj podgląd"),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read class imbalance notes",
+                    pl="przeczytaj notatki o class imbalance",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(en="open the help overlay", pl="otwórz pomoc"),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_class_imbalance_lab_scene,
+        difficulty=LocalizedText(en="Practical", pl="Praktyczny"),
+        tags=("classification", "metrics", "imbalance", "threshold", "level-2"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Class imbalance means one label is much more common "
+                                "than the label you often care about most."
+                            ),
+                            pl=(
+                                "Class imbalance oznacza, że jedna etykieta jest dużo częstsza "
+                                "niż klasa, na której zwykle najbardziej nam zależy."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A model can get many easy negatives right and still miss "
+                                "too many rare positives."
+                            ),
+                            pl=(
+                                "Model może poprawnie klasyfikować wiele łatwych negatywów, "
+                                "a nadal przeoczyć zbyt wiele rzadkich pozytywów."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Accuracy answers a broad question, but recall asks whether "
+                                "the model found the positive class."
+                            ),
+                            pl=(
+                                "Accuracy odpowiada na szerokie pytanie, ale recall pyta, "
+                                "czy model znalazł klasę pozytywną."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Lower thresholds usually improve recall and create more "
+                                "false positives; higher thresholds do the opposite."
+                            ),
+                            pl=(
+                                "Niższe thresholds zwykle poprawiają recall i tworzą więcej "
+                                "false positives; wyższe robią odwrotnie."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Do not optimize accuracy alone when the minority class is "
+                                "the expensive or risky case."
+                            ),
+                            pl=(
+                                "Nie optymalizuj samego accuracy, gdy klasa mniejszościowa "
+                                "jest przypadkiem kosztownym albo ryzykownym."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A high recall threshold choice can still be bad if the review "
+                                "team cannot handle the false positives."
+                            ),
+                            pl=(
+                                "Threshold z wysokim recall nadal może być zły, jeśli zespół "
+                                "nie udźwignie liczby false positives."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["class_imbalance_lab"],
+            glossary=LESSON_GLOSSARY["class_imbalance_lab"],
         ),
     ),
     _placeholder_demo(
