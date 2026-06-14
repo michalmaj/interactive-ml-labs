@@ -116,6 +116,8 @@ def test_model_monitoring_manifest_describes_level_three_lab() -> None:
     assert "lead signal" in text
     assert "trend" in text
     assert "press A" in text
+    assert "single spike" in text
+    assert "persistent drift" in text
     assert "baseline" in text
     assert "D / M" in text
     assert "- / =" in text

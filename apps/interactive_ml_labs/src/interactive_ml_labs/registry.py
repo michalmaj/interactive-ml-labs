@@ -3993,6 +3993,18 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "jakość, calibration, latency albo struktura błędów."
                             ),
                         ),
+                        LocalizedText(
+                            en=(
+                                "Compare both signals before reacting: a single spike is "
+                                "not the same thing as persistent drift, and a threshold "
+                                "is a prompt for inspection rather than proof of failure."
+                            ),
+                            pl=(
+                                "Porównaj oba sygnały przed reakcją: pojedynczy spike "
+                                "to nie to samo co trwały drift, a threshold jest "
+                                "zaproszeniem do sprawdzenia, nie dowodem awarii."
+                            ),
+                        ),
                     ),
                 ),
                 TheorySection(
