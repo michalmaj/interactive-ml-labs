@@ -90,6 +90,31 @@ def test_monitoring_scene_selects_signal_threshold_and_resets(monkeypatch) -> No
         pygame.quit()
 
 
+def test_monitoring_scene_tracks_comparison_signal(monkeypatch) -> None:
+    """The inactive signal should stay available as a muted comparison line."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_model_monitoring_drift_scene(AppContext())
+
+        assert scene.signal == "data drift"
+        assert scene._comparison_signal() == "metric drift"
+        assert scene._comparison_series() == scene.preset.metric_drift
+        assert scene._active_signal_legend_label() == "active: data drift"
+        assert scene._comparison_signal_legend_label() == "compare: metric drift"
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        assert scene.signal == "metric drift"
+        assert scene._comparison_signal() == "data drift"
+        assert scene._comparison_series() == scene.preset.data_drift
+        assert scene._active_signal_legend_label() == "active: metric drift"
+        assert scene._comparison_signal_legend_label() == "compare: data drift"
+    finally:
+        pygame.quit()
+
+
 def test_monitoring_scene_acknowledges_only_active_alerts(monkeypatch) -> None:
     """A should mark investigation only when the current alert is active."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -239,6 +264,8 @@ def test_monitoring_scene_localizes_alert_count_label(monkeypatch) -> None:
         assert scene._alert_count_label() == "1 pkt"
         assert scene._alert_rate_label() == "8%"
         assert scene._window_trend_label() == "w górę"
+        assert scene._active_signal_legend_label() == "aktywne: data drift"
+        assert scene._comparison_signal_legend_label() == "porównaj: metric drift"
         assert scene._first_alert_label() == "t8 / 1 pkt / 8% / chwilowy"
     finally:
         pygame.quit()
