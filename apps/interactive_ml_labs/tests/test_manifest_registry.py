@@ -25,6 +25,7 @@ from interactive_ml_labs.model_comparison_scene import create_model_comparison_l
 from interactive_ml_labs.monitoring_scene import create_model_monitoring_drift_scene
 from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
+from interactive_ml_labs.split_lab_scene import create_train_validation_test_lab_scene
 from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
 
 
@@ -47,7 +48,7 @@ def test_registry_groups_demos_by_level() -> None:
     assert {demo.level for demo in level_two_demos} == {2}
     assert {demo.level for demo in level_three_demos} == {3}
     assert len(level_one_demos) >= 4
-    assert len(level_two_demos) >= 4
+    assert len(level_two_demos) >= 5
     assert len(level_three_demos) == 7
     assert level_three_demos[0].id == "clustering_lab"
     assert level_three_demos[1].id == "pca_lab"
@@ -121,6 +122,39 @@ def test_class_imbalance_manifest_describes_practical_level_two_lab() -> None:
     assert "precision" in text
     assert "recall" in text
     assert "false negative" in text
+    assert "- / = / 0" in text
+
+
+def test_train_validation_test_manifest_describes_practical_level_two_lab() -> None:
+    """Train / Validation / Test Split Lab should extend the practical validation track."""
+    manifest = DEMO_BY_ID["train_validation_test_lab"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(challenge.en for challenge in manifest.theory.mini_challenges),
+            *(entry.term for entry in manifest.theory.glossary),
+        ],
+    )
+
+    assert manifest.level == 2
+    assert manifest.create_scene is create_train_validation_test_lab_scene
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Praktyczny"
+    assert manifest.tags == ("validation", "model-selection", "overfitting", "level-2")
+    assert "Train / Validation / Test Split Lab" in text
+    assert "train set" in text
+    assert "validation set" in text
+    assert "test set" in text
+    assert "model selection" in text
     assert "- / = / 0" in text
 
 

@@ -41,6 +41,7 @@ Real demo integrations are being added gradually. All current Level 1 and Level 
 The unified app includes these app-only Level 2 labs:
 
 - Data Leakage Lab demonstrates suspicious features, prediction-time availability, leaky-vs-clean validation scores, and the habit of distrusting metrics that look too perfect.
+- Train / Validation / Test Split Lab demonstrates model selection with validation scores, overfitting from train-validation gaps, and keeping test as the final honest check.
 - Class Imbalance Lab demonstrates accuracy traps, precision/recall trade-offs, false negatives, and decision threshold tuning when one class is rare.
 
 The unified app also includes app-only Level 3 labs:
@@ -66,7 +67,7 @@ Common shell controls:
 
 ## Standalone Demos
 
-Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Data Leakage Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, and t-SNE / UMAP Exploration Lab, are launched from the unified app.
+Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Data Leakage Lab, Train / Validation / Test Split Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, and t-SNE / UMAP Exploration Lab, are launched from the unified app.
 
 ### App-only Level 2 Labs
 
@@ -76,6 +77,14 @@ Data Leakage Lab controls:
 | ----------- | ------ |
 | `1-3` | Switch leakage scenario |
 | `L` | Toggle the suspicious leakage feature |
+| `R` | Reset the preview |
+
+Train / Validation / Test Split Lab controls:
+
+| Key / input | Action |
+| ----------- | ------ |
+| `1-3` | Switch split scenario |
+| `-` / `=` / `0` | Change or reset model complexity |
 | `R` | Reset the preview |
 
 Class Imbalance Lab controls:

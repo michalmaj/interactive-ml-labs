@@ -41,6 +41,7 @@ Kolejne dema będą podpinane stopniowo. Wszystkie obecne dema z Level 1 i Level
 Unified app zawiera te natywne laby z Level 2:
 
 - Data Leakage Lab pokazuje podejrzane cechy, dostępność w czasie predykcji, leaky-vs-clean validation scores i nawyk nieufania metrykom, które wyglądają zbyt idealnie.
+- Train / Validation / Test Split Lab pokazuje model selection przez validation scores, overfitting przez train-validation gaps i zostawianie test jako finalnego uczciwego checku.
 - Class Imbalance Lab pokazuje pułapki accuracy, trade-offs precision/recall, false negatives i strojenie decision threshold, gdy jedna klasa jest rzadka.
 
 Unified app zawiera też natywne laboratoria z Level 3:
@@ -66,7 +67,7 @@ Podstawowe sterowanie:
 
 ## Osobne dema
 
-Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Data Leakage Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
+Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Data Leakage Lab, Train / Validation / Test Split Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
 
 ### Natywne laby Level 2
 
@@ -76,6 +77,14 @@ Sterowanie w Data Leakage Lab:
 | ----------------- | ----- |
 | `1-3` | Zmień scenariusz leakage |
 | `L` | Włącz albo usuń podejrzaną cechę leakage |
+| `R` | Zresetuj podgląd |
+
+Sterowanie w Train / Validation / Test Split Lab:
+
+| Klawisz / wejście | Akcja |
+| ----------------- | ----- |
+| `1-3` | Zmień scenariusz splitu |
+| `-` / `=` / `0` | Zmień albo zresetuj complexity modelu |
 | `R` | Zresetuj podgląd |
 
 Sterowanie w Class Imbalance Lab:
