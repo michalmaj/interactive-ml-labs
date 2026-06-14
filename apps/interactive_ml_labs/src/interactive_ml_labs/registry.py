@@ -28,6 +28,7 @@ from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 from interactive_ml_labs.scene import Scene
+from interactive_ml_labs.split_lab_scene import create_train_validation_test_lab_scene
 from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
 
 LEVEL_MANIFESTS: tuple[LevelManifest, ...] = (
@@ -236,6 +237,38 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             pl=(
                 "Podnieś threshold i sprawdź false negatives. Nazwij ryzyko biznesowe "
                 "przeoczenia klasy pozytywnej."
+            ),
+        ),
+    ),
+    "train_validation_test_lab": (
+        LocalizedText(
+            en=(
+                "Compare simple, balanced, and too-flexible models. Pick the model "
+                "by validation score before looking at test."
+            ),
+            pl=(
+                "Porównaj model prosty, zbalansowany i zbyt elastyczny. Wybierz model "
+                "po validation score, zanim spojrzysz na test."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Find a case where train score improves but validation score drops. "
+                "Explain why this is overfitting."
+            ),
+            pl=(
+                "Znajdź przypadek, w którym train score rośnie, ale validation score spada. "
+                "Wyjaśnij, czemu to overfitting."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Switch to the small dataset preset and explain why validation becomes "
+                "noisier, but is still safer than tuning on test."
+            ),
+            pl=(
+                "Przełącz na mały dataset i wyjaśnij, czemu validation robi się bardziej "
+                "szumne, ale nadal jest bezpieczniejsze niż strojenie na test."
             ),
         ),
     ),
@@ -692,6 +725,45 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                     "Walidacja używająca tylko informacji dostępnych wtedy, "
                     "gdy model naprawdę będzie działał."
                 ),
+            ),
+        ),
+    ),
+    "train_validation_test_lab": (
+        GlossaryTerm(
+            term="train set",
+            definition=LocalizedText(
+                en="The data used to fit model parameters.",
+                pl="Dane używane do dopasowania parametrów modelu.",
+            ),
+        ),
+        GlossaryTerm(
+            term="validation set",
+            definition=LocalizedText(
+                en="The data used to compare model choices during development.",
+                pl="Dane używane do porównywania wyborów modelu podczas developmentu.",
+            ),
+        ),
+        GlossaryTerm(
+            term="test set",
+            definition=LocalizedText(
+                en=(
+                    "The final held-out data used for an honest estimate after decisions are made."
+                ),
+                pl="Finalne odłożone dane do uczciwej oceny po podjęciu decyzji.",
+            ),
+        ),
+        GlossaryTerm(
+            term="overfitting",
+            definition=LocalizedText(
+                en="When train score improves by memorizing details that do not generalize.",
+                pl="Gdy train score rośnie przez zapamiętywanie szczegółów bez generalizacji.",
+            ),
+        ),
+        GlossaryTerm(
+            term="model selection",
+            definition=LocalizedText(
+                en="Choosing the model setup using validation evidence, not the final test set.",
+                pl="Wybór konfiguracji modelu na podstawie validation, a nie finalnego test set.",
             ),
         ),
     ),
@@ -2278,6 +2350,153 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["data_leakage_lab"],
             glossary=LESSON_GLOSSARY["data_leakage_lab"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="train_validation_test_lab",
+        level=2,
+        title_en="Train / Validation / Test Split Lab",
+        title_pl="Train / Validation / Test Split Lab",
+        summary_en=(
+            "Choose model complexity with validation scores, then treat the test "
+            "score as the final honest estimate."
+        ),
+        summary_pl=(
+            "Wybieraj complexity modelu na podstawie validation score, a test score "
+            "traktuj jako finalną uczciwą ocenę."
+        ),
+        objectives=(
+            LocalizedText(
+                en="Compare train, validation, and test scores across model complexity.",
+                pl="Porównuj train, validation i test scores przy różnych complexity.",
+            ),
+            LocalizedText(
+                en="Recognize overfitting from a large train-validation gap.",
+                pl="Rozpoznawaj overfitting po dużym train-validation gap.",
+            ),
+            LocalizedText(
+                en="Use validation for model selection and keep test for the final check.",
+                pl="Używaj validation do wyboru modelu, a test zostaw na finalny check.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(en="switch split scenario", pl="zmień scenariusz splitu"),
+            ),
+            ControlBinding(
+                key="- / = / 0",
+                action=LocalizedText(
+                    en="decrease, increase, or reset model complexity",
+                    pl="zmniejsz, zwiększ albo zresetuj complexity modelu",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the preview", pl="zresetuj podgląd"),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read train/validation/test notes",
+                    pl="przeczytaj notatki o train/validation/test",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(en="open the help overlay", pl="otwórz pomoc"),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_train_validation_test_lab_scene,
+        difficulty=LocalizedText(en="Practical", pl="Praktyczny"),
+        tags=("validation", "model-selection", "overfitting", "level-2"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Train data fits the model. Validation data helps choose "
+                                "between model setups. Test data waits until the end."
+                            ),
+                            pl=(
+                                "Train data dopasowuje model. Validation data pomaga wybrać "
+                                "konfigurację. Test data czeka do końca."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "If you tune repeatedly on test, the test set stops being "
+                                "an honest estimate of future performance."
+                            ),
+                            pl=(
+                                "Jeśli stroisz model na test, test set przestaje być "
+                                "uczciwą oceną przyszłej jakości."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "A too-simple model has weak train and validation scores, "
+                                "so it is underfitting."
+                            ),
+                            pl=(
+                                "Zbyt prosty model ma słaby train i validation score, "
+                                "więc jest underfitting."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A too-flexible model can reach a high train score while "
+                                "validation drops."
+                            ),
+                            pl=(
+                                "Zbyt elastyczny model może mieć wysoki train score, "
+                                "gdy validation spada."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Do not pick the model with the best test score after trying "
+                                "many options; that leaks test feedback into model selection."
+                            ),
+                            pl=(
+                                "Nie wybieraj modelu po najlepszym test score po wielu próbach; "
+                                "to wpuszcza feedback z testu do model selection."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A small dataset makes validation noisier, but it is still "
+                                "safer than tuning on the final test set."
+                            ),
+                            pl=(
+                                "Mały dataset sprawia, że validation jest bardziej szumne, "
+                                "ale nadal jest bezpieczniejsze niż strojenie na test set."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["train_validation_test_lab"],
+            glossary=LESSON_GLOSSARY["train_validation_test_lab"],
         ),
     ),
     _placeholder_demo(

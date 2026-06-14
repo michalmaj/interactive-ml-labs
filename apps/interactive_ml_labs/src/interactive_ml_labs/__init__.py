@@ -89,6 +89,10 @@ from interactive_ml_labs.settings import (
     settings_from_json,
     settings_to_json,
 )
+from interactive_ml_labs.split_lab_scene import (
+    TrainValidationTestLabScene,
+    create_train_validation_test_lab_scene,
+)
 from interactive_ml_labs.tsne_umap_scene import (
     TSNEUMAPExplorationScene,
     create_tsne_umap_exploration_scene,
@@ -135,6 +139,7 @@ __all__ = [
     "Size",
     "TSNEUMAPExplorationScene",
     "TheorySection",
+    "TrainValidationTestLabScene",
     "center_rect",
     "choose_adaptive_window_size",
     "create_boosting_mistake_lab_scene",
@@ -150,6 +155,7 @@ __all__ = [
     "create_model_monitoring_drift_scene",
     "create_pca_lab_scene",
     "create_random_forest_scene",
+    "create_train_validation_test_lab_scene",
     "create_tsne_umap_exploration_scene",
     "default_settings_path",
     "demos_for_level",
