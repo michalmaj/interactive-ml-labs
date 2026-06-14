@@ -81,8 +81,8 @@ def test_level_three_placeholder_describes_future_advanced_demos() -> None:
     assert manifest.tags == ("level-3", "showcase", "planning")
 
 
-def test_model_monitoring_manifest_describes_next_level_three_candidate() -> None:
-    """Model Monitoring Drift Lab should define the next Level 3 prototype direction."""
+def test_model_monitoring_manifest_describes_level_three_lab() -> None:
+    """Model Monitoring Drift Lab should describe the current Level 3 lab."""
     manifest = DEMO_BY_ID["model_monitoring_drift_lab"]
     text = " ".join(
         [
@@ -111,6 +111,11 @@ def test_model_monitoring_manifest_describes_next_level_three_candidate() -> Non
     assert "metric drift" in text
     assert "monitoring window" in text
     assert "alert threshold" in text
+    assert "alert rate" in text
+    assert "persistence" in text
+    assert "lead signal" in text
+    assert "trend" in text
+    assert "press A" in text
     assert "baseline" in text
     assert "D / M" in text
     assert "- / =" in text

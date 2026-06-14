@@ -416,32 +416,42 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
     "model_monitoring_drift_lab": (
         LocalizedText(
             en=(
-                "Describe one signal that would make you distrust a model that still "
-                "looked good during training."
+                "Use preset 2 and decide whether data drift or metric drift becomes "
+                "the lead signal. Explain why that matters before checking the metric."
             ),
             pl=(
-                "Opisz jeden sygnał, przez który przestałbyś ufać modelowi, "
-                "mimo że dobrze wyglądał podczas treningu."
+                "Użyj presetu 2 i ustal, czy lead signal pochodzi z data drift, "
+                "czy z metric drift. Wyjaśnij, czemu to ważne przed sprawdzeniem metryki."
             ),
         ),
         LocalizedText(
             en=(
-                "Compare data drift with metric drift. Decide which one would be visible "
-                "first in a dashboard."
+                "Lower and raise the alert threshold. Watch how alert rate, persistence, "
+                "severity, and the recommendation change together."
             ),
             pl=(
-                "Porównaj data drift z metric drift. Ustal, który z nich byłby "
-                "widoczny jako pierwszy w dashboardzie."
+                "Obniż i podnieś alert threshold. Obserwuj, jak razem zmieniają się "
+                "alert rate, persistence, severity i rekomendacja."
             ),
         ),
         LocalizedText(
             en=(
-                "Sketch a monitoring window and mark where an alert should become "
-                "useful instead of noisy."
+                "Compare the stable baseline with the single-spike preset. Decide when "
+                "a trend deserves investigation and when it is only noise."
             ),
             pl=(
-                "Naszkicuj monitoring window i zaznacz, kiedy alert staje się "
-                "użyteczny zamiast szumieć."
+                "Porównaj stable baseline z presetem single spike. Ustal, kiedy trend "
+                "wymaga analizy, a kiedy jest tylko szumem."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "When an alert is active, press A and describe what evidence you would "
+                "document before changing the production model."
+            ),
+            pl=(
+                "Gdy alert jest aktywny, naciśnij A i opisz, jakie dowody warto "
+                "zapisać przed zmianą modelu na produkcji."
             ),
         ),
     ),
