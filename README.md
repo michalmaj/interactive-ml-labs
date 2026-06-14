@@ -103,6 +103,7 @@ The unified app is now the recommended guided experience. It includes all implem
 - Logistic Regression Boundary Lab,
 - Decision Tree Splitter,
 - Data Leakage Lab,
+- Class Imbalance Lab,
 - Random Forest Bagging Lab,
 - Boosting Mistake Lab.
 

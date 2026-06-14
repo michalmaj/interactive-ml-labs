@@ -5,6 +5,10 @@ from interactive_ml_labs.boosting_scene import (
     create_boosting_mistake_lab_scene,
 )
 from interactive_ml_labs.calibration_scene import CalibrationLabScene, create_calibration_lab_scene
+from interactive_ml_labs.class_imbalance_scene import (
+    ClassImbalanceLabScene,
+    create_class_imbalance_lab_scene,
+)
 from interactive_ml_labs.clustering_scene import (
     AlgorithmMode,
     ClusteringLabScene,
@@ -106,6 +110,7 @@ __all__ = [
     "AppSettings",
     "BoostingMistakeLabSceneAdapter",
     "CalibrationLabScene",
+    "ClassImbalanceLabScene",
     "ClusteringLabScene",
     "ControlBinding",
     "DataLeakageLabScene",
@@ -134,6 +139,7 @@ __all__ = [
     "choose_adaptive_window_size",
     "create_boosting_mistake_lab_scene",
     "create_calibration_lab_scene",
+    "create_class_imbalance_lab_scene",
     "create_clustering_lab_scene",
     "create_data_leakage_lab_scene",
     "create_decision_tree_scene",
