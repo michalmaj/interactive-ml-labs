@@ -498,8 +498,10 @@ class ModelMonitoringDriftScene:
         recommendation = self._recommendation_label()
         if self.investigation_acknowledged:
             return self._label(
-                f"Next: {recommendation}. Compare data, metric, and business context.",
-                f"Dalej: {recommendation}. Porównaj data, metric i kontekst biznesowy.",
+                f"Next: {recommendation}. "
+                "Record lead signal, first alert, alert rate, and severity.",
+                f"Dalej: {recommendation}. "
+                "Zapisz lead signal, pierwszy alert, alert rate i severity.",
             )
         if self._severity_key() == "high":
             return self._label(

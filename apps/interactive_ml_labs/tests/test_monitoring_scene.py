@@ -137,6 +137,8 @@ def test_monitoring_scene_acknowledges_only_active_alerts(monkeypatch) -> None:
         assert scene.investigation_acknowledged is True
         assert scene._investigation_state_label() == "acknowledged"
         assert "document finding" in scene._active_takeaway()
+        assert "lead signal" in scene._active_takeaway()
+        assert "alert rate" in scene._active_takeaway()
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
 
@@ -323,6 +325,8 @@ def test_monitoring_scene_reports_next_recommendation(monkeypatch) -> None:
 
         assert scene._recommendation_label() == "document finding"
         assert "Next: document finding" in scene._active_takeaway()
+        assert "first alert" in scene._active_takeaway()
+        assert "severity" in scene._active_takeaway()
     finally:
         pygame.quit()
 
