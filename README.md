@@ -102,6 +102,7 @@ The unified app is now the recommended guided experience. It includes all implem
 - k-NN Vote Map,
 - Logistic Regression Boundary Lab,
 - Decision Tree Splitter,
+- Data Leakage Lab,
 - Random Forest Bagging Lab,
 - Boosting Mistake Lab.
 

@@ -15,6 +15,7 @@ from interactive_ml_labs import (
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
 from interactive_ml_labs.calibration_scene import create_calibration_lab_scene
 from interactive_ml_labs.clustering_scene import create_clustering_lab_scene
+from interactive_ml_labs.data_leakage_scene import create_data_leakage_lab_scene
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
@@ -45,7 +46,7 @@ def test_registry_groups_demos_by_level() -> None:
     assert {demo.level for demo in level_two_demos} == {2}
     assert {demo.level for demo in level_three_demos} == {3}
     assert len(level_one_demos) >= 4
-    assert len(level_two_demos) >= 2
+    assert len(level_two_demos) >= 3
     assert len(level_three_demos) == 7
     assert level_three_demos[0].id == "clustering_lab"
     assert level_three_demos[1].id == "pca_lab"
@@ -54,6 +55,39 @@ def test_registry_groups_demos_by_level() -> None:
     assert level_three_demos[4].id == "tsne_umap_exploration_lab"
     assert level_three_demos[5].id == "model_monitoring_drift_lab"
     assert level_three_demos[6].id == "level_3_coming_soon"
+
+
+def test_data_leakage_manifest_describes_practical_level_two_lab() -> None:
+    """Data Leakage Lab should extend the practical ML track."""
+    manifest = DEMO_BY_ID["data_leakage_lab"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(challenge.en for challenge in manifest.theory.mini_challenges),
+            *(entry.term for entry in manifest.theory.glossary),
+        ],
+    )
+
+    assert manifest.level == 2
+    assert manifest.create_scene is create_data_leakage_lab_scene
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Praktyczny"
+    assert manifest.tags == ("data-quality", "validation", "leakage", "level-2")
+    assert "Data Leakage Lab" in text
+    assert "data leakage" in text
+    assert "prediction time" in text
+    assert "target proxy" in text
+    assert "validation" in text
+    assert "L" in text
 
 
 def test_level_three_placeholder_describes_future_advanced_demos() -> None:

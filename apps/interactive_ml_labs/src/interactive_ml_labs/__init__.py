@@ -10,6 +10,10 @@ from interactive_ml_labs.clustering_scene import (
     ClusteringLabScene,
     create_clustering_lab_scene,
 )
+from interactive_ml_labs.data_leakage_scene import (
+    DataLeakageLabScene,
+    create_data_leakage_lab_scene,
+)
 from interactive_ml_labs.decision_tree_scene import (
     DecisionTreeSceneAdapter,
     create_decision_tree_scene,
@@ -104,6 +108,7 @@ __all__ = [
     "CalibrationLabScene",
     "ClusteringLabScene",
     "ControlBinding",
+    "DataLeakageLabScene",
     "DecisionTreeSceneAdapter",
     "DemoManifest",
     "DemoTheory",
@@ -130,6 +135,7 @@ __all__ = [
     "create_boosting_mistake_lab_scene",
     "create_calibration_lab_scene",
     "create_clustering_lab_scene",
+    "create_data_leakage_lab_scene",
     "create_decision_tree_scene",
     "create_gradient_descent_scene",
     "create_knn_vote_map_scene",

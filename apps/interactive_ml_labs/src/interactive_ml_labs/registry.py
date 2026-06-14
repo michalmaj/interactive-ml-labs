@@ -7,6 +7,7 @@ from collections.abc import Callable
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
 from interactive_ml_labs.calibration_scene import create_calibration_lab_scene
 from interactive_ml_labs.clustering_scene import create_clustering_lab_scene
+from interactive_ml_labs.data_leakage_scene import create_data_leakage_lab_scene
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
@@ -174,6 +175,35 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             pl=(
                 "Przełączaj widoki i sprawdź, jakie regiony predykcji powstają po wybranym splicie."
             ),
+        ),
+    ),
+    "data_leakage_lab": (
+        LocalizedText(
+            en=(
+                "Run the leaky version first and explain why a nearly perfect "
+                "test score should make you suspicious."
+            ),
+            pl=(
+                "Najpierw uruchom wersję z leakage i wyjaśnij, czemu prawie idealny "
+                "test score powinien wzbudzić podejrzenia."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Press L to remove the suspicious feature. Compare the score drop "
+                "with the new, more honest validation result."
+            ),
+            pl=(
+                "Naciśnij L, żeby usunąć podejrzaną cechę. Porównaj spadek wyniku "
+                "z nowym, uczciwszym wynikiem walidacji."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "For each preset, decide whether the suspicious feature would exist "
+                "at prediction time."
+            ),
+            pl=("Dla każdego presetu ustal, czy podejrzana cecha istniałaby w czasie predykcji."),
         ),
     ),
     "random_forest_bagging_lab": (
@@ -586,6 +616,48 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                 pl=(
                     "Sytuacja, w której model uczy się przypadkowych szczegółów z treningu "
                     "zamiast stabilnego wzorca."
+                ),
+            ),
+        ),
+    ),
+    "data_leakage_lab": (
+        GlossaryTerm(
+            term="data leakage",
+            definition=LocalizedText(
+                en=(
+                    "When training or validation data contains information that would "
+                    "not be available at prediction time."
+                ),
+                pl=(
+                    "Sytuacja, w której dane treningowe albo walidacyjne zawierają "
+                    "informacje niedostępne w czasie predykcji."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="prediction time",
+            definition=LocalizedText(
+                en="The moment when the model must make a prediction in the real workflow.",
+                pl="Moment, w którym model musi wykonać predykcję w prawdziwym workflow.",
+            ),
+        ),
+        GlossaryTerm(
+            term="target proxy",
+            definition=LocalizedText(
+                en="A feature that almost directly reveals the target label under another name.",
+                pl="Cecha, która prawie bezpośrednio ujawnia target pod inną nazwą.",
+            ),
+        ),
+        GlossaryTerm(
+            term="honest validation",
+            definition=LocalizedText(
+                en=(
+                    "Validation that uses only information available when "
+                    "the model would really run."
+                ),
+                pl=(
+                    "Walidacja używająca tylko informacji dostępnych wtedy, "
+                    "gdy model naprawdę będzie działał."
                 ),
             ),
         ),
@@ -1984,6 +2056,152 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["decision_tree_splitter"],
             glossary=LESSON_GLOSSARY["decision_tree_splitter"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="data_leakage_lab",
+        level=2,
+        title_en="Data Leakage Lab",
+        title_pl="Data Leakage Lab",
+        summary_en=(
+            "Toggle suspicious features to see why perfect validation scores "
+            "can be a data problem, not a great model."
+        ),
+        summary_pl=(
+            "Przełączaj podejrzane cechy i zobacz, czemu idealne validation scores "
+            "mogą oznaczać problem z danymi, a nie świetny model."
+        ),
+        objectives=(
+            LocalizedText(
+                en="Compare leaky and cleaned validation results on the same scenario.",
+                pl="Porównaj leaky i cleaned validation results w tym samym scenariuszu.",
+            ),
+            LocalizedText(
+                en="Identify whether a feature would exist at prediction time.",
+                pl="Ustal, czy cecha istniałaby w czasie predykcji.",
+            ),
+            LocalizedText(
+                en="Treat suspiciously high scores as a prompt to inspect the dataset.",
+                pl="Traktuj podejrzanie wysokie wyniki jako sygnał do sprawdzenia datasetu.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(en="switch leakage scenario", pl="zmien scenariusz leakage"),
+            ),
+            ControlBinding(
+                key="L",
+                action=LocalizedText(
+                    en="toggle suspicious leakage feature",
+                    pl="włącz albo usuń podejrzaną cechę leakage",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the preview", pl="zresetuj podgląd"),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read data leakage notes", pl="przeczytaj notatki o leakage"
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(en="open the help overlay", pl="otwórz pomoc"),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_data_leakage_lab_scene,
+        difficulty=LocalizedText(en="Practical", pl="Praktyczny"),
+        tags=("data-quality", "validation", "leakage", "level-2"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Data leakage happens when the model sees information "
+                                "that would not exist at prediction time."
+                            ),
+                            pl=(
+                                "Data leakage pojawia sie wtedy, gdy model widzi informacje, "
+                                "których nie będzie w czasie predykcji."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The leaky score can look excellent because the suspicious "
+                                "feature already contains part of the answer."
+                            ),
+                            pl=(
+                                "Leaky score może wyglądać świetnie, bo podejrzana cecha "
+                                "zawiera już część odpowiedzi."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwowac"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "When leakage is enabled, train and test accuracy are both "
+                                "nearly perfect, so the small gap is not reassuring."
+                            ),
+                            pl=(
+                                "Gdy leakage jest włączone, train i test accuracy są prawie "
+                                "idealne, więc mały gap nie powinien uspokajać."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "After removing the leakage feature, the score drops, "
+                                "but the validation becomes more honest."
+                            ),
+                            pl=(
+                                "Po usunięciu cechy leakage wynik spada, ale walidacja "
+                                "staje się uczciwsza."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Do not trust a perfect metric until you check when each "
+                                "feature is created in the real workflow."
+                            ),
+                            pl=(
+                                "Nie ufaj idealnej metryce, dopóki nie sprawdzisz, kiedy "
+                                "każda cecha powstaje w prawdziwym workflow."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A feature can leak even if it has a harmless technical name, "
+                                "such as a timestamp or a future aggregate."
+                            ),
+                            pl=(
+                                "Cecha może leakować nawet wtedy, gdy ma niewinną nazwę "
+                                "techniczną, jak timestamp albo future aggregate."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["data_leakage_lab"],
+            glossary=LESSON_GLOSSARY["data_leakage_lab"],
         ),
     ),
     _placeholder_demo(
