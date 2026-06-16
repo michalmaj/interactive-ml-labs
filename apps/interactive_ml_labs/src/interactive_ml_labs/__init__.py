@@ -105,6 +105,7 @@ from interactive_ml_labs.split_lab_scene import (
     TrainValidationTestLabScene,
     create_train_validation_test_lab_scene,
 )
+from interactive_ml_labs.svm_margin_scene import SVMMarginLabScene, create_svm_margin_lab_scene
 from interactive_ml_labs.tsne_umap_scene import (
     TSNEUMAPExplorationScene,
     create_tsne_umap_exploration_scene,
@@ -152,6 +153,7 @@ __all__ = [
     "PCALabScene",
     "RandomForestSceneAdapter",
     "RectTuple",
+    "SVMMarginLabScene",
     "Scene",
     "SceneCommand",
     "SceneCommandKind",
@@ -179,6 +181,7 @@ __all__ = [
     "create_model_monitoring_drift_scene",
     "create_pca_lab_scene",
     "create_random_forest_scene",
+    "create_svm_margin_lab_scene",
     "create_train_validation_test_lab_scene",
     "create_tsne_umap_exploration_scene",
     "default_settings_path",
