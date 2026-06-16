@@ -31,6 +31,7 @@ from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 from interactive_ml_labs.scene import Scene
 from interactive_ml_labs.split_lab_scene import create_train_validation_test_lab_scene
 from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
+from interactive_ml_labs.tuning_scene import create_hyperparameter_tuning_lab_scene
 
 LEVEL_MANIFESTS: tuple[LevelManifest, ...] = (
     LevelManifest(
@@ -298,6 +299,37 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             pl=(
                 "Porównaj accuracy i iterations przed oraz po scaling. Oddziel "
                 "lepszą geometrię danych od lepszego modelu."
+            ),
+        ),
+    ),
+    "hyperparameter_tuning_lab": (
+        LocalizedText(
+            en=(
+                "Move across the validation curve and identify where validation "
+                "peaks before checking test."
+            ),
+            pl=(
+                "Przesuwaj się po validation curve i znajdź miejsce, gdzie validation "
+                "ma maksimum, zanim sprawdzisz test."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Find a setting with the highest train score. Explain why it is not "
+                "the best tuning choice."
+            ),
+            pl=(
+                "Znajdź ustawienie z najwyższym train score. Wyjaśnij, czemu nie jest "
+                "najlepszym wyborem tuningu."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Compare underfit, candidate, and overfit regions. Name the signal "
+                "that separates them."
+            ),
+            pl=(
+                "Porównaj regiony underfit, candidate i overfit. Nazwij sygnał, który je odróżnia."
             ),
         ),
     ),
@@ -829,6 +861,42 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             definition=LocalizedText(
                 en="When one raw numeric range is so large that it controls distance or gradients.",
                 pl="Sytuacja, gdy jeden surowy zakres liczbowy dominuje dystans albo gradienty.",
+            ),
+        ),
+    ),
+    "hyperparameter_tuning_lab": (
+        GlossaryTerm(
+            term="hyperparameter",
+            definition=LocalizedText(
+                en="A model setting chosen before or around training, not learned directly.",
+                pl=(
+                    "Ustawienie modelu wybierane przed treningiem albo wokół niego, "
+                    "nie uczone wprost."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="validation curve",
+            definition=LocalizedText(
+                en="A plot of train and validation scores across hyperparameter values.",
+                pl="Wykres train i validation scores dla kolejnych wartości hyperparameter.",
+            ),
+        ),
+        GlossaryTerm(
+            term="grid search",
+            definition=LocalizedText(
+                en="Trying a planned set of hyperparameter values and comparing validation scores.",
+                pl=(
+                    "Sprawdzanie zaplanowanych wartości hyperparameter "
+                    "i porównywanie validation scores."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="overfitting",
+            definition=LocalizedText(
+                en="When train score keeps improving while validation performance gets worse.",
+                pl="Gdy train score dalej rośnie, ale validation performance się pogarsza.",
             ),
         ),
     ),
@@ -2710,6 +2778,153 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["feature_scaling_lab"],
             glossary=LESSON_GLOSSARY["feature_scaling_lab"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="hyperparameter_tuning_lab",
+        level=2,
+        title_en="Hyperparameter Tuning Lab",
+        title_pl="Hyperparameter Tuning Lab",
+        summary_en=(
+            "Use validation curves to choose k, max depth, or regularization "
+            "without chasing train score."
+        ),
+        summary_pl=(
+            "Używaj validation curves do wyboru k, max depth albo regularization "
+            "bez gonienia za train score."
+        ),
+        objectives=(
+            LocalizedText(
+                en="Compare train, validation, and test scores across parameter values.",
+                pl="Porównuj train, validation i test scores dla kolejnych wartości parametru.",
+            ),
+            LocalizedText(
+                en="Pick the setting with the best validation score, not best train score.",
+                pl="Wybieraj ustawienie z najlepszym validation score, nie train score.",
+            ),
+            LocalizedText(
+                en="Recognize underfit and overfit regions on a validation curve.",
+                pl="Rozpoznawaj regiony underfit i overfit na validation curve.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(en="switch tuning scenario", pl="zmień scenariusz tuningu"),
+            ),
+            ControlBinding(
+                key="- / = / 0",
+                action=LocalizedText(
+                    en="decrease, increase, or reset parameter value",
+                    pl="zmniejsz, zwiększ albo zresetuj wartość parametru",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the preview", pl="zresetuj podgląd"),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read hyperparameter tuning notes",
+                    pl="przeczytaj notatki o hyperparameter tuning",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(en="open the help overlay", pl="otwórz pomoc"),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_hyperparameter_tuning_lab_scene,
+        difficulty=LocalizedText(en="Practical", pl="Praktyczny"),
+        tags=("validation", "tuning", "overfitting", "model-selection", "level-2"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Hyperparameters shape the model before it learns. "
+                                "You choose them by comparing validation evidence."
+                            ),
+                            pl=(
+                                "Hyperparameters kształtują model przed uczeniem. "
+                                "Wybiera się je przez porównanie validation evidence."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Train score often rewards complexity, so validation is "
+                                "the safer signal for model selection."
+                            ),
+                            pl=(
+                                "Train score często nagradza complexity, więc validation "
+                                "jest bezpieczniejszym sygnałem do model selection."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "The best validation point is usually between underfit "
+                                "and overfit regions."
+                            ),
+                            pl=(
+                                "Najlepszy punkt validation zwykle leży między regionami "
+                                "underfit i overfit."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Use test only after choosing the hyperparameter, otherwise "
+                                "test feedback leaks into tuning."
+                            ),
+                            pl=(
+                                "Używaj test dopiero po wyborze hyperparameter, inaczej "
+                                "feedback z testu przecieka do tuningu."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Do not pick the point with the highest train score; that "
+                                "often chooses the most overfit setup."
+                            ),
+                            pl=(
+                                "Nie wybieraj punktu z najwyższym train score; to często "
+                                "wybiera najbardziej overfit setup."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A grid search is only as honest as the validation split "
+                                "and the final untouched test set."
+                            ),
+                            pl=(
+                                "Grid search jest tak uczciwy, jak validation split "
+                                "i finalny nietknięty test set."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["hyperparameter_tuning_lab"],
+            glossary=LESSON_GLOSSARY["hyperparameter_tuning_lab"],
         ),
     ),
     _placeholder_demo(

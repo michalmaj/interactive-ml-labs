@@ -28,6 +28,7 @@ from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 from interactive_ml_labs.split_lab_scene import create_train_validation_test_lab_scene
 from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
+from interactive_ml_labs.tuning_scene import create_hyperparameter_tuning_lab_scene
 
 
 def test_registry_contains_current_demo_levels() -> None:
@@ -49,7 +50,7 @@ def test_registry_groups_demos_by_level() -> None:
     assert {demo.level for demo in level_two_demos} == {2}
     assert {demo.level for demo in level_three_demos} == {3}
     assert len(level_one_demos) >= 4
-    assert len(level_two_demos) >= 6
+    assert len(level_two_demos) >= 7
     assert len(level_three_demos) == 7
     assert level_three_demos[0].id == "clustering_lab"
     assert level_three_demos[1].id == "pca_lab"
@@ -190,6 +191,39 @@ def test_feature_scaling_manifest_describes_practical_level_two_lab() -> None:
     assert "range ratio" in text
     assert "feature dominance" in text
     assert "S" in text
+
+
+def test_hyperparameter_tuning_manifest_describes_practical_level_two_lab() -> None:
+    """Hyperparameter Tuning Lab should extend the practical model-selection track."""
+    manifest = DEMO_BY_ID["hyperparameter_tuning_lab"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(challenge.en for challenge in manifest.theory.mini_challenges),
+            *(entry.term for entry in manifest.theory.glossary),
+        ],
+    )
+
+    assert manifest.level == 2
+    assert manifest.create_scene is create_hyperparameter_tuning_lab_scene
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Praktyczny"
+    assert manifest.tags == ("validation", "tuning", "overfitting", "model-selection", "level-2")
+    assert "Hyperparameter Tuning Lab" in text
+    assert "hyperparameter" in text
+    assert "validation curve" in text
+    assert "grid search" in text
+    assert "overfitting" in text
+    assert "- / = / 0" in text
 
 
 def test_level_three_placeholder_describes_future_advanced_demos() -> None:

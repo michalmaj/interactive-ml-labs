@@ -43,6 +43,7 @@ Unified app zawiera te natywne laby z Level 2:
 - Data Leakage Lab pokazuje podejrzane cechy, dostępność w czasie predykcji, leaky-vs-clean validation scores i nawyk nieufania metrykom, które wyglądają zbyt idealnie.
 - Train / Validation / Test Split Lab pokazuje model selection przez validation scores, overfitting przez train-validation gaps i zostawianie test jako finalnego uczciwego checku.
 - Feature Scaling Lab pokazuje raw-vs-scaled feature ranges, range ratio, modele wrażliwe na skalę oraz wpływ scaling na accuracy i iterations.
+- Hyperparameter Tuning Lab pokazuje validation curves, intuicję grid search, train-validation gaps i wybór parametrów po validation score.
 - Class Imbalance Lab pokazuje pułapki accuracy, trade-offs precision/recall, false negatives i strojenie decision threshold, gdy jedna klasa jest rzadka.
 
 Unified app zawiera też natywne laboratoria z Level 3:
@@ -68,7 +69,7 @@ Podstawowe sterowanie:
 
 ## Osobne dema
 
-Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
+Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
 
 ### Natywne laby Level 2
 
@@ -95,6 +96,14 @@ Sterowanie w Feature Scaling Lab:
 | `1-3` | Zmień scenariusz scaling |
 | `S` | Włącz albo wyłącz feature scaling |
 | `M` | Zmień model |
+| `R` | Zresetuj podgląd |
+
+Sterowanie w Hyperparameter Tuning Lab:
+
+| Klawisz / wejście | Akcja |
+| ----------------- | ----- |
+| `1-3` | Zmień scenariusz tuningu |
+| `-` / `=` / `0` | Zmień albo zresetuj wartość parametru |
 | `R` | Zresetuj podgląd |
 
 Sterowanie w Class Imbalance Lab:
