@@ -1,5 +1,9 @@
 """Unified app shell for Interactive ML Labs."""
 
+from interactive_ml_labs.activation_scene import (
+    ActivationFunctionsLabScene,
+    create_activation_functions_lab_scene,
+)
 from interactive_ml_labs.boosting_scene import (
     BoostingMistakeLabSceneAdapter,
     create_boosting_mistake_lab_scene,
@@ -126,6 +130,7 @@ __all__ = [
     "POLISH_SAMPLE_TEXT",
     "SCREEN_MARGIN",
     "WINDOWED_RESOLUTIONS",
+    "ActivationFunctionsLabScene",
     "AlgorithmMode",
     "AppContext",
     "AppSettings",
@@ -164,6 +169,7 @@ __all__ = [
     "TrainValidationTestLabScene",
     "center_rect",
     "choose_adaptive_window_size",
+    "create_activation_functions_lab_scene",
     "create_boosting_mistake_lab_scene",
     "create_calibration_lab_scene",
     "create_class_imbalance_lab_scene",

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
+from interactive_ml_labs.activation_scene import create_activation_functions_lab_scene
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
 from interactive_ml_labs.calibration_scene import create_calibration_lab_scene
 from interactive_ml_labs.class_imbalance_scene import create_class_imbalance_lab_scene
@@ -189,6 +190,34 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             pl=(
                 "Porównaj wąski poprawny podział z szerszym poprawnym podziałem. "
                 "Zdecyduj, który powinien lepiej generalizować."
+            ),
+        ),
+    ),
+    "activation_functions_lab": (
+        LocalizedText(
+            en=(
+                "Move x far left and far right for sigmoid and tanh. Notice where "
+                "the local gradient almost disappears."
+            ),
+            pl=(
+                "Przesuń x daleko w lewo i w prawo dla sigmoid oraz tanh. Zobacz, "
+                "gdzie local gradient prawie znika."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Switch to ReLU and move x below zero. Explain why the neuron output "
+                "and local gradient become zero."
+            ),
+            pl=(
+                "Przełącz na ReLU i ustaw x poniżej zera. Wyjaśnij, czemu output "
+                "neuronu i local gradient spadają do zera."
+            ),
+        ),
+        LocalizedText(
+            en=("Compare output ranges. Decide which activation is centered around zero."),
+            pl=(
+                "Porównaj zakresy outputu. Zdecyduj, która activation jest wycentrowana wokół zera."
             ),
         ),
     ),
@@ -858,6 +887,39 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             definition=LocalizedText(
                 en="The widest correct separating gap the model can find.",
                 pl="Najszerszy poprawny gap rozdzielający klasy.",
+            ),
+        ),
+    ),
+    "activation_functions_lab": (
+        GlossaryTerm(
+            term="activation function",
+            definition=LocalizedText(
+                en="A nonlinear function that turns a neuron input into its output.",
+                pl="Nieliniowa funkcja zamieniająca input neuronu w jego output.",
+            ),
+        ),
+        GlossaryTerm(
+            term="local gradient",
+            definition=LocalizedText(
+                en="How strongly the activation output changes near the current input.",
+                pl="To, jak mocno output activation zmienia się przy aktualnym input.",
+            ),
+        ),
+        GlossaryTerm(
+            term="saturation",
+            definition=LocalizedText(
+                en="A flat region where changing input barely changes output.",
+                pl="Płaski region, w którym zmiana input prawie nie zmienia outputu.",
+            ),
+        ),
+        GlossaryTerm(
+            term="ReLU",
+            definition=LocalizedText(
+                en=(
+                    "An activation that returns zero for negative input "
+                    "and input itself above zero."
+                ),
+                pl="Activation zwracająca zero dla ujemnego input i sam input powyżej zera.",
             ),
         ),
     ),
@@ -2784,6 +2846,152 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["svm_margin_lab"],
             glossary=LESSON_GLOSSARY["svm_margin_lab"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="activation_functions_lab",
+        level=1,
+        title_en="Activation Functions Lab",
+        title_pl="Activation Functions Lab",
+        summary_en=(
+            "Compare sigmoid, tanh, and ReLU curves to see output ranges and local gradients."
+        ),
+        summary_pl=(
+            "Porównuj krzywe sigmoid, tanh i ReLU, żeby zobaczyć zakresy outputu "
+            "oraz local gradients."
+        ),
+        objectives=(
+            LocalizedText(
+                en="See how an activation function transforms one neuron input.",
+                pl="Zobacz, jak activation function przekształca pojedynczy input neuronu.",
+            ),
+            LocalizedText(
+                en="Compare output ranges for sigmoid, tanh, and ReLU.",
+                pl="Porównaj zakresy outputu dla sigmoid, tanh i ReLU.",
+            ),
+            LocalizedText(
+                en="Notice saturation and local gradient flow.",
+                pl="Zauważ saturation i przepływ local gradient.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(en="switch activation", pl="zmień activation"),
+            ),
+            ControlBinding(
+                key="Left / Right",
+                action=LocalizedText(en="move input x", pl="przesuń input x"),
+            ),
+            ControlBinding(
+                key="0",
+                action=LocalizedText(en="reset x to zero", pl="zresetuj x do zera"),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the lab", pl="zresetuj lab"),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read activation function notes",
+                    pl="przeczytaj notatki o activation functions",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(en="open the help overlay", pl="otwórz pomoc"),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_activation_functions_lab_scene,
+        difficulty=LocalizedText(en="Introductory", pl="Wprowadzający"),
+        tags=("neural-networks", "activation", "gradient", "level-1"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "A neural network layer usually applies an activation after "
+                                "a weighted sum."
+                            ),
+                            pl=(
+                                "Warstwa neural network zwykle stosuje activation po "
+                                "ważonej sumie wejść."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The activation changes both the output signal and the gradient "
+                                "used for learning."
+                            ),
+                            pl=(
+                                "Activation zmienia zarówno output signal, jak i gradient "
+                                "używany do uczenia."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Sigmoid and tanh flatten at the edges, so their local gradient "
+                                "gets tiny."
+                            ),
+                            pl=(
+                                "Sigmoid i tanh wypłaszczają się na krańcach, więc ich local "
+                                "gradient robi się bardzo mały."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "ReLU is simple and keeps gradient on the positive side, but "
+                                "negative input gives zero output."
+                            ),
+                            pl=(
+                                "ReLU jest proste i utrzymuje gradient po dodatniej stronie, "
+                                "ale ujemny input daje output zero."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "An activation is not just decoration; it shapes what the neuron "
+                                "can express."
+                            ),
+                            pl=(
+                                "Activation nie jest ozdobą; wpływa na to, co neuron może wyrazić."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Flat regions can slow learning because gradients carry "
+                                "less signal."
+                            ),
+                            pl=(
+                                "Płaskie regiony mogą spowalniać uczenie, bo gradients niosą "
+                                "mniej sygnału."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["activation_functions_lab"],
+            glossary=LESSON_GLOSSARY["activation_functions_lab"],
         ),
     ),
     _placeholder_demo(
