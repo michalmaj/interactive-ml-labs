@@ -104,6 +104,7 @@ The unified app is now the recommended guided experience. It includes all implem
 - Decision Tree Splitter,
 - Data Leakage Lab,
 - Train / Validation / Test Split Lab,
+- Feature Scaling Lab,
 - Class Imbalance Lab,
 - Random Forest Bagging Lab,
 - Boosting Mistake Lab.
