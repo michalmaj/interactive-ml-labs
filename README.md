@@ -39,6 +39,7 @@ Core machine learning intuition:
 
 - linear regression,
 - gradient descent,
+- distance metrics,
 - logistic regression,
 - k-nearest neighbors,
 - decision trees,
@@ -101,6 +102,7 @@ The unified app is now the recommended guided experience. It includes all implem
 
 - Linear Regression Line Fit Lab,
 - Gradient Descent Playground,
+- Distance Metrics Lab,
 - k-NN Vote Map,
 - Logistic Regression Boundary Lab,
 - Decision Tree Splitter,
