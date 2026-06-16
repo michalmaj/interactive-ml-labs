@@ -38,6 +38,10 @@ wybór języka
 
 Kolejne dema będą podpinane stopniowo. Wszystkie obecne dema z Level 1 i Level 2 działają już w unified app. Oryginalne pakiety demo nadal można uruchomić osobno, a natywne laby app-only uruchamia się z unified app.
 
+Unified app zawiera ten natywny lab z Level 1:
+
+- Linear Regression Line Fit Lab pokazuje slope, intercept, residuals, MSE loss i least-squares fitting przez ręczne ustawianie prostej.
+
 Unified app zawiera te natywne laby z Level 2:
 
 - Data Leakage Lab pokazuje podejrzane cechy, dostępność w czasie predykcji, leaky-vs-clean validation scores i nawyk nieufania metrykom, które wyglądają zbyt idealnie.
@@ -69,7 +73,19 @@ Podstawowe sterowanie:
 
 ## Osobne dema
 
-Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
+Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Linear Regression Line Fit Lab, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
+
+### Natywne laby Level 1
+
+Sterowanie w Linear Regression Line Fit Lab:
+
+| Klawisz / wejście | Akcja |
+| ----------------- | ----- |
+| `1-3` | Zmień dataset |
+| `Left` / `Right` | Zmień slope |
+| `Up` / `Down` | Zmień intercept |
+| `F` | Przejdź do least-squares fit |
+| `R` | Zresetuj lab |
 
 ### Natywne laby Level 2
 

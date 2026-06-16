@@ -43,6 +43,10 @@ from interactive_ml_labs.gradient_scene import (
     create_gradient_descent_scene,
 )
 from interactive_ml_labs.knn_scene import KNNVoteMapSceneAdapter, create_knn_vote_map_scene
+from interactive_ml_labs.linear_regression_scene import (
+    LinearRegressionLineFitLabScene,
+    create_linear_regression_line_fit_lab_scene,
+)
 from interactive_ml_labs.logistic_scene import (
     LogisticRegressionSceneAdapter,
     create_logistic_regression_scene,
@@ -135,6 +139,7 @@ __all__ = [
     "HyperparameterTuningLabScene",
     "KNNVoteMapSceneAdapter",
     "LevelManifest",
+    "LinearRegressionLineFitLabScene",
     "LocalizedText",
     "LogisticRegressionSceneAdapter",
     "ModelComparisonLabScene",
@@ -162,6 +167,7 @@ __all__ = [
     "create_gradient_descent_scene",
     "create_hyperparameter_tuning_lab_scene",
     "create_knn_vote_map_scene",
+    "create_linear_regression_line_fit_lab_scene",
     "create_logistic_regression_scene",
     "create_model_comparison_lab_scene",
     "create_model_monitoring_drift_scene",

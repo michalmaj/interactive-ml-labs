@@ -13,6 +13,7 @@ from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.feature_scaling_scene import create_feature_scaling_lab_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
+from interactive_ml_labs.linear_regression_scene import create_linear_regression_line_fit_lab_scene
 from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
 from interactive_ml_labs.manifest import (
     ControlBinding,
@@ -61,6 +62,38 @@ LEVEL_MANIFESTS: tuple[LevelManifest, ...] = (
 )
 
 LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
+    "linear_regression_line_fit_lab": (
+        LocalizedText(
+            en=(
+                "Move slope until residuals stop growing from left to right. "
+                "Then adjust intercept to balance the errors."
+            ),
+            pl=(
+                "Zmieniaj slope, aż residuals przestaną rosnąć od lewej do prawej. "
+                "Potem dopasuj intercept, żeby zbalansować błędy."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Press F to compare your line with the least-squares fit. "
+                "Name which parameter was farther away."
+            ),
+            pl=(
+                "Naciśnij F i porównaj swoją prostą z least-squares fit. "
+                "Nazwij parametr, który był dalej od optimum."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Switch to the noisy dataset and explain why the best line "
+                "still leaves visible residuals."
+            ),
+            pl=(
+                "Przełącz się na zaszumiony dataset i wyjaśnij, czemu najlepsza "
+                "prosta nadal zostawia widoczne residuals."
+            ),
+        ),
+    ),
     "gradient_descent_playground": (
         LocalizedText(
             en=(
@@ -647,6 +680,36 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
 }
 
 LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
+    "linear_regression_line_fit_lab": (
+        GlossaryTerm(
+            term="linear regression",
+            definition=LocalizedText(
+                en="A regression model that predicts a numeric value with a straight line.",
+                pl="Model regresji, który przewiduje wartość liczbową za pomocą prostej.",
+            ),
+        ),
+        GlossaryTerm(
+            term="residual",
+            definition=LocalizedText(
+                en="The vertical error between a point and the model prediction.",
+                pl="Pionowy błąd między punktem a predykcją modelu.",
+            ),
+        ),
+        GlossaryTerm(
+            term="MSE loss",
+            definition=LocalizedText(
+                en="Mean squared error: the average squared residual across all points.",
+                pl="Mean squared error: średni kwadrat residuals dla wszystkich punktów.",
+            ),
+        ),
+        GlossaryTerm(
+            term="least squares",
+            definition=LocalizedText(
+                en="The line that minimizes the sum of squared residuals.",
+                pl="Prosta minimalizująca sumę kwadratów residuals.",
+            ),
+        ),
+    ),
     "gradient_descent_playground": (
         GlossaryTerm(
             term="loss",
@@ -1649,6 +1712,157 @@ def _placeholder_demo(
 
 
 DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
+    _placeholder_demo(
+        demo_id="linear_regression_line_fit_lab",
+        level=1,
+        title_en="Linear Regression Line Fit Lab",
+        title_pl="Linear Regression Line Fit Lab",
+        summary_en="Fit a straight line by adjusting slope and intercept, then compare residuals.",
+        summary_pl=("Dopasuj prostą przez zmianę slope i intercept, a potem porównaj residuals."),
+        objectives=(
+            LocalizedText(
+                en="Connect slope and intercept with the visible position of a regression line.",
+                pl="Połącz slope i intercept z widocznym położeniem prostej regresji.",
+            ),
+            LocalizedText(
+                en="Use residuals and MSE loss to judge whether a line fits the data.",
+                pl="Używaj residuals i MSE loss do oceny, czy prosta pasuje do danych.",
+            ),
+            LocalizedText(
+                en="Compare a manual line with the least-squares fit.",
+                pl="Porównaj ręcznie ustawioną prostą z least-squares fit.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(en="switch dataset", pl="zmień dataset"),
+            ),
+            ControlBinding(
+                key="Left / Right",
+                action=LocalizedText(
+                    en="decrease or increase slope", pl="zmniejsz albo zwiększ slope"
+                ),
+            ),
+            ControlBinding(
+                key="Up / Down",
+                action=LocalizedText(
+                    en="raise or lower intercept",
+                    pl="podnieś albo opuść intercept",
+                ),
+            ),
+            ControlBinding(
+                key="F",
+                action=LocalizedText(
+                    en="jump to the least-squares fit",
+                    pl="przejdź do least-squares fit",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the lab", pl="zresetuj lab"),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read linear regression notes",
+                    pl="przeczytaj notatki o linear regression",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(en="open the help overlay", pl="otwórz pomoc"),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_linear_regression_line_fit_lab_scene,
+        difficulty=LocalizedText(en="Introductory", pl="Wprowadzający"),
+        tags=("regression", "loss", "residuals", "level-1"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Linear regression fits a line that predicts a numeric target "
+                                "from one input feature."
+                            ),
+                            pl=(
+                                "Linear regression dopasowuje prostą, która przewiduje liczbowy "
+                                "target z jednej cechy wejściowej."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Slope controls the tilt. Intercept controls how high or low "
+                                "the line sits."
+                            ),
+                            pl=(
+                                "Slope steruje nachyleniem. Intercept przesuwa prostą "
+                                "wyżej albo niżej."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Residuals are the vertical distances from points to the line. "
+                                "Large residuals mean large mistakes."
+                            ),
+                            pl=(
+                                "Residuals to pionowe odległości punktów od prostej. "
+                                "Duże residuals oznaczają duże błędy."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Least squares chooses the line with the smallest squared "
+                                "residuals overall."
+                            ),
+                            pl=(
+                                "Least squares wybiera prostą z najmniejszym łącznym "
+                                "kwadratem residuals."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Do not fit one point perfectly if it makes every other "
+                                "point worse."
+                            ),
+                            pl=(
+                                "Nie dopasowuj idealnie jednego punktu, jeśli psuje to "
+                                "większość pozostałych."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=("Noise means even the best simple line can leave visible errors."),
+                            pl=(
+                                "Noise oznacza, że nawet najlepsza prosta może zostawić "
+                                "widoczne błędy."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["linear_regression_line_fit_lab"],
+            glossary=LESSON_GLOSSARY["linear_regression_line_fit_lab"],
+        ),
+    ),
     _placeholder_demo(
         demo_id="gradient_descent_playground",
         level=1,
