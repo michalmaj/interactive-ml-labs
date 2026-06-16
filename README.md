@@ -37,6 +37,7 @@ Individual demo entry points are intentionally still supported. They are useful 
 
 Core machine learning intuition:
 
+- linear regression,
 - gradient descent,
 - logistic regression,
 - k-nearest neighbors,
@@ -98,6 +99,7 @@ This repository is also intended to demonstrate how real software projects are d
 
 The unified app is now the recommended guided experience. It includes all implemented Level 1 and Level 2 demos:
 
+- Linear Regression Line Fit Lab,
 - Gradient Descent Playground,
 - k-NN Vote Map,
 - Logistic Regression Boundary Lab,

@@ -5,7 +5,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pygame
-from interactive_ml_labs import DEMO_BY_ID
+from interactive_ml_labs import DEMO_BY_ID, demos_for_level
 from interactive_ml_labs.boosting_scene import BoostingMistakeLabSceneAdapter
 from interactive_ml_labs.decision_tree_scene import DecisionTreeSceneAdapter
 from interactive_ml_labs.gradient_scene import GradientDescentSceneAdapter
@@ -525,7 +525,9 @@ def test_shell_demo_selection_renders_selected_demo_details(monkeypatch) -> None
     try:
         app.context.current_level = 1
         app.screen_name = ScreenName.DEMOS
-        app.selected_index = 2
+        app.selected_index = tuple(demo.id for demo in demos_for_level(1)).index(
+            "logistic_regression_boundary_lab"
+        )
         app._draw_wrapped = capture_wrapped
 
         app._render_demos()

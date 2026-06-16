@@ -21,6 +21,7 @@ from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.feature_scaling_scene import create_feature_scaling_lab_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
+from interactive_ml_labs.linear_regression_scene import create_linear_regression_line_fit_lab_scene
 from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
 from interactive_ml_labs.model_comparison_scene import create_model_comparison_lab_scene
 from interactive_ml_labs.monitoring_scene import create_model_monitoring_drift_scene
@@ -49,7 +50,7 @@ def test_registry_groups_demos_by_level() -> None:
     assert {demo.level for demo in level_one_demos} == {1}
     assert {demo.level for demo in level_two_demos} == {2}
     assert {demo.level for demo in level_three_demos} == {3}
-    assert len(level_one_demos) >= 4
+    assert len(level_one_demos) >= 5
     assert len(level_two_demos) >= 7
     assert len(level_three_demos) == 7
     assert level_three_demos[0].id == "clustering_lab"
@@ -59,6 +60,40 @@ def test_registry_groups_demos_by_level() -> None:
     assert level_three_demos[4].id == "tsne_umap_exploration_lab"
     assert level_three_demos[5].id == "model_monitoring_drift_lab"
     assert level_three_demos[6].id == "level_3_coming_soon"
+
+
+def test_linear_regression_manifest_describes_foundation_level_one_lab() -> None:
+    """Linear Regression Line Fit Lab should extend the foundation track."""
+    manifest = DEMO_BY_ID["linear_regression_line_fit_lab"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(challenge.en for challenge in manifest.theory.mini_challenges),
+            *(entry.term for entry in manifest.theory.glossary),
+        ],
+    )
+
+    assert manifest.level == 1
+    assert manifest.create_scene is create_linear_regression_line_fit_lab_scene
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Wprowadzający"
+    assert manifest.tags == ("regression", "loss", "residuals", "level-1")
+    assert "Linear Regression Line Fit Lab" in text
+    assert "linear regression" in text
+    assert "residual" in text
+    assert "MSE loss" in text
+    assert "least squares" in text
+    assert "Left / Right" in text
+    assert "F" in text
 
 
 def test_data_leakage_manifest_describes_practical_level_two_lab() -> None:
