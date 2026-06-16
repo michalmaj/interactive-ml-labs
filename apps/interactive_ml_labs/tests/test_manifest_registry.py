@@ -12,6 +12,7 @@ from interactive_ml_labs import (
     levels_from_manifests,
     validate_demo_registry,
 )
+from interactive_ml_labs.activation_scene import create_activation_functions_lab_scene
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
 from interactive_ml_labs.calibration_scene import create_calibration_lab_scene
 from interactive_ml_labs.class_imbalance_scene import create_class_imbalance_lab_scene
@@ -52,7 +53,7 @@ def test_registry_groups_demos_by_level() -> None:
     assert {demo.level for demo in level_one_demos} == {1}
     assert {demo.level for demo in level_two_demos} == {2}
     assert {demo.level for demo in level_three_demos} == {3}
-    assert len(level_one_demos) >= 7
+    assert len(level_one_demos) >= 8
     assert len(level_two_demos) >= 7
     assert len(level_three_demos) == 7
     assert level_three_demos[0].id == "clustering_lab"
@@ -164,6 +165,40 @@ def test_svm_margin_manifest_describes_foundation_level_one_lab() -> None:
     assert "maximum margin" in text
     assert "Left / Right" in text
     assert "F" in text
+
+
+def test_activation_manifest_describes_foundation_level_one_lab() -> None:
+    """Activation Functions Lab should introduce neural-network building blocks."""
+    manifest = DEMO_BY_ID["activation_functions_lab"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(challenge.en for challenge in manifest.theory.mini_challenges),
+            *(entry.term for entry in manifest.theory.glossary),
+        ],
+    )
+
+    assert manifest.level == 1
+    assert manifest.create_scene is create_activation_functions_lab_scene
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Wprowadzający"
+    assert manifest.tags == ("neural-networks", "activation", "gradient", "level-1")
+    assert "Activation Functions Lab" in text
+    assert "sigmoid" in text
+    assert "tanh" in text
+    assert "ReLU" in text
+    assert "local gradient" in text
+    assert "saturation" in text
+    assert "Left / Right" in text
 
 
 def test_data_leakage_manifest_describes_practical_level_two_lab() -> None:

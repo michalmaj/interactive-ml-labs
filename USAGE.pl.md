@@ -43,6 +43,7 @@ Unified app zawiera te natywne laby z Level 1:
 - Linear Regression Line Fit Lab pokazuje slope, intercept, residuals, MSE loss i least-squares fitting przez ręczne ustawianie prostej.
 - Distance Metrics Lab pokazuje query points, nearest neighbors, Euclidean distance, Manhattan distance, Chebyshev distance i to, czemu k-NN zależy od metryki.
 - SVM Margin Lab pokazuje decision boundaries, support vectors, szerokość margin i to, czemu liczy się najszerszy poprawny separator.
+- Activation Functions Lab pokazuje sigmoid, tanh, ReLU, zakresy outputu, saturation i przepływ local gradient.
 
 Unified app zawiera te natywne laby z Level 2:
 
@@ -75,7 +76,7 @@ Podstawowe sterowanie:
 
 ## Osobne dema
 
-Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Linear Regression Line Fit Lab, Distance Metrics Lab, SVM Margin Lab, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
+Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Linear Regression Line Fit Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
 
 ### Natywne laby Level 1
 
@@ -106,6 +107,15 @@ Sterowanie w SVM Margin Lab:
 | `Left` / `Right` | Obróć boundary |
 | `Up` / `Down` | Przesuń boundary |
 | `F` | Przejdź do wide-margin fit |
+| `R` | Zresetuj lab |
+
+Sterowanie w Activation Functions Lab:
+
+| Klawisz / wejście | Akcja |
+| ----------------- | ----- |
+| `1-3` | Zmień activation |
+| `Left` / `Right` | Przesuń input x |
+| `0` | Zresetuj x do zera |
 | `R` | Zresetuj lab |
 
 ### Natywne laby Level 2
