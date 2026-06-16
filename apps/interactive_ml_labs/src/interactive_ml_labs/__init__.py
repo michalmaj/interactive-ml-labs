@@ -33,6 +33,10 @@ from interactive_ml_labs.display import (
     choose_adaptive_window_size,
     scale_rect_to_fit,
 )
+from interactive_ml_labs.distance_metrics_scene import (
+    DistanceMetricsLabScene,
+    create_distance_metrics_lab_scene,
+)
 from interactive_ml_labs.feature_scaling_scene import (
     FeatureScalingLabScene,
     create_feature_scaling_lab_scene,
@@ -133,6 +137,7 @@ __all__ = [
     "DecisionTreeSceneAdapter",
     "DemoManifest",
     "DemoTheory",
+    "DistanceMetricsLabScene",
     "FeatureScalingLabScene",
     "FixedSizeScene",
     "GradientDescentSceneAdapter",
@@ -163,6 +168,7 @@ __all__ = [
     "create_clustering_lab_scene",
     "create_data_leakage_lab_scene",
     "create_decision_tree_scene",
+    "create_distance_metrics_lab_scene",
     "create_feature_scaling_lab_scene",
     "create_gradient_descent_scene",
     "create_hyperparameter_tuning_lab_scene",

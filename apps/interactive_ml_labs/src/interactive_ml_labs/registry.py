@@ -10,6 +10,7 @@ from interactive_ml_labs.class_imbalance_scene import create_class_imbalance_lab
 from interactive_ml_labs.clustering_scene import create_clustering_lab_scene
 from interactive_ml_labs.data_leakage_scene import create_data_leakage_lab_scene
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
+from interactive_ml_labs.distance_metrics_scene import create_distance_metrics_lab_scene
 from interactive_ml_labs.feature_scaling_scene import create_feature_scaling_lab_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
@@ -123,6 +124,38 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             pl=(
                 "Zmień punkt startowy i porównaj, czy ten sam learning rate "
                 "nadal zachowuje się stabilnie."
+            ),
+        ),
+    ),
+    "distance_metrics_lab": (
+        LocalizedText(
+            en=(
+                "Move the query point and watch which labeled point becomes nearest. "
+                "Explain the result before changing the metric."
+            ),
+            pl=(
+                "Przesuwaj query point i obserwuj, który punkt staje się nearest. "
+                "Wyjaśnij wynik, zanim zmienisz metrykę."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Switch between Euclidean, Manhattan, and Chebyshev. Find a case "
+                "where the nearest point changes."
+            ),
+            pl=(
+                "Przełączaj Euclidean, Manhattan i Chebyshev. Znajdź przypadek, "
+                "w którym nearest point się zmienia."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Look at the distance bars and name which axis difference dominates "
+                "the chosen metric."
+            ),
+            pl=(
+                "Spójrz na paski distance i nazwij, która różnica na osi dominuje "
+                "dla wybranej metryki."
             ),
         ),
     ),
@@ -732,6 +765,36 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                 pl=(
                     "Kierunek najszybszego wzrostu loss; gradient descent idzie w stronę przeciwną."
                 ),
+            ),
+        ),
+    ),
+    "distance_metrics_lab": (
+        GlossaryTerm(
+            term="distance metric",
+            definition=LocalizedText(
+                en="A rule for turning two points into one distance number.",
+                pl="Reguła zamieniająca dwa punkty w jedną liczbę distance.",
+            ),
+        ),
+        GlossaryTerm(
+            term="Euclidean distance",
+            definition=LocalizedText(
+                en="Straight-line distance between two points.",
+                pl="Distance po linii prostej między dwoma punktami.",
+            ),
+        ),
+        GlossaryTerm(
+            term="Manhattan distance",
+            definition=LocalizedText(
+                en="Distance counted as horizontal plus vertical movement.",
+                pl="Distance liczony jako ruch poziomy plus pionowy.",
+            ),
+        ),
+        GlossaryTerm(
+            term="nearest neighbor",
+            definition=LocalizedText(
+                en="The training point with the smallest distance to the query point.",
+                pl="Punkt treningowy z najmniejszym distance do query point.",
             ),
         ),
     ),
@@ -2022,6 +2085,151 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["gradient_descent_playground"],
             glossary=LESSON_GLOSSARY["gradient_descent_playground"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="distance_metrics_lab",
+        level=1,
+        title_en="Distance Metrics Lab",
+        title_pl="Distance Metrics Lab",
+        summary_en=(
+            "Move a query point and compare Euclidean, Manhattan, and Chebyshev nearest neighbors."
+        ),
+        summary_pl=(
+            "Przesuwaj query point i porównuj nearest neighbors dla Euclidean, "
+            "Manhattan i Chebyshev."
+        ),
+        objectives=(
+            LocalizedText(
+                en="See how a distance metric turns feature differences into one number.",
+                pl="Zobacz, jak metryka distance zamienia różnice cech w jedną liczbę.",
+            ),
+            LocalizedText(
+                en="Compare nearest neighbors under Euclidean, Manhattan, and Chebyshev distance.",
+                pl="Porównaj nearest neighbors dla Euclidean, Manhattan i Chebyshev distance.",
+            ),
+            LocalizedText(
+                en="Connect distance metrics with k-NN classification intuition.",
+                pl="Połącz metryki distance z intuicją stojącą za k-NN classification.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(en="switch dataset", pl="zmień dataset"),
+            ),
+            ControlBinding(
+                key="Arrow keys",
+                action=LocalizedText(en="move the query point", pl="przesuń query point"),
+            ),
+            ControlBinding(
+                key="M",
+                action=LocalizedText(en="cycle distance metric", pl="zmień metrykę distance"),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the lab", pl="zresetuj lab"),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read distance metric notes",
+                    pl="przeczytaj notatki o metrykach distance",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(en="open the help overlay", pl="otwórz pomoc"),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_distance_metrics_lab_scene,
+        difficulty=LocalizedText(en="Introductory", pl="Wprowadzający"),
+        tags=("distance", "knn", "classification", "level-1"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Many ML methods need a way to decide whether two points are close."
+                            ),
+                            pl=(
+                                "Wiele metod ML potrzebuje sposobu na ocenę, czy dwa punkty "
+                                "są blisko."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A distance metric is that rule. Different rules can disagree "
+                                "near ambiguous points."
+                            ),
+                            pl=(
+                                "Metryka distance jest taką regułą. Różne reguły mogą się "
+                                "nie zgadzać przy niejednoznacznych punktach."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Euclidean measures straight-line closeness. Manhattan counts "
+                                "axis-aligned movement."
+                            ),
+                            pl=(
+                                "Euclidean mierzy bliskość po prostej. Manhattan liczy ruch "
+                                "wzdłuż osi."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The nearest neighbor is not a universal fact; it depends on "
+                                "the chosen metric."
+                            ),
+                            pl=(
+                                "Nearest neighbor nie jest faktem absolutnym; zależy od "
+                                "wybranej metryki."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Do not assume distance is neutral. The metric encodes what "
+                                "kind of difference matters."
+                            ),
+                            pl=(
+                                "Nie zakładaj, że distance jest neutralny. Metryka koduje, "
+                                "jaki rodzaj różnicy ma znaczenie."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Before using k-NN, ask whether the feature geometry matches "
+                                "the problem."
+                            ),
+                            pl=(
+                                "Przed użyciem k-NN zapytaj, czy geometria cech pasuje do problemu."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["distance_metrics_lab"],
+            glossary=LESSON_GLOSSARY["distance_metrics_lab"],
         ),
     ),
     _placeholder_demo(

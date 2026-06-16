@@ -38,9 +38,10 @@ language selection
 
 Real demo integrations are being added gradually. All current Level 1 and Level 2 demos are available through the unified app. Original package demos can still be run directly, while native app-only labs are launched from the unified app.
 
-The unified app includes this app-only Level 1 lab:
+The unified app includes these app-only Level 1 labs:
 
 - Linear Regression Line Fit Lab demonstrates slope, intercept, residuals, MSE loss, and least-squares fitting with a manually adjustable line.
+- Distance Metrics Lab demonstrates query points, nearest neighbors, Euclidean distance, Manhattan distance, Chebyshev distance, and why k-NN depends on the metric.
 
 The unified app includes these app-only Level 2 labs:
 
@@ -73,7 +74,7 @@ Common shell controls:
 
 ## Standalone Demos
 
-Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Linear Regression Line Fit Lab, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, and t-SNE / UMAP Exploration Lab, are launched from the unified app.
+Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Linear Regression Line Fit Lab, Distance Metrics Lab, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, and t-SNE / UMAP Exploration Lab, are launched from the unified app.
 
 ### App-only Level 1 Labs
 
@@ -85,6 +86,15 @@ Linear Regression Line Fit Lab controls:
 | `Left` / `Right` | Change slope |
 | `Up` / `Down` | Change intercept |
 | `F` | Jump to the least-squares fit |
+| `R` | Reset the lab |
+
+Distance Metrics Lab controls:
+
+| Key / input | Action |
+| ----------- | ------ |
+| `1-3` | Switch dataset |
+| Arrow keys | Move the query point |
+| `M` | Cycle distance metric |
 | `R` | Reset the lab |
 
 ### App-only Level 2 Labs
