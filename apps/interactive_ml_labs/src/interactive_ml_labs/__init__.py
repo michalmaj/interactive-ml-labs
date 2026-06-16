@@ -101,6 +101,10 @@ from interactive_ml_labs.tsne_umap_scene import (
     TSNEUMAPExplorationScene,
     create_tsne_umap_exploration_scene,
 )
+from interactive_ml_labs.tuning_scene import (
+    HyperparameterTuningLabScene,
+    create_hyperparameter_tuning_lab_scene,
+)
 
 __all__ = [
     "BOOSTING_FIXED_SCENE_SIZE",
@@ -128,6 +132,7 @@ __all__ = [
     "FeatureScalingLabScene",
     "FixedSizeScene",
     "GradientDescentSceneAdapter",
+    "HyperparameterTuningLabScene",
     "KNNVoteMapSceneAdapter",
     "LevelManifest",
     "LocalizedText",
@@ -155,6 +160,7 @@ __all__ = [
     "create_decision_tree_scene",
     "create_feature_scaling_lab_scene",
     "create_gradient_descent_scene",
+    "create_hyperparameter_tuning_lab_scene",
     "create_knn_vote_map_scene",
     "create_logistic_regression_scene",
     "create_model_comparison_lab_scene",
