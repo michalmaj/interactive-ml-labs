@@ -105,6 +105,7 @@ The unified app is now the recommended guided experience. It includes all implem
 - Distance Metrics Lab,
 - k-NN Vote Map,
 - Logistic Regression Boundary Lab,
+- SVM Margin Lab,
 - Decision Tree Splitter,
 - Data Leakage Lab,
 - Train / Validation / Test Split Lab,

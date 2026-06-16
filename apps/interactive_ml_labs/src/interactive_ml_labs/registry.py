@@ -32,6 +32,7 @@ from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 from interactive_ml_labs.scene import Scene
 from interactive_ml_labs.split_lab_scene import create_train_validation_test_lab_scene
+from interactive_ml_labs.svm_margin_scene import create_svm_margin_lab_scene
 from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
 from interactive_ml_labs.tuning_scene import create_hyperparameter_tuning_lab_scene
 
@@ -156,6 +157,38 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             pl=(
                 "Spójrz na paski distance i nazwij, która różnica na osi dominuje "
                 "dla wybranej metryki."
+            ),
+        ),
+    ),
+    "svm_margin_lab": (
+        LocalizedText(
+            en=(
+                "Move the boundary until both classes are separated. Then widen the "
+                "margin without creating mistakes."
+            ),
+            pl=(
+                "Przesuwaj boundary, aż klasy będą rozdzielone. Potem poszerz margin "
+                "bez tworzenia błędów."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Press F and identify which points became support vectors. Explain why "
+                "far-away points matter less."
+            ),
+            pl=(
+                "Naciśnij F i wskaż, które punkty stały się support vectors. Wyjaśnij, "
+                "czemu dalekie punkty są mniej ważne."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Compare a narrow correct split with a wider correct split. Decide which "
+                "one should generalize better."
+            ),
+            pl=(
+                "Porównaj wąski poprawny podział z szerszym poprawnym podziałem. "
+                "Zdecyduj, który powinien lepiej generalizować."
             ),
         ),
     ),
@@ -795,6 +828,36 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             definition=LocalizedText(
                 en="The training point with the smallest distance to the query point.",
                 pl="Punkt treningowy z najmniejszym distance do query point.",
+            ),
+        ),
+    ),
+    "svm_margin_lab": (
+        GlossaryTerm(
+            term="margin",
+            definition=LocalizedText(
+                en="The gap between the decision boundary and the closest training points.",
+                pl="Gap między decision boundary a najbliższymi punktami treningowymi.",
+            ),
+        ),
+        GlossaryTerm(
+            term="support vector",
+            definition=LocalizedText(
+                en="A closest point that defines how wide the margin can be.",
+                pl="Najbliższy punkt, który definiuje, jak szeroki może być margin.",
+            ),
+        ),
+        GlossaryTerm(
+            term="decision boundary",
+            definition=LocalizedText(
+                en="The line or surface where the model changes its predicted class.",
+                pl="Linia albo powierzchnia, przy której model zmienia przewidywaną klasę.",
+            ),
+        ),
+        GlossaryTerm(
+            term="maximum margin",
+            definition=LocalizedText(
+                en="The widest correct separating gap the model can find.",
+                pl="Najszerszy poprawny gap rozdzielający klasy.",
             ),
         ),
     ),
@@ -2571,6 +2634,156 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["logistic_regression_boundary_lab"],
             glossary=LESSON_GLOSSARY["logistic_regression_boundary_lab"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="svm_margin_lab",
+        level=1,
+        title_en="SVM Margin Lab",
+        title_pl="SVM Margin Lab",
+        summary_en=(
+            "Rotate a decision boundary and see how support vectors define the widest margin."
+        ),
+        summary_pl=(
+            "Obracaj decision boundary i zobacz, jak support vectors definiują najszerszy margin."
+        ),
+        objectives=(
+            LocalizedText(
+                en="Separate two classes with a linear decision boundary.",
+                pl="Rozdziel dwie klasy liniową decision boundary.",
+            ),
+            LocalizedText(
+                en="Watch how margin changes as the boundary rotates or shifts.",
+                pl="Obserwuj, jak margin zmienia się przy obrocie albo przesunięciu boundary.",
+            ),
+            LocalizedText(
+                en="Identify support vectors as the points closest to the boundary.",
+                pl="Rozpoznaj support vectors jako punkty najbliższe boundary.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(en="switch dataset", pl="zmień dataset"),
+            ),
+            ControlBinding(
+                key="Left / Right",
+                action=LocalizedText(en="rotate boundary", pl="obróć boundary"),
+            ),
+            ControlBinding(
+                key="Up / Down",
+                action=LocalizedText(en="shift boundary", pl="przesuń boundary"),
+            ),
+            ControlBinding(
+                key="F",
+                action=LocalizedText(
+                    en="jump to a wide-margin fit",
+                    pl="przejdź do wide-margin fit",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the lab", pl="zresetuj lab"),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read SVM margin notes",
+                    pl="przeczytaj notatki o SVM margin",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(en="open the help overlay", pl="otwórz pomoc"),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_svm_margin_lab_scene,
+        difficulty=LocalizedText(en="Introductory", pl="Wprowadzający"),
+        tags=("classification", "svm", "margin", "boundary", "level-1"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "An SVM tries to separate classes with a boundary that leaves "
+                                "a wide safe gap."
+                            ),
+                            pl=(
+                                "SVM próbuje rozdzielić klasy boundary, która zostawia "
+                                "szeroki bezpieczny gap."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Only the closest points define that gap. "
+                                "These are support vectors."
+                            ),
+                            pl=("Ten gap definiują najbliższe punkty. To właśnie support vectors."),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "A boundary can classify all points correctly and still have "
+                                "a narrow margin."
+                            ),
+                            pl=(
+                                "Boundary może klasyfikować wszystkie punkty poprawnie, "
+                                "a mimo to mieć wąski margin."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Moving far-away points does not matter as much as moving "
+                                "support vectors."
+                            ),
+                            pl=(
+                                "Przesunięcie dalekich punktów ma mniejsze znaczenie niż "
+                                "przesunięcie support vectors."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Do not stop at any correct split. SVM prefers the correct split "
+                                "with the widest margin."
+                            ),
+                            pl=(
+                                "Nie zatrzymuj się na dowolnym poprawnym podziale. SVM woli "
+                                "poprawny podział z najszerszym margin."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "If the classes are not separable, hard-margin intuition is only "
+                                "the first step."
+                            ),
+                            pl=(
+                                "Jeśli klas nie da się rozdzielić idealnie, intuicja hard-margin "
+                                "jest tylko pierwszym krokiem."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["svm_margin_lab"],
+            glossary=LESSON_GLOSSARY["svm_margin_lab"],
         ),
     ),
     _placeholder_demo(

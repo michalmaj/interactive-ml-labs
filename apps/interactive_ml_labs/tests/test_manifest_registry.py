@@ -29,6 +29,7 @@ from interactive_ml_labs.monitoring_scene import create_model_monitoring_drift_s
 from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 from interactive_ml_labs.split_lab_scene import create_train_validation_test_lab_scene
+from interactive_ml_labs.svm_margin_scene import create_svm_margin_lab_scene
 from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
 from interactive_ml_labs.tuning_scene import create_hyperparameter_tuning_lab_scene
 
@@ -51,7 +52,7 @@ def test_registry_groups_demos_by_level() -> None:
     assert {demo.level for demo in level_one_demos} == {1}
     assert {demo.level for demo in level_two_demos} == {2}
     assert {demo.level for demo in level_three_demos} == {3}
-    assert len(level_one_demos) >= 6
+    assert len(level_one_demos) >= 7
     assert len(level_two_demos) >= 7
     assert len(level_three_demos) == 7
     assert level_three_demos[0].id == "clustering_lab"
@@ -129,6 +130,40 @@ def test_distance_metrics_manifest_describes_foundation_level_one_lab() -> None:
     assert "nearest neighbor" in text
     assert "Arrow keys" in text
     assert "M" in text
+
+
+def test_svm_margin_manifest_describes_foundation_level_one_lab() -> None:
+    """SVM Margin Lab should extend the foundation classification track."""
+    manifest = DEMO_BY_ID["svm_margin_lab"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(challenge.en for challenge in manifest.theory.mini_challenges),
+            *(entry.term for entry in manifest.theory.glossary),
+        ],
+    )
+
+    assert manifest.level == 1
+    assert manifest.create_scene is create_svm_margin_lab_scene
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Wprowadzający"
+    assert manifest.tags == ("classification", "svm", "margin", "boundary", "level-1")
+    assert "SVM Margin Lab" in text
+    assert "support vector" in text
+    assert "margin" in text
+    assert "decision boundary" in text
+    assert "maximum margin" in text
+    assert "Left / Right" in text
+    assert "F" in text
 
 
 def test_data_leakage_manifest_describes_practical_level_two_lab() -> None:

@@ -42,6 +42,7 @@ The unified app includes these app-only Level 1 labs:
 
 - Linear Regression Line Fit Lab demonstrates slope, intercept, residuals, MSE loss, and least-squares fitting with a manually adjustable line.
 - Distance Metrics Lab demonstrates query points, nearest neighbors, Euclidean distance, Manhattan distance, Chebyshev distance, and why k-NN depends on the metric.
+- SVM Margin Lab demonstrates decision boundaries, support vectors, margin width, and why the widest correct separator matters.
 
 The unified app includes these app-only Level 2 labs:
 
@@ -74,7 +75,7 @@ Common shell controls:
 
 ## Standalone Demos
 
-Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Linear Regression Line Fit Lab, Distance Metrics Lab, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, and t-SNE / UMAP Exploration Lab, are launched from the unified app.
+Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Linear Regression Line Fit Lab, Distance Metrics Lab, SVM Margin Lab, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, and t-SNE / UMAP Exploration Lab, are launched from the unified app.
 
 ### App-only Level 1 Labs
 
@@ -95,6 +96,16 @@ Distance Metrics Lab controls:
 | `1-3` | Switch dataset |
 | Arrow keys | Move the query point |
 | `M` | Cycle distance metric |
+| `R` | Reset the lab |
+
+SVM Margin Lab controls:
+
+| Key / input | Action |
+| ----------- | ------ |
+| `1-3` | Switch dataset |
+| `Left` / `Right` | Rotate boundary |
+| `Up` / `Down` | Shift boundary |
+| `F` | Jump to a wide-margin fit |
 | `R` | Reset the lab |
 
 ### App-only Level 2 Labs
