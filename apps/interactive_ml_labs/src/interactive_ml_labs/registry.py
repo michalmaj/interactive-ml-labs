@@ -10,6 +10,7 @@ from interactive_ml_labs.class_imbalance_scene import create_class_imbalance_lab
 from interactive_ml_labs.clustering_scene import create_clustering_lab_scene
 from interactive_ml_labs.data_leakage_scene import create_data_leakage_lab_scene
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
+from interactive_ml_labs.feature_scaling_scene import create_feature_scaling_lab_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
 from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
@@ -269,6 +270,34 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             pl=(
                 "Przełącz na mały dataset i wyjaśnij, czemu validation robi się bardziej "
                 "szumne, ale nadal jest bezpieczniejsze niż strojenie na test."
+            ),
+        ),
+    ),
+    "feature_scaling_lab": (
+        LocalizedText(
+            en=(
+                "Toggle scaling and watch how the range ratio changes. Explain why "
+                "raw distance can be misleading."
+            ),
+            pl=(
+                "Przełącz scaling i obserwuj zmianę range ratio. Wyjaśnij, czemu "
+                "raw distance może wprowadzać w błąd."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Cycle through models and identify which ones are most sensitive to feature scale."
+            ),
+            pl=("Przełączaj modele i wskaż, które są najbardziej wrażliwe na skalę cech."),
+        ),
+        LocalizedText(
+            en=(
+                "Compare accuracy and iterations before and after scaling. Separate "
+                "better geometry from a better model."
+            ),
+            pl=(
+                "Porównaj accuracy i iterations przed oraz po scaling. Oddziel "
+                "lepszą geometrię danych od lepszego modelu."
             ),
         ),
     ),
@@ -764,6 +793,42 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             definition=LocalizedText(
                 en="Choosing the model setup using validation evidence, not the final test set.",
                 pl="Wybór konfiguracji modelu na podstawie validation, a nie finalnego test set.",
+            ),
+        ),
+    ),
+    "feature_scaling_lab": (
+        GlossaryTerm(
+            term="feature scaling",
+            definition=LocalizedText(
+                en=(
+                    "Transforming feature values so numeric ranges are comparable "
+                    "before distance, gradient, or coefficient-based learning."
+                ),
+                pl=(
+                    "Przekształcanie wartości cech tak, żeby zakresy liczbowe były "
+                    "porównywalne przed użyciem dystansu, gradientu albo coefficients."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="standardization",
+            definition=LocalizedText(
+                en="A common scaling method that centers a feature and measures it in std units.",
+                pl="Popularna metoda scaling, która centruje cechę i mierzy ją w std units.",
+            ),
+        ),
+        GlossaryTerm(
+            term="range ratio",
+            definition=LocalizedText(
+                en="A quick comparison of the largest feature range to the smallest feature range.",
+                pl="Szybkie porównanie największego zakresu cechy z najmniejszym zakresem.",
+            ),
+        ),
+        GlossaryTerm(
+            term="feature dominance",
+            definition=LocalizedText(
+                en="When one raw numeric range is so large that it controls distance or gradients.",
+                pl="Sytuacja, gdy jeden surowy zakres liczbowy dominuje dystans albo gradienty.",
             ),
         ),
     ),
@@ -2497,6 +2562,154 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["train_validation_test_lab"],
             glossary=LESSON_GLOSSARY["train_validation_test_lab"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="feature_scaling_lab",
+        level=2,
+        title_en="Feature Scaling Lab",
+        title_pl="Feature Scaling Lab",
+        summary_en=(
+            "Toggle scaling to see how raw feature ranges distort distance, gradients, "
+            "and practical model comparison."
+        ),
+        summary_pl=(
+            "Przełączaj scaling i zobacz, jak surowe zakresy cech zniekształcają "
+            "dystans, gradienty i praktyczne porównanie modeli."
+        ),
+        objectives=(
+            LocalizedText(
+                en="Compare raw and scaled feature ranges on the same dataset.",
+                pl="Porównuj raw i scaled feature ranges na tym samym datasecie.",
+            ),
+            LocalizedText(
+                en="See which models are sensitive to numeric scale.",
+                pl="Zobacz, które modele są wrażliwe na skalę liczbową.",
+            ),
+            LocalizedText(
+                en="Use range ratio, accuracy, and iteration count to reason about scaling.",
+                pl="Używaj range ratio, accuracy i iterations do analizy scaling.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(en="switch scaling scenario", pl="zmień scenariusz scaling"),
+            ),
+            ControlBinding(
+                key="S",
+                action=LocalizedText(en="toggle feature scaling", pl="włącz albo wyłącz scaling"),
+            ),
+            ControlBinding(
+                key="M",
+                action=LocalizedText(en="cycle model", pl="zmień model"),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the preview", pl="zresetuj podgląd"),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read feature scaling notes",
+                    pl="przeczytaj notatki o feature scaling",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(en="open the help overlay", pl="otwórz pomoc"),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_feature_scaling_lab_scene,
+        difficulty=LocalizedText(en="Practical", pl="Praktyczny"),
+        tags=("preprocessing", "scaling", "distance", "optimization", "level-2"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Many ML algorithms read numeric size literally. A feature "
+                                "with a huge range can dominate distance or gradient steps."
+                            ),
+                            pl=(
+                                "Wiele algorytmów ML czyta wielkość liczbową dosłownie. "
+                                "Cecha o ogromnym zakresie może zdominować dystans albo gradient."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Scaling does not add information; it changes the geometry "
+                                "so models can compare features more fairly."
+                            ),
+                            pl=(
+                                "Scaling nie dodaje informacji; zmienia geometrię danych, "
+                                "żeby modele uczciwiej porównywały cechy."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "k-NN changes because distance changes. Gradient Descent "
+                                "often needs fewer iterations after scaling."
+                            ),
+                            pl=(
+                                "k-NN zmienia się, bo zmienia się dystans. Gradient Descent "
+                                "często potrzebuje mniej iterations po scaling."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Logistic Regression coefficients are easier to compare "
+                                "when features share a similar scale."
+                            ),
+                            pl=(
+                                "Logistic Regression coefficients łatwiej porównywać, "
+                                "gdy cechy mają podobną skalę."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Do not compare raw coefficients across features measured "
+                                "in different units."
+                            ),
+                            pl=(
+                                "Nie porównuj raw coefficients między cechami mierzonymi "
+                                "w różnych jednostkach."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Scaling should be fitted on train data and reused on validation, "
+                                "test, and production data."
+                            ),
+                            pl=(
+                                "Scaling dopasuj na train data i użyj tej samej transformacji "
+                                "na validation, test oraz production data."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["feature_scaling_lab"],
+            glossary=LESSON_GLOSSARY["feature_scaling_lab"],
         ),
     ),
     _placeholder_demo(
