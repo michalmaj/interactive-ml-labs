@@ -9,6 +9,11 @@ import pygame
 
 from interactive_ml_labs.display import DEFAULT_RESOLUTION, Size
 from interactive_ml_labs.fonts import make_ui_font
+from interactive_ml_labs.readout_panel import (
+    ReadoutPanelColors,
+    ReadoutPanelFonts,
+    draw_readout_panel,
+)
 from interactive_ml_labs.scene import SceneCommand
 from interactive_ml_labs.settings import AppContext
 
@@ -210,14 +215,6 @@ class TrainValidationTestLabScene:
         )
 
     def _draw_side_panel(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
-        self._draw_panel(surface, rect)
-        self._draw_text(
-            surface,
-            self._label("Model selection", "Wybór modelu"),
-            (rect.x + 22, rect.y + 20),
-            self._font_heading,
-            TEXT,
-        )
         rows = (
             (self._label("preset", "preset"), self.preset.name_for_language(self._language)),
             (self._label("complexity", "complexity"), self._complexity_label()),
@@ -230,29 +227,25 @@ class TrainValidationTestLabScene:
             (self._label("train-val gap", "train-val gap"), self._gap_label()),
             (self._label("diagnosis", "diagnoza"), self._diagnosis_label()),
         )
-        y = rect.y + 68
-        for label, value in rows:
-            self._draw_text(surface, f"{label}: {value}", (rect.x + 22, y), self._font_small, TEXT)
-            y += 25
-        y += 12
-        for index, preset in enumerate(PRESETS):
-            color = ACCENT if index == self.preset_index else MUTED_TEXT
-            self._draw_text(
-                surface,
-                f"{index + 1}. {preset.name_for_language(self._language)}",
-                (rect.x + 22, y),
-                self._font_small,
-                color,
-            )
-            y += 24
-        self._draw_wrapped(
+        options = tuple(
+            (f"{index + 1}. {preset.name_for_language(self._language)}", index == self.preset_index)
+            for index, preset in enumerate(PRESETS)
+        )
+        draw_readout_panel(
             surface,
-            self._active_takeaway(),
-            (rect.x + 22, rect.bottom - 108),
-            rect.width - 44,
-            self._font_small,
-            SECONDARY,
-            line_height=17,
+            rect,
+            title=self._label("Model selection", "Wybór modelu"),
+            rows=rows,
+            options=options,
+            takeaway=self._active_takeaway(),
+            fonts=ReadoutPanelFonts(heading=self._font_heading, small=self._font_small),
+            colors=ReadoutPanelColors(
+                panel=PANEL,
+                text=TEXT,
+                muted_text=MUTED_TEXT,
+                accent=ACCENT,
+                secondary=SECONDARY,
+            ),
         )
 
     def _draw_footer(self, surface: pygame.Surface) -> None:
