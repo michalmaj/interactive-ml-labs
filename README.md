@@ -107,6 +107,7 @@ The unified app is now the recommended guided experience. It includes all implem
 - Logistic Regression Boundary Lab,
 - SVM Margin Lab,
 - Activation Functions Lab,
+- Neural Network Playground,
 - Decision Tree Splitter,
 - Data Leakage Lab,
 - Train / Validation / Test Split Lab,
