@@ -39,6 +39,7 @@ Core machine learning intuition:
 
 - linear regression,
 - gradient descent,
+- k-means intro,
 - distance metrics,
 - logistic regression,
 - k-nearest neighbors,
@@ -101,6 +102,7 @@ This repository is also intended to demonstrate how real software projects are d
 The unified app is now the recommended guided experience. It includes all implemented Level 1 and Level 2 demos:
 
 - Linear Regression Line Fit Lab,
+- K-Means Intro Lab,
 - Gradient Descent Playground,
 - Distance Metrics Lab,
 - k-NN Vote Map,
@@ -119,7 +121,7 @@ The unified app is now the recommended guided experience. It includes all implem
 
 It also includes the first real Level 3 labs:
 
-- Clustering Lab, with K-Means assignment/update phases, point-to-centroid links, inertia trend, draggable points, and a DBSCAN comparison mode.
+- Clustering Lab, with K-Means/DBSCAN comparison, point-to-centroid links, inertia trend, draggable points, and density-based clustering behavior.
 - PCA Lab, with dataset presets, noise controls, manual projection rotation, fitted PCA direction, explained variance, reconstruction residuals, and reconstruction error.
 - Model Comparison Lab, with Logistic Regression, k-NN, and Decision Tree previews on shared datasets, active model parameters, train/test accuracy, compact confusion details, and highlighted misclassified test points.
 - Calibration Lab, with overconfident, underconfident, and better calibrated presets, a reliability diagram, score distribution, raw-vs-scaled score reference with a compact legend, accuracy@0.5, Brier score, ECE, worst-gap highlighting, calibration gap error bars, and temperature scaling.

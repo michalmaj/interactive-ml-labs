@@ -41,6 +41,7 @@ Kolejne dema będą podpinane stopniowo. Wszystkie obecne dema z Level 1 i Level
 Unified app zawiera te natywne laby z Level 1:
 
 - Linear Regression Line Fit Lab pokazuje slope, intercept, residuals, MSE loss i least-squares fitting przez ręczne ustawianie prostej.
+- K-Means Intro Lab pokazuje kroki assignment/update, centroidy, k, inertia i to, czemu niższa inertia nie jest całą historią clusteringu.
 - Distance Metrics Lab pokazuje query points, nearest neighbors, Euclidean distance, Manhattan distance, Chebyshev distance i to, czemu k-NN zależy od metryki.
 - SVM Margin Lab pokazuje decision boundaries, support vectors, szerokość margin i to, czemu liczy się najszerszy poprawny separator.
 - Activation Functions Lab pokazuje sigmoid, tanh, ReLU, zakresy outputu, saturation i przepływ local gradient.
@@ -77,7 +78,7 @@ Podstawowe sterowanie:
 
 ## Osobne dema
 
-Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Linear Regression Line Fit Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Neural Network Playground, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
+Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Linear Regression Line Fit Lab, K-Means Intro Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Neural Network Playground, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
 
 ### Natywne laby Level 1
 
@@ -89,6 +90,18 @@ Sterowanie w Linear Regression Line Fit Lab:
 | `Left` / `Right` | Zmień slope |
 | `Up` / `Down` | Zmień intercept |
 | `F` | Przejdź do least-squares fit |
+| `R` | Zresetuj lab |
+
+Sterowanie w K-Means Intro Lab:
+
+| Klawisz / wejście | Akcja |
+| ----------------- | ----- |
+| `Space` | Wykonaj jeden krok assignment albo update centroidów |
+| `A` | Uruchom albo zatrzymaj auto-run |
+| `-` / `=` | Zmień `k` |
+| `1-3` | Zmień dataset |
+| `C` | Pokaż albo ukryj linie punkt-centroid |
+| `N` | Wygeneruj nową próbkę |
 | `R` | Zresetuj lab |
 
 Sterowanie w Distance Metrics Lab:
