@@ -46,6 +46,10 @@ from interactive_ml_labs.feature_scaling_scene import (
     create_feature_scaling_lab_scene,
 )
 from interactive_ml_labs.fonts import POLISH_FONT_CANDIDATES, POLISH_SAMPLE_TEXT, make_ui_font
+from interactive_ml_labs.gaussian_mixture_scene import (
+    GaussianMixtureIntroLabScene,
+    create_gaussian_mixture_intro_lab_scene,
+)
 from interactive_ml_labs.gradient_scene import (
     GradientDescentSceneAdapter,
     create_gradient_descent_scene,
@@ -155,6 +159,7 @@ __all__ = [
     "DistanceMetricsLabScene",
     "FeatureScalingLabScene",
     "FixedSizeScene",
+    "GaussianMixtureIntroLabScene",
     "GradientDescentSceneAdapter",
     "HyperparameterTuningLabScene",
     "KMeansIntroLabScene",
@@ -190,6 +195,7 @@ __all__ = [
     "create_decision_tree_scene",
     "create_distance_metrics_lab_scene",
     "create_feature_scaling_lab_scene",
+    "create_gaussian_mixture_intro_lab_scene",
     "create_gradient_descent_scene",
     "create_hyperparameter_tuning_lab_scene",
     "create_kmeans_intro_lab_scene",

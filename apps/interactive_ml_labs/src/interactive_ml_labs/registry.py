@@ -13,6 +13,7 @@ from interactive_ml_labs.data_leakage_scene import create_data_leakage_lab_scene
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.distance_metrics_scene import create_distance_metrics_lab_scene
 from interactive_ml_labs.feature_scaling_scene import create_feature_scaling_lab_scene
+from interactive_ml_labs.gaussian_mixture_scene import create_gaussian_mixture_intro_lab_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.kmeans_intro_scene import create_kmeans_intro_lab_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
@@ -488,6 +489,32 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
                 "Porównaj accuracy i iterations przed oraz po scaling. Oddziel "
                 "lepszą geometrię danych od lepszego modelu."
             ),
+        ),
+    ),
+    "gaussian_mixture_intro_lab": (
+        LocalizedText(
+            en=(
+                "Move the query point between overlapping components and explain why "
+                "soft responsibilities are more honest than one forced label."
+            ),
+            pl=(
+                "Przesuń query point między nakładające się komponenty i wyjaśnij, "
+                "czemu soft responsibilities są uczciwsze niż jedna wymuszona etykieta."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Increase the component count and decide whether the extra component "
+                "explains structure or only slices the data."
+            ),
+            pl=(
+                "Zwiększ liczbę komponentów i zdecyduj, czy dodatkowy komponent "
+                "tłumaczy strukturę, czy tylko tnie dane."
+            ),
+        ),
+        LocalizedText(
+            en=("Use the rare segment preset and compare local density with mixture weight."),
+            pl=("Użyj presetu rare segment i porównaj lokalną density z mixture weight."),
         ),
     ),
     "hyperparameter_tuning_lab": (
@@ -1238,6 +1265,48 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             definition=LocalizedText(
                 en="When one raw numeric range is so large that it controls distance or gradients.",
                 pl="Sytuacja, gdy jeden surowy zakres liczbowy dominuje dystans albo gradienty.",
+            ),
+        ),
+    ),
+    "gaussian_mixture_intro_lab": (
+        GlossaryTerm(
+            term="Gaussian component",
+            definition=LocalizedText(
+                en=(
+                    "One bell-shaped part of a mixture, described by a mean, covariance, "
+                    "and mixture weight."
+                ),
+                pl=(
+                    "Jedna dzwonowa część mieszanki, opisana przez mean, covariance "
+                    "i mixture weight."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="responsibility",
+            definition=LocalizedText(
+                en=(
+                    "The posterior share of a point explained by a component after "
+                    "combining density and mixture weight."
+                ),
+                pl=(
+                    "Posterior udział komponentu w wyjaśnieniu punktu po połączeniu "
+                    "density i mixture weight."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="mixture weight",
+            definition=LocalizedText(
+                en="How common a component is before looking at the exact query point.",
+                pl="Jak częsty jest komponent, zanim spojrzymy na konkretny query point.",
+            ),
+        ),
+        GlossaryTerm(
+            term="covariance",
+            definition=LocalizedText(
+                en="The shape and spread of a Gaussian component.",
+                pl="Kształt i rozrzut komponentu Gaussian.",
             ),
         ),
     ),
@@ -4062,6 +4131,171 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["feature_scaling_lab"],
             glossary=LESSON_GLOSSARY["feature_scaling_lab"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="gaussian_mixture_intro_lab",
+        level=2,
+        title_en="Gaussian Mixture Intro Lab",
+        title_pl="Gaussian Mixture Intro Lab",
+        summary_en=(
+            "Move a query point through overlapping Gaussian components to compare "
+            "soft responsibilities with hard assignment."
+        ),
+        summary_pl=(
+            "Przesuwaj query point przez nakładające się komponenty Gaussian "
+            "i porównuj soft responsibilities z hard assignment."
+        ),
+        objectives=(
+            LocalizedText(
+                en="See how density and mixture weight combine into component responsibility.",
+                pl=("Zobacz, jak density i mixture weight łączą się w responsibility komponentu."),
+            ),
+            LocalizedText(
+                en="Compare soft responsibilities with a forced hard cluster label.",
+                pl="Porównaj soft responsibilities z wymuszoną hard cluster label.",
+            ),
+            LocalizedText(
+                en="Change component count and notice when extra components help or confuse.",
+                pl=(
+                    "Zmieniaj liczbę komponentów i obserwuj, kiedy dodatkowe komponenty "
+                    "pomagają, a kiedy mieszają obraz."
+                ),
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="Arrow keys",
+                action=LocalizedText(en="move the query point", pl="przesuń query point"),
+            ),
+            ControlBinding(
+                key="- / =",
+                action=LocalizedText(
+                    en="decrease or increase component count",
+                    pl="zmniejsz albo zwiększ liczbę komponentów",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(
+                    en="toggle hard assignment view",
+                    pl="przełącz hard assignment",
+                ),
+            ),
+            ControlBinding(
+                key="D",
+                action=LocalizedText(
+                    en="toggle density ellipses",
+                    pl="pokaż albo ukryj density ellipses",
+                ),
+            ),
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(en="switch dataset", pl="zmień dataset"),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the lab", pl="zresetuj lab"),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read Gaussian Mixture notes",
+                    pl="przeczytaj notatki o Gaussian Mixture",
+                ),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_gaussian_mixture_intro_lab_scene,
+        difficulty=LocalizedText(en="Practical", pl="Praktyczny"),
+        tags=("clustering", "probability", "gmm", "soft-assignment", "level-2"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "A Gaussian Mixture Model treats the data as a blend of "
+                                "several Gaussian components."
+                            ),
+                            pl=(
+                                "Gaussian Mixture Model traktuje dane jak mieszankę kilku "
+                                "komponentów Gaussian."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Instead of assigning a point to one cluster immediately, "
+                                "it estimates how much each component explains that point."
+                            ),
+                            pl=(
+                                "Zamiast od razu przypisać punkt do jednego klastra, "
+                                "model szacuje, jak mocno każdy komponent tłumaczy ten punkt."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Responsibility depends on local density and mixture weight. "
+                                "A rare component can still win near its own dense region."
+                            ),
+                            pl=(
+                                "Responsibility zależy od local density i mixture weight. "
+                                "Rzadki komponent nadal może wygrać blisko własnego gęstego "
+                                "regionu."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Hard assignment is sometimes useful for summaries, but it "
+                                "throws away uncertainty around overlaps."
+                            ),
+                            pl=(
+                                "Hard assignment bywa wygodne do podsumowań, ale wyrzuca "
+                                "uncertainty w miejscach nakładania się komponentów."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Do not treat component colors as ground-truth classes. "
+                                "They are a probabilistic explanation of the data."
+                            ),
+                            pl=(
+                                "Nie traktuj kolorów komponentów jak prawdziwych klas. "
+                                "To probabilistyczne wyjaśnienie danych."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Adding more components can lower local error while making "
+                                "the story harder to trust."
+                            ),
+                            pl=(
+                                "Dodanie komponentów może obniżyć lokalny błąd, ale utrudnić "
+                                "zaufanie do całej historii."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["gaussian_mixture_intro_lab"],
+            glossary=LESSON_GLOSSARY["gaussian_mixture_intro_lab"],
         ),
     ),
     _placeholder_demo(
