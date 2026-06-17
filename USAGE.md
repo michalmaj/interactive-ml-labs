@@ -53,6 +53,7 @@ The unified app includes these app-only Level 2 labs:
 - Train / Validation / Test Split Lab demonstrates model selection with validation scores, overfitting from train-validation gaps, and keeping test as the final honest check.
 - Feature Scaling Lab demonstrates raw-vs-scaled feature ranges, range ratio, scale-sensitive models, and the effect of scaling on accuracy and iterations.
 - Gaussian Mixture Intro Lab demonstrates soft responsibilities, hard assignment, mixture weights, component shapes, and overlapping clusters.
+- Anomaly Detection Lab demonstrates anomaly scores, thresholds, alert noise, false positives, and missed anomalies.
 - Hyperparameter Tuning Lab demonstrates validation curves, grid-search intuition, train-validation gaps, and choosing parameters by validation score.
 - Class Imbalance Lab demonstrates accuracy traps, precision/recall trade-offs, false negatives, and decision threshold tuning when one class is rare.
 
@@ -79,7 +80,7 @@ Common shell controls:
 
 ## Standalone Demos
 
-Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Linear Regression Line Fit Lab, K-Means Intro Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Neural Network Playground, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Gaussian Mixture Intro Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, and t-SNE / UMAP Exploration Lab, are launched from the unified app.
+Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Linear Regression Line Fit Lab, K-Means Intro Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Neural Network Playground, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Gaussian Mixture Intro Lab, Anomaly Detection Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, and t-SNE / UMAP Exploration Lab, are launched from the unified app.
 
 ### App-only Level 1 Labs
 
@@ -179,6 +180,15 @@ Gaussian Mixture Intro Lab controls:
 | `H` | Toggle hard assignment |
 | `D` | Show or hide density ellipses |
 | `1-3` | Switch dataset |
+| `R` | Reset the lab |
+
+Anomaly Detection Lab controls:
+
+| Key / input | Action |
+| ----------- | ------ |
+| `1-3` | Switch anomaly scenario |
+| `-` / `=` / `0` | Change or reset anomaly threshold |
+| `S` | Show or hide flagged score rings |
 | `R` | Reset the lab |
 
 Hyperparameter Tuning Lab controls:

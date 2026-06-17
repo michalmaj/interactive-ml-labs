@@ -53,6 +53,7 @@ Unified app zawiera te natywne laby z Level 2:
 - Train / Validation / Test Split Lab pokazuje model selection przez validation scores, overfitting przez train-validation gaps i zostawianie test jako finalnego uczciwego checku.
 - Feature Scaling Lab pokazuje raw-vs-scaled feature ranges, range ratio, modele wrażliwe na skalę oraz wpływ scaling na accuracy i iterations.
 - Gaussian Mixture Intro Lab pokazuje soft responsibilities, hard assignment, mixture weights, kształty komponentów i nakładające się klastry.
+- Anomaly Detection Lab pokazuje anomaly scores, thresholds, szum alertów, false positives i pominięte anomalie.
 - Hyperparameter Tuning Lab pokazuje validation curves, intuicję grid search, train-validation gaps i wybór parametrów po validation score.
 - Class Imbalance Lab pokazuje pułapki accuracy, trade-offs precision/recall, false negatives i strojenie decision threshold, gdy jedna klasa jest rzadka.
 
@@ -79,7 +80,7 @@ Podstawowe sterowanie:
 
 ## Osobne dema
 
-Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Linear Regression Line Fit Lab, K-Means Intro Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Neural Network Playground, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Gaussian Mixture Intro Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
+Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Linear Regression Line Fit Lab, K-Means Intro Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Neural Network Playground, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Gaussian Mixture Intro Lab, Anomaly Detection Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
 
 ### Natywne laby Level 1
 
@@ -179,6 +180,15 @@ Sterowanie w Gaussian Mixture Intro Lab:
 | `H` | Przełącz hard assignment |
 | `D` | Pokaż albo ukryj density ellipses |
 | `1-3` | Zmień dataset |
+| `R` | Zresetuj lab |
+
+Sterowanie w Anomaly Detection Lab:
+
+| Klawisz / wejście | Akcja |
+| ----------------- | ----- |
+| `1-3` | Zmień scenariusz anomalii |
+| `-` / `=` / `0` | Zmień albo zresetuj threshold anomalii |
+| `S` | Pokaż albo ukryj pierścienie score |
 | `R` | Zresetuj lab |
 
 Sterowanie w Hyperparameter Tuning Lab:

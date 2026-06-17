@@ -4,6 +4,10 @@ from interactive_ml_labs.activation_scene import (
     ActivationFunctionsLabScene,
     create_activation_functions_lab_scene,
 )
+from interactive_ml_labs.anomaly_detection_scene import (
+    AnomalyDetectionLabScene,
+    create_anomaly_detection_lab_scene,
+)
 from interactive_ml_labs.boosting_scene import (
     BoostingMistakeLabSceneAdapter,
     create_boosting_mistake_lab_scene,
@@ -145,6 +149,7 @@ __all__ = [
     "WINDOWED_RESOLUTIONS",
     "ActivationFunctionsLabScene",
     "AlgorithmMode",
+    "AnomalyDetectionLabScene",
     "AppContext",
     "AppSettings",
     "BoostingMistakeLabSceneAdapter",
@@ -187,6 +192,7 @@ __all__ = [
     "center_rect",
     "choose_adaptive_window_size",
     "create_activation_functions_lab_scene",
+    "create_anomaly_detection_lab_scene",
     "create_boosting_mistake_lab_scene",
     "create_calibration_lab_scene",
     "create_class_imbalance_lab_scene",

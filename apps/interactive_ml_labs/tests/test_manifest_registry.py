@@ -13,6 +13,7 @@ from interactive_ml_labs import (
     validate_demo_registry,
 )
 from interactive_ml_labs.activation_scene import create_activation_functions_lab_scene
+from interactive_ml_labs.anomaly_detection_scene import create_anomaly_detection_lab_scene
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
 from interactive_ml_labs.calibration_scene import create_calibration_lab_scene
 from interactive_ml_labs.class_imbalance_scene import create_class_imbalance_lab_scene
@@ -446,6 +447,41 @@ def test_gaussian_mixture_manifest_describes_practical_level_two_lab() -> None:
     assert "hard assignment" in text
     assert "Arrow keys" in text
     assert "- / =" in text
+
+
+def test_anomaly_detection_manifest_describes_practical_level_two_lab() -> None:
+    """Anomaly Detection Lab should extend practical alert threshold intuition."""
+    manifest = DEMO_BY_ID["anomaly_detection_lab"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(challenge.en for challenge in manifest.theory.mini_challenges),
+            *(entry.term for entry in manifest.theory.glossary),
+        ],
+    )
+
+    assert manifest.level == 2
+    assert manifest.create_scene is create_anomaly_detection_lab_scene
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Praktyczny"
+    assert manifest.tags == ("anomaly-detection", "threshold", "monitoring", "metrics", "level-2")
+    assert "Anomaly Detection Lab" in text
+    assert "anomaly score" in text
+    assert "threshold" in text
+    assert "false positive" in text
+    assert "false negative" in text
+    assert "alert" in text
+    assert "- / = / 0" in text
+    assert "S" in text
 
 
 def test_hyperparameter_tuning_manifest_describes_practical_level_two_lab() -> None:
