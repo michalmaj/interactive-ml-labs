@@ -41,6 +41,7 @@ Real demo integrations are being added gradually. All current Level 1 and Level 
 The unified app includes these app-only Level 1 labs:
 
 - Linear Regression Line Fit Lab demonstrates slope, intercept, residuals, MSE loss, and least-squares fitting with a manually adjustable line.
+- K-Means Intro Lab demonstrates assignment/update steps, centroids, k, inertia, and why lower inertia is not the whole clustering story.
 - Distance Metrics Lab demonstrates query points, nearest neighbors, Euclidean distance, Manhattan distance, Chebyshev distance, and why k-NN depends on the metric.
 - SVM Margin Lab demonstrates decision boundaries, support vectors, margin width, and why the widest correct separator matters.
 - Activation Functions Lab demonstrates sigmoid, tanh, ReLU, output ranges, saturation, and local gradient flow.
@@ -77,7 +78,7 @@ Common shell controls:
 
 ## Standalone Demos
 
-Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Linear Regression Line Fit Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Neural Network Playground, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, and t-SNE / UMAP Exploration Lab, are launched from the unified app.
+Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Linear Regression Line Fit Lab, K-Means Intro Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Neural Network Playground, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, and t-SNE / UMAP Exploration Lab, are launched from the unified app.
 
 ### App-only Level 1 Labs
 
@@ -89,6 +90,18 @@ Linear Regression Line Fit Lab controls:
 | `Left` / `Right` | Change slope |
 | `Up` / `Down` | Change intercept |
 | `F` | Jump to the least-squares fit |
+| `R` | Reset the lab |
+
+K-Means Intro Lab controls:
+
+| Key / input | Action |
+| ----------- | ------ |
+| `Space` | Run one assignment or centroid-update step |
+| `A` | Start or pause auto-run |
+| `-` / `=` | Change `k` |
+| `1-3` | Switch dataset |
+| `C` | Toggle point-to-centroid links |
+| `N` | Generate a new sample |
 | `R` | Reset the lab |
 
 Distance Metrics Lab controls:
