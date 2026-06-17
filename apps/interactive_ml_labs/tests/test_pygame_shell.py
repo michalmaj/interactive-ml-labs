@@ -540,6 +540,65 @@ def test_shell_demo_selection_renders_selected_demo_details(monkeypatch) -> None
         pygame.quit()
 
 
+def test_shell_demo_list_scrolls_selected_item_above_footer(monkeypatch) -> None:
+    """Long demo lists should keep the selected item above the shared footer."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+
+    try:
+        app.context.current_level = 1
+        app.screen_name = ScreenName.DEMOS
+        for _ in range(len(demos_for_level(1)) - 1):
+            app._move_down()
+
+        app._render_demos()
+
+        assert app.demo_scroll_offset > 0
+        assert app.menu_items
+        assert max(item.rect.bottom for item in app.menu_items) <= app._content_bottom()
+        assert max(item.rect.bottom for item in app.menu_items) < app._footer_y()
+    finally:
+        pygame.quit()
+
+
+def test_shell_demo_list_mouse_wheel_scrolls_and_draws_indicator(monkeypatch) -> None:
+    """Mouse wheel should scroll long demo lists and expose a scrollbar."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    scrollbars: list[tuple[int, int, int, int]] = []
+    original_draw_rect = pygame.draw.rect
+
+    def capture_rect(
+        surface: pygame.Surface,
+        color: tuple[int, int, int],
+        rect: pygame.Rect,
+        width: int = 0,
+        border_radius: int = 0,
+        *args: object,
+        **kwargs: object,
+    ) -> pygame.Rect:
+        if rect.x == 598 and rect.width == 4:
+            scrollbars.append((rect.x, rect.y, rect.width, rect.height))
+        return original_draw_rect(surface, color, rect, width, border_radius, *args, **kwargs)
+
+    monkeypatch.setattr(pygame.draw, "rect", capture_rect)
+
+    try:
+        app.context.current_level = 1
+        app.screen_name = ScreenName.DEMOS
+        app._render_demos()
+
+        assert app.demo_max_scroll > 0
+
+        app._handle_mouse_wheel(-1)
+        app._render_demos()
+
+        assert app.demo_scroll_offset > 0
+        assert scrollbars
+    finally:
+        pygame.quit()
+
+
 def test_shell_pause_help_menu_toggles_visible_overlay(monkeypatch) -> None:
     """Pause menu Help should make the shared help overlay visible."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")

@@ -38,6 +38,10 @@ ACCENT: Final[tuple[int, int, int]] = (113, 204, 152)
 FOOTER_OFFSET: Final[int] = 50
 FOOTER_RESERVED_HEIGHT: Final[int] = 84
 THEORY_SCROLL_STEP: Final[int] = 72
+DEMO_MENU_TOP: Final[int] = 190
+DEMO_MENU_WIDTH: Final[int] = 500
+MENU_ITEM_HEIGHT: Final[int] = 54
+MENU_ITEM_PITCH: Final[int] = 70
 
 
 class ScreenName(StrEnum):
@@ -99,6 +103,8 @@ class UnifiedAppShell:
         self.mouse_position: tuple[int, int] = (0, 0)
         self.theory_scroll_offset = 0
         self.theory_max_scroll = 0
+        self.demo_scroll_offset = 0
+        self.demo_max_scroll = 0
 
         pygame.display.set_caption("Interactive ML Labs")
 
@@ -226,12 +232,14 @@ class UnifiedAppShell:
         self._select_menu_item_at(position)
 
     def _handle_mouse_wheel(self, y: int) -> None:
-        """Scroll the active theory screen with the mouse wheel."""
-        if self.screen_name != ScreenName.THEORY:
-            return
-
-        self.theory_scroll_offset -= y * THEORY_SCROLL_STEP
-        self._clamp_theory_scroll()
+        """Scroll the active scrollable screen with the mouse wheel."""
+        if self.screen_name == ScreenName.THEORY:
+            self.theory_scroll_offset -= y * THEORY_SCROLL_STEP
+            self._clamp_theory_scroll()
+        elif self.screen_name == ScreenName.DEMOS:
+            self.demo_scroll_offset -= y * MENU_ITEM_PITCH
+            self._clamp_demo_scroll()
+            self._select_visible_demo_after_scroll(DEMO_MENU_TOP, self._content_bottom())
 
     def _select_menu_item_at(self, position: tuple[int, int]) -> bool:
         for index, item in enumerate(self.menu_items):
@@ -296,12 +304,15 @@ class UnifiedAppShell:
         )
 
         self._draw_title(level_name, self._text("Select demo", "Wybierz demo"))
-        self._draw_menu(labels, top=190, width=500)
+        menu_bottom = self._content_bottom()
+        self._update_demo_scroll_limit(len(demos), DEMO_MENU_TOP, menu_bottom)
+        self._draw_scrollable_demo_menu(labels, top=DEMO_MENU_TOP, bottom=menu_bottom)
+        self._draw_demo_scroll_indicator(DEMO_MENU_TOP, menu_bottom)
         self._render_demo_details(demos[self.selected_index])
         self._draw_footer(
             self._text(
-                "Enter: intro | Esc/Backspace: levels | L: language",
-                "Enter: intro | Esc/Backspace: poziomy | S: ustawienia | L: zmień język",
+                "Wheel: scroll | Enter: intro | Esc/Backspace: levels | S: settings | L: language",
+                "Kółko: scroll | Enter: intro | Esc/Backspace: poziomy | S: ustawienia | L: język",
             ),
         )
 
@@ -727,16 +738,40 @@ class UnifiedAppShell:
 
     def _draw_menu(self, labels: list[str], *, top: int, width: int = 760) -> None:
         self.menu_items = []
-        height = 54
         left = 80
 
         for index, label in enumerate(labels):
-            rect = pygame.Rect(left, top + index * 70, width, height)
+            rect = pygame.Rect(left, top + index * MENU_ITEM_PITCH, width, MENU_ITEM_HEIGHT)
             color = PANEL_SELECTED if index == self.selected_index else PANEL
             pygame.draw.rect(self.screen, color, rect, border_radius=8)
             pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
             self._draw_text(label, (rect.x + 20, rect.y + 14), self.font_body, TEXT)
             self.menu_items.append(MenuItem(label=label, rect=rect))
+
+    def _draw_scrollable_demo_menu(self, labels: list[str], *, top: int, bottom: int) -> None:
+        """Draw the demo list inside a clipped scrollable viewport."""
+        self.menu_items = []
+        left = 80
+        viewport = pygame.Rect(left, top, DEMO_MENU_WIDTH, max(0, bottom - top))
+        previous_clip = self.screen.get_clip()
+        self.screen.set_clip(viewport)
+        try:
+            for index, label in enumerate(labels):
+                rect = pygame.Rect(
+                    left,
+                    top + index * MENU_ITEM_PITCH - self.demo_scroll_offset,
+                    DEMO_MENU_WIDTH,
+                    MENU_ITEM_HEIGHT,
+                )
+                if not rect.colliderect(viewport):
+                    continue
+                color = PANEL_SELECTED if index == self.selected_index else PANEL
+                pygame.draw.rect(self.screen, color, rect, border_radius=8)
+                pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
+                self._draw_text(label, (rect.x + 20, rect.y + 14), self.font_body, TEXT)
+                self.menu_items.append(MenuItem(label=label, rect=rect))
+        finally:
+            self.screen.set_clip(previous_clip)
 
     def _draw_footer(self, text: str) -> None:
         self._draw_text(text, (80, self._footer_y()), self.font_small, MUTED_TEXT)
@@ -853,14 +888,45 @@ class UnifiedAppShell:
             return
 
         width, _ = self.context.settings.resolution
+        self._draw_scroll_indicator_at(
+            x=width - 48,
+            top=top,
+            bottom=bottom,
+            scroll_offset=self.theory_scroll_offset,
+            max_scroll=self.theory_max_scroll,
+        )
+
+    def _draw_demo_scroll_indicator(self, top: int, bottom: int) -> None:
+        """Draw a small scrollbar for the scrollable demo list."""
+        if self.demo_max_scroll <= 0:
+            return
+
+        self._draw_scroll_indicator_at(
+            x=80 + DEMO_MENU_WIDTH + 18,
+            top=top,
+            bottom=bottom,
+            scroll_offset=self.demo_scroll_offset,
+            max_scroll=self.demo_max_scroll,
+        )
+
+    def _draw_scroll_indicator_at(
+        self,
+        *,
+        x: int,
+        top: int,
+        bottom: int,
+        scroll_offset: int,
+        max_scroll: int,
+    ) -> None:
+        """Draw a small scrollbar at a fixed x position."""
         track_height = bottom - top
-        track_rect = pygame.Rect(width - 48, top, 4, track_height)
+        track_rect = pygame.Rect(x, top, 4, track_height)
         pygame.draw.rect(self.screen, (55, 61, 69), track_rect, border_radius=2)
 
-        visible_ratio = track_height / (track_height + self.theory_max_scroll)
+        visible_ratio = track_height / (track_height + max_scroll)
         thumb_height = max(36, round(track_height * visible_ratio))
         thumb_range = track_height - thumb_height
-        thumb_y = top + round(thumb_range * self.theory_scroll_offset / self.theory_max_scroll)
+        thumb_y = top + round(thumb_range * scroll_offset / max_scroll)
         pygame.draw.rect(
             self.screen,
             ACCENT,
@@ -983,10 +1049,24 @@ class UnifiedAppShell:
 
     def _move_up(self) -> None:
         self.selected_index = max(0, self.selected_index - 1)
+        if self.screen_name == ScreenName.DEMOS:
+            self._update_demo_scroll_limit(
+                len(self._current_level_demos()),
+                DEMO_MENU_TOP,
+                self._content_bottom(),
+            )
+            self._ensure_selected_demo_visible(DEMO_MENU_TOP, self._content_bottom())
 
     def _move_down(self) -> None:
         item_count = self._current_menu_item_count()
         self.selected_index = min(item_count - 1, self.selected_index + 1)
+        if self.screen_name == ScreenName.DEMOS:
+            self._update_demo_scroll_limit(
+                len(self._current_level_demos()),
+                DEMO_MENU_TOP,
+                self._content_bottom(),
+            )
+            self._ensure_selected_demo_visible(DEMO_MENU_TOP, self._content_bottom())
 
     def _activate_selected(self) -> None:
         actions = {
@@ -1130,6 +1210,8 @@ class UnifiedAppShell:
         self.screen_name = screen_name
         self.selected_index = 0
         self.menu_items = []
+        if screen_name == ScreenName.DEMOS:
+            self.demo_scroll_offset = 0
 
     def _handle_scene_command(self, command: SceneCommand) -> None:
         if command.kind == SceneCommandKind.NONE:
@@ -1166,6 +1248,49 @@ class UnifiedAppShell:
 
     def _current_level_demos(self) -> tuple[DemoManifest, ...]:
         return demos_for_level(self.context.current_level or 1)
+
+    def _update_demo_scroll_limit(self, item_count: int, top: int, bottom: int) -> None:
+        """Update maximum scroll offset for the demo list."""
+        if item_count <= 0:
+            self.demo_max_scroll = 0
+            self.demo_scroll_offset = 0
+            return
+
+        content_height = ((item_count - 1) * MENU_ITEM_PITCH) + MENU_ITEM_HEIGHT
+        viewport_height = max(0, bottom - top)
+        self.demo_max_scroll = max(0, content_height - viewport_height)
+        self._clamp_demo_scroll()
+
+    def _clamp_demo_scroll(self) -> None:
+        """Keep the demo list scroll offset inside the available scroll range."""
+        self.demo_scroll_offset = max(0, min(self.demo_scroll_offset, self.demo_max_scroll))
+
+    def _ensure_selected_demo_visible(self, top: int, bottom: int) -> None:
+        """Scroll the demo list so the selected item stays inside the viewport."""
+        selected_top = self.selected_index * MENU_ITEM_PITCH
+        selected_bottom = selected_top + MENU_ITEM_HEIGHT
+        viewport_height = max(0, bottom - top)
+
+        if selected_top < self.demo_scroll_offset:
+            self.demo_scroll_offset = selected_top
+        elif selected_bottom > self.demo_scroll_offset + viewport_height:
+            self.demo_scroll_offset = selected_bottom - viewport_height
+
+        self._clamp_demo_scroll()
+
+    def _select_visible_demo_after_scroll(self, top: int, bottom: int) -> None:
+        """Keep selection on a visible demo after mouse-wheel scrolling."""
+        viewport_height = max(0, bottom - top)
+        selected_top = self.selected_index * MENU_ITEM_PITCH
+        selected_bottom = selected_top + MENU_ITEM_HEIGHT
+        if self.demo_scroll_offset <= selected_top and selected_bottom <= (
+            self.demo_scroll_offset + viewport_height
+        ):
+            return
+
+        first_visible = self.demo_scroll_offset // MENU_ITEM_PITCH
+        item_count = len(self._current_level_demos())
+        self.selected_index = max(0, min(item_count - 1, first_visible))
 
     def _require_demo(self) -> DemoManifest:
         if self.selected_demo is None:
