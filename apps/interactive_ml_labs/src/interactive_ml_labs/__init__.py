@@ -75,6 +75,10 @@ from interactive_ml_labs.monitoring_scene import (
     ModelMonitoringDriftScene,
     create_model_monitoring_drift_scene,
 )
+from interactive_ml_labs.neural_network_scene import (
+    NeuralNetworkPlaygroundScene,
+    create_neural_network_playground_scene,
+)
 from interactive_ml_labs.pca_scene import PCALabScene, create_pca_lab_scene
 from interactive_ml_labs.random_forest_scene import (
     RandomForestSceneAdapter,
@@ -155,6 +159,7 @@ __all__ = [
     "LogisticRegressionSceneAdapter",
     "ModelComparisonLabScene",
     "ModelMonitoringDriftScene",
+    "NeuralNetworkPlaygroundScene",
     "PCALabScene",
     "RandomForestSceneAdapter",
     "RectTuple",
@@ -185,6 +190,7 @@ __all__ = [
     "create_logistic_regression_scene",
     "create_model_comparison_lab_scene",
     "create_model_monitoring_drift_scene",
+    "create_neural_network_playground_scene",
     "create_pca_lab_scene",
     "create_random_forest_scene",
     "create_svm_margin_lab_scene",

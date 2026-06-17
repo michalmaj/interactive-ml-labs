@@ -28,6 +28,7 @@ from interactive_ml_labs.manifest import (
 )
 from interactive_ml_labs.model_comparison_scene import create_model_comparison_lab_scene
 from interactive_ml_labs.monitoring_scene import create_model_monitoring_drift_scene
+from interactive_ml_labs.neural_network_scene import create_neural_network_playground_scene
 from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
@@ -218,6 +219,32 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             en=("Compare output ranges. Decide which activation is centered around zero."),
             pl=(
                 "Porównaj zakresy outputu. Zdecyduj, która activation jest wycentrowana wokół zera."
+            ),
+        ),
+    ),
+    "neural_network_playground": (
+        LocalizedText(
+            en=(
+                "Switch activation functions and watch how hidden outputs change "
+                "the final probability."
+            ),
+            pl=(
+                "Przełączaj activation functions i obserwuj, jak hidden outputs "
+                "zmieniają finalne probability."
+            ),
+        ),
+        LocalizedText(
+            en=("Increase weight scale and explain why the same input can become more confident."),
+            pl=(
+                "Zwiększ weight scale i wyjaśnij, czemu ten sam input może dać "
+                "bardziej pewną predykcję."
+            ),
+        ),
+        LocalizedText(
+            en=("Move hidden bias up and down. Name which hidden unit changes most."),
+            pl=(
+                "Przesuwaj hidden bias w górę i w dół. Nazwij hidden unit, "
+                "który zmienia się najmocniej."
             ),
         ),
     ),
@@ -920,6 +947,43 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
                     "and input itself above zero."
                 ),
                 pl="Activation zwracająca zero dla ujemnego input i sam input powyżej zera.",
+            ),
+        ),
+    ),
+    "neural_network_playground": (
+        GlossaryTerm(
+            term="forward pass",
+            definition=LocalizedText(
+                en="A single computation from inputs through layers to model output.",
+                pl="Pojedyncze obliczenie od inputs przez warstwy do outputu modelu.",
+            ),
+        ),
+        GlossaryTerm(
+            term="hidden layer",
+            definition=LocalizedText(
+                en="A layer between inputs and output that builds intermediate features.",
+                pl="Warstwa między inputs i output, która buduje pośrednie cechy.",
+            ),
+        ),
+        GlossaryTerm(
+            term="weight",
+            definition=LocalizedText(
+                en="A learned multiplier that controls how strongly one signal is used.",
+                pl="Uczony mnożnik kontrolujący, jak mocno używany jest dany sygnał.",
+            ),
+        ),
+        GlossaryTerm(
+            term="bias",
+            definition=LocalizedText(
+                en="A learned offset added before activation.",
+                pl="Uczone przesunięcie dodawane przed activation.",
+            ),
+        ),
+        GlossaryTerm(
+            term="loss",
+            definition=LocalizedText(
+                en="A number that says how wrong the prediction is for the current target.",
+                pl="Liczba mówiąca, jak bardzo predykcja myli się dla aktualnego targetu.",
             ),
         ),
     ),
@@ -2992,6 +3056,150 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["activation_functions_lab"],
             glossary=LESSON_GLOSSARY["activation_functions_lab"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="neural_network_playground",
+        level=1,
+        title_en="Neural Network Playground",
+        title_pl="Neural Network Playground",
+        summary_en=("Follow inputs through a tiny hidden layer to probability, target, and loss."),
+        summary_pl=("Prześledź inputs przez małą hidden layer aż do probability, targetu i loss."),
+        objectives=(
+            LocalizedText(
+                en="Trace one forward pass through inputs, hidden units, activation, and output.",
+                pl="Prześledź forward pass przez inputs, hidden units, activation i output.",
+            ),
+            LocalizedText(
+                en="See how weights and hidden bias change probability and loss.",
+                pl="Zobacz, jak weights i hidden bias zmieniają probability oraz loss.",
+            ),
+            LocalizedText(
+                en="Connect activation choice with hidden-layer behavior.",
+                pl="Połącz wybór activation z zachowaniem hidden layer.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(en="switch input example", pl="zmień przykład input"),
+            ),
+            ControlBinding(
+                key="A",
+                action=LocalizedText(en="cycle activation", pl="zmień activation"),
+            ),
+            ControlBinding(
+                key="- / =",
+                action=LocalizedText(en="change weight scale", pl="zmień weight scale"),
+            ),
+            ControlBinding(
+                key="Up / Down",
+                action=LocalizedText(en="change hidden bias", pl="zmień hidden bias"),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the playground", pl="zresetuj playground"),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read neural network notes",
+                    pl="przeczytaj notatki o neural networks",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(en="open the help overlay", pl="otwórz pomoc"),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_neural_network_playground_scene,
+        difficulty=LocalizedText(en="Introductory", pl="Wprowadzający"),
+        tags=("neural-networks", "forward-pass", "classification", "loss", "level-1"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "A neural network is a chain of simple computations: inputs, "
+                                "weights, bias, activation, and output."
+                            ),
+                            pl=(
+                                "Neural network to łańcuch prostych obliczeń: inputs, "
+                                "weights, bias, activation i output."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "This playground follows one forward pass through a tiny "
+                                "hidden layer."
+                            ),
+                            pl=(
+                                "Ten playground śledzi jeden forward pass przez małą hidden layer."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Weights decide which input signals matter. Bias shifts "
+                                "hidden units before activation."
+                            ),
+                            pl=(
+                                "Weights decydują, które sygnały wejściowe są ważne. "
+                                "Bias przesuwa hidden units przed activation."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The output probability is useful only when you compare it "
+                                "with the target and loss."
+                            ),
+                            pl=(
+                                "Output probability ma sens dopiero w porównaniu z targetem i loss."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Do not treat the network as magic. Every arrow and node is "
+                                "part of a calculation."
+                            ),
+                            pl=(
+                                "Nie traktuj sieci jak magii. Każda strzałka i każdy neuron "
+                                "są częścią obliczenia."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "High probability is not automatically good; it is good only "
+                                "when it points toward the target."
+                            ),
+                            pl=(
+                                "Wysokie probability nie jest automatycznie dobre; jest dobre "
+                                "tylko wtedy, gdy wskazuje target."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["neural_network_playground"],
+            glossary=LESSON_GLOSSARY["neural_network_playground"],
         ),
     ),
     _placeholder_demo(
