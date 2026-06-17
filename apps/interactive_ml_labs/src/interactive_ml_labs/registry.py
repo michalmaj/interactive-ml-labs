@@ -14,6 +14,7 @@ from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.distance_metrics_scene import create_distance_metrics_lab_scene
 from interactive_ml_labs.feature_scaling_scene import create_feature_scaling_lab_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
+from interactive_ml_labs.kmeans_intro_scene import create_kmeans_intro_lab_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
 from interactive_ml_labs.linear_regression_scene import create_linear_regression_line_fit_lab_scene
 from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
@@ -127,6 +128,38 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             pl=(
                 "Zmień punkt startowy i porównaj, czy ten sam learning rate "
                 "nadal zachowuje się stabilnie."
+            ),
+        ),
+    ),
+    "kmeans_intro_lab": (
+        LocalizedText(
+            en=(
+                "Press Space once and name which centroid owns each visible group. "
+                "Then press Space again and describe how centroids move."
+            ),
+            pl=(
+                "Naciśnij Space raz i nazwij, który centroid przejmuje każdą grupę. "
+                "Potem naciśnij Space ponownie i opisz, jak przesuwają się centroidy."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Change k on the two-group dataset. Find a setting where K-Means "
+                "splits a natural group."
+            ),
+            pl=(
+                "Zmień k na datasecie z dwiema grupami. Znajdź ustawienie, w którym "
+                "K-Means dzieli naturalną grupę."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Turn on auto-run and watch inertia. Explain why it usually drops "
+                "but does not prove the clusters are meaningful."
+            ),
+            pl=(
+                "Włącz auto-run i obserwuj inertia. Wyjaśnij, czemu zwykle spada, "
+                "ale nie dowodzi, że klastry mają sens."
             ),
         ),
     ),
@@ -829,6 +862,35 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             definition=LocalizedText(
                 en="The line that minimizes the sum of squared residuals.",
                 pl="Prosta minimalizująca sumę kwadratów residuals.",
+            ),
+        ),
+    ),
+    "kmeans_intro_lab": (
+        GlossaryTerm(
+            term="centroid",
+            definition=LocalizedText(
+                en="The current center used to represent one K-Means cluster.",
+                pl="Aktualny środek reprezentujący jeden klaster w K-Means.",
+            ),
+        ),
+        GlossaryTerm(
+            term="assignment",
+            definition=LocalizedText(
+                en="The step where each point is attached to the nearest centroid.",
+                pl="Krok, w którym każdy punkt trafia do najbliższego centroidu.",
+            ),
+        ),
+        GlossaryTerm(
+            term="inertia",
+            definition=LocalizedText(
+                en=(
+                    "The sum of squared distances from points to assigned centroids. "
+                    "Lower means tighter clusters, not always better meaning."
+                ),
+                pl=(
+                    "Suma kwadratów odległości punktów od przypisanych centroidów. "
+                    "Niższa oznacza ciaśniejsze klastry, ale nie zawsze lepszy sens."
+                ),
             ),
         ),
     ),
@@ -2113,6 +2175,177 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["linear_regression_line_fit_lab"],
             glossary=LESSON_GLOSSARY["linear_regression_line_fit_lab"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="kmeans_intro_lab",
+        level=1,
+        title_en="K-Means Intro Lab",
+        title_pl="K-Means Intro Lab",
+        summary_en="Step through assignments, centroid updates, k, and inertia.",
+        summary_pl="Przejdź przez assignments, aktualizacje centroidów, k i inertia.",
+        objectives=(
+            LocalizedText(
+                en="See K-Means as two repeating steps: assign points, then move centroids.",
+                pl=(
+                    "Zobacz K-Means jako dwa powtarzające się kroki: "
+                    "przypisz punkty, potem przesuń centroidy."
+                ),
+            ),
+            LocalizedText(
+                en="Change k and notice when compact-looking groups stop matching the data.",
+                pl=("Zmieniaj k i obserwuj, kiedy zwarte grupy przestają pasować do danych."),
+            ),
+            LocalizedText(
+                en="Use inertia as a useful signal, not as the only definition of a good cluster.",
+                pl=(
+                    "Używaj inertia jako przydatnego sygnału, ale nie jako jedynej "
+                    "definicji dobrego klastra."
+                ),
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="Space",
+                action=LocalizedText(
+                    en="run one assignment or centroid-update step",
+                    pl="wykonaj jeden krok assignment albo update centroidów",
+                ),
+            ),
+            ControlBinding(
+                key="A",
+                action=LocalizedText(
+                    en="start or pause auto-run",
+                    pl="uruchom albo zatrzymaj auto-run",
+                ),
+            ),
+            ControlBinding(
+                key="- / =",
+                action=LocalizedText(en="decrease or increase k", pl="zmniejsz albo zwiększ k"),
+            ),
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(en="switch dataset", pl="zmień dataset"),
+            ),
+            ControlBinding(
+                key="C",
+                action=LocalizedText(
+                    en="toggle point-to-centroid links",
+                    pl="pokaż albo ukryj linie punkt-centroid",
+                ),
+            ),
+            ControlBinding(
+                key="N",
+                action=LocalizedText(en="generate a new sample", pl="wygeneruj nową próbkę"),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the lab", pl="zresetuj lab"),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read K-Means notes",
+                    pl="przeczytaj notatki o K-Means",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(en="open the help overlay", pl="otwórz pomoc"),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_kmeans_intro_lab_scene,
+        difficulty=LocalizedText(en="Introductory", pl="Wprowadzający"),
+        tags=("clustering", "k-means", "unsupervised", "inertia", "level-1"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "K-Means is an unsupervised algorithm: it groups points "
+                                "without class labels."
+                            ),
+                            pl=(
+                                "K-Means jest algorytmem unsupervised: grupuje punkty "
+                                "bez etykiet klas."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The algorithm alternates between assigning points to the "
+                                "nearest centroid and moving each centroid to the mean of "
+                                "its assigned points."
+                            ),
+                            pl=(
+                                "Algorytm przełącza się między przypisaniem punktów do "
+                                "najbliższego centroidu i przesunięciem każdego centroidu "
+                                "do średniej przypisanych punktów."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Changing k changes the question. K-Means will always create "
+                                "k clusters, even when that number is not meaningful."
+                            ),
+                            pl=(
+                                "Zmiana k zmienia pytanie. K-Means zawsze utworzy k klastrów, "
+                                "nawet kiedy taka liczba nie ma sensu."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Inertia often drops as centroids move, but a lower value can "
+                                "come from splitting a natural group."
+                            ),
+                            pl=(
+                                "Inertia zwykle spada, gdy centroidy się przesuwają, ale niższa "
+                                "wartość może wynikać z podzielenia naturalnej grupy."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Do not read cluster colors as true labels. They are only "
+                                "the current K-Means assignments."
+                            ),
+                            pl=(
+                                "Nie traktuj kolorów klastrów jak prawdziwych etykiet. "
+                                "To tylko aktualne assignments z K-Means."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "K-Means likes compact, roughly round groups. Long or curved "
+                                "shapes can be misleading."
+                            ),
+                            pl=(
+                                "K-Means lubi zwarte, dość okrągłe grupy. Długie albo "
+                                "zakrzywione kształty mogą go mylić."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["kmeans_intro_lab"],
+            glossary=LESSON_GLOSSARY["kmeans_intro_lab"],
         ),
     ),
     _placeholder_demo(
