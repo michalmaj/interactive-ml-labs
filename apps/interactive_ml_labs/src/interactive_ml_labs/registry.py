@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from interactive_ml_labs.activation_scene import create_activation_functions_lab_scene
+from interactive_ml_labs.anomaly_detection_scene import create_anomaly_detection_lab_scene
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
 from interactive_ml_labs.calibration_scene import create_calibration_lab_scene
 from interactive_ml_labs.class_imbalance_scene import create_class_imbalance_lab_scene
@@ -515,6 +516,29 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
         LocalizedText(
             en=("Use the rare segment preset and compare local density with mixture weight."),
             pl=("Użyj presetu rare segment i porównaj lokalną density z mixture weight."),
+        ),
+    ),
+    "anomaly_detection_lab": (
+        LocalizedText(
+            en=(
+                "Lower the threshold and watch recall improve. Name the cost paid "
+                "in false positives."
+            ),
+            pl=("Obniż threshold i obserwuj, jak rośnie recall. Nazwij koszt w false positives."),
+        ),
+        LocalizedText(
+            en=("Raise the threshold and find which true anomalies are now missed."),
+            pl=("Podnieś threshold i znajdź, które prawdziwe anomalie zostają pominięte."),
+        ),
+        LocalizedText(
+            en=(
+                "Switch scenarios and decide whether alert noise or missed anomalies "
+                "is the bigger operational risk."
+            ),
+            pl=(
+                "Zmień scenariusz i zdecyduj, czy większym ryzykiem operacyjnym "
+                "jest szum alertów, czy pominięte anomalie."
+            ),
         ),
     ),
     "hyperparameter_tuning_lab": (
@@ -1307,6 +1331,36 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             definition=LocalizedText(
                 en="The shape and spread of a Gaussian component.",
                 pl="Kształt i rozrzut komponentu Gaussian.",
+            ),
+        ),
+    ),
+    "anomaly_detection_lab": (
+        GlossaryTerm(
+            term="anomaly score",
+            definition=LocalizedText(
+                en="A numeric signal where larger values mean a point looks less normal.",
+                pl="Sygnał liczbowy, w którym większa wartość oznacza mniej normalny punkt.",
+            ),
+        ),
+        GlossaryTerm(
+            term="threshold",
+            definition=LocalizedText(
+                en="The score cutoff used to turn anomaly scores into alerts.",
+                pl="Próg score, który zamienia anomaly scores w alerty.",
+            ),
+        ),
+        GlossaryTerm(
+            term="false positive",
+            definition=LocalizedText(
+                en="A normal point that was flagged as an anomaly.",
+                pl="Normalny punkt błędnie oznaczony jako anomalia.",
+            ),
+        ),
+        GlossaryTerm(
+            term="false negative",
+            definition=LocalizedText(
+                en="A true anomaly that was not flagged.",
+                pl="Prawdziwa anomalia, której system nie oznaczył.",
             ),
         ),
     ),
@@ -4296,6 +4350,154 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["gaussian_mixture_intro_lab"],
             glossary=LESSON_GLOSSARY["gaussian_mixture_intro_lab"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="anomaly_detection_lab",
+        level=2,
+        title_en="Anomaly Detection Lab",
+        title_pl="Anomaly Detection Lab",
+        summary_en=(
+            "Adjust an anomaly score threshold to balance alert noise against missed anomalies."
+        ),
+        summary_pl=(
+            "Dostosuj threshold anomaly score i zbalansuj szum alertów z pominiętymi anomaliami."
+        ),
+        objectives=(
+            LocalizedText(
+                en="Use anomaly score as a ranking signal, not a final decision by itself.",
+                pl="Używaj anomaly score jako rankingu, a nie finalnej decyzji samej w sobie.",
+            ),
+            LocalizedText(
+                en="Move threshold and compare false positives with false negatives.",
+                pl="Przesuwaj threshold i porównuj false positives z false negatives.",
+            ),
+            LocalizedText(
+                en="Connect threshold choice with operational alert volume and missed risk.",
+                pl="Połącz wybór threshold z liczbą alertów i ryzykiem pominięć.",
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(en="switch anomaly scenario", pl="zmień scenariusz anomalii"),
+            ),
+            ControlBinding(
+                key="- / = / 0",
+                action=LocalizedText(
+                    en="decrease, increase, or reset anomaly threshold",
+                    pl="zmniejsz, zwiększ albo zresetuj threshold anomalii",
+                ),
+            ),
+            ControlBinding(
+                key="S",
+                action=LocalizedText(
+                    en="show or hide flagged score rings",
+                    pl="pokaż albo ukryj pierścienie score",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the lab", pl="zresetuj lab"),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read anomaly detection notes",
+                    pl="przeczytaj notatki o anomaly detection",
+                ),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_anomaly_detection_lab_scene,
+        difficulty=LocalizedText(en="Practical", pl="Praktyczny"),
+        tags=("anomaly-detection", "threshold", "monitoring", "metrics", "level-2"),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Anomaly detection often starts with a score: how unusual "
+                                "does this point look compared with normal behavior?"
+                            ),
+                            pl=(
+                                "Anomaly detection często zaczyna się od score: jak nietypowo "
+                                "wygląda punkt względem normalnego zachowania?"
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "The threshold turns that score into an alert. That choice "
+                                "decides the trade-off between noise and missed anomalies."
+                            ),
+                            pl=(
+                                "Threshold zamienia score w alert. Ten wybór decyduje "
+                                "o kompromisie między szumem i pominiętymi anomaliami."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "A loose threshold catches more true anomalies, but it can "
+                                "flood people with false positives."
+                            ),
+                            pl=(
+                                "Luźny threshold łapie więcej prawdziwych anomalii, "
+                                "ale może zalać ludzi false positives."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A strict threshold creates fewer alerts, but it can miss "
+                                "subtle anomalies near the normal boundary."
+                            ),
+                            pl=(
+                                "Surowy threshold tworzy mniej alertów, ale może pominąć "
+                                "subtelne anomalie blisko granicy normalności."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Do not optimize only for the smallest alert count. "
+                                "Missed anomalies may be the expensive failure mode."
+                            ),
+                            pl=(
+                                "Nie optymalizuj wyłącznie pod najmniejszą liczbę alertów. "
+                                "Pominięte anomalie mogą być najdroższą porażką."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Do not ship a threshold without checking whether people can "
+                                "actually investigate the alert volume."
+                            ),
+                            pl=(
+                                "Nie wdrażaj threshold bez sprawdzenia, czy ludzie realnie "
+                                "udźwigną liczbę alertów."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["anomaly_detection_lab"],
+            glossary=LESSON_GLOSSARY["anomaly_detection_lab"],
         ),
     ),
     _placeholder_demo(
