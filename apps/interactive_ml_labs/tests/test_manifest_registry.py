@@ -21,6 +21,7 @@ from interactive_ml_labs.data_leakage_scene import create_data_leakage_lab_scene
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.distance_metrics_scene import create_distance_metrics_lab_scene
 from interactive_ml_labs.feature_scaling_scene import create_feature_scaling_lab_scene
+from interactive_ml_labs.gaussian_mixture_scene import create_gaussian_mixture_intro_lab_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.kmeans_intro_scene import create_kmeans_intro_lab_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
@@ -409,6 +410,42 @@ def test_feature_scaling_manifest_describes_practical_level_two_lab() -> None:
     assert "range ratio" in text
     assert "feature dominance" in text
     assert "S" in text
+
+
+def test_gaussian_mixture_manifest_describes_practical_level_two_lab() -> None:
+    """Gaussian Mixture Intro Lab should add probabilistic clustering intuition."""
+    manifest = DEMO_BY_ID["gaussian_mixture_intro_lab"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(challenge.en for challenge in manifest.theory.mini_challenges),
+            *(entry.term for entry in manifest.theory.glossary),
+        ],
+    )
+
+    assert manifest.level == 2
+    assert manifest.create_scene is create_gaussian_mixture_intro_lab_scene
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Praktyczny"
+    assert manifest.tags == ("clustering", "probability", "gmm", "soft-assignment", "level-2")
+    assert "Gaussian Mixture Intro Lab" in text
+    assert "Gaussian Mixture Model" in text
+    assert "Gaussian component" in text
+    assert "responsibility" in text
+    assert "mixture weight" in text
+    assert "covariance" in text
+    assert "hard assignment" in text
+    assert "Arrow keys" in text
+    assert "- / =" in text
 
 
 def test_hyperparameter_tuning_manifest_describes_practical_level_two_lab() -> None:

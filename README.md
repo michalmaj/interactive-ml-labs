@@ -114,6 +114,7 @@ The unified app is now the recommended guided experience. It includes all implem
 - Data Leakage Lab,
 - Train / Validation / Test Split Lab,
 - Feature Scaling Lab,
+- Gaussian Mixture Intro Lab,
 - Hyperparameter Tuning Lab,
 - Class Imbalance Lab,
 - Random Forest Bagging Lab,
