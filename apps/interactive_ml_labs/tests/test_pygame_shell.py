@@ -11,7 +11,7 @@ from interactive_ml_labs.decision_tree_scene import DecisionTreeSceneAdapter
 from interactive_ml_labs.gradient_scene import GradientDescentSceneAdapter
 from interactive_ml_labs.knn_scene import KNNVoteMapSceneAdapter
 from interactive_ml_labs.logistic_scene import LogisticRegressionSceneAdapter
-from interactive_ml_labs.pygame_app import ScreenName, UnifiedAppShell
+from interactive_ml_labs.pygame_app import DEMO_SCROLLBAR_X, ScreenName, UnifiedAppShell
 from interactive_ml_labs.random_forest_scene import RandomForestSceneAdapter
 from interactive_ml_labs.scene import SceneCommand
 from interactive_ml_labs.settings import AppSettings, save_app_settings
@@ -595,6 +595,54 @@ def test_shell_demo_list_mouse_wheel_scrolls_and_draws_indicator(monkeypatch) ->
 
         assert app.demo_scroll_offset > 0
         assert scrollbars
+    finally:
+        pygame.quit()
+
+
+def test_shell_demo_scrollbar_track_click_jumps_list(monkeypatch) -> None:
+    """Clicking the demo scrollbar track should jump the list near that position."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+
+    try:
+        app.context.current_level = 1
+        app.screen_name = ScreenName.DEMOS
+        app._render_demos()
+        bottom = app._content_bottom()
+        target_y = bottom - 8
+
+        app._handle_mouse_click((DEMO_SCROLLBAR_X, target_y))
+
+        assert app.demo_scroll_offset > 0
+        assert app.demo_scroll_offset == app.demo_max_scroll
+        assert app.selected_index > 0
+    finally:
+        pygame.quit()
+
+
+def test_shell_demo_scrollbar_thumb_drag_scrolls_list(monkeypatch) -> None:
+    """Dragging the demo scrollbar thumb should update the scroll offset until release."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+
+    try:
+        app.context.current_level = 1
+        app.screen_name = ScreenName.DEMOS
+        app._render_demos()
+        top = 190
+        bottom = app._content_bottom()
+        _, thumb_rect = app._demo_scrollbar_hit_rects(top, bottom)
+
+        app._handle_mouse_click((DEMO_SCROLLBAR_X, thumb_rect.centery))
+        app._handle_mouse_motion((DEMO_SCROLLBAR_X, bottom - 8))
+
+        assert app.demo_scrollbar_dragging is True
+        assert app.demo_scroll_offset == app.demo_max_scroll
+        assert app.selected_index > 0
+
+        app._handle_mouse_release()
+
+        assert app.demo_scrollbar_dragging is False
     finally:
         pygame.quit()
 

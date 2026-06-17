@@ -42,6 +42,10 @@ DEMO_MENU_TOP: Final[int] = 190
 DEMO_MENU_WIDTH: Final[int] = 500
 MENU_ITEM_HEIGHT: Final[int] = 54
 MENU_ITEM_PITCH: Final[int] = 70
+SCROLLBAR_WIDTH: Final[int] = 4
+SCROLLBAR_MIN_THUMB_HEIGHT: Final[int] = 36
+DEMO_SCROLLBAR_X: Final[int] = 80 + DEMO_MENU_WIDTH + 18
+DEMO_SCROLLBAR_HIT_WIDTH: Final[int] = 18
 
 
 class ScreenName(StrEnum):
@@ -105,6 +109,8 @@ class UnifiedAppShell:
         self.theory_max_scroll = 0
         self.demo_scroll_offset = 0
         self.demo_max_scroll = 0
+        self.demo_scrollbar_dragging = False
+        self.demo_scrollbar_drag_offset = 0
 
         pygame.display.set_caption("Interactive ML Labs")
 
@@ -163,6 +169,8 @@ class UnifiedAppShell:
                 self._handle_mouse_motion(event.pos)
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self._handle_mouse_click(event.pos)
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                self._handle_mouse_release()
 
     def _is_demo_event(self, event: pygame.event.Event) -> bool:
         return not (
@@ -224,12 +232,19 @@ class UnifiedAppShell:
             handler()
 
     def _handle_mouse_click(self, position: tuple[int, int]) -> None:
+        if self._handle_demo_scrollbar_click(position):
+            return
         if self._select_menu_item_at(position):
             self._activate_selected()
 
     def _handle_mouse_motion(self, position: tuple[int, int]) -> None:
         self.mouse_position = position
+        if self._handle_demo_scrollbar_drag(position):
+            return
         self._select_menu_item_at(position)
+
+    def _handle_mouse_release(self) -> None:
+        self.demo_scrollbar_dragging = False
 
     def _handle_mouse_wheel(self, y: int) -> None:
         """Scroll the active scrollable screen with the mouse wheel."""
@@ -902,7 +917,7 @@ class UnifiedAppShell:
             return
 
         self._draw_scroll_indicator_at(
-            x=80 + DEMO_MENU_WIDTH + 18,
+            x=DEMO_SCROLLBAR_X,
             top=top,
             bottom=bottom,
             scroll_offset=self.demo_scroll_offset,
@@ -919,20 +934,39 @@ class UnifiedAppShell:
         max_scroll: int,
     ) -> None:
         """Draw a small scrollbar at a fixed x position."""
-        track_height = bottom - top
-        track_rect = pygame.Rect(x, top, 4, track_height)
+        track_rect, thumb_rect = self._scrollbar_rects(
+            x=x,
+            top=top,
+            bottom=bottom,
+            scroll_offset=scroll_offset,
+            max_scroll=max_scroll,
+        )
         pygame.draw.rect(self.screen, (55, 61, 69), track_rect, border_radius=2)
-
-        visible_ratio = track_height / (track_height + max_scroll)
-        thumb_height = max(36, round(track_height * visible_ratio))
-        thumb_range = track_height - thumb_height
-        thumb_y = top + round(thumb_range * scroll_offset / max_scroll)
         pygame.draw.rect(
             self.screen,
             ACCENT,
-            pygame.Rect(track_rect.x, thumb_y, track_rect.width, thumb_height),
+            thumb_rect,
             border_radius=2,
         )
+
+    def _scrollbar_rects(
+        self,
+        *,
+        x: int,
+        top: int,
+        bottom: int,
+        scroll_offset: int,
+        max_scroll: int,
+    ) -> tuple[pygame.Rect, pygame.Rect]:
+        """Return track and thumb rectangles for a scrollbar."""
+        track_height = bottom - top
+        track_rect = pygame.Rect(x, top, SCROLLBAR_WIDTH, track_height)
+        visible_ratio = track_height / (track_height + max_scroll)
+        thumb_height = max(SCROLLBAR_MIN_THUMB_HEIGHT, round(track_height * visible_ratio))
+        thumb_range = max(1, track_height - thumb_height)
+        thumb_y = top + round(thumb_range * scroll_offset / max_scroll)
+        thumb_rect = pygame.Rect(track_rect.x, thumb_y, track_rect.width, thumb_height)
+        return track_rect, thumb_rect
 
     def _render_help_overlay(self) -> None:
         width, height = self.context.settings.resolution
@@ -1210,6 +1244,7 @@ class UnifiedAppShell:
         self.screen_name = screen_name
         self.selected_index = 0
         self.menu_items = []
+        self.demo_scrollbar_dragging = False
         if screen_name == ScreenName.DEMOS:
             self.demo_scroll_offset = 0
 
@@ -1264,6 +1299,88 @@ class UnifiedAppShell:
     def _clamp_demo_scroll(self) -> None:
         """Keep the demo list scroll offset inside the available scroll range."""
         self.demo_scroll_offset = max(0, min(self.demo_scroll_offset, self.demo_max_scroll))
+
+    def _handle_demo_scrollbar_click(self, position: tuple[int, int]) -> bool:
+        """Handle click-to-jump and thumb dragging on the demo scrollbar."""
+        if self.screen_name != ScreenName.DEMOS:
+            return False
+
+        top = DEMO_MENU_TOP
+        bottom = self._content_bottom()
+        self._update_demo_scroll_limit(len(self._current_level_demos()), top, bottom)
+        if self.demo_max_scroll <= 0:
+            return False
+
+        hit_rect, thumb_rect = self._demo_scrollbar_hit_rects(top, bottom)
+        if not hit_rect.collidepoint(position):
+            return False
+
+        if thumb_rect.collidepoint(position):
+            self.demo_scrollbar_dragging = True
+            self.demo_scrollbar_drag_offset = position[1] - thumb_rect.y
+            return True
+
+        self.demo_scrollbar_dragging = True
+        self.demo_scrollbar_drag_offset = thumb_rect.height // 2
+        self._set_demo_scroll_from_thumb_y(
+            position[1] - self.demo_scrollbar_drag_offset,
+            top,
+            bottom,
+        )
+        return True
+
+    def _handle_demo_scrollbar_drag(self, position: tuple[int, int]) -> bool:
+        """Scroll the demo list while the scrollbar thumb is being dragged."""
+        if not self.demo_scrollbar_dragging or self.screen_name != ScreenName.DEMOS:
+            return False
+
+        top = DEMO_MENU_TOP
+        bottom = self._content_bottom()
+        self._update_demo_scroll_limit(len(self._current_level_demos()), top, bottom)
+        self._set_demo_scroll_from_thumb_y(
+            position[1] - self.demo_scrollbar_drag_offset,
+            top,
+            bottom,
+        )
+        return True
+
+    def _demo_scrollbar_hit_rects(self, top: int, bottom: int) -> tuple[pygame.Rect, pygame.Rect]:
+        """Return a generous hit area and the visual thumb for demo scrollbar input."""
+        track_rect, thumb_rect = self._scrollbar_rects(
+            x=DEMO_SCROLLBAR_X,
+            top=top,
+            bottom=bottom,
+            scroll_offset=self.demo_scroll_offset,
+            max_scroll=self.demo_max_scroll,
+        )
+        hit_rect = pygame.Rect(
+            track_rect.centerx - (DEMO_SCROLLBAR_HIT_WIDTH // 2),
+            track_rect.y,
+            DEMO_SCROLLBAR_HIT_WIDTH,
+            track_rect.height,
+        )
+        thumb_hit_rect = pygame.Rect(
+            hit_rect.x,
+            thumb_rect.y,
+            hit_rect.width,
+            thumb_rect.height,
+        )
+        return hit_rect, thumb_hit_rect
+
+    def _set_demo_scroll_from_thumb_y(self, thumb_y: int, top: int, bottom: int) -> None:
+        """Set demo scroll offset from a visual scrollbar thumb y-position."""
+        _, thumb_rect = self._scrollbar_rects(
+            x=DEMO_SCROLLBAR_X,
+            top=top,
+            bottom=bottom,
+            scroll_offset=self.demo_scroll_offset,
+            max_scroll=self.demo_max_scroll,
+        )
+        thumb_range = max(1, (bottom - top) - thumb_rect.height)
+        relative_thumb_y = max(0, min(thumb_y - top, thumb_range))
+        self.demo_scroll_offset = round(relative_thumb_y / thumb_range * self.demo_max_scroll)
+        self._clamp_demo_scroll()
+        self._select_visible_demo_after_scroll(top, bottom)
 
     def _ensure_selected_demo_visible(self, top: int, bottom: int) -> None:
         """Scroll the demo list so the selected item stays inside the viewport."""
