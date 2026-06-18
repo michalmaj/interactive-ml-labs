@@ -84,6 +84,7 @@ def draw_readout_panel(
         fonts.small,
         colors.secondary,
         line_height=LINE_HEIGHT,
+        max_bottom=rect.bottom - PADDING,
     )
 
 
@@ -155,8 +156,30 @@ def _draw_wrapped(
     color: tuple[int, int, int],
     *,
     line_height: int,
+    max_bottom: int | None = None,
 ) -> int:
     x, y = position
+    lines = _wrapped_lines(text, width, font)
+    if max_bottom is not None:
+        available_lines = max(0, (max_bottom - y) // line_height)
+        if available_lines == 0:
+            return y
+        if len(lines) > available_lines:
+            lines = [
+                *lines[: available_lines - 1],
+                _fit_with_ellipsis(lines[available_lines - 1], width, font),
+            ]
+
+    for line in lines:
+        _draw_text(surface, line, (x, y), font, color)
+        y += line_height
+
+    return y
+
+
+def _wrapped_lines(text: str, width: int, font: pygame.font.Font) -> list[str]:
+    """Wrap text into lines that fit the requested width."""
+    lines: list[str] = []
     current = ""
     for word in text.split():
         candidate = word if not current else f"{current} {word}"
@@ -164,10 +187,24 @@ def _draw_wrapped(
             current = candidate
             continue
         if current:
-            _draw_text(surface, current, (x, y), font, color)
-            y += line_height
+            lines.append(current)
         current = word
     if current:
-        _draw_text(surface, current, (x, y), font, color)
-        y += line_height
-    return y
+        lines.append(current)
+    return lines
+
+
+def _fit_with_ellipsis(text: str, width: int, font: pygame.font.Font) -> str:
+    """Trim text so a clipped line still communicates that more text exists."""
+    suffix = "..."
+    if font.size(text + suffix)[0] <= width:
+        return text + suffix
+
+    trimmed = text
+    while trimmed and font.size(trimmed.rstrip() + suffix)[0] > width:
+        trimmed = trimmed[:-1]
+
+    if not trimmed:
+        return suffix
+
+    return trimmed.rstrip() + suffix
