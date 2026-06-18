@@ -45,6 +45,10 @@ from interactive_ml_labs.distance_metrics_scene import (
     DistanceMetricsLabScene,
     create_distance_metrics_lab_scene,
 )
+from interactive_ml_labs.feature_importance_scene import (
+    FeatureImportanceLabScene,
+    create_feature_importance_lab_scene,
+)
 from interactive_ml_labs.feature_scaling_scene import (
     FeatureScalingLabScene,
     create_feature_scaling_lab_scene,
@@ -162,6 +166,7 @@ __all__ = [
     "DemoManifest",
     "DemoTheory",
     "DistanceMetricsLabScene",
+    "FeatureImportanceLabScene",
     "FeatureScalingLabScene",
     "FixedSizeScene",
     "GaussianMixtureIntroLabScene",
@@ -200,6 +205,7 @@ __all__ = [
     "create_data_leakage_lab_scene",
     "create_decision_tree_scene",
     "create_distance_metrics_lab_scene",
+    "create_feature_importance_lab_scene",
     "create_feature_scaling_lab_scene",
     "create_gaussian_mixture_intro_lab_scene",
     "create_gradient_descent_scene",

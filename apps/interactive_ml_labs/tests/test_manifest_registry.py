@@ -21,6 +21,7 @@ from interactive_ml_labs.clustering_scene import create_clustering_lab_scene
 from interactive_ml_labs.data_leakage_scene import create_data_leakage_lab_scene
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.distance_metrics_scene import create_distance_metrics_lab_scene
+from interactive_ml_labs.feature_importance_scene import create_feature_importance_lab_scene
 from interactive_ml_labs.feature_scaling_scene import create_feature_scaling_lab_scene
 from interactive_ml_labs.gaussian_mixture_scene import create_gaussian_mixture_intro_lab_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
@@ -411,6 +412,49 @@ def test_feature_scaling_manifest_describes_practical_level_two_lab() -> None:
     assert "range ratio" in text
     assert "feature dominance" in text
     assert "S" in text
+
+
+def test_feature_importance_manifest_describes_practical_level_two_lab() -> None:
+    """Feature Importance Lab should teach careful importance interpretation."""
+    manifest = DEMO_BY_ID["feature_importance_lab"]
+    text = " ".join(
+        [
+            manifest.title.en,
+            manifest.summary.en,
+            manifest.summary.pl,
+            *(objective.en for objective in manifest.objectives),
+            *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
+            *(control.action.en for control in manifest.controls),
+            *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(challenge.en for challenge in manifest.theory.mini_challenges),
+            *(entry.term for entry in manifest.theory.glossary),
+        ],
+    )
+
+    assert manifest.level == 2
+    assert manifest.create_scene is create_feature_importance_lab_scene
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Praktyczny"
+    assert manifest.tags == (
+        "interpretability",
+        "feature-importance",
+        "leakage",
+        "correlation",
+        "level-2",
+    )
+    assert "Feature Importance Lab" in text
+    assert "feature importance" in text
+    assert "permutation importance" in text
+    assert "model importance" in text
+    assert "leakage" in text
+    assert "correlated features" in text
+    assert "causality" in text
+    assert "M" in text
+    assert "C" in text
+    assert "L" in text
 
 
 def test_gaussian_mixture_manifest_describes_practical_level_two_lab() -> None:
