@@ -13,6 +13,7 @@ from interactive_ml_labs.clustering_scene import create_clustering_lab_scene
 from interactive_ml_labs.data_leakage_scene import create_data_leakage_lab_scene
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.distance_metrics_scene import create_distance_metrics_lab_scene
+from interactive_ml_labs.feature_importance_scene import create_feature_importance_lab_scene
 from interactive_ml_labs.feature_scaling_scene import create_feature_scaling_lab_scene
 from interactive_ml_labs.gaussian_mixture_scene import create_gaussian_mixture_intro_lab_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
@@ -489,6 +490,38 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             pl=(
                 "Porównaj accuracy i iterations przed oraz po scaling. Oddziel "
                 "lepszą geometrię danych od lepszego modelu."
+            ),
+        ),
+    ),
+    "feature_importance_lab": (
+        LocalizedText(
+            en=(
+                "Switch between permutation importance and model importance. "
+                "Name a feature whose rank changes and explain why that matters."
+            ),
+            pl=(
+                "Przełącz permutation importance i model importance. Wskaż cechę, "
+                "której miejsce w rankingu się zmienia, i wyjaśnij, czemu to ważne."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Use the correlated-features scenario. Decide whether income "
+                "and credit_limit should be read separately or together."
+            ),
+            pl=(
+                "Użyj scenariusza ze skorelowanymi cechami. Zdecyduj, czy income "
+                "i credit_limit warto czytać osobno, czy razem."
+            ),
+        ),
+        LocalizedText(
+            en=(
+                "Open the leakage candidate scenario and decide whether future_status "
+                "should be removed before trusting the model."
+            ),
+            pl=(
+                "Otwórz scenariusz leakage candidate i zdecyduj, czy future_status "
+                "trzeba usunąć, zanim zaufasz modelowi."
             ),
         ),
     ),
@@ -1289,6 +1322,67 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             definition=LocalizedText(
                 en="When one raw numeric range is so large that it controls distance or gradients.",
                 pl="Sytuacja, gdy jeden surowy zakres liczbowy dominuje dystans albo gradienty.",
+            ),
+        ),
+    ),
+    "feature_importance_lab": (
+        GlossaryTerm(
+            term="feature importance",
+            definition=LocalizedText(
+                en=(
+                    "A ranking of features by how strongly they appear to help "
+                    "a trained model make predictions."
+                ),
+                pl=(
+                    "Ranking cech według tego, jak mocno wydają się pomagać "
+                    "wytrenowanemu modelowi w predykcji."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="permutation importance",
+            definition=LocalizedText(
+                en=(
+                    "Importance measured by shuffling one feature and checking "
+                    "how much model quality drops."
+                ),
+                pl=(
+                    "Importance mierzona przez przetasowanie jednej cechy i sprawdzenie, "
+                    "jak mocno spada jakość modelu."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="model importance",
+            definition=LocalizedText(
+                en=(
+                    "A model-specific importance score, often based on splits, "
+                    "coefficients, or internal gain."
+                ),
+                pl=(
+                    "Model-specific importance score, często oparty na splitach, "
+                    "coefficients albo wewnętrznym gain."
+                ),
+            ),
+        ),
+        GlossaryTerm(
+            term="leakage",
+            definition=LocalizedText(
+                en="A feature that reveals information unavailable at prediction time.",
+                pl="Cecha ujawniająca informację niedostępną w czasie predykcji.",
+            ),
+        ),
+        GlossaryTerm(
+            term="correlated features",
+            definition=LocalizedText(
+                en=(
+                    "Features that carry overlapping signal, so importance may be "
+                    "split or moved between them."
+                ),
+                pl=(
+                    "Cechy niosące podobny sygnał, przez co importance może się "
+                    "dzielić albo przesuwać między nimi."
+                ),
             ),
         ),
     ),
@@ -4185,6 +4279,181 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             ),
             mini_challenges=LESSON_CHALLENGES["feature_scaling_lab"],
             glossary=LESSON_GLOSSARY["feature_scaling_lab"],
+        ),
+    ),
+    _placeholder_demo(
+        demo_id="feature_importance_lab",
+        level=2,
+        title_en="Feature Importance Lab",
+        title_pl="Feature Importance Lab",
+        summary_en=(
+            "Compare permutation and model importance, then inspect why correlated "
+            "features, leakage, and unstable rankings need extra care."
+        ),
+        summary_pl=(
+            "Porównuj permutation i model importance, a potem sprawdzaj, czemu "
+            "skorelowane cechy, leakage i niestabilne rankingi wymagają ostrożności."
+        ),
+        objectives=(
+            LocalizedText(
+                en="Compare two importance methods on the same feature set.",
+                pl="Porównuj dwie metody importance na tym samym zestawie cech.",
+            ),
+            LocalizedText(
+                en="Spot when correlated features split credit between themselves.",
+                pl="Zauważ, kiedy skorelowane cechy dzielą między sobą zasługę.",
+            ),
+            LocalizedText(
+                en="Treat leakage and low stability as warnings, not as model insight.",
+                pl=(
+                    "Traktuj leakage i niską stabilność jak ostrzeżenia, "
+                    "a nie jak insight o modelu."
+                ),
+            ),
+        ),
+        controls=(
+            ControlBinding(
+                key="1-3",
+                action=LocalizedText(
+                    en="switch importance scenario",
+                    pl="zmień scenariusz importance",
+                ),
+            ),
+            ControlBinding(
+                key="M",
+                action=LocalizedText(
+                    en="switch importance method",
+                    pl="zmień metodę importance",
+                ),
+            ),
+            ControlBinding(
+                key="C",
+                action=LocalizedText(
+                    en="show or hide correlation groups",
+                    pl="pokaż albo ukryj grupy korelacji",
+                ),
+            ),
+            ControlBinding(
+                key="L",
+                action=LocalizedText(
+                    en="show or hide leakage warning",
+                    pl="pokaż albo ukryj ostrzeżenie leakage",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(en="reset the lab", pl="zresetuj lab"),
+            ),
+            ControlBinding(
+                key="T",
+                action=LocalizedText(
+                    en="read feature importance notes",
+                    pl="przeczytaj notatki o feature importance",
+                ),
+            ),
+            ControlBinding(
+                key="H",
+                action=LocalizedText(en="open the help overlay", pl="otwórz pomoc"),
+            ),
+            ControlBinding(
+                key="Esc",
+                action=LocalizedText(
+                    en="open pause or return to the demo list",
+                    pl="otwórz pauzę albo wróć do listy dem",
+                ),
+            ),
+        ),
+        create_scene=create_feature_importance_lab_scene,
+        difficulty=LocalizedText(en="Practical", pl="Praktyczny"),
+        tags=(
+            "interpretability",
+            "feature-importance",
+            "leakage",
+            "correlation",
+            "level-2",
+        ),
+        theory=DemoTheory(
+            sections=(
+                TheorySection(
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Feature importance is useful for investigation, but it is "
+                                "not proof of causality. It says what a trained model seems "
+                                "to use, not what truly causes the target."
+                            ),
+                            pl=(
+                                "Feature importance pomaga w analizie, ale nie jest dowodem "
+                                "przyczynowości. Pokazuje, czego wytrenowany model wydaje się "
+                                "używać, a nie co naprawdę powoduje target."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Permutation importance asks what happens when one feature is "
+                                "broken. Model importance reads a model-specific internal score."
+                            ),
+                            pl=(
+                                "Permutation importance pyta, co się stanie po zepsuciu jednej "
+                                "cechy. Model importance czyta wewnętrzny score konkretnego modelu."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Correlated features can share the same signal. If one feature "
+                                "drops in the ranking, the other may still carry similar evidence."
+                            ),
+                            pl=(
+                                "Skorelowane cechy mogą nieść ten sam sygnał. Jeśli jedna spada "
+                                "w rankingu, druga nadal może przenosić podobną informację."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "A feature with very high importance and leakage risk should be "
+                                "investigated before the model is trusted."
+                            ),
+                            pl=(
+                                "Cecha z bardzo wysokim importance i ryzykiem leakage wymaga "
+                                "sprawdzenia, zanim zaufamy modelowi."
+                            ),
+                        ),
+                    ),
+                ),
+                TheorySection(
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
+                    body=(
+                        LocalizedText(
+                            en=(
+                                "Do not read importance as causal impact. A feature can be "
+                                "important because it is a proxy, correlated, or leaked."
+                            ),
+                            pl=(
+                                "Nie czytaj importance jak wpływu przyczynowego. Cecha może być "
+                                "ważna, bo jest proxy, jest skorelowana albo przecieka z targetu."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
+                                "Do not over-trust tiny ranking differences when stability is low. "
+                                "Treat them as a prompt for another check."
+                            ),
+                            pl=(
+                                "Nie ufaj drobnym różnicom w rankingu, gdy stability jest niska. "
+                                "Traktuj je jako powód do dodatkowego sprawdzenia."
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            mini_challenges=LESSON_CHALLENGES["feature_importance_lab"],
+            glossary=LESSON_GLOSSARY["feature_importance_lab"],
         ),
     ),
     _placeholder_demo(

@@ -52,6 +52,7 @@ Unified app zawiera te natywne laby z Level 2:
 - Data Leakage Lab pokazuje podejrzane cechy, dostępność w czasie predykcji, leaky-vs-clean validation scores i nawyk nieufania metrykom, które wyglądają zbyt idealnie.
 - Train / Validation / Test Split Lab pokazuje model selection przez validation scores, overfitting przez train-validation gaps i zostawianie test jako finalnego uczciwego checku.
 - Feature Scaling Lab pokazuje raw-vs-scaled feature ranges, range ratio, modele wrażliwe na skalę oraz wpływ scaling na accuracy i iterations.
+- Feature Importance Lab pokazuje permutation/model importance, skorelowane cechy, leakage warnings i stabilność rankingu.
 - Gaussian Mixture Intro Lab pokazuje soft responsibilities, hard assignment, mixture weights, kształty komponentów i nakładające się klastry.
 - Anomaly Detection Lab pokazuje anomaly scores, thresholds, szum alertów, false positives i pominięte anomalie.
 - Hyperparameter Tuning Lab pokazuje validation curves, intuicję grid search, train-validation gaps i wybór parametrów po validation score.
@@ -80,7 +81,7 @@ Podstawowe sterowanie:
 
 ## Osobne dema
 
-Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Linear Regression Line Fit Lab, K-Means Intro Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Neural Network Playground, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Gaussian Mixture Intro Lab, Anomaly Detection Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
+Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Linear Regression Line Fit Lab, K-Means Intro Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Neural Network Playground, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Feature Importance Lab, Gaussian Mixture Intro Lab, Anomaly Detection Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
 
 ### Natywne laby Level 1
 
@@ -170,6 +171,16 @@ Sterowanie w Feature Scaling Lab:
 | `S` | Włącz albo wyłącz feature scaling |
 | `M` | Zmień model |
 | `R` | Zresetuj podgląd |
+
+Sterowanie w Feature Importance Lab:
+
+| Klawisz / wejście | Akcja |
+| ----------------- | ----- |
+| `1-3` | Zmień scenariusz importance |
+| `M` | Zmień metodę importance |
+| `C` | Pokaż albo ukryj grupy korelacji |
+| `L` | Pokaż albo ukryj ostrzeżenie leakage |
+| `R` | Zresetuj lab |
 
 Sterowanie w Gaussian Mixture Intro Lab:
 

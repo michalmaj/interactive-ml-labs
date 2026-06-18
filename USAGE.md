@@ -52,6 +52,7 @@ The unified app includes these app-only Level 2 labs:
 - Data Leakage Lab demonstrates suspicious features, prediction-time availability, leaky-vs-clean validation scores, and the habit of distrusting metrics that look too perfect.
 - Train / Validation / Test Split Lab demonstrates model selection with validation scores, overfitting from train-validation gaps, and keeping test as the final honest check.
 - Feature Scaling Lab demonstrates raw-vs-scaled feature ranges, range ratio, scale-sensitive models, and the effect of scaling on accuracy and iterations.
+- Feature Importance Lab demonstrates permutation/model importance, correlated features, leakage warnings, and ranking stability.
 - Gaussian Mixture Intro Lab demonstrates soft responsibilities, hard assignment, mixture weights, component shapes, and overlapping clusters.
 - Anomaly Detection Lab demonstrates anomaly scores, thresholds, alert noise, false positives, and missed anomalies.
 - Hyperparameter Tuning Lab demonstrates validation curves, grid-search intuition, train-validation gaps, and choosing parameters by validation score.
@@ -80,7 +81,7 @@ Common shell controls:
 
 ## Standalone Demos
 
-Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Linear Regression Line Fit Lab, K-Means Intro Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Neural Network Playground, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Gaussian Mixture Intro Lab, Anomaly Detection Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, and t-SNE / UMAP Exploration Lab, are launched from the unified app.
+Each original Level 1 and Level 2 demo remains runnable on its own. Native app-only labs, such as Linear Regression Line Fit Lab, K-Means Intro Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Neural Network Playground, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Feature Importance Lab, Gaussian Mixture Intro Lab, Anomaly Detection Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, and t-SNE / UMAP Exploration Lab, are launched from the unified app.
 
 ### App-only Level 1 Labs
 
@@ -170,6 +171,16 @@ Feature Scaling Lab controls:
 | `S` | Toggle feature scaling |
 | `M` | Cycle model |
 | `R` | Reset the preview |
+
+Feature Importance Lab controls:
+
+| Key / input | Action |
+| ----------- | ------ |
+| `1-3` | Switch importance scenario |
+| `M` | Switch importance method |
+| `C` | Show or hide correlation groups |
+| `L` | Show or hide leakage warning |
+| `R` | Reset the lab |
 
 Gaussian Mixture Intro Lab controls:
 
