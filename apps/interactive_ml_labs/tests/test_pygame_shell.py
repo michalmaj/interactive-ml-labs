@@ -446,6 +446,27 @@ def test_level_one_help_overlay_copy_stays_inside_overlay(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_level_one_theory_screens_render_in_polish_and_english(monkeypatch) -> None:
+    """Level 1 theory screens should render without relying on external markdown files."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+
+    try:
+        app.screen_name = ScreenName.THEORY
+        for language in ("pl", "en"):
+            app.context.settings.language = language
+            for demo in demos_for_level(1):
+                app.selected_demo = demo
+                app.theory_scroll_offset = 0
+                app.theory_max_scroll = 0
+
+                app._render_theory()
+
+                assert app.theory_max_scroll >= 0
+    finally:
+        pygame.quit()
+
+
 def test_shell_opens_theory_screen_from_intro(monkeypatch) -> None:
     """The intro screen should expose the generated in-app theory screen."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
