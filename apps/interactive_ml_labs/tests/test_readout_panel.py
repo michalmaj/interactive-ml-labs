@@ -84,3 +84,42 @@ def test_readout_panel_wraps_long_values_without_crashing(monkeypatch) -> None:
         assert surface.get_bounding_rect().bottom <= surface.get_height()
     finally:
         pygame.quit()
+
+
+def test_readout_panel_clips_long_takeaway_to_panel_bounds(monkeypatch) -> None:
+    """Long takeaway text should stay inside the readout panel."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        panel_rect = pygame.Rect(0, 0, 300, 260)
+        surface = pygame.Surface((340, 360), pygame.SRCALPHA)
+        draw_readout_panel(
+            surface,
+            panel_rect,
+            title="Odczyt",
+            rows=(
+                ("dataset", "długi opis"),
+                ("diagnosis", "do sprawdzenia"),
+            ),
+            options=(("1. Opcja", True), ("2. Druga opcja", False)),
+            takeaway=(
+                "To jest bardzo długi wniosek, który w praktycznym labie mógłby "
+                "mieć kilka linijek i nie powinien wychodzić poza dolną krawędź panelu."
+            ),
+            fonts=ReadoutPanelFonts(
+                heading=make_ui_font(23, bold=True),
+                small=make_ui_font(15),
+            ),
+            colors=ReadoutPanelColors(
+                panel=(34, 39, 45),
+                text=(236, 239, 242),
+                muted_text=(166, 174, 184),
+                accent=(118, 205, 247),
+                secondary=(248, 183, 96),
+            ),
+        )
+
+        assert surface.get_bounding_rect().bottom <= panel_rect.bottom
+    finally:
+        pygame.quit()

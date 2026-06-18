@@ -80,6 +80,32 @@ class CountingScene:
         _ = surface
 
 
+def _wrapped_text_bottom(
+    text: str,
+    position: tuple[int, int],
+    width: int,
+    font: pygame.font.Font,
+) -> int:
+    """Return the bottom y coordinate for text wrapped like the shell does."""
+    words = text.split()
+    line = ""
+    _, y = position
+
+    for word in words:
+        candidate = f"{line} {word}".strip()
+        if font.size(candidate)[0] <= width:
+            line = candidate
+            continue
+
+        y += font.get_linesize()
+        line = word
+
+    if line:
+        y += font.get_linesize()
+
+    return y
+
+
 def test_shell_can_render_initial_screen(monkeypatch) -> None:
     """The shell should render its first screen without opening a real window."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -330,6 +356,92 @@ def test_shell_intro_uses_columns_for_long_demo_controls(monkeypatch) -> None:
         assert control_positions
         assert all(position[0] > 600 for position in control_positions)
         assert max(position[1] for position in control_positions) < 670
+    finally:
+        pygame.quit()
+
+
+def test_level_one_intro_copy_stays_above_footer(monkeypatch) -> None:
+    """Level 1 intro objectives and controls should not collide with the footer."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    bottom_limit = app._content_bottom()
+    wrapped_bottoms: list[int] = []
+
+    def capture_text(
+        text: str,
+        position: tuple[int, int],
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> None:
+        _ = text, position, font, color
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = color
+        y = _wrapped_text_bottom(text, position, width, font)
+        wrapped_bottoms.append(y)
+        return y
+
+    try:
+        app.context.settings.language = "pl"
+        app.screen_name = ScreenName.INTRO
+        app._draw_text = capture_text
+        app._draw_wrapped = capture_wrapped
+
+        for demo in demos_for_level(1):
+            wrapped_bottoms.clear()
+            app.selected_demo = demo
+            app._render_intro()
+            assert wrapped_bottoms
+            assert max(wrapped_bottoms) <= bottom_limit
+    finally:
+        pygame.quit()
+
+
+def test_level_one_help_overlay_copy_stays_inside_overlay(monkeypatch) -> None:
+    """Level 1 help overlay text should stay inside the dialog body."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    overlay_bottom = 720 - min(90, max(32, 720 // 10)) - 32
+    wrapped_bottoms: list[int] = []
+
+    def capture_text(
+        text: str,
+        position: tuple[int, int],
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> None:
+        _ = text, position, font, color
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = color
+        y = _wrapped_text_bottom(text, position, width, font)
+        wrapped_bottoms.append(y)
+        return y
+
+    try:
+        app.context.settings.language = "pl"
+        app.screen_name = ScreenName.INTRO
+        app._draw_text = capture_text
+        app._draw_wrapped = capture_wrapped
+
+        for demo in demos_for_level(1):
+            wrapped_bottoms.clear()
+            app.selected_demo = demo
+            app._render_help_overlay()
+            assert wrapped_bottoms
+            assert max(wrapped_bottoms) <= overlay_bottom
     finally:
         pygame.quit()
 
