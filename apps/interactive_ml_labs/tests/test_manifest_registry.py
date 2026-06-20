@@ -36,6 +36,7 @@ from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 from interactive_ml_labs.split_lab_scene import create_train_validation_test_lab_scene
 from interactive_ml_labs.svm_margin_scene import create_svm_margin_lab_scene
+from interactive_ml_labs.time_series_scene import create_time_series_forecasting_lab_scene
 from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
 from interactive_ml_labs.tuning_scene import create_hyperparameter_tuning_lab_scene
 
@@ -67,7 +68,7 @@ def test_registry_groups_demos_by_level() -> None:
     assert level_three_demos[3].id == "calibration_lab"
     assert level_three_demos[4].id == "tsne_umap_exploration_lab"
     assert level_three_demos[5].id == "model_monitoring_drift_lab"
-    assert level_three_demos[6].id == "level_3_coming_soon"
+    assert level_three_demos[6].id == "time_series_forecasting_lab"
 
 
 def test_linear_regression_manifest_describes_foundation_level_one_lab() -> None:
@@ -561,29 +562,54 @@ def test_hyperparameter_tuning_manifest_describes_practical_level_two_lab() -> N
     assert "- / = / 0" in text
 
 
-def test_level_three_placeholder_describes_future_advanced_demos() -> None:
-    """Level 3 placeholder should explain the future advanced/showcase track."""
-    manifest = DEMO_BY_ID["level_3_coming_soon"]
+def test_time_series_forecasting_manifest_describes_level_three_lab() -> None:
+    """Time Series Forecasting Lab should replace the Level 3 placeholder."""
+    manifest = DEMO_BY_ID["time_series_forecasting_lab"]
     text = " ".join(
         [
             manifest.title.en,
-            manifest.title.pl,
             manifest.summary.en,
             manifest.summary.pl,
             *(objective.en for objective in manifest.objectives),
             *(objective.pl for objective in manifest.objectives),
+            *(control.key for control in manifest.controls),
             *(control.action.en for control in manifest.controls),
             *(control.action.pl for control in manifest.controls),
+            *(section.title.en for section in manifest.theory.sections),
+            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+            *(challenge.en for challenge in manifest.theory.mini_challenges),
+            *(entry.term for entry in manifest.theory.glossary),
         ],
     )
 
     assert manifest.level == 3
-    assert "Coming Soon" in text
-    assert "advanced" in text
-    assert "Level 3" in text
-    assert "Coming soon" in text
-    assert manifest.difficulty.pl == "W przygotowaniu"
-    assert manifest.tags == ("level-3", "showcase", "planning")
+    assert manifest.create_scene is create_time_series_forecasting_lab_scene
+    assert manifest.difficulty is not None
+    assert manifest.difficulty.pl == "Zaawansowany"
+    assert manifest.tags == (
+        "time-series",
+        "forecasting",
+        "uncertainty",
+        "evaluation",
+        "level-3",
+    )
+    assert "Time Series Forecasting Lab" in text
+    assert "holdout window" in text
+    assert "forecast horizon" in text
+    assert "moving average" in text
+    assert "trend-seasonal" in text
+    assert "residual" in text
+    assert "MAE" in text
+    assert "RMSE" in text
+    assert "forecast bias" in text
+    assert "uncertainty" in text
+    assert "1-3" in text
+    assert "M" in text
+    assert "- / =" in text
+    assert "U" in text
+    assert "E" in text
+    assert "R" in text
+    assert "T" in text
 
 
 def test_model_monitoring_manifest_describes_level_three_lab() -> None:
