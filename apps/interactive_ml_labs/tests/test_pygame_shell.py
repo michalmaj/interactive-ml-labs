@@ -11,7 +11,13 @@ from interactive_ml_labs.decision_tree_scene import DecisionTreeSceneAdapter
 from interactive_ml_labs.gradient_scene import GradientDescentSceneAdapter
 from interactive_ml_labs.knn_scene import KNNVoteMapSceneAdapter
 from interactive_ml_labs.logistic_scene import LogisticRegressionSceneAdapter
-from interactive_ml_labs.pygame_app import DEMO_SCROLLBAR_X, ScreenName, UnifiedAppShell
+from interactive_ml_labs.pygame_app import (
+    DEMO_MENU_TOP,
+    DEMO_SCROLLBAR_X,
+    MENU_ITEM_PITCH,
+    ScreenName,
+    UnifiedAppShell,
+)
 from interactive_ml_labs.random_forest_scene import RandomForestSceneAdapter
 from interactive_ml_labs.scene import SceneCommand
 from interactive_ml_labs.settings import AppSettings, save_app_settings
@@ -728,6 +734,29 @@ def test_shell_demo_list_mouse_wheel_scrolls_and_draws_indicator(monkeypatch) ->
 
         assert app.demo_scroll_offset > 0
         assert scrollbars
+    finally:
+        pygame.quit()
+
+
+def test_shell_demo_list_hover_uses_scrolled_position_before_rerender(monkeypatch) -> None:
+    """Hover selection should account for demo scroll offset immediately after wheel input."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+
+    try:
+        app.context.current_level = 1
+        app.screen_name = ScreenName.DEMOS
+        app._render_demos()
+
+        app._handle_mouse_wheel(-10)
+        scrolled_offset = app.demo_scroll_offset
+        hover_position = (120, DEMO_MENU_TOP + 14)
+
+        app._handle_mouse_motion(hover_position)
+
+        expected_index = scrolled_offset // MENU_ITEM_PITCH
+        assert scrolled_offset > 0
+        assert app.selected_index == expected_index
     finally:
         pygame.quit()
 

@@ -257,12 +257,40 @@ class UnifiedAppShell:
             self._select_visible_demo_after_scroll(DEMO_MENU_TOP, self._content_bottom())
 
     def _select_menu_item_at(self, position: tuple[int, int]) -> bool:
+        if self.screen_name == ScreenName.DEMOS:
+            return self._select_demo_item_at(position)
+
         for index, item in enumerate(self.menu_items):
             if item.enabled and item.rect.collidepoint(position):
                 self.selected_index = index
                 return True
 
         return False
+
+    def _select_demo_item_at(self, position: tuple[int, int]) -> bool:
+        """Select a demo under the pointer, accounting for scroll offset."""
+        x, y = position
+        left = 80
+        top = DEMO_MENU_TOP
+        bottom = self._content_bottom()
+        if not (left <= x <= left + DEMO_MENU_WIDTH and top <= y <= bottom):
+            return False
+
+        demos = self._current_level_demos()
+        if not demos:
+            return False
+
+        scrolled_y = y - top + self.demo_scroll_offset
+        row_offset = scrolled_y % MENU_ITEM_PITCH
+        if row_offset >= MENU_ITEM_HEIGHT:
+            return False
+
+        index = scrolled_y // MENU_ITEM_PITCH
+        if not 0 <= index < len(demos):
+            return False
+
+        self.selected_index = index
+        return True
 
     def _update(self, dt: float) -> None:
         if self.screen_name != ScreenName.DEMO:
