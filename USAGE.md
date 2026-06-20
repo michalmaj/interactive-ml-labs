@@ -36,7 +36,7 @@ language selection
 -> pause/help overlay
 ```
 
-Real demo integrations are being added gradually. All current Level 1 and Level 2 demos are available through the unified app. Original package demos can still be run directly, while native app-only labs are launched from the unified app.
+The unified app is now the main guided path. All current Level 1 and Level 2 demos are available through it, and Level 3 contains a growing set of advanced app-only labs. Original package demos can still be run directly, while native app-only labs are launched from the unified app.
 
 The unified app includes these app-only Level 1 labs:
 
