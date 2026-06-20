@@ -36,7 +36,7 @@ wybór języka
 -> pauza / pomoc
 ```
 
-Kolejne dema będą podpinane stopniowo. Wszystkie obecne dema z Level 1 i Level 2 działają już w unified app. Oryginalne pakiety demo nadal można uruchomić osobno, a natywne laby app-only uruchamia się z unified app.
+Unified app jest teraz główną ścieżką przechodzenia przez laboratoria. Wszystkie obecne dema z Level 1 i Level 2 działają już w appce, a Level 3 ma rosnący zestaw zaawansowanych labów app-only. Oryginalne pakiety demo nadal można uruchomić osobno, a natywne laby app-only uruchamia się z unified app.
 
 Unified app zawiera te natywne laby z Level 1:
 

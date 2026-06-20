@@ -99,7 +99,9 @@ This repository is also intended to demonstrate how real software projects are d
 
 ## Current status
 
-The unified app is now the recommended guided experience. It includes all implemented Level 1 and Level 2 demos:
+The unified app is now the recommended guided experience. The project is no longer only a collection of separate demos: the app shell provides language selection, level selection, demo intros, in-app theory, help overlays, settings, and scrollable demo lists.
+
+Level 1 is a broad foundation track with the original demos plus native app-only labs:
 
 - Linear Regression Line Fit Lab,
 - K-Means Intro Lab,
@@ -110,7 +112,10 @@ The unified app is now the recommended guided experience. It includes all implem
 - SVM Margin Lab,
 - Activation Functions Lab,
 - Neural Network Playground,
-- Decision Tree Splitter,
+- Decision Tree Splitter.
+
+Level 2 is now being strengthened as the practical ML track:
+
 - Data Leakage Lab,
 - Train / Validation / Test Split Lab,
 - Feature Scaling Lab,
@@ -122,15 +127,12 @@ The unified app is now the recommended guided experience. It includes all implem
 - Random Forest Bagging Lab,
 - Boosting Mistake Lab.
 
-It also includes the first real Level 3 labs:
+Level 3 has moved beyond placeholders into a real advanced/showcase track:
 
 - Clustering Lab, with K-Means/DBSCAN comparison, point-to-centroid links, inertia trend, draggable points, and density-based clustering behavior.
 - PCA Lab, with dataset presets, noise controls, manual projection rotation, fitted PCA direction, explained variance, reconstruction residuals, and reconstruction error.
 - Model Comparison Lab, with Logistic Regression, k-NN, and Decision Tree previews on shared datasets, active model parameters, train/test accuracy, compact confusion details, and highlighted misclassified test points.
 - Calibration Lab, with overconfident, underconfident, and better calibrated presets, a reliability diagram, score distribution, raw-vs-scaled score reference with a compact legend, accuracy@0.5, Brier score, ECE, worst-gap highlighting, calibration gap error bars, and temperature scaling.
-
-It also includes the next Level 3 labs:
-
 - t-SNE / UMAP Exploration Lab, with deterministic toy embeddings, raw-vs-embedding comparison, dataset cues, a compact class legend, seed drift, t-SNE/UMAP comparison, and neighborhood tuning.
 - Model Monitoring Drift Lab, with production-style data drift, metric drift, monitoring windows, alert thresholds, lead signals, alert rate, persistence, trend readouts, and investigation acknowledgements.
 - Time Series Forecasting Lab, with holdout forecasts, naive/moving-average/trend-seasonal models, forecast horizon controls, residuals, MAE/RMSE, bias, and uncertainty bands.
@@ -139,17 +141,15 @@ The original Level 1 and Level 2 demos can still be run as standalone commands. 
 
 ## Next milestones
 
-Near-term work focuses on turning Level 3 into a stronger guided learning track while keeping the shell stable:
+Near-term work focuses on balancing the practical Level 2 track with the advanced Level 3 track while keeping the shell stable:
 
-- collect review feedback on Clustering Lab, PCA Lab, Model Comparison Lab, and Calibration Lab after classroom-style use,
-- iterate on the t-SNE / UMAP Exploration Lab prototype with richer projection behavior,
-- collect review feedback on Model Monitoring Drift Lab after classroom-style use,
-- collect review feedback on Time Series Forecasting Lab, especially whether horizon, residuals, and uncertainty read clearly,
-- keep a later Calibration Lab slice in mind for real model outputs and post-hoc calibration workflows,
-- keep improving the Level 3 flow from theory to interaction to mini-challenges,
-- decide whether the following Level 3 track should go deeper into forecasting, monitoring, drift, or richer evaluation workflows,
+- keep adding focused Level 2 labs around preprocessing, evaluation, robustness, interpretability, and production-readiness,
+- review whether Level 2 has enough guided practice after Feature Scaling, Feature Importance, Gaussian Mixture, Anomaly Detection, Hyperparameter Tuning, and Class Imbalance,
+- collect classroom-style feedback on the newer Level 3 labs: t-SNE / UMAP Exploration, Model Monitoring Drift, and Time Series Forecasting,
+- iterate on Level 3 only where the interaction teaches a clear idea, not just where the visual result looks impressive,
+- keep improving in-app theory, mini-challenges, and glossary content across Level 1, Level 2, and Level 3,
 - continue polishing Polish copy inside demos without forcing translations of standard ML terms,
-- keep app settings, scaling, and help overlays stable as new Level 3 scenes are added.
+- keep app settings, scaling, scrollbars, and help overlays stable as new scenes are added.
 
 ## Usage
 
