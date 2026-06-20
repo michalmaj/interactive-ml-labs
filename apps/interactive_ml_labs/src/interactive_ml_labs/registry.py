@@ -39,6 +39,7 @@ from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 from interactive_ml_labs.scene import Scene
 from interactive_ml_labs.split_lab_scene import create_train_validation_test_lab_scene
 from interactive_ml_labs.svm_margin_scene import create_svm_margin_lab_scene
+from interactive_ml_labs.time_series_scene import create_time_series_forecasting_lab_scene
 from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
 from interactive_ml_labs.tuning_scene import create_hyperparameter_tuning_lab_scene
 
@@ -884,35 +885,35 @@ LESSON_CHALLENGES: dict[str, tuple[LocalizedText, ...]] = {
             ),
         ),
     ),
-    "level_3_coming_soon": (
+    "time_series_forecasting_lab": (
         LocalizedText(
             en=(
-                "Pick one advanced idea you want to explain visually: dimensionality "
-                "reduction, clustering, calibration, or model monitoring."
+                "Switch models and explain why naive, moving average, and trend-seasonal "
+                "forecasts react differently to the same holdout window."
             ),
             pl=(
-                "Wybierz jeden zaawansowany temat do pokazania wizualnie: "
-                "dimensionality reduction, clustering, calibration albo model monitoring."
+                "Przełącz modele i wyjaśnij, czemu naive, moving average oraz "
+                "trend-seasonal forecast inaczej reagują na ten sam holdout window."
             ),
         ),
         LocalizedText(
             en=(
-                "Write down what the student should be able to change, observe, "
-                "and explain after five minutes."
+                "Increase the horizon and watch how uncertainty, residuals, MAE, "
+                "and RMSE change together."
             ),
             pl=(
-                "Zapisz, co student powinien móc zmienić, zaobserwować "
-                "i wyjaśnić po pięciu minutach pracy z demo."
+                "Zwiększ horizon i obserwuj, jak razem zmieniają się uncertainty, "
+                "residuals, MAE i RMSE."
             ),
         ),
         LocalizedText(
             en=(
-                "Compare two candidate ideas and choose the one with the clearest "
-                "interactive feedback loop."
+                "Use the trend-shift preset and decide whether the model is noisy "
+                "or systematically biased."
             ),
             pl=(
-                "Porównaj dwa pomysły i wybierz ten, który ma najczytelniejszą "
-                "pętlę interakcji: ustawienie, obserwacja, wniosek."
+                "Użyj presetu trend shift i zdecyduj, czy model jest szumny, "
+                "czy systematycznie biased."
             ),
         ),
     ),
@@ -2131,43 +2132,48 @@ LESSON_GLOSSARY: dict[str, tuple[GlossaryTerm, ...]] = {
             ),
         ),
     ),
-    "level_3_coming_soon": (
+    "time_series_forecasting_lab": (
         GlossaryTerm(
-            term="showcase demo",
+            term="time series",
+            definition=LocalizedText(
+                en="Data ordered in time, where recent and seasonal context often matters.",
+                pl="Dane uporządkowane w czasie, gdzie często liczy się kontekst i sezonowość.",
+            ),
+        ),
+        GlossaryTerm(
+            term="forecast horizon",
             definition=LocalizedText(
                 en=(
-                    "A visually strong demo that helps students connect an advanced "
-                    "ML idea with concrete behavior."
+                    "How many future time steps the model is asked to predict before "
+                    "seeing actual values."
                 ),
                 pl=(
-                    "Efektowne wizualnie demo, które łączy zaawansowaną ideę ML "
-                    "z konkretnym zachowaniem modelu."
+                    "Liczba przyszłych kroków czasu, które model ma przewidzieć "
+                    "przed zobaczeniem actual values."
                 ),
             ),
         ),
         GlossaryTerm(
-            term="interactive feedback loop",
+            term="holdout window",
             definition=LocalizedText(
-                en=(
-                    "The cycle where a student changes a setting, observes the result, "
-                    "and explains why it happened."
-                ),
-                pl=(
-                    "Cykl, w którym student zmienia ustawienie, obserwuje rezultat "
-                    "i wyjaśnia, dlaczego tak się stało."
-                ),
+                en="The final part of the series kept aside to check forecast quality.",
+                pl="Końcowy fragment szeregu odłożony do sprawdzenia jakości forecastu.",
             ),
         ),
         GlossaryTerm(
-            term="advanced experiment",
+            term="residual",
             definition=LocalizedText(
-                en=(
-                    "A lab that goes beyond core algorithms and focuses on richer "
-                    "model behavior or real-world ML workflow."
-                ),
+                en="The difference between the actual value and the forecast value.",
+                pl="Różnica między actual value a forecast value.",
+            ),
+        ),
+        GlossaryTerm(
+            term="forecast bias",
+            definition=LocalizedText(
+                en=("A systematic forecasting error where predictions stay too high or too low."),
                 pl=(
-                    "Lab wykraczający poza podstawowe algorytmy, skupiony na bogatszym "
-                    "zachowaniu modeli albo praktycznym workflow ML."
+                    "Systematyczny błąd forecastu, gdy predykcje zostają zbyt wysoko "
+                    "albo zbyt nisko."
                 ),
             ),
         ),
@@ -7125,50 +7131,80 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         ),
     ),
     _placeholder_demo(
-        demo_id="level_3_coming_soon",
+        demo_id="time_series_forecasting_lab",
         level=3,
-        title_en="Coming Soon: Advanced Experiments",
-        title_pl="Coming soon: zaawansowane eksperymenty",
+        title_en="Time Series Forecasting Lab",
+        title_pl="Time Series Forecasting Lab",
         summary_en=(
-            "A preview slot for richer Level 3 demos: dimensionality reduction, "
-            "clustering, calibration, monitoring, and other showcase topics."
+            "Forecast a holdout window and compare naive, moving-average, and "
+            "trend-seasonal assumptions under uncertainty."
         ),
         summary_pl=(
-            "Zapowiedź bardziej zaawansowanych dem Level 3: dimensionality reduction, "
-            "clustering, calibration, monitoring i innych tematów showcase."
+            "Prognozuj holdout window i porównuj założenia naive, moving average "
+            "oraz trend-seasonal przy uncertainty."
         ),
         objectives=(
             LocalizedText(
-                en="Show that Level 3 is reserved for advanced, visually rich ML experiments.",
-                pl=(
-                    "Pokaż, że Level 3 jest miejscem na zaawansowane, "
-                    "wizualnie mocniejsze eksperymenty ML."
-                ),
+                en="Compare forecast models on the same holdout window.",
+                pl="Porównuj modele forecastingu na tym samym holdout window.",
             ),
             LocalizedText(
-                en="Keep the guided app shape visible as more focused Level 3 demos land.",
-                pl=(
-                    "Pokaż docelowy kształt aplikacji, gdy dochodzą kolejne konkretne dema Level 3."
-                ),
+                en="Use horizon, residuals, MAE, RMSE, and bias to judge forecast quality.",
+                pl=("Oceniaj jakość forecastu przez horizon, residuals, MAE, RMSE i bias."),
             ),
             LocalizedText(
-                en="Give students a hint about the kinds of workflows coming next.",
-                pl="Daj studentom podgląd tematów i workflow, które pojawią się później.",
+                en="Notice when a forecast is systematically late, not only noisy.",
+                pl=("Zauważ, kiedy forecast jest systematycznie spóźniony, a nie tylko szumny."),
             ),
         ),
         controls=(
             ControlBinding(
-                key="Enter",
+                key="1-3",
                 action=LocalizedText(
-                    en="open the coming-soon placeholder scene",
-                    pl="otwórz placeholder Coming soon",
+                    en="switch time-series scenario",
+                    pl="zmień scenariusz time series",
+                ),
+            ),
+            ControlBinding(
+                key="M",
+                action=LocalizedText(
+                    en="switch forecasting model",
+                    pl="zmień model forecastingu",
+                ),
+            ),
+            ControlBinding(
+                key="- / =",
+                action=LocalizedText(
+                    en="change forecast horizon",
+                    pl="zmień forecast horizon",
+                ),
+            ),
+            ControlBinding(
+                key="U",
+                action=LocalizedText(
+                    en="show or hide uncertainty band",
+                    pl="pokaż albo ukryj uncertainty band",
+                ),
+            ),
+            ControlBinding(
+                key="E",
+                action=LocalizedText(
+                    en="show or hide residuals",
+                    pl="pokaż albo ukryj residuals",
+                ),
+            ),
+            ControlBinding(
+                key="R",
+                action=LocalizedText(
+                    en="reset the lab",
+                    pl="zresetuj lab",
                 ),
             ),
             ControlBinding(
                 key="T",
                 action=LocalizedText(
-                    en="read Level 3 planning notes",
-                    pl="przeczytaj notatki o planie Level 3",
+                    en="read forecasting notes",
+                    pl="przeczytaj notatki o forecastingu",
                 ),
             ),
             ControlBinding(
@@ -7179,88 +7215,89 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 ),
             ),
         ),
-        difficulty=LocalizedText(en="Coming soon", pl="W przygotowaniu"),
-        tags=("level-3", "showcase", "planning"),
+        create_scene=create_time_series_forecasting_lab_scene,
+        difficulty=LocalizedText(en="Advanced", pl="Zaawansowany"),
+        tags=("time-series", "forecasting", "uncertainty", "evaluation", "level-3"),
         theory=DemoTheory(
             sections=(
                 TheorySection(
-                    title=LocalizedText(en="What this slot shows", pl="Co pokazuje ten ekran"),
+                    title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
                     body=(
                         LocalizedText(
                             en=(
-                                "Level 3 is planned as the advanced/showcase layer "
-                                "of Interactive ML Labs."
+                                "Forecasting is evaluated on future points the model did not "
+                                "see while fitting. The holdout window plays that role here."
                             ),
                             pl=(
-                                "Level 3 jest planowany jako zaawansowana, pokazowa "
-                                "warstwa Interactive ML Labs."
+                                "Forecasting oceniamy na przyszłych punktach, których model "
+                                "nie widział przy dopasowaniu. Tutaj robi to holdout window."
                             ),
                         ),
                         LocalizedText(
                             en=(
-                                "The placeholder keeps the learning path visible even before "
-                                "the first advanced demo is implemented."
+                                "Naive, moving average, and trend-seasonal forecasts make "
+                                "different assumptions about what repeats and what changes."
                             ),
                             pl=(
-                                "Placeholder pokazuje pełną ścieżkę nauki jeszcze zanim "
-                                "powstanie pierwsze zaawansowane demo."
+                                "Naive, moving average i trend-seasonal forecast mają różne "
+                                "założenia o tym, co się powtarza, a co się zmienia."
                             ),
                         ),
                     ),
                 ),
                 TheorySection(
-                    title=LocalizedText(en="What belongs here", pl="Co tu pasuje"),
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
                     body=(
                         LocalizedText(
                             en=(
-                                "Good Level 3 demos should make a more complex ML idea visible, "
-                                "not only configurable."
+                                "A longer horizon usually makes errors larger and uncertainty "
+                                "more important. Smooth lines are not automatically better."
                             ),
                             pl=(
-                                "Dobre demo Level 3 powinno pokazywać bardziej złożoną ideę ML "
-                                "w sposób widoczny, a nie tylko konfigurowalny."
+                                "Dłuższy horizon zwykle powiększa błędy i zwiększa znaczenie "
+                                "uncertainty. Gładka linia nie jest automatycznie lepsza."
                             ),
                         ),
                         LocalizedText(
                             en=(
-                                "Examples: PCA and embeddings, clustering behavior, "
-                                "calibration, drift, monitoring, or model comparison workflows."
+                                "Residuals show where the forecast missed. Bias shows whether "
+                                "it tends to miss in the same direction."
                             ),
                             pl=(
-                                "Przykłady: PCA i embeddings, zachowanie clusteringu, "
-                                "calibration, drift, monitoring albo workflow porównywania modeli."
+                                "Residuals pokazują, gdzie forecast się pomylił. Bias pokazuje, "
+                                "czy zwykle myli się w tę samą stronę."
                             ),
                         ),
                     ),
                 ),
                 TheorySection(
-                    title=LocalizedText(en="Design principle", pl="Zasada projektowa"),
+                    title=LocalizedText(en="Common mistakes", pl="Typowe pułapki"),
                     body=(
                         LocalizedText(
                             en=(
-                                "A showcase demo should still be teachable: the student changes "
-                                "one thing, observes a clear reaction, and can explain it."
+                                "Do not tune the model by staring only at the training history. "
+                                "A forecast earns trust on held-out future data."
                             ),
                             pl=(
-                                "Demo showcase nadal musi uczyć: student zmienia jedną rzecz, "
-                                "widzi czytelną reakcję i potrafi ją wyjaśnić."
+                                "Nie stroj modelu, patrząc tylko na historię treningową. "
+                                "Forecast zdobywa zaufanie na odłożonych danych z przyszłości."
                             ),
                         ),
                         LocalizedText(
                             en=(
-                                "If the visual result is impressive but hard to reason about, "
-                                "it is not ready for the guided app yet."
+                                "Do not read an uncertainty band as a promise. It is a warning "
+                                "about plausible error, not a guarantee."
                             ),
                             pl=(
-                                "Jeśli efekt wygląda imponująco, ale trudno go wyjaśnić, "
-                                "to demo nie jest jeszcze gotowe do guided app."
+                                "Nie czytaj uncertainty band jak obietnicy. To ostrzeżenie "
+                                "o możliwym błędzie, nie gwarancja."
                             ),
                         ),
                     ),
                 ),
             ),
-            mini_challenges=LESSON_CHALLENGES["level_3_coming_soon"],
-            glossary=LESSON_GLOSSARY["level_3_coming_soon"],
+            mini_challenges=LESSON_CHALLENGES["time_series_forecasting_lab"],
+            glossary=LESSON_GLOSSARY["time_series_forecasting_lab"],
         ),
     ),
 )

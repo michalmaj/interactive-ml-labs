@@ -79,7 +79,7 @@ Advanced and visually rich topics:
 - t-SNE / UMAP Exploration Lab,
 - association rules,
 - recommender systems,
-- time-series forecasting,
+- Time Series Forecasting Lab: holdout forecasts, forecast horizon, residuals, and uncertainty bands,
 - Hidden Markov Models,
 - hyperparameter optimization,
 - autoencoders,
@@ -133,6 +133,7 @@ It also includes the next Level 3 labs:
 
 - t-SNE / UMAP Exploration Lab, with deterministic toy embeddings, raw-vs-embedding comparison, dataset cues, a compact class legend, seed drift, t-SNE/UMAP comparison, and neighborhood tuning.
 - Model Monitoring Drift Lab, with production-style data drift, metric drift, monitoring windows, alert thresholds, lead signals, alert rate, persistence, trend readouts, and investigation acknowledgements.
+- Time Series Forecasting Lab, with holdout forecasts, naive/moving-average/trend-seasonal models, forecast horizon controls, residuals, MAE/RMSE, bias, and uncertainty bands.
 
 The original Level 1 and Level 2 demos can still be run as standalone commands. The unified app is the recommended path for students, while standalone entry points remain part of the supported development and teaching workflow.
 
@@ -143,9 +144,10 @@ Near-term work focuses on turning Level 3 into a stronger guided learning track 
 - collect review feedback on Clustering Lab, PCA Lab, Model Comparison Lab, and Calibration Lab after classroom-style use,
 - iterate on the t-SNE / UMAP Exploration Lab prototype with richer projection behavior,
 - collect review feedback on Model Monitoring Drift Lab after classroom-style use,
+- collect review feedback on Time Series Forecasting Lab, especially whether horizon, residuals, and uncertainty read clearly,
 - keep a later Calibration Lab slice in mind for real model outputs and post-hoc calibration workflows,
 - keep improving the Level 3 flow from theory to interaction to mini-challenges,
-- decide whether the following Level 3 track should go deeper into monitoring, drift, or richer evaluation workflows,
+- decide whether the following Level 3 track should go deeper into forecasting, monitoring, drift, or richer evaluation workflows,
 - continue polishing Polish copy inside demos without forcing translations of standard ML terms,
 - keep app settings, scaling, and help overlays stable as new Level 3 scenes are added.
 
