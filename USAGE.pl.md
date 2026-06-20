@@ -66,6 +66,7 @@ Unified app zawiera też natywne laboratoria z Level 3:
 - Calibration Lab pokazuje calibration prawdopodobieństw przez reliability diagram, rozkład score, legendę raw-vs-scaled score, accuracy@0.5, Brier score, ECE, podświetlenie worst gap, error bars kalibracji i temperature scaling.
 - t-SNE / UMAP Exploration Lab pokazuje deterministyczne toy embeddingi, porównanie raw-vs-embedding, wskazówki datasetów, etykiety klas, seed drift, strojenie sąsiedztwa i lokalne połączenia sąsiadów.
 - Model Monitoring Drift Lab pokazuje data drift, metric drift, monitoring windows, alert thresholds, lead signal, alert rate, persistence, trend i potwierdzanie analizy.
+- Time Series Forecasting Lab pokazuje holdout forecasts, modele naive/moving-average/trend-seasonal, forecast horizon, residuals, MAE/RMSE, bias i uncertainty bands.
 
 Podstawowe sterowanie:
 
@@ -81,7 +82,7 @@ Podstawowe sterowanie:
 
 ## Osobne dema
 
-Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Linear Regression Line Fit Lab, K-Means Intro Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Neural Network Playground, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Feature Importance Lab, Gaussian Mixture Intro Lab, Anomaly Detection Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab i t-SNE / UMAP Exploration Lab, uruchamia się z unified app.
+Każde oryginalne demo z Level 1 i Level 2 nadal działa jako osobny pakiet i może być uruchamiane bez unified app. Natywne laby, takie jak Linear Regression Line Fit Lab, K-Means Intro Lab, Distance Metrics Lab, SVM Margin Lab, Activation Functions Lab, Neural Network Playground, Data Leakage Lab, Train / Validation / Test Split Lab, Feature Scaling Lab, Feature Importance Lab, Gaussian Mixture Intro Lab, Anomaly Detection Lab, Hyperparameter Tuning Lab, Class Imbalance Lab, Clustering Lab, PCA Lab, Model Comparison Lab, Calibration Lab, t-SNE / UMAP Exploration Lab i Time Series Forecasting Lab, uruchamia się z unified app.
 
 ### Natywne laby Level 1
 
@@ -292,6 +293,17 @@ Na co patrzeć w Model Monitoring Drift Lab:
 - `luka`, `threshold` i `severity` pokazują, czy obecna zmiana jest poniżej, blisko czy powyżej wybranego alert threshold.
 - `pierwszy alert`, `alert rate`, `persistence` i `lead signal` pomagają odróżnić jednorazowy pik od powtarzalnego sygnału produkcyjnego.
 - `analiza` zmienia się po naciśnięciu `A`, więc lab pokazuje mały workflow monitoringu zamiast traktować każdy alert jak automatyczną panikę.
+
+Sterowanie w Time Series Forecasting Lab:
+
+| Klawisz / wejście | Akcja |
+| ----------------- | ----- |
+| `1-3` | Zmień scenariusz time series |
+| `M` | Zmień model forecastingu |
+| `-` / `=` | Zmień forecast horizon |
+| `U` | Pokaż albo ukryj uncertainty band |
+| `E` | Pokaż albo ukryj residuals |
+| `R` | Zresetuj lab |
 
 ### Gradient Descent Playground
 
