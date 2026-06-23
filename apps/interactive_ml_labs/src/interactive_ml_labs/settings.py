@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from interactive_ml_labs.display import DEFAULT_RESOLUTION, Size
+from interactive_ml_labs.progress import AppProgress
 
 SETTINGS_FILE_NAME = "settings.json"
 SETTINGS_SCHEMA_VERSION = 1
@@ -29,6 +30,7 @@ class AppContext:
     """Shared app context passed to shell screens and future demo scenes."""
 
     settings: AppSettings = field(default_factory=AppSettings)
+    progress: AppProgress = field(default_factory=AppProgress)
     current_level: int | None = None
     selected_demo_id: str | None = None
     theme: str = "default"

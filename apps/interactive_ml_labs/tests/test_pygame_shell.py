@@ -11,6 +11,7 @@ from interactive_ml_labs.decision_tree_scene import DecisionTreeSceneAdapter
 from interactive_ml_labs.gradient_scene import GradientDescentSceneAdapter
 from interactive_ml_labs.knn_scene import KNNVoteMapSceneAdapter
 from interactive_ml_labs.logistic_scene import LogisticRegressionSceneAdapter
+from interactive_ml_labs.progress import load_app_progress
 from interactive_ml_labs.pygame_app import (
     DEMO_MENU_TOP,
     DEMO_SCROLLBAR_X,
@@ -298,6 +299,66 @@ def test_shell_lesson_selection_opens_demo_intro(monkeypatch) -> None:
         assert app.selected_demo == DEMO_BY_ID["gradient_descent_playground"]
         assert app.context.selected_demo_id == "gradient_descent_playground"
         assert app.context.current_level == 1
+    finally:
+        pygame.quit()
+
+
+def test_shell_lesson_selection_persists_started_progress(monkeypatch, tmp_path) -> None:
+    """Selecting a lesson should mark it as started in persisted progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    settings_path = tmp_path / "settings.json"
+    app = UnifiedAppShell(settings_path=settings_path)
+
+    try:
+        app.selected_learning_path = LEARNING_PATH_MANIFESTS[0]
+        app.screen_name = ScreenName.LESSONS
+        app.selected_index = 1
+
+        app._activate_selected()
+        loaded_progress = load_app_progress(tmp_path / "progress.json")
+
+        assert loaded_progress.lessons["error_gradient_descent"].started is True
+    finally:
+        pygame.quit()
+
+
+def test_shell_open_theory_persists_theory_visit_for_selected_lesson(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    """Opening theory from a selected lesson should persist theory progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    settings_path = tmp_path / "settings.json"
+    app = UnifiedAppShell(settings_path=settings_path)
+
+    try:
+        app.selected_lesson = LESSON_BY_ID["error_gradient_descent"]
+        app.selected_demo = DEMO_BY_ID["gradient_descent_playground"]
+        app.screen_name = ScreenName.INTRO
+
+        app._open_theory()
+        loaded_progress = load_app_progress(tmp_path / "progress.json")
+
+        assert loaded_progress.lessons["error_gradient_descent"].started is True
+        assert loaded_progress.lessons["error_gradient_descent"].theory_visited is True
+    finally:
+        pygame.quit()
+
+
+def test_shell_explicit_settings_keep_progress_in_memory(monkeypatch, tmp_path) -> None:
+    """Explicit settings should not cause user progress files to be written in tests."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.progress_path = tmp_path / "progress.json"
+        app.selected_learning_path = LEARNING_PATH_MANIFESTS[0]
+        app.screen_name = ScreenName.LESSONS
+
+        app._activate_selected()
+
+        assert app.context.progress.lessons["error_linear_regression_line_fit"].started is True
+        assert not app.progress_path.exists()
     finally:
         pygame.quit()
 

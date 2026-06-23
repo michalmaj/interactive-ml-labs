@@ -100,6 +100,15 @@ from interactive_ml_labs.neural_network_scene import (
     create_neural_network_playground_scene,
 )
 from interactive_ml_labs.pca_scene import PCALabScene, create_pca_lab_scene
+from interactive_ml_labs.progress import (
+    AppProgress,
+    LessonProgress,
+    default_progress_path,
+    load_app_progress,
+    progress_from_json,
+    progress_to_json,
+    save_app_progress,
+)
 from interactive_ml_labs.random_forest_scene import (
     RandomForestSceneAdapter,
     create_random_forest_scene,
@@ -169,6 +178,7 @@ __all__ = [
     "AlgorithmMode",
     "AnomalyDetectionLabScene",
     "AppContext",
+    "AppProgress",
     "AppSettings",
     "BoostingMistakeLabSceneAdapter",
     "CalibrationLabScene",
@@ -191,6 +201,7 @@ __all__ = [
     "KNNVoteMapSceneAdapter",
     "LearningPathManifest",
     "LessonManifest",
+    "LessonProgress",
     "LessonTask",
     "LevelManifest",
     "LinearRegressionLineFitLabScene",
@@ -241,11 +252,16 @@ __all__ = [
     "create_time_series_forecasting_lab_scene",
     "create_train_validation_test_lab_scene",
     "create_tsne_umap_exploration_scene",
+    "default_progress_path",
     "default_settings_path",
     "demos_for_level",
     "levels_from_manifests",
+    "load_app_progress",
     "load_app_settings",
     "make_ui_font",
+    "progress_from_json",
+    "progress_to_json",
+    "save_app_progress",
     "save_app_settings",
     "scale_rect_to_fit",
     "settings_from_json",
