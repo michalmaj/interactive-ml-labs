@@ -26,6 +26,21 @@ def test_app_progress_creates_lesson_records_on_demand() -> None:
     assert lesson.theory_visited is True
     assert lesson.completed_task_ids == {"task_a"}
     assert lesson.completed is True
+    assert progress.revision > 0
+
+
+def test_app_progress_revision_changes_only_for_new_state() -> None:
+    """Progress revision should only change when state actually changes."""
+    progress = AppProgress()
+
+    progress.mark_started("lesson_one")
+    revision = progress.revision
+
+    progress.mark_started("lesson_one")
+    assert progress.revision == revision
+
+    progress.complete_task("lesson_one", "task_a")
+    assert progress.revision > revision
 
 
 def test_progress_serialization_round_trips_lesson_state() -> None:
