@@ -31,6 +31,9 @@ WARNING: Final[tuple[int, int, int]] = (246, 132, 134)
 
 SLOPE_STEP: Final[float] = 0.2
 INTERCEPT_STEP: Final[float] = 0.2
+LINEAR_REGRESSION_LESSON_ID: Final[str] = "error_linear_regression_line_fit"
+BALANCE_RESIDUALS_TASK_ID: Final[str] = "balance_residuals"
+COMPARE_LEAST_SQUARES_TASK_ID: Final[str] = "compare_least_squares"
 
 
 @dataclass(frozen=True, slots=True)
@@ -120,6 +123,7 @@ class LinearRegressionLineFitLabScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create the deterministic line fitting scene."""
+        self._context = context
         self._language = context.settings.language
         self._font_title = make_ui_font(34, bold=True)
         self._font_heading = make_ui_font(23, bold=True)
@@ -128,6 +132,8 @@ class LinearRegressionLineFitLabScene:
         self.preset_index = 0
         self.slope = PRESETS[0].start_slope
         self.intercept = PRESETS[0].start_intercept
+        self._manual_slope_adjusted = False
+        self._manual_intercept_adjusted = False
 
     @property
     def preset(self) -> RegressionPreset:
@@ -162,14 +168,23 @@ class LinearRegressionLineFitLabScene:
             self._reset_parameters()
         elif key == pygame.K_LEFT:
             self.slope -= SLOPE_STEP
+            self._manual_slope_adjusted = True
+            self._record_manual_fit_progress()
         elif key == pygame.K_RIGHT:
             self.slope += SLOPE_STEP
+            self._manual_slope_adjusted = True
+            self._record_manual_fit_progress()
         elif key == pygame.K_DOWN:
             self.intercept -= INTERCEPT_STEP
+            self._manual_intercept_adjusted = True
+            self._record_manual_fit_progress()
         elif key == pygame.K_UP:
             self.intercept += INTERCEPT_STEP
+            self._manual_intercept_adjusted = True
+            self._record_manual_fit_progress()
         elif key == pygame.K_f:
             self.slope, self.intercept = self._best_fit()
+            self._record_least_squares_progress()
         elif key == pygame.K_r:
             self.preset_index = 0
             self._reset_parameters()
@@ -309,6 +324,8 @@ class LinearRegressionLineFitLabScene:
     def _reset_parameters(self) -> None:
         self.slope = self.preset.start_slope
         self.intercept = self.preset.start_intercept
+        self._manual_slope_adjusted = False
+        self._manual_intercept_adjusted = False
 
     def _predict(self, x_value: float) -> float:
         return (self.slope * x_value) + self.intercept
@@ -363,6 +380,40 @@ class LinearRegressionLineFitLabScene:
             "The line is shifted too high or too low for most points.",
             "Prosta jest przesunięta za wysoko albo za nisko względem większości punktów.",
         )
+
+    def _record_manual_fit_progress(self) -> None:
+        """Complete the manual residual-balancing task after both parameters move."""
+        if self._context.selected_lesson_id != LINEAR_REGRESSION_LESSON_ID:
+            return
+        if not (self._manual_slope_adjusted and self._manual_intercept_adjusted):
+            return
+
+        self._context.progress.complete_task(
+            LINEAR_REGRESSION_LESSON_ID,
+            BALANCE_RESIDUALS_TASK_ID,
+        )
+        self._mark_lesson_completed_if_ready()
+
+    def _record_least_squares_progress(self) -> None:
+        """Complete the least-squares comparison task."""
+        if self._context.selected_lesson_id != LINEAR_REGRESSION_LESSON_ID:
+            return
+
+        self._context.progress.complete_task(
+            LINEAR_REGRESSION_LESSON_ID,
+            COMPARE_LEAST_SQUARES_TASK_ID,
+        )
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both tasks are done."""
+        progress = self._context.progress.lessons.get(LINEAR_REGRESSION_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {BALANCE_RESIDUALS_TASK_ID, COMPARE_LEAST_SQUARES_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(LINEAR_REGRESSION_LESSON_ID)
 
     def _equation_label(self) -> str:
         return f"y = {self.slope:+.1f}x {self.intercept:+.1f}"
