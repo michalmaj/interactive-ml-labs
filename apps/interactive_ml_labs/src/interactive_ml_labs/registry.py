@@ -26,6 +26,9 @@ from interactive_ml_labs.manifest import (
     DemoManifest,
     DemoTheory,
     GlossaryTerm,
+    LearningPathManifest,
+    LessonManifest,
+    LessonTask,
     LevelManifest,
     LocalizedText,
     TheorySection,
@@ -7304,6 +7307,254 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
 
 DEMO_BY_ID: dict[str, DemoManifest] = {manifest.id: manifest for manifest in DEMO_MANIFESTS}
 
+LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
+    LessonManifest(
+        id="error_linear_regression_line_fit",
+        level=1,
+        demo_id="linear_regression_line_fit_lab",
+        title=LocalizedText(
+            en="See error in a fitted line",
+            pl="Zobacz błąd dopasowanej prostej",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand that a regression model is judged by the residuals "
+                "it leaves behind, not by whether the line looks nice."
+            ),
+            pl=(
+                "Zrozum, że model regresji oceniamy po residuals, które zostawia, "
+                "a nie po tym, czy prosta wygląda ładnie."
+            ),
+        ),
+        tasks=(
+            LessonTask(
+                id="balance_residuals",
+                title=LocalizedText(en="Balance residuals", pl="Zbalansuj residuals"),
+                instruction=LocalizedText(
+                    en=(
+                        "Move slope and intercept until the residuals stop leaning "
+                        "mostly to one side."
+                    ),
+                    pl=(
+                        "Zmieniaj slope i intercept, aż residuals przestaną wyraźnie "
+                        "uciekać w jedną stronę."
+                    ),
+                ),
+                success_condition="changed_parameter",
+                hint=LocalizedText(
+                    en="Watch whether errors are systematically above or below the line.",
+                    pl="Patrz, czy błędy są systematycznie nad albo pod prostą.",
+                ),
+            ),
+            LessonTask(
+                id="compare_least_squares",
+                title=LocalizedText(en="Compare with least squares", pl="Porównaj z least squares"),
+                instruction=LocalizedText(
+                    en=(
+                        "Use the fitted line view and identify which manual parameter "
+                        "was farther from the optimum."
+                    ),
+                    pl=(
+                        "Włącz podgląd fitted line i wskaż, który ręczny parametr był "
+                        "dalej od optimum."
+                    ),
+                ),
+                success_condition="completed_scene_challenge",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Residual Reader", pl="Czytelnik residuals"),
+    ),
+    LessonManifest(
+        id="error_gradient_descent",
+        level=1,
+        demo_id="gradient_descent_playground",
+        title=LocalizedText(
+            en="Let an algorithm reduce loss",
+            pl="Pozwól algorytmowi zmniejszać loss",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand how gradient descent uses repeated small parameter "
+                "updates to reduce a loss value."
+            ),
+            pl=(
+                "Zrozum, jak gradient descent przez małe, powtarzane zmiany "
+                "parametrów zmniejsza loss."
+            ),
+        ),
+        prerequisites=("error_linear_regression_line_fit",),
+        tasks=(
+            LessonTask(
+                id="find_stable_learning_rate",
+                title=LocalizedText(
+                    en="Find a stable learning rate", pl="Znajdź stabilny learning rate"
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Change learning rate until the path moves toward the minimum "
+                        "without bouncing wildly."
+                    ),
+                    pl=(
+                        "Zmieniaj learning rate, aż ścieżka będzie iść do minimum "
+                        "bez chaotycznego odbijania."
+                    ),
+                ),
+                success_condition="changed_parameter",
+                hint=LocalizedText(
+                    en="Too small is slow; too large overshoots.",
+                    pl="Za mały jest wolny; za duży przeskakuje optimum.",
+                ),
+            ),
+            LessonTask(
+                id="observe_loss_drop",
+                title=LocalizedText(en="Observe the loss drop", pl="Zaobserwuj spadek loss"),
+                instruction=LocalizedText(
+                    en="Run several steps and watch the loss trend, not only the moving point.",
+                    pl=(
+                        "Uruchom kilka kroków i patrz na trend loss, "
+                        "nie tylko na poruszający się punkt."
+                    ),
+                ),
+                success_condition="reached_metric_threshold",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Loss Navigator", pl="Nawigator loss"),
+    ),
+    LessonManifest(
+        id="error_logistic_boundary",
+        level=1,
+        demo_id="logistic_regression_boundary_lab",
+        title=LocalizedText(
+            en="Turn scores into decisions",
+            pl="Zamień score na decyzję",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand that classification uses scores, thresholds, and a decision boundary, "
+                "not only a single label."
+            ),
+            pl=(
+                "Zrozum, że klasyfikacja używa score, threshold i decision boundary, "
+                "a nie tylko jednej etykiety."
+            ),
+        ),
+        prerequisites=("error_gradient_descent",),
+        tasks=(
+            LessonTask(
+                id="move_decision_boundary",
+                title=LocalizedText(
+                    en="Move the decision boundary", pl="Przesuń decision boundary"
+                ),
+                instruction=LocalizedText(
+                    en="Change the parameters and notice which points switch class first.",
+                    pl="Zmień parametry i zobacz, które punkty jako pierwsze zmieniają klasę.",
+                ),
+                success_condition="changed_parameter",
+            ),
+            LessonTask(
+                id="compare_confident_and_borderline_points",
+                title=LocalizedText(
+                    en="Compare confident and borderline points",
+                    pl="Porównaj punkty pewne i graniczne",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Find points far from the boundary and points near it. "
+                        "Explain why the model treats them differently."
+                    ),
+                    pl=(
+                        "Znajdź punkty daleko od granicy i blisko niej. "
+                        "Wyjaśnij, czemu model traktuje je inaczej."
+                    ),
+                ),
+                success_condition="completed_scene_challenge",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Boundary Reader", pl="Czytelnik decision boundary"),
+    ),
+    LessonManifest(
+        id="error_boosting_mistakes",
+        level=2,
+        demo_id="boosting_mistake_lab",
+        title=LocalizedText(
+            en="Learn from previous mistakes",
+            pl="Ucz się z poprzednich błędów",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand why boosting focuses the next weak learner on examples "
+                "that previous learners handled poorly."
+            ),
+            pl=(
+                "Zrozum, dlaczego boosting kieruje kolejny weak learner na przykłady, "
+                "z którymi poprzednie modele radziły sobie słabo."
+            ),
+        ),
+        prerequisites=("error_logistic_boundary",),
+        tasks=(
+            LessonTask(
+                id="advance_boosting_rounds",
+                title=LocalizedText(
+                    en="Advance boosting rounds", pl="Przejdź kolejne rundy boosting"
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Step through several weak learners and watch which mistakes "
+                        "get more attention."
+                    ),
+                    pl=(
+                        "Przejdź przez kilka weak learners i obserwuj, "
+                        "które błędy dostają więcej uwagi."
+                    ),
+                ),
+                success_condition="completed_scene_challenge",
+            ),
+            LessonTask(
+                id="connect_weight_to_error",
+                title=LocalizedText(en="Connect weight to error", pl="Połącz wagę z błędem"),
+                instruction=LocalizedText(
+                    en=(
+                        "Find an example whose weight changes after a mistake and explain "
+                        "what the next learner should do with it."
+                    ),
+                    pl=(
+                        "Znajdź przykład, którego waga zmienia się po błędzie, i wyjaśnij, "
+                        "co kolejny learner powinien z nim zrobić."
+                    ),
+                ),
+                success_condition="completed_scene_challenge",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Mistake-Driven Learner", pl="Uczenie przez błędy"),
+    ),
+)
+
+LESSON_BY_ID: dict[str, LessonManifest] = {manifest.id: manifest for manifest in LESSON_MANIFESTS}
+
+LEARNING_PATH_MANIFESTS: tuple[LearningPathManifest, ...] = (
+    LearningPathManifest(
+        id="models_learn_from_error",
+        title=LocalizedText(en="How models learn from error", pl="Jak modele uczą się z błędu"),
+        summary=LocalizedText(
+            en=(
+                "A guided path from visible residuals, through loss minimization and "
+                "classification boundaries, to boosting that focuses on previous mistakes."
+            ),
+            pl=(
+                "Ścieżka od widocznych residuals, przez minimalizowanie loss i granice "
+                "klasyfikacji, po boosting skupiający się na poprzednich błędach."
+            ),
+        ),
+        lesson_ids=(
+            "error_linear_regression_line_fit",
+            "error_gradient_descent",
+            "error_logistic_boundary",
+            "error_boosting_mistakes",
+        ),
+        tags=("guided-path", "loss", "classification", "boosting"),
+    ),
+)
+
 
 def levels_from_manifests(manifests: tuple[DemoManifest, ...] = DEMO_MANIFESTS) -> tuple[int, ...]:
     """Return sorted level numbers present in the registry."""
@@ -7356,6 +7607,102 @@ def validate_demo_registry(
             raise ValueError(f"Demo {demo.id!r} must define a scene factory")
 
 
+def validate_learning_registry(
+    *,
+    demo_manifests: tuple[DemoManifest, ...] = DEMO_MANIFESTS,
+    lesson_manifests: tuple[LessonManifest, ...] = LESSON_MANIFESTS,
+    learning_path_manifests: tuple[LearningPathManifest, ...] = LEARNING_PATH_MANIFESTS,
+) -> None:
+    """Validate learning-path metadata consistency."""
+    known_demo_ids = {demo.id for demo in demo_manifests}
+
+    lesson_ids = [lesson.id for lesson in lesson_manifests]
+    duplicate_lesson_ids = _duplicates(lesson_ids)
+    if duplicate_lesson_ids:
+        raise ValueError(f"Duplicate lesson ids: {duplicate_lesson_ids}")
+
+    known_lesson_ids = set(lesson_ids)
+    for lesson in lesson_manifests:
+        _validate_lesson_manifest(
+            lesson,
+            known_demo_ids=known_demo_ids,
+            known_lesson_ids=known_lesson_ids,
+        )
+
+    path_ids = [path.id for path in learning_path_manifests]
+    duplicate_path_ids = _duplicates(path_ids)
+    if duplicate_path_ids:
+        raise ValueError(f"Duplicate learning path ids: {duplicate_path_ids}")
+
+    for path in learning_path_manifests:
+        _validate_learning_path_manifest(path, known_lesson_ids=known_lesson_ids)
+
+
+def _validate_lesson_manifest(
+    lesson: LessonManifest,
+    *,
+    known_demo_ids: set[str],
+    known_lesson_ids: set[str],
+) -> None:
+    """Validate one lesson manifest."""
+    if not lesson.id:
+        raise ValueError("Lesson id must not be empty")
+    if lesson.demo_id not in known_demo_ids:
+        raise ValueError(f"Lesson {lesson.id!r} references unknown demo {lesson.demo_id!r}")
+    if not lesson.title.en or not lesson.title.pl:
+        raise ValueError(f"Lesson {lesson.id!r} must have localized titles")
+    if not lesson.learning_goal.en or not lesson.learning_goal.pl:
+        raise ValueError(f"Lesson {lesson.id!r} must have a localized learning goal")
+    if not lesson.tasks:
+        raise ValueError(f"Lesson {lesson.id!r} must define tasks")
+
+    for prerequisite in lesson.prerequisites:
+        if prerequisite not in known_lesson_ids:
+            raise ValueError(
+                f"Lesson {lesson.id!r} references unknown prerequisite {prerequisite!r}"
+            )
+
+    task_ids = [task.id for task in lesson.tasks]
+    duplicate_task_ids = _duplicates(task_ids)
+    if duplicate_task_ids:
+        raise ValueError(f"Lesson {lesson.id!r} has duplicate task ids: {duplicate_task_ids}")
+
+    for task in lesson.tasks:
+        _validate_lesson_task(task, lesson_id=lesson.id)
+
+
+def _validate_lesson_task(task: LessonTask, *, lesson_id: str) -> None:
+    """Validate one lesson task."""
+    if not task.id:
+        raise ValueError(f"Lesson {lesson_id!r} has an empty task id")
+    if not task.title.en or not task.title.pl:
+        raise ValueError(f"Task {task.id!r} must have localized titles")
+    if not task.instruction.en or not task.instruction.pl:
+        raise ValueError(f"Task {task.id!r} must have localized instructions")
+    if not task.success_condition:
+        raise ValueError(f"Task {task.id!r} must define a success condition")
+
+
+def _validate_learning_path_manifest(
+    path: LearningPathManifest,
+    *,
+    known_lesson_ids: set[str],
+) -> None:
+    """Validate one learning path manifest."""
+    if not path.id:
+        raise ValueError("Learning path id must not be empty")
+    if not path.title.en or not path.title.pl:
+        raise ValueError(f"Learning path {path.id!r} must have localized titles")
+    if not path.summary.en or not path.summary.pl:
+        raise ValueError(f"Learning path {path.id!r} must have localized summaries")
+    if not path.lesson_ids:
+        raise ValueError(f"Learning path {path.id!r} must contain lessons")
+
+    for lesson_id in path.lesson_ids:
+        if lesson_id not in known_lesson_ids:
+            raise ValueError(f"Learning path {path.id!r} references unknown lesson {lesson_id!r}")
+
+
 def _duplicates(values: list[int] | list[str]) -> tuple[int | str, ...]:
     """Return duplicate values in first-seen order."""
     seen: set[int | str] = set()
@@ -7370,3 +7717,4 @@ def _duplicates(values: list[int] | list[str]) -> tuple[int | str, ...]:
 
 
 validate_demo_registry()
+validate_learning_registry()

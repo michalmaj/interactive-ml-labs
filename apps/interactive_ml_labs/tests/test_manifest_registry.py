@@ -4,13 +4,20 @@ import pytest
 from interactive_ml_labs import (
     DEMO_BY_ID,
     DEMO_MANIFESTS,
+    LEARNING_PATH_MANIFESTS,
+    LESSON_BY_ID,
+    LESSON_MANIFESTS,
     LEVEL_MANIFESTS,
     LEVEL_NAMES,
     DemoManifest,
+    LearningPathManifest,
+    LessonManifest,
+    LessonTask,
     LocalizedText,
     demos_for_level,
     levels_from_manifests,
     validate_demo_registry,
+    validate_learning_registry,
 )
 from interactive_ml_labs.activation_scene import create_activation_functions_lab_scene
 from interactive_ml_labs.anomaly_detection_scene import create_anomaly_detection_lab_scene
@@ -1126,6 +1133,54 @@ def test_registry_contains_polish_diacritics() -> None:
 def test_registry_validates_default_manifests() -> None:
     """Default registry should pass consistency validation."""
     validate_demo_registry()
+    validate_learning_registry()
+
+
+def test_learning_path_registry_contains_models_learn_from_error_path() -> None:
+    """Learning paths should connect existing demos into a guided story."""
+    path = LEARNING_PATH_MANIFESTS[0]
+
+    assert path.id == "models_learn_from_error"
+    assert path.title.en == "How models learn from error"
+    assert path.title.pl == "Jak modele uczą się z błędu"
+    assert path.lesson_ids == (
+        "error_linear_regression_line_fit",
+        "error_gradient_descent",
+        "error_logistic_boundary",
+        "error_boosting_mistakes",
+    )
+
+    demos_in_path = [LESSON_BY_ID[lesson_id].demo_id for lesson_id in path.lesson_ids]
+    assert demos_in_path == [
+        "linear_regression_line_fit_lab",
+        "gradient_descent_playground",
+        "logistic_regression_boundary_lab",
+        "boosting_mistake_lab",
+    ]
+    assert all(demo_id in DEMO_BY_ID for demo_id in demos_in_path)
+
+
+def test_learning_lessons_define_goals_tasks_and_badges() -> None:
+    """Every default lesson should have enough metadata for a future lesson screen."""
+    assert len(LESSON_MANIFESTS) == 4
+
+    for lesson in LESSON_MANIFESTS:
+        assert lesson.title.en
+        assert lesson.title.pl
+        assert lesson.learning_goal.en
+        assert lesson.learning_goal.pl
+        assert lesson.completion_badge is not None
+        assert lesson.completion_badge.en
+        assert lesson.completion_badge.pl
+        assert len(lesson.tasks) >= 2
+        assert all(task.title.en and task.title.pl for task in lesson.tasks)
+        assert all(task.instruction.en and task.instruction.pl for task in lesson.tasks)
+        assert all(task.success_condition for task in lesson.tasks)
+
+    assert LESSON_BY_ID["error_gradient_descent"].prerequisites == (
+        "error_linear_regression_line_fit",
+    )
+    assert LESSON_BY_ID["error_boosting_mistakes"].level == 2
 
 
 def test_registry_rejects_duplicate_demo_ids() -> None:
@@ -1151,3 +1206,38 @@ def test_registry_rejects_unknown_demo_level() -> None:
 
     with pytest.raises(ValueError, match="unknown level"):
         validate_demo_registry(demo_manifests=(invalid_demo,))
+
+
+def test_learning_registry_rejects_unknown_demo_reference() -> None:
+    """Learning validation should reject lessons for demos that do not exist."""
+    invalid_lesson = LessonManifest(
+        id="missing_demo_lesson",
+        level=1,
+        demo_id="missing_demo",
+        title=LocalizedText(en="Missing", pl="Brak"),
+        learning_goal=LocalizedText(en="Learn something", pl="Naucz się czegoś"),
+        tasks=(
+            LessonTask(
+                id="task",
+                title=LocalizedText(en="Task", pl="Zadanie"),
+                instruction=LocalizedText(en="Do it", pl="Zrób to"),
+                success_condition="started_demo",
+            ),
+        ),
+    )
+
+    with pytest.raises(ValueError, match="unknown demo"):
+        validate_learning_registry(lesson_manifests=(invalid_lesson,))
+
+
+def test_learning_registry_rejects_unknown_lesson_in_path() -> None:
+    """Learning validation should reject paths that reference missing lessons."""
+    invalid_path = LearningPathManifest(
+        id="broken_path",
+        title=LocalizedText(en="Broken", pl="Zepsuta"),
+        summary=LocalizedText(en="Broken path", pl="Zepsuta ścieżka"),
+        lesson_ids=("missing_lesson",),
+    )
+
+    with pytest.raises(ValueError, match="unknown lesson"):
+        validate_learning_registry(learning_path_manifests=(invalid_path,))
