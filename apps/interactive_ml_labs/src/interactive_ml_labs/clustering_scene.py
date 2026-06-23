@@ -14,6 +14,7 @@ from interactive_ml_labs.display import DEFAULT_RESOLUTION, Size
 from interactive_ml_labs.fonts import make_ui_font
 from interactive_ml_labs.scene import SceneCommand
 from interactive_ml_labs.settings import AppContext
+from interactive_ml_labs.ui_helpers import draw_text, draw_wrapped_text, wrap_text
 
 PLOT_RECT: Final[tuple[int, int, int, int]] = (48, 72, 820, 580)
 PANEL_RECT: Final[tuple[int, int, int, int]] = (904, 72, 328, 620)
@@ -598,7 +599,7 @@ class ClusteringLabScene:
         font: pygame.font.Font,
         color: tuple[int, int, int],
     ) -> None:
-        surface.blit(font.render(text, True, color), position)
+        draw_text(surface, text, position, font, color)
 
     def _control_labels(self) -> tuple[str, ...]:
         return (
@@ -685,31 +686,18 @@ class ClusteringLabScene:
         *,
         line_height: int,
     ) -> int:
-        x, y = position
-        for line in self._wrap_text(text, width, font):
-            self._draw_text(surface, line, (x, y), font, color)
-            y += line_height
-
-        return y
+        return draw_wrapped_text(
+            surface,
+            text,
+            position,
+            width,
+            font,
+            color,
+            line_height=line_height,
+        )
 
     def _wrap_text(self, text: str, width: int, font: pygame.font.Font) -> list[str]:
-        words = text.split()
-        lines: list[str] = []
-        current = ""
-        for word in words:
-            candidate = word if not current else f"{current} {word}"
-            if font.size(candidate)[0] <= width:
-                current = candidate
-                continue
-
-            if current:
-                lines.append(current)
-            current = word
-
-        if current:
-            lines.append(current)
-
-        return lines
+        return wrap_text(text, width, font)
 
     def _panel_controls_start_y(self, rect: pygame.Rect) -> int:
         y = rect.y + 24

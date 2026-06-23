@@ -12,6 +12,7 @@ from interactive_ml_labs.display import DEFAULT_RESOLUTION, Size
 from interactive_ml_labs.fonts import make_ui_font
 from interactive_ml_labs.scene import SceneCommand
 from interactive_ml_labs.settings import AppContext
+from interactive_ml_labs.ui_helpers import draw_panel, draw_text, draw_wrapped_text, wrap_text
 
 BACKGROUND: Final[tuple[int, int, int]] = (20, 23, 27)
 PANEL: Final[tuple[int, int, int]] = (34, 39, 45)
@@ -550,22 +551,10 @@ class CalibrationLabScene:
         line_height: int,
     ) -> int:
         """Estimate wrapped text bottom for layout tests."""
-        lines = 1
-        current = ""
-        for word in text.split():
-            candidate = word if not current else f"{current} {word}"
-            if font.size(candidate)[0] <= width:
-                current = candidate
-                continue
-
-            if current:
-                lines += 1
-            current = word
-
-        return top_y + lines * line_height
+        return top_y + len(wrap_text(text, width, font)) * line_height
 
     def _draw_panel(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
-        pygame.draw.rect(surface, PANEL, rect, border_radius=8)
+        draw_panel(surface, rect, PANEL)
 
     def _draw_text(
         self,
@@ -575,7 +564,7 @@ class CalibrationLabScene:
         font: pygame.font.Font,
         color: tuple[int, int, int],
     ) -> None:
-        surface.blit(font.render(text, True, color), position)
+        draw_text(surface, text, position, font, color)
 
     def _draw_wrapped(
         self,
@@ -588,21 +577,15 @@ class CalibrationLabScene:
         *,
         line_height: int,
     ) -> None:
-        x, y = position
-        current = ""
-        for word in text.split():
-            candidate = word if not current else f"{current} {word}"
-            if font.size(candidate)[0] <= width:
-                current = candidate
-                continue
-
-            if current:
-                self._draw_text(surface, current, (x, y), font, color)
-                y += line_height
-            current = word
-
-        if current:
-            self._draw_text(surface, current, (x, y), font, color)
+        draw_wrapped_text(
+            surface,
+            text,
+            position,
+            width,
+            font,
+            color,
+            line_height=line_height,
+        )
 
     def _label(self, en: str, pl: str) -> str:
         if self._language == "pl":
