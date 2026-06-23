@@ -2188,7 +2188,7 @@ LEVEL_NAMES: dict[int, LocalizedText] = {
 }
 
 
-def _placeholder_demo(
+def _demo_manifest(
     *,
     demo_id: str,
     level: int,
@@ -2203,7 +2203,7 @@ def _placeholder_demo(
     difficulty: LocalizedText | None = None,
     theory: DemoTheory | None = None,
 ) -> DemoManifest:
-    """Build a placeholder manifest for a demo."""
+    """Build a demo manifest with shared defaults."""
     return DemoManifest(
         id=demo_id,
         level=level,
@@ -2224,7 +2224,7 @@ def _placeholder_demo(
         or (
             ControlBinding(
                 key="Enter",
-                action=LocalizedText(en="start placeholder scene", pl="uruchom ekran demo"),
+                action=LocalizedText(en="start demo scene", pl="uruchom ekran demo"),
             ),
             ControlBinding(
                 key="Esc",
@@ -2249,7 +2249,7 @@ def _placeholder_demo(
 
 
 DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="linear_regression_line_fit_lab",
         level=1,
         title_en="Linear Regression Line Fit Lab",
@@ -2400,7 +2400,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["linear_regression_line_fit_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="kmeans_intro_lab",
         level=1,
         title_en="K-Means Intro Lab",
@@ -2571,7 +2571,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["kmeans_intro_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="gradient_descent_playground",
         level=1,
         title_en="Gradient Descent Playground",
@@ -2732,7 +2732,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["gradient_descent_playground"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="distance_metrics_lab",
         level=1,
         title_en="Distance Metrics Lab",
@@ -2877,7 +2877,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["distance_metrics_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="knn_vote_map",
         level=1,
         title_en="k-NN Vote Map",
@@ -3036,7 +3036,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["knn_vote_map"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="logistic_regression_boundary_lab",
         level=1,
         title_en="Logistic Regression Boundary Lab",
@@ -3218,7 +3218,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["logistic_regression_boundary_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="svm_margin_lab",
         level=1,
         title_en="SVM Margin Lab",
@@ -3368,7 +3368,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["svm_margin_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="activation_functions_lab",
         level=1,
         title_en="Activation Functions Lab",
@@ -3514,7 +3514,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["activation_functions_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="neural_network_playground",
         level=1,
         title_en="Neural Network Playground",
@@ -3658,7 +3658,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["neural_network_playground"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="decision_tree_splitter",
         level=1,
         title_en="Decision Tree Splitter",
@@ -3846,7 +3846,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["decision_tree_splitter"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="data_leakage_lab",
         level=2,
         title_en="Data Leakage Lab",
@@ -3992,7 +3992,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["data_leakage_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="train_validation_test_lab",
         level=2,
         title_en="Train / Validation / Test Split Lab",
@@ -4139,7 +4139,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["train_validation_test_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="feature_scaling_lab",
         level=2,
         title_en="Feature Scaling Lab",
@@ -4287,7 +4287,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["feature_scaling_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="feature_importance_lab",
         level=2,
         title_en="Feature Importance Lab",
@@ -4462,7 +4462,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["feature_importance_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="gaussian_mixture_intro_lab",
         level=2,
         title_en="Gaussian Mixture Intro Lab",
@@ -4627,7 +4627,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["gaussian_mixture_intro_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="anomaly_detection_lab",
         level=2,
         title_en="Anomaly Detection Lab",
@@ -4775,7 +4775,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["anomaly_detection_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="hyperparameter_tuning_lab",
         level=2,
         title_en="Hyperparameter Tuning Lab",
@@ -4922,7 +4922,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["hyperparameter_tuning_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="class_imbalance_lab",
         level=2,
         title_en="Class Imbalance Lab",
@@ -5071,7 +5071,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["class_imbalance_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="random_forest_bagging_lab",
         level=2,
         title_en="Random Forest Bagging Lab",
@@ -5246,7 +5246,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["random_forest_bagging_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="boosting_mistake_lab",
         level=2,
         title_en="Boosting Mistake Lab",
@@ -6654,7 +6654,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["calibration_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="tsne_umap_exploration_lab",
         level=3,
         title_en="t-SNE / UMAP Exploration Lab",
@@ -6938,7 +6938,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["tsne_umap_exploration_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="model_monitoring_drift_lab",
         level=3,
         title_en="Model Monitoring Drift Lab",
@@ -7130,7 +7130,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             glossary=LESSON_GLOSSARY["model_monitoring_drift_lab"],
         ),
     ),
-    _placeholder_demo(
+    _demo_manifest(
         demo_id="time_series_forecasting_lab",
         level=3,
         title_en="Time Series Forecasting Lab",
