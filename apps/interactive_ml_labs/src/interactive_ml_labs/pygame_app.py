@@ -564,10 +564,13 @@ class UnifiedAppShell:
 
         if lesson.completion_badge is not None:
             y += 12
-            badge = self._text("Badge: ", "Odznaka: ") + lesson.completion_badge.for_language(
-                language
+            self._draw_wrapped(
+                self._lesson_badge_label(lesson),
+                (content_x, y),
+                content_width,
+                self.font_small,
+                ACCENT,
             )
-            self._draw_wrapped(badge, (content_x, y), content_width, self.font_small, ACCENT)
 
     def _lesson_progress_label(self, lesson: LessonManifest) -> str:
         """Return a short localized progress label for one lesson."""
@@ -602,6 +605,18 @@ class UnifiedAppShell:
             return set()
 
         return progress.completed_task_ids
+
+    def _lesson_badge_label(self, lesson: LessonManifest) -> str:
+        """Return a localized badge status label for one lesson."""
+        if lesson.completion_badge is None:
+            return ""
+
+        badge = lesson.completion_badge.for_language(self.context.settings.language)
+        progress = self.context.progress.lessons.get(lesson.id)
+        if progress is not None and progress.completed:
+            return self._text(f"Badge unlocked: {badge}", f"Odznaka zdobyta: {badge}")
+
+        return self._text(f"Badge locked: {badge}", f"Odznaka do zdobycia: {badge}")
 
     def _render_levels(self) -> None:
         language = self.context.settings.language

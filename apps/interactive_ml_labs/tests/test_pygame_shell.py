@@ -409,6 +409,23 @@ def test_shell_lesson_task_labels_reflect_progress(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_lesson_badge_label_reflects_completion(monkeypatch) -> None:
+    """Lesson badge label should distinguish locked and unlocked badges."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        lesson = LESSON_BY_ID["error_gradient_descent"]
+
+        assert app._lesson_badge_label(lesson) == "Badge locked: Loss Navigator"
+
+        app.context.progress.mark_completed(lesson.id)
+
+        assert app._lesson_badge_label(lesson) == "Badge unlocked: Loss Navigator"
+    finally:
+        pygame.quit()
+
+
 def test_shell_lesson_details_render_task_checklist(monkeypatch) -> None:
     """Lesson details panel should render task checklist state."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -439,6 +456,7 @@ def test_shell_lesson_details_render_task_checklist(monkeypatch) -> None:
     try:
         lesson = LESSON_BY_ID["error_gradient_descent"]
         app.context.progress.complete_task(lesson.id, "find_stable_learning_rate")
+        app.context.progress.mark_completed(lesson.id)
         app._draw_text = capture_text
         app._draw_wrapped = capture_wrapped
 
@@ -447,6 +465,7 @@ def test_shell_lesson_details_render_task_checklist(monkeypatch) -> None:
         assert "Tasks: 1/2 completed" in drawn_text
         assert any(text.startswith("[x]") for text in wrapped_text)
         assert any(text.startswith("[ ]") for text in wrapped_text)
+        assert "Badge unlocked: Loss Navigator" in wrapped_text
     finally:
         pygame.quit()
 
