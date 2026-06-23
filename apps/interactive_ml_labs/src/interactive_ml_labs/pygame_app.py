@@ -11,9 +11,22 @@ import pygame
 
 from interactive_ml_labs.display import Size, choose_adaptive_window_size, scale_rect_to_fit
 from interactive_ml_labs.fonts import make_ui_font
-from interactive_ml_labs.manifest import DemoManifest, DemoTheory, LocalizedText
+from interactive_ml_labs.manifest import (
+    DemoManifest,
+    DemoTheory,
+    LearningPathManifest,
+    LessonManifest,
+    LocalizedText,
+)
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
-from interactive_ml_labs.registry import LEVEL_NAMES, demos_for_level, levels_from_manifests
+from interactive_ml_labs.registry import (
+    DEMO_BY_ID,
+    LEARNING_PATH_MANIFESTS,
+    LESSON_BY_ID,
+    LEVEL_NAMES,
+    demos_for_level,
+    levels_from_manifests,
+)
 from interactive_ml_labs.scene import (
     FixedSizeScene,
     Scene,
@@ -52,6 +65,9 @@ class ScreenName(StrEnum):
     """Top-level shell screens."""
 
     LANGUAGE = "language"
+    HOME = "home"
+    PATHS = "paths"
+    LESSONS = "lessons"
     LEVELS = "levels"
     DEMOS = "demos"
     INTRO = "intro"
@@ -98,9 +114,11 @@ class UnifiedAppShell:
         self.screen_name = ScreenName.LANGUAGE
         self.previous_screen = ScreenName.INTRO
         self.theory_return_screen = ScreenName.INTRO
-        self.settings_return_screen = ScreenName.LEVELS
+        self.settings_return_screen = ScreenName.HOME
         self.selected_index = 0
         self.selected_demo: DemoManifest | None = None
+        self.selected_learning_path: LearningPathManifest | None = None
+        self.selected_lesson: LessonManifest | None = None
         self.scene_manager = SceneManager()
         self.menu_items: list[MenuItem] = []
         self.help_visible = False
@@ -307,6 +325,9 @@ class UnifiedAppShell:
 
         renderers = {
             ScreenName.LANGUAGE: self._render_language,
+            ScreenName.HOME: self._render_home,
+            ScreenName.PATHS: self._render_learning_paths,
+            ScreenName.LESSONS: self._render_lessons,
             ScreenName.LEVELS: self._render_levels,
             ScreenName.DEMOS: self._render_demos,
             ScreenName.INTRO: self._render_intro,
@@ -327,6 +348,163 @@ class UnifiedAppShell:
         self._draw_menu(["English", "Polski"], top=230)
         self._draw_footer("Enter: select | Up/Down: move | Mouse: select | S: settings | Esc: quit")
 
+    def _render_home(self) -> None:
+        self._draw_title(
+            "Interactive ML Labs",
+            self._text("Choose how you want to learn", "Wybierz sposób nauki"),
+        )
+        labels = [
+            self._text("Guided learning paths", "Prowadzone ścieżki nauki"),
+            self._text("Browse demos by level", "Przeglądaj dema według poziomu"),
+            self._text("Settings", "Ustawienia"),
+        ]
+        self._draw_menu(labels, top=210)
+        self._draw_footer(
+            self._text(
+                "Enter: select | Esc/Backspace: language | S: settings | L: language",
+                "Enter: wybierz | Esc/Backspace: język | S: ustawienia | L: język",
+            ),
+        )
+
+    def _render_learning_paths(self) -> None:
+        language = self.context.settings.language
+        labels = [path.title.for_language(language) for path in LEARNING_PATH_MANIFESTS]
+        self._draw_title(
+            self._text("Guided learning paths", "Prowadzone ścieżki nauki"),
+            self._text(
+                "Follow lessons that build one idea at a time.",
+                "Przechodź lekcje, które budują intuicję krok po kroku.",
+            ),
+        )
+        self._draw_menu(labels, top=210, width=520)
+        self._render_learning_path_details(LEARNING_PATH_MANIFESTS[self.selected_index])
+        self._draw_footer(
+            self._text(
+                "Enter: lessons | Esc/Backspace: home | S: settings | L: language",
+                "Enter: lekcje | Esc/Backspace: start | S: ustawienia | L: język",
+            ),
+        )
+
+    def _render_learning_path_details(self, path: LearningPathManifest) -> None:
+        """Draw details for the selected learning path."""
+        language = self.context.settings.language
+        width, height = self.context.settings.resolution
+        left = 660
+        top = 190
+        panel_width = max(360, width - left - 80)
+        panel_height = max(320, height - top - 100)
+        rect = pygame.Rect(left, top, panel_width, panel_height)
+
+        pygame.draw.rect(self.screen, PANEL, rect, border_radius=8)
+        pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
+
+        y = rect.y + 28
+        content_x = rect.x + 28
+        content_width = rect.width - 56
+        y = self._draw_wrapped(
+            path.title.for_language(language),
+            (content_x, y),
+            content_width,
+            self.font_heading,
+            TEXT,
+        )
+        y += 12
+        y = self._draw_wrapped(
+            path.summary.for_language(language),
+            (content_x, y),
+            content_width,
+            self.font_body,
+            MUTED_TEXT,
+        )
+        y += 22
+        lesson_count = len(path.lesson_ids)
+        lesson_label = self._text(
+            f"{lesson_count} lessons",
+            f"{lesson_count} lekcje" if lesson_count < 5 else f"{lesson_count} lekcji",
+        )
+        self._draw_text(lesson_label, (content_x, y), self.font_small, ACCENT)
+        y += 34
+        for lesson_id in path.lesson_ids[:4]:
+            lesson = LESSON_BY_ID[lesson_id]
+            y = self._draw_wrapped(
+                "• " + lesson.title.for_language(language),
+                (content_x, y),
+                content_width,
+                self.font_small,
+                TEXT,
+            )
+            y += 4
+
+    def _render_lessons(self) -> None:
+        path = self._require_learning_path()
+        lessons = self._current_learning_path_lessons()
+        language = self.context.settings.language
+        labels = [lesson.title.for_language(language) for lesson in lessons]
+
+        self._draw_title(
+            path.title.for_language(language),
+            self._text("Select lesson", "Wybierz lekcję"),
+        )
+        self._draw_menu(labels, top=190, width=520)
+        self._render_lesson_details(lessons[self.selected_index])
+        self._draw_footer(
+            self._text(
+                "Enter: lesson intro | Esc/Backspace: paths | S: settings | L: language",
+                "Enter: intro lekcji | Esc/Backspace: ścieżki | S: ustawienia | L: język",
+            ),
+        )
+
+    def _render_lesson_details(self, lesson: LessonManifest) -> None:
+        """Draw details for the selected lesson."""
+        language = self.context.settings.language
+        width, height = self.context.settings.resolution
+        left = 660
+        top = 190
+        panel_width = max(360, width - left - 80)
+        panel_height = max(360, height - top - 100)
+        rect = pygame.Rect(left, top, panel_width, panel_height)
+
+        pygame.draw.rect(self.screen, PANEL, rect, border_radius=8)
+        pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
+
+        y = rect.y + 28
+        content_x = rect.x + 28
+        content_width = rect.width - 56
+        y = self._draw_wrapped(
+            lesson.title.for_language(language),
+            (content_x, y),
+            content_width,
+            self.font_heading,
+            TEXT,
+        )
+        y += 12
+        y = self._draw_wrapped(
+            lesson.learning_goal.for_language(language),
+            (content_x, y),
+            content_width,
+            self.font_body,
+            MUTED_TEXT,
+        )
+        y += 22
+        self._draw_text(self._text("Tasks", "Zadania"), (content_x, y), self.font_small, ACCENT)
+        y += 28
+        for task in lesson.tasks[:3]:
+            y = self._draw_wrapped(
+                "• " + task.title.for_language(language),
+                (content_x, y),
+                content_width,
+                self.font_small,
+                TEXT,
+            )
+            y += 4
+
+        if lesson.completion_badge is not None:
+            y += 12
+            badge = self._text("Badge: ", "Odznaka: ") + lesson.completion_badge.for_language(
+                language
+            )
+            self._draw_wrapped(badge, (content_x, y), content_width, self.font_small, ACCENT)
+
     def _render_levels(self) -> None:
         language = self.context.settings.language
         labels = [LEVEL_NAMES[level].for_language(language) for level in levels_from_manifests()]
@@ -334,8 +512,8 @@ class UnifiedAppShell:
         self._draw_menu(labels, top=220)
         self._draw_footer(
             self._text(
-                "Enter: demos | Esc/Backspace: language | L: language",
-                "Enter: dema | Esc/Backspace: wybór języka | S: ustawienia | L: zmień język",
+                "Enter: demos | Esc/Backspace: home | S: settings | L: language",
+                "Enter: dema | Esc/Backspace: start | S: ustawienia | L: język",
             ),
         )
 
@@ -1133,6 +1311,9 @@ class UnifiedAppShell:
     def _activate_selected(self) -> None:
         actions = {
             ScreenName.LANGUAGE: self._select_language,
+            ScreenName.HOME: self._select_home_item,
+            ScreenName.PATHS: self._select_learning_path,
+            ScreenName.LESSONS: self._select_lesson,
             ScreenName.LEVELS: self._select_level,
             ScreenName.DEMOS: self._select_demo,
             ScreenName.INTRO: self._start_demo,
@@ -1146,7 +1327,27 @@ class UnifiedAppShell:
     def _select_language(self) -> None:
         self.context.settings.language = "en" if self.selected_index == 0 else "pl"
         self._save_settings()
-        self._go_to(ScreenName.LEVELS)
+        self._go_to(ScreenName.HOME)
+
+    def _select_home_item(self) -> None:
+        if self.selected_index == 0:
+            self._go_to(ScreenName.PATHS)
+        elif self.selected_index == 1:
+            self._go_to(ScreenName.LEVELS)
+        else:
+            self._open_settings()
+
+    def _select_learning_path(self) -> None:
+        self.selected_learning_path = LEARNING_PATH_MANIFESTS[self.selected_index]
+        self._go_to(ScreenName.LESSONS)
+
+    def _select_lesson(self) -> None:
+        lesson = self._current_learning_path_lessons()[self.selected_index]
+        self.selected_lesson = lesson
+        self.selected_demo = DEMO_BY_ID[lesson.demo_id]
+        self.context.current_level = self.selected_demo.level
+        self.context.selected_demo_id = self.selected_demo.id
+        self._go_to(ScreenName.INTRO)
 
     def _select_level(self) -> None:
         levels = levels_from_manifests()
@@ -1208,8 +1409,14 @@ class UnifiedAppShell:
     def _escape(self) -> None:
         if self.screen_name == ScreenName.LANGUAGE:
             self.running = False
-        elif self.screen_name == ScreenName.LEVELS:
+        elif self.screen_name == ScreenName.HOME:
             self._go_to(ScreenName.LANGUAGE)
+        elif self.screen_name == ScreenName.PATHS:
+            self._go_to(ScreenName.HOME)
+        elif self.screen_name == ScreenName.LESSONS:
+            self._go_to(ScreenName.PATHS)
+        elif self.screen_name == ScreenName.LEVELS:
+            self._go_to(ScreenName.HOME)
         elif self.screen_name == ScreenName.DEMOS:
             self._go_to(ScreenName.LEVELS)
         elif self.screen_name == ScreenName.INTRO:
@@ -1299,6 +1506,9 @@ class UnifiedAppShell:
     def _current_menu_item_count(self) -> int:
         counts = {
             ScreenName.LANGUAGE: 2,
+            ScreenName.HOME: 3,
+            ScreenName.PATHS: len(LEARNING_PATH_MANIFESTS),
+            ScreenName.LESSONS: len(self._current_learning_path_lessons()),
             ScreenName.LEVELS: len(levels_from_manifests()),
             ScreenName.DEMOS: len(self._current_level_demos()),
             ScreenName.INTRO: 1,
@@ -1311,6 +1521,16 @@ class UnifiedAppShell:
 
     def _current_level_demos(self) -> tuple[DemoManifest, ...]:
         return demos_for_level(self.context.current_level or 1)
+
+    def _require_learning_path(self) -> LearningPathManifest:
+        if self.selected_learning_path is None:
+            return LEARNING_PATH_MANIFESTS[0]
+
+        return self.selected_learning_path
+
+    def _current_learning_path_lessons(self) -> tuple[LessonManifest, ...]:
+        path = self._require_learning_path()
+        return tuple(LESSON_BY_ID[lesson_id] for lesson_id in path.lesson_ids)
 
     def _update_demo_scroll_limit(self, item_count: int, top: int, bottom: int) -> None:
         """Update maximum scroll offset for the demo list."""
