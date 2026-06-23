@@ -2,7 +2,7 @@
 
 import json
 
-from interactive_ml_labs import AppContext, AppSettings
+from interactive_ml_labs import AppContext, AppProgress, AppSettings
 from interactive_ml_labs.display import (
     BOOSTING_FIXED_SCENE_SIZE,
     DEFAULT_RESOLUTION,
@@ -111,6 +111,16 @@ def test_app_context_tracks_current_navigation() -> None:
 
     assert context.current_level == 2
     assert context.selected_demo_id == "boosting_mistake_lab"
+
+
+def test_app_context_carries_learning_progress() -> None:
+    """App context should carry lesson progress for shell and future scenes."""
+    context = AppContext()
+
+    context.progress.mark_started("lesson_one")
+
+    assert isinstance(context.progress, AppProgress)
+    assert context.progress.lessons["lesson_one"].started is True
 
 
 def test_settings_serialization_persists_user_preferences_only() -> None:

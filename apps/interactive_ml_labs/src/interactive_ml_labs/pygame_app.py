@@ -19,6 +19,11 @@ from interactive_ml_labs.manifest import (
     LocalizedText,
 )
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
+from interactive_ml_labs.progress import (
+    AppProgress,
+    load_app_progress,
+    save_app_progress,
+)
 from interactive_ml_labs.registry import (
     DEMO_BY_ID,
     LEARNING_PATH_MANIFESTS,
@@ -93,13 +98,22 @@ class UnifiedAppShell:
         self,
         settings: AppSettings | None = None,
         settings_path: Path | None = None,
+        progress: AppProgress | None = None,
+        progress_path: Path | None = None,
     ) -> None:
         """Initialize the shell."""
         pygame.init()
 
         self.settings_path = settings_path
+        self.progress_path = progress_path or self._default_progress_path_for(settings_path)
         self.settings_persistence_enabled = settings is None or settings_path is not None
-        self.context = AppContext(settings=settings or load_app_settings(settings_path))
+        self.progress_persistence_enabled = progress is None and (
+            settings is None or progress_path is not None
+        )
+        self.context = AppContext(
+            settings=settings or load_app_settings(settings_path),
+            progress=progress or self._load_initial_progress(settings, self.progress_path),
+        )
         self._apply_adaptive_window_size()
         self.screen = pygame.display.set_mode(
             self.context.settings.resolution,
@@ -161,6 +175,29 @@ class UnifiedAppShell:
         """Persist settings when the shell owns settings storage."""
         if self.settings_persistence_enabled:
             save_app_settings(self.context.settings, self.settings_path)
+
+    def _save_progress(self) -> None:
+        """Persist progress when the shell owns progress storage."""
+        if self.progress_persistence_enabled:
+            save_app_progress(self.context.progress, self.progress_path)
+
+    def _default_progress_path_for(self, settings_path: Path | None) -> Path | None:
+        """Keep explicit test settings and progress files next to each other."""
+        if settings_path is None:
+            return None
+
+        return settings_path.with_name("progress.json")
+
+    def _load_initial_progress(
+        self,
+        settings: AppSettings | None,
+        progress_path: Path | None,
+    ) -> AppProgress:
+        """Load progress only when the shell owns persistent app state."""
+        if settings is not None and progress_path is None:
+            return AppProgress()
+
+        return load_app_progress(progress_path)
 
     def run(self) -> None:
         """Run the shell event loop."""
@@ -486,6 +523,21 @@ class UnifiedAppShell:
             MUTED_TEXT,
         )
         y += 22
+        self._draw_text(
+            self._text("Status", "Status"),
+            (content_x, y),
+            self.font_small,
+            ACCENT,
+        )
+        y += 28
+        y = self._draw_wrapped(
+            self._lesson_progress_label(lesson),
+            (content_x, y),
+            content_width,
+            self.font_small,
+            TEXT,
+        )
+        y += 18
         self._draw_text(self._text("Tasks", "Zadania"), (content_x, y), self.font_small, ACCENT)
         y += 28
         for task in lesson.tasks[:3]:
@@ -504,6 +556,18 @@ class UnifiedAppShell:
                 language
             )
             self._draw_wrapped(badge, (content_x, y), content_width, self.font_small, ACCENT)
+
+    def _lesson_progress_label(self, lesson: LessonManifest) -> str:
+        """Return a short localized progress label for one lesson."""
+        progress = self.context.progress.lessons.get(lesson.id)
+        if progress is None or not progress.started:
+            return self._text("Not started", "Nie rozpoczęto")
+        if progress.completed:
+            return self._text("Completed", "Ukończona")
+        if progress.theory_visited:
+            return self._text("Theory visited", "Teoria przeczytana")
+
+        return self._text("Started", "Rozpoczęta")
 
     def _render_levels(self) -> None:
         language = self.context.settings.language
@@ -1347,6 +1411,8 @@ class UnifiedAppShell:
         self.selected_demo = DEMO_BY_ID[lesson.demo_id]
         self.context.current_level = self.selected_demo.level
         self.context.selected_demo_id = self.selected_demo.id
+        self.context.progress.mark_started(lesson.id)
+        self._save_progress()
         self._go_to(ScreenName.INTRO)
 
     def _select_level(self) -> None:
@@ -1459,6 +1525,9 @@ class UnifiedAppShell:
         self.help_visible = False
         self.theory_return_screen = self.screen_name
         self.theory_scroll_offset = 0
+        if self.selected_lesson is not None:
+            self.context.progress.mark_theory_visited(self.selected_lesson.id)
+            self._save_progress()
         self._go_to(ScreenName.THEORY)
 
     def _activate_theory(self) -> None:
