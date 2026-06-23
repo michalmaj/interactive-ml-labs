@@ -545,11 +545,16 @@ class UnifiedAppShell:
             TEXT,
         )
         y += 18
-        self._draw_text(self._text("Tasks", "Zadania"), (content_x, y), self.font_small, ACCENT)
+        self._draw_text(
+            self._lesson_task_summary(lesson),
+            (content_x, y),
+            self.font_small,
+            ACCENT,
+        )
         y += 28
         for task in lesson.tasks[:3]:
             y = self._draw_wrapped(
-                "• " + task.title.for_language(language),
+                self._lesson_task_label(lesson, task.id, task.title.for_language(language)),
                 (content_x, y),
                 content_width,
                 self.font_small,
@@ -575,6 +580,28 @@ class UnifiedAppShell:
             return self._text("Theory visited", "Teoria przeczytana")
 
         return self._text("Started", "Rozpoczęta")
+
+    def _lesson_task_summary(self, lesson: LessonManifest) -> str:
+        """Return a short localized task completion summary."""
+        completed_count = len(self._completed_lesson_task_ids(lesson))
+        total_count = len(lesson.tasks)
+        return self._text(
+            f"Tasks: {completed_count}/{total_count} completed",
+            f"Zadania: {completed_count}/{total_count} ukończone",
+        )
+
+    def _lesson_task_label(self, lesson: LessonManifest, task_id: str, title: str) -> str:
+        """Return one task label with a stable checkbox prefix."""
+        marker = "[x]" if task_id in self._completed_lesson_task_ids(lesson) else "[ ]"
+        return f"{marker} {title}"
+
+    def _completed_lesson_task_ids(self, lesson: LessonManifest) -> set[str]:
+        """Return completed task ids for one lesson."""
+        progress = self.context.progress.lessons.get(lesson.id)
+        if progress is None:
+            return set()
+
+        return progress.completed_task_ids
 
     def _render_levels(self) -> None:
         language = self.context.settings.language

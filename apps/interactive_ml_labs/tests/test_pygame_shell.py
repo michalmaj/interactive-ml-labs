@@ -388,6 +388,69 @@ def test_shell_persists_task_progress_from_active_demo(monkeypatch, tmp_path) ->
         pygame.quit()
 
 
+def test_shell_lesson_task_labels_reflect_progress(monkeypatch) -> None:
+    """Lesson task labels should show completed and pending task state."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        lesson = LESSON_BY_ID["error_gradient_descent"]
+        app.context.progress.complete_task(lesson.id, "find_stable_learning_rate")
+
+        assert app._lesson_task_summary(lesson) == "Tasks: 1/2 completed"
+        assert (
+            app._lesson_task_label(lesson, "find_stable_learning_rate", "Find learning rate")
+            == "[x] Find learning rate"
+        )
+        assert app._lesson_task_label(lesson, "observe_loss_drop", "Observe loss") == (
+            "[ ] Observe loss"
+        )
+    finally:
+        pygame.quit()
+
+
+def test_shell_lesson_details_render_task_checklist(monkeypatch) -> None:
+    """Lesson details panel should render task checklist state."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    drawn_text: list[str] = []
+    wrapped_text: list[str] = []
+
+    def capture_text(
+        text: str,
+        position: tuple[int, int],
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> None:
+        _ = position, font, color
+        drawn_text.append(text)
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = width, font, color
+        wrapped_text.append(text)
+        return position[1] + 24
+
+    try:
+        lesson = LESSON_BY_ID["error_gradient_descent"]
+        app.context.progress.complete_task(lesson.id, "find_stable_learning_rate")
+        app._draw_text = capture_text
+        app._draw_wrapped = capture_wrapped
+
+        app._render_lesson_details(lesson)
+
+        assert "Tasks: 1/2 completed" in drawn_text
+        assert any(text.startswith("[x]") for text in wrapped_text)
+        assert any(text.startswith("[ ]") for text in wrapped_text)
+    finally:
+        pygame.quit()
+
+
 def test_shell_help_overlay_uses_selected_demo_manifest(monkeypatch) -> None:
     """Help overlay should use manifest text for the selected demo."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
