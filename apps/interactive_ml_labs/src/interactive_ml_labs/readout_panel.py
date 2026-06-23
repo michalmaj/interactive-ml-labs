@@ -7,6 +7,8 @@ from typing import Final
 
 import pygame
 
+from interactive_ml_labs.ui_helpers import draw_panel, draw_text, draw_wrapped_text
+
 ReadoutRow = tuple[str, str]
 ReadoutOption = tuple[str, bool]
 
@@ -50,8 +52,8 @@ def draw_readout_panel(
     colors: ReadoutPanelColors,
 ) -> None:
     """Draw a compact side readout with rows, selectable options, and a takeaway."""
-    pygame.draw.rect(surface, colors.panel, rect, border_radius=8)
-    _draw_text(
+    draw_panel(surface, rect, colors.panel)
+    draw_text(
         surface,
         title,
         (rect.x + PADDING, rect.y + TITLE_OFFSET_Y),
@@ -73,10 +75,10 @@ def draw_readout_panel(
         if y > options_bottom:
             break
         color = colors.accent if selected else colors.muted_text
-        _draw_text(surface, option_label, (rect.x + PADDING, y), fonts.small, color)
+        draw_text(surface, option_label, (rect.x + PADDING, y), fonts.small, color)
         y += OPTION_GAP
 
-    _draw_wrapped(
+    draw_wrapped_text(
         surface,
         takeaway,
         (rect.x + PADDING, rect.bottom - TAKEAWAY_BOTTOM_PADDING),
@@ -101,15 +103,15 @@ def _draw_readout_row(
     x, y = position
     line = f"{label}: {value}"
     if fonts.small.size(line)[0] <= width:
-        _draw_text(surface, line, (x, y), fonts.small, colors.text)
+        draw_text(surface, line, (x, y), fonts.small, colors.text)
         return y + ROW_GAP
 
     label_text = f"{label}:"
-    _draw_text(surface, label_text, (x, y), fonts.small, colors.muted_text)
+    draw_text(surface, label_text, (x, y), fonts.small, colors.muted_text)
     label_width = fonts.small.size(label_text)[0]
     if label_width + 126 > width:
         return (
-            _draw_wrapped(
+            draw_wrapped_text(
                 surface,
                 value,
                 (x, y + LINE_HEIGHT),
@@ -124,7 +126,7 @@ def _draw_readout_row(
     value_x = x + label_width + 6
     value_width = width - (value_x - x)
     return (
-        _draw_wrapped(
+        draw_wrapped_text(
             surface,
             value,
             (value_x, y),
@@ -135,76 +137,3 @@ def _draw_readout_row(
         )
         + 7
     )
-
-
-def _draw_text(
-    surface: pygame.Surface,
-    text: str,
-    position: tuple[int, int],
-    font: pygame.font.Font,
-    color: tuple[int, int, int],
-) -> None:
-    surface.blit(font.render(text, True, color), position)
-
-
-def _draw_wrapped(
-    surface: pygame.Surface,
-    text: str,
-    position: tuple[int, int],
-    width: int,
-    font: pygame.font.Font,
-    color: tuple[int, int, int],
-    *,
-    line_height: int,
-    max_bottom: int | None = None,
-) -> int:
-    x, y = position
-    lines = _wrapped_lines(text, width, font)
-    if max_bottom is not None:
-        available_lines = max(0, (max_bottom - y) // line_height)
-        if available_lines == 0:
-            return y
-        if len(lines) > available_lines:
-            lines = [
-                *lines[: available_lines - 1],
-                _fit_with_ellipsis(lines[available_lines - 1], width, font),
-            ]
-
-    for line in lines:
-        _draw_text(surface, line, (x, y), font, color)
-        y += line_height
-
-    return y
-
-
-def _wrapped_lines(text: str, width: int, font: pygame.font.Font) -> list[str]:
-    """Wrap text into lines that fit the requested width."""
-    lines: list[str] = []
-    current = ""
-    for word in text.split():
-        candidate = word if not current else f"{current} {word}"
-        if font.size(candidate)[0] <= width:
-            current = candidate
-            continue
-        if current:
-            lines.append(current)
-        current = word
-    if current:
-        lines.append(current)
-    return lines
-
-
-def _fit_with_ellipsis(text: str, width: int, font: pygame.font.Font) -> str:
-    """Trim text so a clipped line still communicates that more text exists."""
-    suffix = "..."
-    if font.size(text + suffix)[0] <= width:
-        return text + suffix
-
-    trimmed = text
-    while trimmed and font.size(trimmed.rstrip() + suffix)[0] > width:
-        trimmed = trimmed[:-1]
-
-    if not trimmed:
-        return suffix
-
-    return trimmed.rstrip() + suffix

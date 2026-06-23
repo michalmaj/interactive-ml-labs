@@ -18,6 +18,7 @@ from interactive_ml_labs.readout_panel import (
 )
 from interactive_ml_labs.scene import SceneCommand
 from interactive_ml_labs.settings import AppContext
+from interactive_ml_labs.ui_helpers import draw_panel, draw_text, draw_wrapped_text
 
 BACKGROUND: Final[tuple[int, int, int]] = (21, 24, 28)
 PANEL: Final[tuple[int, int, int]] = (35, 40, 47)
@@ -516,7 +517,7 @@ class KMeansIntroLabScene:
         return max(-0.94, min(0.94, value))
 
     def _draw_panel(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
-        pygame.draw.rect(surface, PANEL, rect, border_radius=8)
+        draw_panel(surface, rect, PANEL)
 
     def _draw_text(
         self,
@@ -526,7 +527,7 @@ class KMeansIntroLabScene:
         font: pygame.font.Font,
         color: tuple[int, int, int],
     ) -> None:
-        surface.blit(font.render(text, True, color), position)
+        draw_text(surface, text, position, font, color)
 
     def _draw_wrapped(
         self,
@@ -539,19 +540,15 @@ class KMeansIntroLabScene:
         *,
         line_height: int,
     ) -> None:
-        x, y = position
-        current = ""
-        for word in text.split():
-            candidate = word if not current else f"{current} {word}"
-            if font.size(candidate)[0] <= width:
-                current = candidate
-                continue
-            if current:
-                self._draw_text(surface, current, (x, y), font, color)
-                y += line_height
-            current = word
-        if current:
-            self._draw_text(surface, current, (x, y), font, color)
+        draw_wrapped_text(
+            surface,
+            text,
+            position,
+            width,
+            font,
+            color,
+            line_height=line_height,
+        )
 
     def _label(self, en: str, pl: str) -> str:
         if self._language == "pl":
