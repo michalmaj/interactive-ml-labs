@@ -4,8 +4,8 @@ import pygame
 from interactive_ml_labs.boosting_scene import (
     ADVANCE_ROUNDS_TASK_ID,
     BOOSTING_LESSON_ID,
-    BoostingMistakeLabSceneAdapter,
     CONNECT_WEIGHT_TASK_ID,
+    BoostingMistakeLabSceneAdapter,
     create_boosting_mistake_lab_scene,
 )
 from interactive_ml_labs.display import BOOSTING_FIXED_SCENE_SIZE
