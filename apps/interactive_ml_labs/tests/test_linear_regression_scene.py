@@ -3,7 +3,10 @@
 import pygame
 from interactive_ml_labs.display import DEFAULT_RESOLUTION
 from interactive_ml_labs.linear_regression_scene import (
+    BALANCE_RESIDUALS_TASK_ID,
+    COMPARE_LEAST_SQUARES_TASK_ID,
     INTERCEPT_STEP,
+    LINEAR_REGRESSION_LESSON_ID,
     PRESETS,
     SLOPE_STEP,
     LinearRegressionLineFitLabScene,
@@ -101,5 +104,69 @@ def test_linear_regression_scene_renders_to_shell_surface(monkeypatch) -> None:
 
         assert surface.get_bounding_rect().width > 0
         assert surface.get_bounding_rect().height > 0
+    finally:
+        pygame.quit()
+
+
+def test_linear_regression_scene_completes_manual_balance_task(monkeypatch) -> None:
+    """Moving slope and intercept should complete the manual residual task."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.selected_lesson_id = LINEAR_REGRESSION_LESSON_ID
+        scene = create_linear_regression_line_fit_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+        assert LINEAR_REGRESSION_LESSON_ID not in context.progress.lessons
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP))
+
+        progress = context.progress.lessons[LINEAR_REGRESSION_LESSON_ID]
+        assert BALANCE_RESIDUALS_TASK_ID in progress.completed_task_ids
+        assert progress.completed is False
+    finally:
+        pygame.quit()
+
+
+def test_linear_regression_scene_completes_least_squares_task_and_lesson(monkeypatch) -> None:
+    """Using least-squares after manual adjustment should complete the lesson."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.selected_lesson_id = LINEAR_REGRESSION_LESSON_ID
+        scene = create_linear_regression_line_fit_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_f))
+
+        progress = context.progress.lessons[LINEAR_REGRESSION_LESSON_ID]
+        assert progress.completed_task_ids >= {
+            BALANCE_RESIDUALS_TASK_ID,
+            COMPARE_LEAST_SQUARES_TASK_ID,
+        }
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_linear_regression_scene_ignores_tasks_outside_guided_lesson(monkeypatch) -> None:
+    """Standalone demo use should not mutate guided lesson progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_linear_regression_line_fit_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_f))
+
+        assert LINEAR_REGRESSION_LESSON_ID not in context.progress.lessons
     finally:
         pygame.quit()
