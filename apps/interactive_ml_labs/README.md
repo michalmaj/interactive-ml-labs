@@ -1,22 +1,48 @@
 # Interactive ML Labs App
 
-Unified Pygame shell for browsing Interactive ML Labs demos.
+Unified Pygame app for browsing and running Interactive ML Labs demos.
 
-This package is intentionally small at first. It provides the future single entry point:
+The app is the recommended guided experience:
 
 ```bash
 uv run --package interactive-ml-labs-app interactive-ml-labs
 ```
 
-Standalone demo entry points remain supported.
+Standalone demo entry points remain supported for development, debugging, and focused teaching sessions.
 
-## Current scope
+## Current Scope
 
-- language selection,
-- dynamic level selection from demo manifests,
-- dynamic demo selection from demo manifests,
-- generated demo intro screen,
-- placeholder demo scene,
-- pause/help overlay skeleton.
+- global language selection: English and Polish,
+- dynamic level and demo selection from manifests,
+- scrollable demo lists with keyboard and mouse navigation,
+- generated intro screens with objectives and controls,
+- built-in theory screens for every current demo,
+- pause and help overlays during active demos,
+- display settings for fullscreen, adaptive window size, and fixed-scene scaling,
+- persistent app settings,
+- all current Level 1, Level 2, and Level 3 demos available through the shell.
 
-Real demo integrations will be added one by one.
+## Demo Flow
+
+```text
+Interactive ML Labs
+-> language and settings
+-> level selection
+-> demo selection
+-> demo intro
+-> theory or experiment
+-> pause / help / objectives / controls
+```
+
+## Development Notes
+
+The shell lives in `apps/interactive_ml_labs` so `ml_lab_core` can stay focused on small reusable primitives.
+
+Each demo is registered through a manifest. The manifest provides title, summary, objectives, controls, tags, difficulty, theory content, and a scene factory. The shell uses that metadata to build consistent menu, intro, help, and theory screens.
+
+New demos should be added in small pull requests:
+
+1. Add or adapt the demo scene.
+2. Register the manifest.
+3. Add tests for manifest metadata, scene behavior, and layout-sensitive UI.
+4. Keep standalone entry points working when a demo already has one.

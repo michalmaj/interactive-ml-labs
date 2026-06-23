@@ -1,51 +1,50 @@
 # Unified App Shell
 
-This document describes the planned unified Pygame application shell for Interactive ML Labs.
+This document describes the unified Pygame application shell for Interactive ML Labs.
 
-The goal is to move from a collection of separately launched demos toward one guided educational application, while keeping existing demo packages, entry points, tests, and workflows intact.
+The project has moved from a collection of separately launched demos toward one guided educational application, while keeping existing demo packages, entry points, tests, and workflows intact.
 
-## Vision
+## Entry Point
 
-Interactive ML Labs should eventually have one recommended entry point:
+The recommended guided entry point is:
 
 ```text
 interactive-ml-labs
 ```
 
-The guided flow should be:
+From the workspace:
+
+```bash
+uv run --package interactive-ml-labs-app interactive-ml-labs
+```
+
+The guided flow is:
 
 ```text
 Interactive ML Labs
--> language selection
+-> language and settings
 -> level selection
 -> demo selection
 -> demo intro screen
--> game / simulation / experiment
+-> theory or experiment
 -> pause menu / help / objectives / controls
 ```
 
-Individual demos should still remain runnable on their own for development, testing, teaching, and debugging.
+Individual demos still remain runnable on their own for development, testing, teaching, and debugging.
 
-## Architectural Direction
+## Architecture
 
-The unified shell should be added as a separate application package, not folded into `ml_lab_core` at the beginning.
-
-Preferred initial location:
+The shell lives as a separate application package:
 
 ```text
 apps/interactive_ml_labs/
 ```
 
-Alternative considered locations:
-
-- `packages/ml_lab_app/`
-- `packages/ml_lab_core/src/ml_lab_core/ui/`
-
-The shell should not become part of `ml_lab_core` too early. `ml_lab_core` should stay focused on reusable interfaces and small shared utilities. The shell is a concrete application with concrete navigation, settings, and Pygame behavior.
+It is intentionally not part of `ml_lab_core`. `ml_lab_core` should stay focused on reusable interfaces and small shared utilities. The shell is a concrete application with concrete navigation, settings, manifests, and Pygame behavior.
 
 ## Existing Entry Points
 
-Existing demo entry points should stay.
+Existing demo entry points stay.
 
 Examples:
 
@@ -55,7 +54,7 @@ gradient-descent-playground
 knn-vote-map
 ```
 
-The unified shell should become the recommended guided experience, but it should not delete or replace standalone demo launchers.
+The unified shell is the recommended guided experience, but it does not delete or replace standalone demo launchers.
 
 This keeps the project safer to evolve:
 
@@ -64,24 +63,9 @@ This keeps the project safer to evolve:
 - tests do not need to be rewritten at once,
 - each demo integration can happen in a separate pull request.
 
-## Demo Integration Strategy
-
-The first integration should avoid destructive rewrites.
-
-Preferred approach:
-
-1. Add a shell-level demo scene contract.
-2. Add a manifest registry.
-3. Integrate one demo through an adapter or thin scene wrapper.
-4. Keep the existing `pygame_app.py` entry point working.
-
-Boosting Mistake Lab is a good first real integration target because it already has a mature Pygame UI, challenge mode, explanation text, export behavior, and tests.
-
-Its standalone Pygame app should keep working while the reusable demo scene is extracted for shell integration.
-
 ## Scene Contract
 
-The minimal scene contract should look like this:
+Shell scenes follow a small lifecycle:
 
 ```python
 class Scene:
@@ -90,73 +74,46 @@ class Scene:
     def render(self, surface): ...
 ```
 
-Implemented first slice:
+Current behavior:
 
 - scenes return `SceneCommand`,
-- demo scenes are owned by a small stack-based `SceneManager`,
-- `Esc` and `H` stay global shell shortcuts before demo event handling,
-- demo scenes can request pause, restart, back to demo selection, or quit.
+- demo scenes are owned by a stack-based `SceneManager`,
+- `Esc` and `H` work as global shell shortcuts before demo event handling,
+- demo scenes can request pause, restart, back to demo selection, or quit,
+- shell overlays use manifest content for objectives, controls, tips, and theory.
 
-Still open:
+## App Context And Settings
 
-- whether scene-specific state should survive deeper overlay stacks,
-- how export commands should be represented,
-- how much of the shell menu system should eventually become scene-based too.
+The shell uses a small app context for global state.
 
-## App Context
+Important settings:
 
-The initial `AppContext` should stay small and in memory.
+- language,
+- resolution,
+- fullscreen,
+- adaptive window size,
+- fixed-scene scaling,
+- sound placeholder,
+- current level and selected demo,
+- theme.
 
-Likely fields:
-
-```python
-language
-resolution
-sound_enabled
-current_level
-selected_demo
-theme
-```
-
-Initial rules:
-
-- settings are mutable in memory,
-- no config file in the first slice,
-- demos may read settings,
-- demos should not freely mutate global settings unless the shell exposes an explicit action.
-
-Persistent settings can be added later.
+Settings are mutable through the shell and persisted between launches. Demos may read settings, but global settings should still be changed through explicit shell actions.
 
 ## Localization
 
-Localization should start simple.
+Localization stays deliberately simple.
 
-Preferred initial options:
+Current approach:
 
-- dataclasses with `pl` and `en` fields,
-- Python dictionaries for shell strings,
-- no full i18n framework.
-
-The language should be global, not per-demo.
-
-Open decisions:
-
-- default language: `en` or `pl`,
-- whether `L` changes language at runtime,
-- whether language selection appears before the main menu,
-- which technical terms should stay in English.
-
-Current direction:
-
+- Python dataclasses and dictionaries for app strings,
 - global language setting,
-- language chosen in the shell,
-- runtime language switching can be added if it stays simple.
-
-## Polish Copy Style
+- English and Polish UI,
+- Polish-capable fonts for diacritics,
+- no heavy i18n framework.
 
 Polish UI copy should sound natural rather than literal.
 
-Current style rules:
+Style rules:
 
 - keep algorithm names in English when they are recognizable names, such as `k-NN`, `Random Forest`, or `Boosting`,
 - keep common ML terms in English when Polish versions sound forced, such as `learning rate`, `loss`, `split`, or `decision boundary`,
@@ -165,9 +122,9 @@ Current style rules:
 
 ## Demo Manifest
 
-Each demo should be described by a manifest.
+Each demo is described by a manifest.
 
-Minimal fields:
+Core fields:
 
 ```python
 id
@@ -176,27 +133,27 @@ title
 summary
 objectives
 controls
+difficulty
+tags
+theory
 create_scene
 ```
 
-Likely near-term extensions:
+The manifest registry drives level and demo selection. The shell should not hardcode level contents in multiple places.
 
-```python
-difficulty
-tags
-```
+Current state:
 
-The manifest registry should drive level and demo selection. The shell should not hardcode level contents in multiple places.
+- Level 1 has 10 demos,
+- Level 2 has 10 demos,
+- Level 3 has 7 demos,
+- all current demos provide theory content,
+- all current demos can be launched through the shell.
 
-Boosting Mistake Lab is the first manifest with demo-specific summary, objectives, and controls. Other demos may keep generic placeholder copy until they are prepared for shell integration.
+## Intro, Theory, Pause, And Help
 
-## Intro Screen
+The shell generates consistent screens and overlays from manifest metadata.
 
-The shell should generate the default demo intro screen from the demo manifest.
-
-This keeps the experience consistent across demos.
-
-The generated intro screen can show:
+Intro screens show:
 
 - title,
 - summary,
@@ -204,35 +161,24 @@ The generated intro screen can show:
 - controls,
 - difficulty,
 - tags,
-- start action.
+- start and theory actions.
 
-Later, individual demos may override the default intro if they need a special presentation.
+Theory screens give students enough context without forcing them to switch to Markdown files during a live session.
 
-## Pause And Help
-
-Global behavior should be consistent:
+Global behavior:
 
 ```text
 Esc = pause menu
 H = help overlay
+T = theory screen from intro/demo flow
 L = toggle language
 ```
 
-The pause menu should eventually contain:
+Pause and help content is owned by the shell. Demos provide content through their manifests and scenes.
 
-- Resume,
-- Help,
-- Objectives,
-- Controls,
-- Restart,
-- Back to demos,
-- Quit.
+## Resolution, Scaling, And Sound
 
-The shell should own the overlay behavior. Demos should provide content through their manifest or a small help provider.
-
-## Resolution And Sound
-
-Resolution should be represented in settings from the beginning.
+Resolution is represented in settings.
 
 Current default:
 
@@ -249,94 +195,53 @@ Supported windowed presets:
 1920x1080
 ```
 
-Fullscreen should remain optional rather than the default.
+Fullscreen is optional, not the default.
 
-A later settings menu should expose these on/off choices:
+The settings menu includes:
 
 - adaptive window size,
 - fullscreen,
 - fixed-scene scaling.
 
-Fixed-size demo scenes, such as Boosting Mistake Lab's `1320x780` renderer, should initially be centered or scaled inside the available app window instead of forcing a renderer rewrite.
+Fixed-size demo scenes are centered or scaled inside the available app window instead of forcing a renderer rewrite.
 
-Sound should not be implemented in the first slice. A `sound_enabled` placeholder may exist in settings if it helps the architecture, but no audio assets or mixer behavior are required yet.
-
-## Fonts And Polish Text
-
-The shell should support Polish diacritics in UI text.
-
-Current direction:
-
-- keep source files as UTF-8,
-- use real Polish text in PL strings,
-- create UI fonts through a helper that prefers fonts with broad Unicode coverage,
-- add a bundled font later if system font selection becomes inconsistent across platforms.
+Sound remains deferred. The settings model may carry a `sound_enabled` placeholder, but there are no audio assets or mixer behavior yet.
 
 ## Existing Renderers
 
-Existing demo renderers should stay standalone.
+Existing demo renderers stay standalone.
 
 They do not need to inherit from a shared renderer base class.
 
-The shell should provide a Pygame surface and scene lifecycle. Demo renderers can keep their own drawing logic.
+The shell provides a Pygame surface and scene lifecycle. Demo renderers can keep their own drawing logic.
 
 ## Testing And Workflow
 
-The migration must preserve the current workflow.
+The migration preserves the current workflow.
 
 Rules:
 
 - old tests stay,
 - old entry points stay,
-- new shell gets its own smoke and unit tests,
+- shell tests stay first-class,
 - every demo integration should be a separate pull request,
 - no single commit should rewrite all demos,
 - algorithmic code should remain testable without opening a Pygame window.
 
-## Vertical Slice Plan
-
-Recommended pull request sequence:
-
-1. Add minimal shell skeleton with placeholder screens.
-2. Add demo manifest and registry.
-3. Integrate Boosting Mistake Lab through an adapter or scene wrapper.
-4. Add generated intro screen from manifest.
-5. Add pause/help overlay.
-6. Add language switching and translated shell strings.
-7. Integrate additional demos one by one.
-
-The first implementation request should be intentionally small:
-
-```text
-Implement the minimal app shell skeleton only.
-```
-
-It should not attempt to implement the entire unified app at once.
-
-## Naming
-
-Preferred entry point:
-
-```text
-interactive-ml-labs
-```
-
-This is the most natural name for the guided application.
-
 ## Current Decisions
 
-The following are accepted as initial direction, unless later implementation work proves otherwise:
+The following are accepted as current direction:
 
 - The shell is a separate application package.
 - Existing demo entry points remain.
-- Boosting Mistake Lab is the first serious integration candidate.
-- The shell generates default intro screens from manifests.
+- The shell generates default intro, theory, pause, and help screens from manifests.
 - Language is global.
-- Localization starts with simple Python data structures.
-- Settings are in memory at first.
-- Default app resolution is `1280x720`; adaptive sizing, fullscreen, and fixed-scene scaling remain opt-in settings.
+- Localization uses simple Python data structures.
+- Settings are persisted.
+- Default app resolution is `1280x720`.
+- Adaptive sizing, fullscreen, and fixed-scene scaling are opt-in settings.
 - Sound is deferred.
 - Existing renderers remain standalone.
 - Level selection is dynamic from manifests.
 - Demo scenes use `SceneCommand` and `SceneManager` for shell navigation.
-- Keyboard support comes first; mouse support should be added early.
+- Keyboard and mouse support are both part of the shell experience.
