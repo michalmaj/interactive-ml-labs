@@ -36,10 +36,17 @@ The shell currently supports:
 - [ ] Keep project docs aligned with the current unified app.
 - [ ] Clean up small repository artifacts and naming drift.
 - [x] Extract shared UI helpers for repeated demo-scene panel, text, and wrapping patterns.
+- [ ] Introduce learning paths, lesson/task manifests, progress, and meaningful completion badges.
 - [ ] Continue balancing Level 1, Level 2, and Level 3 with small focused demos.
 - [ ] Add screenshots or short GIFs for the main README and app docs.
 
 ## Next Engineering Themes
+
+### Learning Platform Layer
+
+The next product step is to turn the app from a guided demo browser into a guided learning platform. The app should keep demos, but add lessons, ordered learning paths, concrete tasks, progress, and meaningful badges.
+
+The direction is captured in [learning_platform.md](learning_platform.md). The first slice should be narrow: add lesson/path metadata and one path that reuses existing demos before building richer gamification.
 
 ### Shared UI Helpers
 

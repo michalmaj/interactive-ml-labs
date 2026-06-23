@@ -23,6 +23,8 @@ Each demo should answer three questions:
 2. How does the algorithm work step by step?
 3. What happens when important parameters change?
 
+The next product direction is to connect demos into guided learning paths with lessons, concrete tasks, progress, and meaningful badges. See [docs/learning_platform.md](docs/learning_platform.md) for the learning-platform direction.
+
 ## Planned demo levels
 
 The recommended way to explore the demos is the unified Pygame app:
@@ -145,6 +147,7 @@ The original Level 1 and Level 2 demos can still be run as standalone commands. 
 
 Near-term work focuses on balancing the practical Level 2 track with the advanced Level 3 track while keeping the shell stable:
 
+- introduce learning paths, lesson/task manifests, progress, and meaningful badges before adding too many more isolated demos,
 - keep adding focused Level 2 labs around preprocessing, evaluation, robustness, interpretability, and production-readiness,
 - review whether Level 2 has enough guided practice after Feature Scaling, Feature Importance, Gaussian Mixture, Anomaly Detection, Hyperparameter Tuning, and Class Imbalance,
 - collect classroom-style feedback on the newer Level 3 labs: t-SNE / UMAP Exploration, Model Monitoring Drift, and Time Series Forecasting,
