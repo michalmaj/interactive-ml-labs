@@ -35,7 +35,7 @@ The shell currently supports:
 - [ ] Run app tests in CI and root pytest.
 - [ ] Keep project docs aligned with the current unified app.
 - [ ] Clean up small repository artifacts and naming drift.
-- [ ] Start extracting shared UI helpers as repeated layout/text patterns stabilize.
+- [x] Extract shared UI helpers for repeated demo-scene panel, text, and wrapping patterns.
 - [ ] Continue balancing Level 1, Level 2, and Level 3 with small focused demos.
 - [ ] Add screenshots or short GIFs for the main README and app docs.
 
@@ -43,16 +43,13 @@ The shell currently supports:
 
 ### Shared UI Helpers
 
-Several newer scenes now repeat similar layout, text wrapping, panel, and theme logic. The next refactor should extract only the helpers that are already proven by duplication.
+Native demo scenes now use small shared helpers for repeated panel drawing, text rendering, text wrapping, and readout panels. The helpers were intentionally introduced only after the same patterns appeared across many scenes.
 
-Good candidates:
+Current boundaries:
 
-- panel geometry,
-- wrapped text blocks,
-- section headers,
-- metric/readout rows,
-- scroll state utilities,
-- small theme tokens.
+- demo scenes share small drawing primitives through `ui_helpers.py` and `readout_panel.py`,
+- scene-specific geometry stays near each scene,
+- shell screens keep their own rendering path for menus, scrollbars, intro screens, theory viewports, and overlays.
 
 Avoid forcing every scene into one renderer inheritance model. Existing demo renderers can remain standalone.
 

@@ -409,6 +409,50 @@ def test_level_one_intro_copy_stays_above_footer(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_level_two_and_three_intro_copy_stays_above_footer(monkeypatch) -> None:
+    """Level 2 and 3 intro copy should stay clear of the shared footer."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    bottom_limit = app._content_bottom()
+    wrapped_bottoms: list[int] = []
+
+    def capture_text(
+        text: str,
+        position: tuple[int, int],
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> None:
+        _ = text, position, font, color
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = color
+        y = _wrapped_text_bottom(text, position, width, font)
+        wrapped_bottoms.append(y)
+        return y
+
+    try:
+        app.context.settings.language = "pl"
+        app.screen_name = ScreenName.INTRO
+        app._draw_text = capture_text
+        app._draw_wrapped = capture_wrapped
+
+        for level in (2, 3):
+            for demo in demos_for_level(level):
+                wrapped_bottoms.clear()
+                app.selected_demo = demo
+                app._render_intro()
+                assert wrapped_bottoms
+                assert max(wrapped_bottoms) <= bottom_limit
+    finally:
+        pygame.quit()
+
+
 def test_level_one_help_overlay_copy_stays_inside_overlay(monkeypatch) -> None:
     """Level 1 help overlay text should stay inside the dialog body."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -448,6 +492,50 @@ def test_level_one_help_overlay_copy_stays_inside_overlay(monkeypatch) -> None:
             app._render_help_overlay()
             assert wrapped_bottoms
             assert max(wrapped_bottoms) <= overlay_bottom
+    finally:
+        pygame.quit()
+
+
+def test_level_two_and_three_help_overlay_copy_stays_inside_overlay(monkeypatch) -> None:
+    """Level 2 and 3 help overlay text should stay inside the dialog body."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    overlay_bottom = 720 - min(90, max(32, 720 // 10)) - 32
+    wrapped_bottoms: list[int] = []
+
+    def capture_text(
+        text: str,
+        position: tuple[int, int],
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> None:
+        _ = text, position, font, color
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = color
+        y = _wrapped_text_bottom(text, position, width, font)
+        wrapped_bottoms.append(y)
+        return y
+
+    try:
+        app.context.settings.language = "pl"
+        app.screen_name = ScreenName.INTRO
+        app._draw_text = capture_text
+        app._draw_wrapped = capture_wrapped
+
+        for level in (2, 3):
+            for demo in demos_for_level(level):
+                wrapped_bottoms.clear()
+                app.selected_demo = demo
+                app._render_help_overlay()
+                assert wrapped_bottoms
+                assert max(wrapped_bottoms) <= overlay_bottom
     finally:
         pygame.quit()
 

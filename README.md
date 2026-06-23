@@ -101,6 +101,8 @@ This repository is also intended to demonstrate how real software projects are d
 
 The unified app is now the recommended guided experience. The project is no longer only a collection of separate demos: the app shell provides language selection, level selection, demo intros, in-app theory, help overlays, settings, and scrollable demo lists.
 
+Native demo scenes now share small UI helpers for panel drawing, text rendering, and text wrapping. The app shell still keeps its own menu, scroll, viewport, intro, theory, and overlay drawing code because those screens have different interaction and clipping responsibilities.
+
 Level 1 is a broad foundation track with the original demos plus native app-only labs:
 
 - Linear Regression Line Fit Lab,
@@ -149,6 +151,7 @@ Near-term work focuses on balancing the practical Level 2 track with the advance
 - iterate on Level 3 only where the interaction teaches a clear idea, not just where the visual result looks impressive,
 - keep improving in-app theory, mini-challenges, and glossary content across Level 1, Level 2, and Level 3,
 - continue polishing Polish copy inside demos without forcing translations of standard ML terms,
+- keep shared demo-scene UI helpers small and avoid forcing shell screens into the same drawing path,
 - keep app settings, scaling, scrollbars, and help overlays stable as new scenes are added.
 
 ## Usage
