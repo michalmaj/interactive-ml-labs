@@ -114,6 +114,7 @@ class UnifiedAppShell:
             settings=settings or load_app_settings(settings_path),
             progress=progress or self._load_initial_progress(settings, self.progress_path),
         )
+        self._saved_progress_revision = self.context.progress.revision
         self._apply_adaptive_window_size()
         self.screen = pygame.display.set_mode(
             self.context.settings.resolution,
@@ -178,8 +179,12 @@ class UnifiedAppShell:
 
     def _save_progress(self) -> None:
         """Persist progress when the shell owns progress storage."""
+        if self.context.progress.revision == self._saved_progress_revision:
+            return
+
         if self.progress_persistence_enabled:
             save_app_progress(self.context.progress, self.progress_path)
+        self._saved_progress_revision = self.context.progress.revision
 
     def _default_progress_path_for(self, settings_path: Path | None) -> Path | None:
         """Keep explicit test settings and progress files next to each other."""
@@ -242,6 +247,7 @@ class UnifiedAppShell:
             return
 
         self._handle_scene_command(scene.handle_event(scene_event))
+        self._save_progress()
 
     def _event_in_scene_coordinates(
         self,
@@ -356,6 +362,7 @@ class UnifiedAppShell:
             return
 
         self._handle_scene_command(scene.update(dt))
+        self._save_progress()
 
     def _render(self) -> None:
         self.screen.fill(BACKGROUND)
@@ -1411,6 +1418,7 @@ class UnifiedAppShell:
         self.selected_demo = DEMO_BY_ID[lesson.demo_id]
         self.context.current_level = self.selected_demo.level
         self.context.selected_demo_id = self.selected_demo.id
+        self.context.selected_lesson_id = lesson.id
         self.context.progress.mark_started(lesson.id)
         self._save_progress()
         self._go_to(ScreenName.INTRO)
@@ -1423,7 +1431,9 @@ class UnifiedAppShell:
     def _select_demo(self) -> None:
         demos = self._current_level_demos()
         self.selected_demo = demos[self.selected_index]
+        self.selected_lesson = None
         self.context.selected_demo_id = self.selected_demo.id
+        self.context.selected_lesson_id = None
         self._go_to(ScreenName.INTRO)
 
     def _start_demo(self) -> None:

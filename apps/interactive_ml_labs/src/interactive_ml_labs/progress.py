@@ -27,32 +27,57 @@ class AppProgress:
     """Persistent progress across guided learning paths."""
 
     lessons: dict[str, LessonProgress] = field(default_factory=dict)
+    revision: int = 0
 
     def lesson(self, lesson_id: str) -> LessonProgress:
         """Return existing progress for a lesson, creating it when needed."""
-        return self.lessons.setdefault(lesson_id, LessonProgress())
+        if lesson_id not in self.lessons:
+            self.lessons[lesson_id] = LessonProgress()
+            self.revision += 1
+
+        return self.lessons[lesson_id]
 
     def mark_started(self, lesson_id: str) -> None:
         """Mark a lesson as started."""
-        self.lesson(lesson_id).started = True
+        progress = self.lesson(lesson_id)
+        if progress.started:
+            return
+
+        progress.started = True
+        self.revision += 1
 
     def mark_theory_visited(self, lesson_id: str) -> None:
         """Mark the theory screen as visited for a lesson."""
         progress = self.lesson(lesson_id)
+        changed = not progress.started or not progress.theory_visited
+        if not changed:
+            return
+
         progress.started = True
         progress.theory_visited = True
+        self.revision += 1
 
     def complete_task(self, lesson_id: str, task_id: str) -> None:
         """Mark one lesson task as completed."""
         progress = self.lesson(lesson_id)
+        changed = not progress.started or task_id not in progress.completed_task_ids
+        if not changed:
+            return
+
         progress.started = True
         progress.completed_task_ids.add(task_id)
+        self.revision += 1
 
     def mark_completed(self, lesson_id: str) -> None:
         """Mark a lesson as completed."""
         progress = self.lesson(lesson_id)
+        changed = not progress.started or not progress.completed
+        if not changed:
+            return
+
         progress.started = True
         progress.completed = True
+        self.revision += 1
 
 
 def default_progress_path() -> Path:

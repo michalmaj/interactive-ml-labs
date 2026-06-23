@@ -298,6 +298,7 @@ def test_shell_lesson_selection_opens_demo_intro(monkeypatch) -> None:
         assert app.selected_lesson == LESSON_BY_ID["error_gradient_descent"]
         assert app.selected_demo == DEMO_BY_ID["gradient_descent_playground"]
         assert app.context.selected_demo_id == "gradient_descent_playground"
+        assert app.context.selected_lesson_id == "error_gradient_descent"
         assert app.context.current_level == 1
     finally:
         pygame.quit()
@@ -359,6 +360,30 @@ def test_shell_explicit_settings_keep_progress_in_memory(monkeypatch, tmp_path) 
 
         assert app.context.progress.lessons["error_linear_regression_line_fit"].started is True
         assert not app.progress_path.exists()
+    finally:
+        pygame.quit()
+
+
+def test_shell_persists_task_progress_from_active_demo(monkeypatch, tmp_path) -> None:
+    """Task progress reported by an active scene should be saved by the shell."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    settings_path = tmp_path / "settings.json"
+    app = UnifiedAppShell(settings_path=settings_path)
+
+    try:
+        app.selected_learning_path = LEARNING_PATH_MANIFESTS[0]
+        app.screen_name = ScreenName.LESSONS
+        app.selected_index = 1
+        app._activate_selected()
+        app._start_demo()
+
+        app._handle_active_demo_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP))
+        loaded_progress = load_app_progress(tmp_path / "progress.json")
+
+        assert (
+            "find_stable_learning_rate"
+            in loaded_progress.lessons["error_gradient_descent"].completed_task_ids
+        )
     finally:
         pygame.quit()
 

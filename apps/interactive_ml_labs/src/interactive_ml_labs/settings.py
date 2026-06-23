@@ -33,6 +33,7 @@ class AppContext:
     progress: AppProgress = field(default_factory=AppProgress)
     current_level: int | None = None
     selected_demo_id: str | None = None
+    selected_lesson_id: str | None = None
     theme: str = "default"
 
 
