@@ -5,7 +5,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pygame
-from interactive_ml_labs import DEMO_BY_ID, demos_for_level
+from interactive_ml_labs import DEMO_BY_ID, LEARNING_PATH_MANIFESTS, LESSON_BY_ID, demos_for_level
 from interactive_ml_labs.boosting_scene import BoostingMistakeLabSceneAdapter
 from interactive_ml_labs.decision_tree_scene import DecisionTreeSceneAdapter
 from interactive_ml_labs.gradient_scene import GradientDescentSceneAdapter
@@ -227,6 +227,77 @@ def test_shell_starts_random_forest_scene_from_manifest(monkeypatch) -> None:
 
         assert isinstance(app.scene_manager.current, RandomForestSceneAdapter)
         assert app.screen_name == ScreenName.DEMO
+    finally:
+        pygame.quit()
+
+
+def test_shell_language_selection_opens_home_screen(monkeypatch) -> None:
+    """Choosing a language should enter the app home screen."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app._select_language()
+
+        assert app.screen_name == ScreenName.HOME
+    finally:
+        pygame.quit()
+
+
+def test_shell_home_opens_learning_paths(monkeypatch) -> None:
+    """Home screen should expose guided learning paths as the first option."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.screen_name = ScreenName.HOME
+        app.selected_index = 0
+
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.PATHS
+    finally:
+        pygame.quit()
+
+
+def test_shell_learning_path_selection_opens_lessons(monkeypatch) -> None:
+    """Selecting a learning path should show its ordered lessons."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.screen_name = ScreenName.PATHS
+        app.selected_index = 0
+
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.LESSONS
+        assert app.selected_learning_path == LEARNING_PATH_MANIFESTS[0]
+        assert (
+            app._current_learning_path_lessons()[0]
+            == LESSON_BY_ID["error_linear_regression_line_fit"]
+        )
+    finally:
+        pygame.quit()
+
+
+def test_shell_lesson_selection_opens_demo_intro(monkeypatch) -> None:
+    """Selecting a lesson should reuse the existing demo intro flow."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.selected_learning_path = LEARNING_PATH_MANIFESTS[0]
+        app.screen_name = ScreenName.LESSONS
+        app.selected_index = 1
+
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.INTRO
+        assert app.selected_lesson == LESSON_BY_ID["error_gradient_descent"]
+        assert app.selected_demo == DEMO_BY_ID["gradient_descent_playground"]
+        assert app.context.selected_demo_id == "gradient_descent_playground"
+        assert app.context.current_level == 1
     finally:
         pygame.quit()
 
@@ -1185,6 +1256,20 @@ def test_shell_backspace_goes_back_like_escape(monkeypatch) -> None:
     try:
         app.screen_name = ScreenName.LEVELS
         app._handle_keydown(pygame.K_BACKSPACE)
+
+        assert app.screen_name == ScreenName.HOME
+    finally:
+        pygame.quit()
+
+
+def test_shell_home_escape_returns_to_language(monkeypatch) -> None:
+    """Esc from the home screen should return to language selection."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.screen_name = ScreenName.HOME
+        app._escape()
 
         assert app.screen_name == ScreenName.LANGUAGE
     finally:
