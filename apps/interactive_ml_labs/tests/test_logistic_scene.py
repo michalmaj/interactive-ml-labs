@@ -4,8 +4,8 @@ import pygame
 from interactive_ml_labs.logistic_scene import (
     COMPARE_POINTS_TASK_ID,
     LOGISTIC_LESSON_ID,
-    LogisticRegressionSceneAdapter,
     MOVE_BOUNDARY_TASK_ID,
+    LogisticRegressionSceneAdapter,
     create_logistic_regression_scene,
 )
 from interactive_ml_labs.scene import FixedSizeScene, SceneCommandKind

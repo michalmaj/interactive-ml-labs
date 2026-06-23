@@ -10,7 +10,11 @@ from interactive_ml_labs.boosting_scene import BoostingMistakeLabSceneAdapter
 from interactive_ml_labs.decision_tree_scene import DecisionTreeSceneAdapter
 from interactive_ml_labs.gradient_scene import GradientDescentSceneAdapter
 from interactive_ml_labs.knn_scene import KNNVoteMapSceneAdapter
-from interactive_ml_labs.logistic_scene import LogisticRegressionSceneAdapter
+from interactive_ml_labs.logistic_scene import (
+    LOGISTIC_LESSON_ID,
+    MOVE_BOUNDARY_TASK_ID,
+    LogisticRegressionSceneAdapter,
+)
 from interactive_ml_labs.progress import load_app_progress
 from interactive_ml_labs.pygame_app import (
     DEMO_MENU_TOP,
@@ -408,6 +412,29 @@ def test_shell_persists_linear_regression_task_progress(monkeypatch, tmp_path) -
         assert (
             "balance_residuals"
             in loaded_progress.lessons["error_linear_regression_line_fit"].completed_task_ids
+        )
+    finally:
+        pygame.quit()
+
+
+def test_shell_persists_logistic_regression_task_progress(monkeypatch, tmp_path) -> None:
+    """Logistic Regression task progress should be saved from active scene events."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    settings_path = tmp_path / "settings.json"
+    app = UnifiedAppShell(settings_path=settings_path)
+
+    try:
+        app.selected_learning_path = LEARNING_PATH_MANIFESTS[0]
+        app.screen_name = ScreenName.LESSONS
+        app.selected_index = 2
+        app._activate_selected()
+        app._start_demo()
+
+        app._handle_active_demo_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_e))
+        loaded_progress = load_app_progress(tmp_path / "progress.json")
+
+        assert (
+            MOVE_BOUNDARY_TASK_ID in loaded_progress.lessons[LOGISTIC_LESSON_ID].completed_task_ids
         )
     finally:
         pygame.quit()
