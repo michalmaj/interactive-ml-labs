@@ -388,6 +388,31 @@ def test_shell_persists_task_progress_from_active_demo(monkeypatch, tmp_path) ->
         pygame.quit()
 
 
+def test_shell_persists_linear_regression_task_progress(monkeypatch, tmp_path) -> None:
+    """Linear Regression task progress should be saved from active scene events."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    settings_path = tmp_path / "settings.json"
+    app = UnifiedAppShell(settings_path=settings_path)
+
+    try:
+        app.selected_learning_path = LEARNING_PATH_MANIFESTS[0]
+        app.screen_name = ScreenName.LESSONS
+        app.selected_index = 0
+        app._activate_selected()
+        app._start_demo()
+
+        app._handle_active_demo_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+        app._handle_active_demo_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP))
+        loaded_progress = load_app_progress(tmp_path / "progress.json")
+
+        assert (
+            "balance_residuals"
+            in loaded_progress.lessons["error_linear_regression_line_fit"].completed_task_ids
+        )
+    finally:
+        pygame.quit()
+
+
 def test_shell_lesson_task_labels_reflect_progress(monkeypatch) -> None:
     """Lesson task labels should show completed and pending task state."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
