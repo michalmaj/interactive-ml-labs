@@ -2,6 +2,9 @@
 
 import pygame
 from interactive_ml_labs.logistic_scene import (
+    COMPARE_POINTS_TASK_ID,
+    LOGISTIC_LESSON_ID,
+    MOVE_BOUNDARY_TASK_ID,
     LogisticRegressionSceneAdapter,
     create_logistic_regression_scene,
 )
@@ -69,5 +72,69 @@ def test_logistic_scene_adapter_updates_and_renders_to_shell_surface(monkeypatch
 
         assert surface.get_bounding_rect().width > 0
         assert surface.get_bounding_rect().height > 0
+    finally:
+        pygame.quit()
+
+
+def test_logistic_scene_adapter_records_boundary_task_for_guided_lesson(
+    monkeypatch,
+) -> None:
+    """Changing a Logistic Regression parameter should complete the boundary task."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.selected_lesson_id = LOGISTIC_LESSON_ID
+        scene = create_logistic_regression_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_e))
+
+        progress = context.progress.lessons[LOGISTIC_LESSON_ID]
+        assert MOVE_BOUNDARY_TASK_ID in progress.completed_task_ids
+        assert COMPARE_POINTS_TASK_ID not in progress.completed_task_ids
+        assert progress.completed is False
+    finally:
+        pygame.quit()
+
+
+def test_logistic_scene_adapter_records_compare_task_and_completes_lesson(
+    monkeypatch,
+) -> None:
+    """Training interaction should complete the compare task and then the lesson."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.selected_lesson_id = LOGISTIC_LESSON_ID
+        scene = create_logistic_regression_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_q))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_n))
+
+        progress = context.progress.lessons[LOGISTIC_LESSON_ID]
+        assert MOVE_BOUNDARY_TASK_ID in progress.completed_task_ids
+        assert COMPARE_POINTS_TASK_ID in progress.completed_task_ids
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_logistic_scene_adapter_ignores_task_progress_outside_guided_lesson(
+    monkeypatch,
+) -> None:
+    """Standalone Logistic Regression interactions should not write lesson progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_logistic_regression_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_e))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_n))
+
+        assert LOGISTIC_LESSON_ID not in context.progress.lessons
     finally:
         pygame.quit()
