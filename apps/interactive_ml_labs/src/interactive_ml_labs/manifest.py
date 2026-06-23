@@ -79,3 +79,39 @@ class DemoManifest:
     difficulty: LocalizedText | None = None
     tags: tuple[str, ...] = field(default_factory=tuple)
     theory: DemoTheory | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class LessonTask:
+    """One checkable learning task inside a lesson."""
+
+    id: str
+    title: LocalizedText
+    instruction: LocalizedText
+    success_condition: str
+    hint: LocalizedText | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class LessonManifest:
+    """Metadata for one guided lesson built around an existing demo."""
+
+    id: str
+    level: int
+    demo_id: str
+    title: LocalizedText
+    learning_goal: LocalizedText
+    tasks: tuple[LessonTask, ...]
+    prerequisites: tuple[str, ...] = field(default_factory=tuple)
+    completion_badge: LocalizedText | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class LearningPathManifest:
+    """Ordered set of lessons that form one learning story."""
+
+    id: str
+    title: LocalizedText
+    summary: LocalizedText
+    lesson_ids: tuple[str, ...]
+    tags: tuple[str, ...] = field(default_factory=tuple)
