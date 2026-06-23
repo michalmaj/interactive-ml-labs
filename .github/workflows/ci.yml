@@ -35,6 +35,11 @@ jobs:
       - name: Run ml-lab-core tests
         run: uv run --package ml-lab-core pytest packages/ml_lab_core/tests
 
+      - name: Run Interactive ML Labs app tests
+        run: >
+          uv run --package interactive-ml-labs-app
+          pytest apps/interactive_ml_labs/tests
+
       - name: Run Gradient Descent Playground tests
         run: >
           uv run --package gradient-descent-playground
@@ -44,7 +49,7 @@ jobs:
         run: >
           uv run --package knn-vote-map
           pytest demos/level_1_fundamentals/02_knn_vote_map/tests
-      
+
       - name: Run Logistic Regression Boundary Lab tests
         run: >
           uv run --package logistic-regression-boundary-lab

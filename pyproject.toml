@@ -63,5 +63,6 @@ addopts = [
 ]
 testpaths = [
     "packages/ml_lab_core/tests",
+    "apps/interactive_ml_labs/tests",
     "tests",
 ]
