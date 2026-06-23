@@ -2,58 +2,54 @@
 
 Interactive ML Labs is organized into three levels.
 
-The goal is to support gradual learning: from fundamental intuition, through practical machine learning workflows, to advanced and showcase topics.
+The goal is to support gradual learning: from fundamental intuition, through practical machine learning workflows, to advanced experiments and showcase topics.
+
+The tables below describe the current unified app registry, not a distant wishlist.
 
 ## Level 1 — Fundamentals
 
 Level 1 focuses on core machine learning intuition.
 
-These demos should be implemented first.
-
 | # | Demo | Main concept |
 | -: | ---- | ------------ |
-| 1 | Gradient Descent Playground | Optimization, loss, learning rate |
-| 2 | Logistic Regression Boundary Lab | Classification, probability, threshold |
-| 3 | k-NN Vote Map | Distance-based classification |
-| 4 | Decision Tree Splitter | Splits, impurity, interpretability |
-| 5 | SVM Kernel Duel | Margin, kernels, support vectors |
-| 6 | XOR Neural Playground | Non-linearity, hidden layers |
-| 7 | k-means Arena | Centroids, clustering, inertia |
-| 8 | DBSCAN Density Radar | Density-based clustering, outliers |
-| 9 | PCA Projector | Dimensionality reduction, variance |
-| 10 | RL Gridworld | Rewards, policy, value function |
+| 1 | Linear Regression Line Fit Lab | Linear models, residuals, loss |
+| 2 | K-Means Intro Lab | Centroids, clustering, inertia |
+| 3 | Gradient Descent Playground | Optimization, loss, learning rate |
+| 4 | Distance Metrics Lab | Distance functions and geometry |
+| 5 | k-NN Vote Map | Distance-based classification |
+| 6 | Logistic Regression Boundary Lab | Probability, threshold, decision boundary |
+| 7 | SVM Margin Lab | Margin, support vectors, regularization |
+| 8 | Activation Functions Lab | Non-linearity and gradients |
+| 9 | Neural Network Playground | Hidden layers and learned decision boundaries |
+| 10 | Decision Tree Splitter | Splits, impurity, interpretability |
 
 ## Level 2 — Practical ML
 
-Level 2 focuses on practical model evaluation, robustness, and interpretation.
+Level 2 focuses on model evaluation, robustness, preprocessing, interpretation, and practical workflow risks.
 
 | # | Demo | Main concept |
 | -: | ---- | ------------ |
-| 11 | Random Forest Council | Bagging, variance reduction |
-| 12 | Boosting Race | Sequential error correction |
-| 13 | Gaussian Mixture EM Theater | Soft clustering, EM algorithm |
-| 14 | Hierarchical Clustering Tree | Dendrograms, linkage |
-| 15 | Anomaly Detection Alarm | Outliers, thresholds |
-| 16 | Imbalanced Learning Triage | Precision, recall, class imbalance |
-| 17 | Calibration & Risk Gauge | Probability calibration |
-| 18 | Feature Importance X-Ray | Interpretability |
-| 19 | Active Learning Labeler | Labeling budget, uncertainty |
-| 20 | Semi-Supervised Label Propagation | Graph-based label propagation |
+| 1 | Data Leakage Lab | Leakage, train/test discipline |
+| 2 | Train/Validation/Test Split Lab | Evaluation splits and model selection |
+| 3 | Feature Scaling Lab | Scaling, distance, optimization |
+| 4 | Feature Importance Lab | Interpretation and feature signal |
+| 5 | Gaussian Mixture Intro Lab | Soft clustering, EM intuition |
+| 6 | Anomaly Detection Lab | Outliers, scores, thresholds |
+| 7 | Hyperparameter Tuning Lab | Search, validation, overfitting |
+| 8 | Class Imbalance Lab | Precision, recall, class balance |
+| 9 | Random Forest Bagging Lab | Bagging, variance reduction |
+| 10 | Boosting Mistake Lab | Sequential error correction |
 
 ## Level 3 — Advanced / Showcase
 
-Level 3 focuses on advanced, specialized, or visually rich demos.
+Level 3 focuses on advanced, specialized, or visually rich experiments.
 
 | # | Demo | Main concept |
 | -: | ---- | ------------ |
-| 21 | Naive Bayes Spam Scanner | Text classification, probabilities |
-| 22 | CNN Filter Viewer | Convolutions, feature maps |
-| 23 | t-SNE / UMAP Map of Digits | Embeddings, visualization pitfalls |
-| 24 | Association Rules Shop | Support, confidence, lift |
-| 25 | Movie Recommender Jukebox | Recommender systems |
-| 26 | Time-Series Forecasting Board | Forecasting, seasonality, leakage |
-| 27 | HMM Weather Detective | Hidden states, Viterbi algorithm |
-| 28 | Hyperparameter Casino | Search strategies, validation |
-| 29 | Autoencoder Denoising Lab | Latent space, reconstruction |
-| 30 | Graph ML: Karate Club | Graphs, communities, node embeddings |
-
+| 1 | Clustering Lab | Comparing clustering algorithms |
+| 2 | Explained Variance Lab | PCA, compression, retained variance |
+| 3 | Model Comparison Lab | Model families and trade-offs |
+| 4 | Calibration Lab | Probability calibration and ECE |
+| 5 | t-SNE / UMAP Lab | Embeddings and visualization pitfalls |
+| 6 | Model Monitoring Drift Lab | Data drift, alerting, monitoring windows |
+| 7 | Time Series Forecasting Lab | Forecast horizon, seasonality, leakage |
