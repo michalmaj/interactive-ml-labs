@@ -3,7 +3,10 @@
 import pygame
 from interactive_ml_labs.display import DEFAULT_RESOLUTION
 from interactive_ml_labs.distance_metrics_scene import (
+    COMPARE_METRICS_TASK_ID,
+    DISTANCE_METRICS_LESSON_ID,
     METRICS,
+    MOVE_QUERY_TASK_ID,
     PRESETS,
     QUERY_STEP,
     DistanceMetric,
@@ -101,5 +104,66 @@ def test_distance_metrics_scene_renders_to_shell_surface(monkeypatch) -> None:
 
         assert surface.get_bounding_rect().width > 0
         assert surface.get_bounding_rect().height > 0
+    finally:
+        pygame.quit()
+
+
+def test_distance_metrics_scene_records_query_task_for_guided_lesson(monkeypatch) -> None:
+    """Moving the query point should complete the first guided lesson task."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.selected_lesson_id = DISTANCE_METRICS_LESSON_ID
+        scene = create_distance_metrics_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+
+        progress = context.progress.lessons[DISTANCE_METRICS_LESSON_ID]
+        assert MOVE_QUERY_TASK_ID in progress.completed_task_ids
+        assert COMPARE_METRICS_TASK_ID not in progress.completed_task_ids
+        assert progress.completed is False
+    finally:
+        pygame.quit()
+
+
+def test_distance_metrics_scene_records_metric_task_and_completes_lesson(
+    monkeypatch,
+) -> None:
+    """Comparing metrics after moving the query should complete the lesson."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.selected_lesson_id = DISTANCE_METRICS_LESSON_ID
+        scene = create_distance_metrics_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        progress = context.progress.lessons[DISTANCE_METRICS_LESSON_ID]
+        assert progress.completed_task_ids >= {MOVE_QUERY_TASK_ID, COMPARE_METRICS_TASK_ID}
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_distance_metrics_scene_ignores_task_progress_outside_guided_lesson(
+    monkeypatch,
+) -> None:
+    """Standalone Distance Metrics interactions should not write lesson progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_distance_metrics_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        assert DISTANCE_METRICS_LESSON_ID not in context.progress.lessons
     finally:
         pygame.quit()

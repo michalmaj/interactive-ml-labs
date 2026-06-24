@@ -32,6 +32,9 @@ GOOD: Final[tuple[int, int, int]] = (147, 218, 155)
 WARNING: Final[tuple[int, int, int]] = (246, 132, 134)
 
 QUERY_STEP: Final[float] = 0.35
+DISTANCE_METRICS_LESSON_ID: Final[str] = "distance_choose_metric"
+MOVE_QUERY_TASK_ID: Final[str] = "move_query_point"
+COMPARE_METRICS_TASK_ID: Final[str] = "compare_distance_metrics"
 
 
 class DistanceMetric(Enum):
@@ -131,6 +134,7 @@ class DistanceMetricsLabScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create the deterministic distance metric scene."""
+        self._context = context
         self._language = context.settings.language
         self._font_title = make_ui_font(34, bold=True)
         self._font_heading = make_ui_font(23, bold=True)
@@ -178,18 +182,55 @@ class DistanceMetricsLabScene:
             self._reset_query()
         elif key == pygame.K_m:
             self.metric_index = (self.metric_index + 1) % len(METRICS)
+            self._record_compare_metrics_progress()
         elif key == pygame.K_LEFT:
             self.query_x = max(-3.0, self.query_x - QUERY_STEP)
+            self._record_move_query_progress()
         elif key == pygame.K_RIGHT:
             self.query_x = min(3.0, self.query_x + QUERY_STEP)
+            self._record_move_query_progress()
         elif key == pygame.K_DOWN:
             self.query_y = max(-3.0, self.query_y - QUERY_STEP)
+            self._record_move_query_progress()
         elif key == pygame.K_UP:
             self.query_y = min(3.0, self.query_y + QUERY_STEP)
+            self._record_move_query_progress()
         elif key == pygame.K_r:
             self.preset_index = 0
             self.metric_index = 0
             self._reset_query()
+
+    def _record_move_query_progress(self) -> None:
+        """Complete the query movement task for the guided lesson."""
+        if self._context.selected_lesson_id != DISTANCE_METRICS_LESSON_ID:
+            return
+
+        self._context.progress.complete_task(
+            DISTANCE_METRICS_LESSON_ID,
+            MOVE_QUERY_TASK_ID,
+        )
+        self._mark_lesson_completed_if_ready()
+
+    def _record_compare_metrics_progress(self) -> None:
+        """Complete the metric comparison task for the guided lesson."""
+        if self._context.selected_lesson_id != DISTANCE_METRICS_LESSON_ID:
+            return
+
+        self._context.progress.complete_task(
+            DISTANCE_METRICS_LESSON_ID,
+            COMPARE_METRICS_TASK_ID,
+        )
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both tasks are done."""
+        progress = self._context.progress.lessons.get(DISTANCE_METRICS_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {MOVE_QUERY_TASK_ID, COMPARE_METRICS_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(DISTANCE_METRICS_LESSON_ID)
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "Distance Metrics Lab", (58, 40), self._font_title, TEXT)
