@@ -1160,9 +1160,36 @@ def test_learning_path_registry_contains_models_learn_from_error_path() -> None:
     assert all(demo_id in DEMO_BY_ID for demo_id in demos_in_path)
 
 
+def test_learning_path_registry_contains_distance_to_clusters_path() -> None:
+    """Second learning path should connect distance intuition to clustering."""
+    path = next(path for path in LEARNING_PATH_MANIFESTS if path.id == "distance_to_clusters")
+
+    assert path.title.en == "From distance to clusters"
+    assert path.title.pl == "Od distance do klastrów"
+    assert path.lesson_ids == (
+        "distance_choose_metric",
+        "distance_knn_vote",
+        "distance_kmeans_centroids",
+        "distance_clustering_shape",
+        "distance_soft_clusters",
+    )
+
+    demos_in_path = [LESSON_BY_ID[lesson_id].demo_id for lesson_id in path.lesson_ids]
+    assert demos_in_path == [
+        "distance_metrics_lab",
+        "knn_vote_map",
+        "kmeans_intro_lab",
+        "clustering_lab",
+        "gaussian_mixture_intro_lab",
+    ]
+    assert all(demo_id in DEMO_BY_ID for demo_id in demos_in_path)
+    assert LESSON_BY_ID["distance_knn_vote"].prerequisites == ("distance_choose_metric",)
+    assert LESSON_BY_ID["distance_soft_clusters"].level == 2
+
+
 def test_learning_lessons_define_goals_tasks_and_badges() -> None:
     """Every default lesson should have enough metadata for a future lesson screen."""
-    assert len(LESSON_MANIFESTS) == 4
+    assert len(LESSON_MANIFESTS) == 9
 
     for lesson in LESSON_MANIFESTS:
         assert lesson.title.en
