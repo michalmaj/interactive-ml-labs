@@ -37,6 +37,9 @@ MIN_K: Final[int] = 2
 MAX_K: Final[int] = 5
 POINT_RADIUS: Final[int] = 5
 CENTROID_RADIUS: Final[int] = 12
+KMEANS_LESSON_ID: Final[str] = "distance_kmeans_centroids"
+STEP_ITERATIONS_TASK_ID: Final[str] = "step_kmeans_iterations"
+COMPARE_CLUSTER_COUNT_TASK_ID: Final[str] = "compare_cluster_count"
 
 CLUSTER_COLORS: Final[tuple[tuple[int, int, int], ...]] = (
     (116, 190, 240),
@@ -129,6 +132,7 @@ class KMeansIntroLabScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create a deterministic K-Means intro scene."""
+        self._context = context
         self._language = context.settings.language
         self._rng = random.Random(17)
         self._sample_seed = 17
@@ -206,10 +210,13 @@ class KMeansIntroLabScene:
             self._generate_dataset()
         elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
             self._change_k(-1)
+            self._record_cluster_count_progress()
         elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
             self._change_k(1)
+            self._record_cluster_count_progress()
         elif key == pygame.K_SPACE:
             self.step()
+            self._record_step_progress()
         elif key == pygame.K_a:
             self.auto_run = not self.auto_run
         elif key == pygame.K_c:
@@ -224,6 +231,38 @@ class KMeansIntroLabScene:
             self.show_links = True
             self._sample_seed = 17
             self._generate_dataset()
+
+    def _record_step_progress(self) -> None:
+        """Complete the iteration stepping task for the guided lesson."""
+        if self._context.selected_lesson_id != KMEANS_LESSON_ID:
+            return
+
+        self._context.progress.complete_task(
+            KMEANS_LESSON_ID,
+            STEP_ITERATIONS_TASK_ID,
+        )
+        self._mark_lesson_completed_if_ready()
+
+    def _record_cluster_count_progress(self) -> None:
+        """Complete the cluster-count comparison task for the guided lesson."""
+        if self._context.selected_lesson_id != KMEANS_LESSON_ID:
+            return
+
+        self._context.progress.complete_task(
+            KMEANS_LESSON_ID,
+            COMPARE_CLUSTER_COUNT_TASK_ID,
+        )
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both tasks are done."""
+        progress = self._context.progress.lessons.get(KMEANS_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {STEP_ITERATIONS_TASK_ID, COMPARE_CLUSTER_COUNT_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(KMEANS_LESSON_ID)
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "K-Means Intro Lab", (58, 38), self._font_title, TEXT)
