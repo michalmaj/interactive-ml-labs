@@ -127,6 +127,28 @@ Narrative:
 
 This path is a good first slice because it connects existing Level 1 and Level 2 material into one learning story. It now has checkable tasks, prerequisite and next-lesson guidance, completion badges, persisted lesson progress, and a visible learning-path progress summary.
 
+## Second Learning Path
+
+The second path starts broadening the platform beyond supervised error minimization.
+
+**From distance to clusters**
+
+1. Distance Metrics Lab
+2. k-NN Vote Map
+3. K-Means Intro Lab
+4. Clustering Lab
+5. Gaussian Mixture Intro Lab
+
+Narrative:
+
+- first, students see that "close" depends on the chosen distance metric,
+- then they see how k-NN turns distance into neighborhood voting,
+- then they see K-Means repeat nearest-centroid assignment,
+- then they compare centroid-based and density-based clustering,
+- finally, they see soft cluster membership in Gaussian Mixture Models.
+
+This path has lesson and task metadata first. The next slices should connect its tasks to real scene interactions, just as the first path did.
+
 ## Suggested PR Sequence
 
 1. Done: add `LessonManifest`, `LessonTask`, and a small learning-path registry.
@@ -137,7 +159,7 @@ This path is a good first slice because it connects existing Level 1 and Level 2
 6. Done: show completion badges and aggregate learning-path progress.
 7. Done: show prerequisite and next-lesson guidance in the lesson details panel.
 
-Next slices should focus on adding a second learning path and making progress summaries more useful for students and instructors.
+Next slices should focus on adding task completion hooks to the second learning path and making progress summaries more useful for students and instructors.
 
 ## Non-Goals For The First Slice
 

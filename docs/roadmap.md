@@ -38,7 +38,8 @@ The shell currently supports:
 - [ ] Clean up small repository artifacts and naming drift.
 - [x] Extract shared UI helpers for repeated demo-scene panel, text, and wrapping patterns.
 - [x] Introduce learning paths, lesson/task manifests, progress, and meaningful completion badges.
-- [ ] Expand learning paths beyond the first end-to-end path.
+- [x] Expand learning paths beyond the first end-to-end path.
+- [ ] Add checkable task completion to the second learning path.
 - [ ] Continue balancing Level 1, Level 2, and Level 3 with small focused demos.
 - [ ] Add screenshots or short GIFs for the main README and app docs.
 
@@ -46,9 +47,9 @@ The shell currently supports:
 
 ### Learning Platform Layer
 
-The app now has its first end-to-end learning path with ordered lessons, concrete tasks, persisted progress, and meaningful badges. The next product step is to grow this from one guided path into a broader learning platform while keeping the standalone demo browser intact.
+The app now has two guided learning paths: one end-to-end path with checkable tasks and one new distance-to-clustering path ready for task completion hooks. The next product step is to make the second path interactive lesson by lesson while keeping the standalone demo browser intact.
 
-The direction is captured in [learning_platform.md](learning_platform.md). Future slices should add more paths, improve progress summaries, and only introduce richer gamification where it reinforces actual understanding.
+The direction is captured in [learning_platform.md](learning_platform.md). Future slices should add task completion hooks for the second path, improve progress summaries, and only introduce richer gamification where it reinforces actual understanding.
 
 ### Shared UI Helpers
 

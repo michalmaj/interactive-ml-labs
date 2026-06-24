@@ -7527,6 +7527,233 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
         ),
         completion_badge=LocalizedText(en="Mistake-Driven Learner", pl="Uczenie przez błędy"),
     ),
+    LessonManifest(
+        id="distance_choose_metric",
+        level=1,
+        demo_id="distance_metrics_lab",
+        title=LocalizedText(
+            en="Choose what close means",
+            pl="Ustal, co znaczy blisko",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand that distance is a modeling choice: different metrics can "
+                "make different neighbors look closest."
+            ),
+            pl=(
+                "Zrozum, że distance jest decyzją modelarską: różne metryki mogą "
+                "wskazywać różnych nearest neighbors."
+            ),
+        ),
+        tasks=(
+            LessonTask(
+                id="move_query_point",
+                title=LocalizedText(en="Move the query point", pl="Przesuń query point"),
+                instruction=LocalizedText(
+                    en=(
+                        "Move the query point until at least two metrics disagree about "
+                        "the nearest neighbor."
+                    ),
+                    pl=(
+                        "Przesuń query point tak, żeby co najmniej dwie metryki "
+                        "nie zgadzały się co do nearest neighbor."
+                    ),
+                ),
+                success_condition="changed_parameter",
+            ),
+            LessonTask(
+                id="compare_distance_metrics",
+                title=LocalizedText(en="Compare distance metrics", pl="Porównaj metryki distance"),
+                instruction=LocalizedText(
+                    en=(
+                        "Switch between Euclidean, Manhattan, and Chebyshev distance "
+                        "and name what each one emphasizes."
+                    ),
+                    pl=(
+                        "Przełącz Euclidean, Manhattan i Chebyshev distance i nazwij, "
+                        "co każda metryka podkreśla."
+                    ),
+                ),
+                success_condition="completed_scene_challenge",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Metric Reader", pl="Czytelnik metryk"),
+    ),
+    LessonManifest(
+        id="distance_knn_vote",
+        level=1,
+        demo_id="knn_vote_map",
+        title=LocalizedText(
+            en="Classify by nearby examples",
+            pl="Klasyfikuj przez najbliższe przykłady",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand how k-NN turns distance into a local vote and why k changes "
+                "the smoothness of the decision map."
+            ),
+            pl=(
+                "Zrozum, jak k-NN zamienia distance w lokalne głosowanie i dlaczego k "
+                "zmienia gładkość decision map."
+            ),
+        ),
+        prerequisites=("distance_choose_metric",),
+        tasks=(
+            LessonTask(
+                id="classify_query_point",
+                title=LocalizedText(en="Classify a query point", pl="Sklasyfikuj query point"),
+                instruction=LocalizedText(
+                    en="Click or sample query points and watch which neighbors vote.",
+                    pl="Klikaj albo losuj query points i obserwuj, którzy sąsiedzi głosują.",
+                ),
+                success_condition="completed_scene_challenge",
+            ),
+            LessonTask(
+                id="compare_k_values",
+                title=LocalizedText(en="Compare k values", pl="Porównaj wartości k"),
+                instruction=LocalizedText(
+                    en="Change k and compare noisy local boundaries with smoother regions.",
+                    pl="Zmieniaj k i porównuj szumne lokalne granice z gładszymi regionami.",
+                ),
+                success_condition="changed_parameter",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Neighborhood Voter", pl="Głos sąsiedztwa"),
+    ),
+    LessonManifest(
+        id="distance_kmeans_centroids",
+        level=1,
+        demo_id="kmeans_intro_lab",
+        title=LocalizedText(
+            en="Group points by centroids",
+            pl="Grupuj punkty przez centroidy",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand K-Means as repeated assignment to nearest centroids and "
+                "centroid movement toward assigned points."
+            ),
+            pl=(
+                "Zrozum K-Means jako powtarzane przypisanie do najbliższych centroidów "
+                "i przesuwanie centroidów do przypisanych punktów."
+            ),
+        ),
+        prerequisites=("distance_knn_vote",),
+        tasks=(
+            LessonTask(
+                id="step_kmeans_iterations",
+                title=LocalizedText(en="Step K-Means iterations", pl="Przejdź iteracje K-Means"),
+                instruction=LocalizedText(
+                    en="Step through assignment and centroid-update phases.",
+                    pl="Przejdź przez fazy assignment i aktualizacji centroidów.",
+                ),
+                success_condition="completed_scene_challenge",
+            ),
+            LessonTask(
+                id="compare_cluster_count",
+                title=LocalizedText(en="Compare cluster count", pl="Porównaj liczbę klastrów"),
+                instruction=LocalizedText(
+                    en="Change k and notice when inertia improves but interpretation gets worse.",
+                    pl="Zmień k i zauważ, kiedy inertia się poprawia, ale interpretacja słabnie.",
+                ),
+                success_condition="changed_parameter",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Centroid Mover", pl="Przesuwacz centroidów"),
+    ),
+    LessonManifest(
+        id="distance_clustering_shape",
+        level=2,
+        demo_id="clustering_lab",
+        title=LocalizedText(
+            en="Match clusters to shape",
+            pl="Dopasuj clustering do kształtu",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand why centroid-based and density-based clustering can disagree "
+                "when the data shape changes."
+            ),
+            pl=(
+                "Zrozum, dlaczego clustering oparty na centroidach i clustering oparty "
+                "na gęstości mogą się różnić, gdy zmienia się kształt danych."
+            ),
+        ),
+        prerequisites=("distance_kmeans_centroids",),
+        tasks=(
+            LessonTask(
+                id="compare_kmeans_dbscan",
+                title=LocalizedText(
+                    en="Compare K-Means and DBSCAN",
+                    pl="Porównaj K-Means i DBSCAN",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Switch algorithms and identify a dataset where their assumptions disagree."
+                    ),
+                    pl="Przełącz algorytmy i znajdź dataset, gdzie ich założenia się rozmijają.",
+                ),
+                success_condition="completed_scene_challenge",
+            ),
+            LessonTask(
+                id="adjust_density_controls",
+                title=LocalizedText(en="Adjust density controls", pl="Dostosuj parametry gęstości"),
+                instruction=LocalizedText(
+                    en="Change eps or minimum samples and observe what becomes noise.",
+                    pl="Zmień eps albo minimum samples i obserwuj, co staje się noise.",
+                ),
+                success_condition="changed_parameter",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Cluster Shape Reader", pl="Czytelnik kształtu klastrów"),
+    ),
+    LessonManifest(
+        id="distance_soft_clusters",
+        level=2,
+        demo_id="gaussian_mixture_intro_lab",
+        title=LocalizedText(
+            en="Read soft cluster membership",
+            pl="Czytaj soft cluster membership",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand that Gaussian Mixture Models assign probabilities, so a point "
+                "can partly belong to more than one cluster."
+            ),
+            pl=(
+                "Zrozum, że Gaussian Mixture Models przypisują prawdopodobieństwa, "
+                "więc punkt może częściowo należeć do więcej niż jednego klastra."
+            ),
+        ),
+        prerequisites=("distance_clustering_shape",),
+        tasks=(
+            LessonTask(
+                id="compare_soft_assignments",
+                title=LocalizedText(
+                    en="Compare soft assignments",
+                    pl="Porównaj soft assignments",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Inspect points near overlapping components and compare their "
+                        "probabilities."
+                    ),
+                    pl="Sprawdź punkty przy nakładających się komponentach i porównaj probability.",
+                ),
+                success_condition="completed_scene_challenge",
+            ),
+            LessonTask(
+                id="adjust_component_count",
+                title=LocalizedText(en="Adjust component count", pl="Dostosuj liczbę komponentów"),
+                instruction=LocalizedText(
+                    en="Change the number of components and watch when the mixture overfits.",
+                    pl="Zmień liczbę komponentów i obserwuj, kiedy mixture zaczyna overfitować.",
+                ),
+                success_condition="changed_parameter",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Soft Cluster Reader", pl="Czytelnik soft clusters"),
+    ),
 )
 
 LESSON_BY_ID: dict[str, LessonManifest] = {manifest.id: manifest for manifest in LESSON_MANIFESTS}
@@ -7552,6 +7779,31 @@ LEARNING_PATH_MANIFESTS: tuple[LearningPathManifest, ...] = (
             "error_boosting_mistakes",
         ),
         tags=("guided-path", "loss", "classification", "boosting"),
+    ),
+    LearningPathManifest(
+        id="distance_to_clusters",
+        title=LocalizedText(
+            en="From distance to clusters",
+            pl="Od distance do klastrów",
+        ),
+        summary=LocalizedText(
+            en=(
+                "A guided path from choosing a distance metric, through neighborhood voting, "
+                "to hard and soft clustering."
+            ),
+            pl=(
+                "Ścieżka od wyboru metryki distance, przez głosowanie sąsiedztwa, "
+                "po hard i soft clustering."
+            ),
+        ),
+        lesson_ids=(
+            "distance_choose_metric",
+            "distance_knn_vote",
+            "distance_kmeans_centroids",
+            "distance_clustering_shape",
+            "distance_soft_clusters",
+        ),
+        tags=("guided-path", "distance", "knn", "clustering", "unsupervised"),
     ),
 )
 
