@@ -7784,7 +7784,7 @@ LEARNING_PATH_MANIFESTS: tuple[LearningPathManifest, ...] = (
         id="distance_to_clusters",
         title=LocalizedText(
             en="From distance to clusters",
-            pl="Od distance do klastrów",
+            pl="Od odległości do klastrów",
         ),
         summary=LocalizedText(
             en=(
