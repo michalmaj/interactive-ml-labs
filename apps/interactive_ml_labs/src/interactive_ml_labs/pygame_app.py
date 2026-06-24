@@ -477,6 +477,14 @@ class UnifiedAppShell:
         )
         y += 6
         y = self._draw_wrapped(
+            self._learning_path_task_progress_label(path),
+            (content_x, y),
+            content_width,
+            self.font_small,
+            TEXT,
+        )
+        y += 6
+        y = self._draw_wrapped(
             self._learning_path_status_label(path),
             (content_x, y),
             content_width,
@@ -626,6 +634,15 @@ class UnifiedAppShell:
             f"Lekcje: {completed_count}/{total_count} ukończone",
         )
 
+    def _learning_path_task_progress_label(self, path: LearningPathManifest) -> str:
+        """Return a localized task completion summary for one learning path."""
+        completed_count = self._completed_learning_path_task_count(path)
+        total_count = self._learning_path_task_count(path)
+        return self._text(
+            f"Tasks: {completed_count}/{total_count} completed",
+            f"Zadania: {completed_count}/{total_count} ukończone",
+        )
+
     def _learning_path_status_label(self, path: LearningPathManifest) -> str:
         """Return a localized status label for one learning path."""
         started_count = self._started_learning_path_lesson_count(path)
@@ -648,6 +665,24 @@ class UnifiedAppShell:
                 completed_count += 1
 
         return completed_count
+
+    def _completed_learning_path_task_count(self, path: LearningPathManifest) -> int:
+        """Count completed tasks across one learning path."""
+        completed_count = 0
+        for lesson_id in path.lesson_ids:
+            lesson = LESSON_BY_ID[lesson_id]
+            completed_task_ids = self._completed_lesson_task_ids(lesson)
+            completed_count += len(completed_task_ids)
+
+        return completed_count
+
+    def _learning_path_task_count(self, path: LearningPathManifest) -> int:
+        """Count all tasks across one learning path."""
+        task_count = 0
+        for lesson_id in path.lesson_ids:
+            task_count += len(LESSON_BY_ID[lesson_id].tasks)
+
+        return task_count
 
     def _started_learning_path_lesson_count(self, path: LearningPathManifest) -> int:
         """Count started lessons in one learning path."""
