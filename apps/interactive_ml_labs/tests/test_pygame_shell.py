@@ -306,6 +306,48 @@ def test_shell_learning_path_selection_opens_lessons(monkeypatch) -> None:
             app._current_learning_path_lessons()[0]
             == LESSON_BY_ID["error_linear_regression_line_fit"]
         )
+        assert app.selected_index == 0
+    finally:
+        pygame.quit()
+
+
+def test_shell_learning_path_selection_focuses_next_incomplete_lesson(monkeypatch) -> None:
+    """Selecting a path should highlight the first incomplete lesson."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        app.context.progress.mark_completed(path.lesson_ids[0])
+        app.context.progress.mark_completed(path.lesson_ids[1])
+        app.screen_name = ScreenName.PATHS
+        app.selected_index = 0
+
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.LESSONS
+        assert app.selected_index == 2
+        assert app.selected_learning_path == path
+    finally:
+        pygame.quit()
+
+
+def test_shell_completed_learning_path_selection_focuses_first_lesson(monkeypatch) -> None:
+    """Completed paths should open at the first lesson for review."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        for lesson_id in path.lesson_ids:
+            app.context.progress.mark_completed(lesson_id)
+        app.screen_name = ScreenName.PATHS
+        app.selected_index = 0
+
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.LESSONS
+        assert app.selected_index == 0
     finally:
         pygame.quit()
 

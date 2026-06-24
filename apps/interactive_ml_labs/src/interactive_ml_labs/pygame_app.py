@@ -689,6 +689,14 @@ class UnifiedAppShell:
 
         return None
 
+    def _next_learning_path_lesson_index(self, path: LearningPathManifest) -> int:
+        """Return the first incomplete lesson index in one learning path."""
+        for index, lesson_id in enumerate(path.lesson_ids):
+            if not self._is_lesson_completed(lesson_id):
+                return index
+
+        return 0
+
     def _completed_learning_path_lesson_count(self, path: LearningPathManifest) -> int:
         """Count completed lessons in one learning path."""
         completed_count = 0
@@ -1682,6 +1690,7 @@ class UnifiedAppShell:
     def _select_learning_path(self) -> None:
         self.selected_learning_path = LEARNING_PATH_MANIFESTS[self.selected_index]
         self._go_to(ScreenName.LESSONS)
+        self.selected_index = self._next_learning_path_lesson_index(self.selected_learning_path)
 
     def _select_lesson(self) -> None:
         lesson = self._current_learning_path_lessons()[self.selected_index]
