@@ -505,6 +505,74 @@ def test_shell_lesson_badge_label_reflects_completion(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_learning_path_progress_labels_reflect_completion(monkeypatch) -> None:
+    """Learning path labels should summarize started and completed lessons."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+
+        assert app._learning_path_progress_label(path) == "Lessons: 0/4 completed"
+        assert app._learning_path_status_label(path) == "Not started"
+
+        app.context.progress.mark_started(path.lesson_ids[0])
+        app.context.progress.mark_completed(path.lesson_ids[1])
+
+        assert app._learning_path_progress_label(path) == "Lessons: 1/4 completed"
+        assert app._learning_path_status_label(path) == "In progress"
+
+        for lesson_id in path.lesson_ids:
+            app.context.progress.mark_completed(lesson_id)
+
+        assert app._learning_path_progress_label(path) == "Lessons: 4/4 completed"
+        assert app._learning_path_status_label(path) == "Path completed"
+    finally:
+        pygame.quit()
+
+
+def test_shell_learning_path_details_render_progress_summary(monkeypatch) -> None:
+    """Learning path details should render aggregate progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    drawn_text: list[str] = []
+    wrapped_text: list[str] = []
+
+    def capture_text(
+        text: str,
+        position: tuple[int, int],
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> None:
+        _ = position, font, color
+        drawn_text.append(text)
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = width, font, color
+        wrapped_text.append(text)
+        return position[1] + 24
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        app.context.progress.mark_completed(path.lesson_ids[0])
+        app._draw_text = capture_text
+        app._draw_wrapped = capture_wrapped
+
+        app._render_learning_path_details(path)
+
+        assert "4 lessons" in drawn_text
+        assert "Lessons: 1/4 completed" in wrapped_text
+        assert "In progress" in wrapped_text
+    finally:
+        pygame.quit()
+
+
 def test_shell_lesson_details_render_task_checklist(monkeypatch) -> None:
     """Lesson details panel should render task checklist state."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
