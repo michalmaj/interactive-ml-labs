@@ -491,6 +491,14 @@ class UnifiedAppShell:
             self.font_small,
             ACCENT,
         )
+        y += 6
+        y = self._draw_wrapped(
+            self._learning_path_next_action_label(path),
+            (content_x, y),
+            content_width,
+            self.font_small,
+            ACCENT,
+        )
         y += 24
         for lesson_id in path.lesson_ids[:4]:
             lesson = LESSON_BY_ID[lesson_id]
@@ -655,6 +663,32 @@ class UnifiedAppShell:
 
         return self._text("Not started", "Nie rozpoczęto")
 
+    def _learning_path_next_action_label(self, path: LearningPathManifest) -> str:
+        """Return a localized next action hint for one learning path."""
+        next_lesson = self._next_learning_path_lesson(path)
+        if next_lesson is None:
+            return self._text(
+                "Next action: review completed lessons",
+                "Następny krok: powtórz ukończone lekcje",
+            )
+
+        title = next_lesson.title.for_language(self.context.settings.language)
+        if self._has_lesson_progress(next_lesson.id):
+            return self._text(f"Next action: continue {title}", f"Następny krok: kontynuuj {title}")
+
+        return self._text(f"Next action: start {title}", f"Następny krok: zacznij {title}")
+
+    def _next_learning_path_lesson(
+        self,
+        path: LearningPathManifest,
+    ) -> LessonManifest | None:
+        """Return the first incomplete lesson in one learning path."""
+        for lesson_id in path.lesson_ids:
+            if not self._is_lesson_completed(lesson_id):
+                return LESSON_BY_ID[lesson_id]
+
+        return None
+
     def _completed_learning_path_lesson_count(self, path: LearningPathManifest) -> int:
         """Count completed lessons in one learning path."""
         completed_count = 0
@@ -763,6 +797,13 @@ class UnifiedAppShell:
         """Return whether one lesson is completed."""
         progress = self.context.progress.lessons.get(lesson_id)
         return progress is not None and progress.completed
+
+    def _has_lesson_progress(self, lesson_id: str) -> bool:
+        """Return whether one lesson has any saved progress."""
+        progress = self.context.progress.lessons.get(lesson_id)
+        return progress is not None and (
+            progress.started or progress.theory_visited or bool(progress.completed_task_ids)
+        )
 
     def _lesson_task_label(self, lesson: LessonManifest, task_id: str, title: str) -> str:
         """Return one task label with a stable checkbox prefix."""
