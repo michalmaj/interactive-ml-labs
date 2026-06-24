@@ -125,7 +125,7 @@ Narrative:
 - then they see decisions and thresholds in classification,
 - finally, they see an ensemble focus on previous mistakes.
 
-This path is a good first slice because it connects existing Level 1 and Level 2 material into one learning story. It now has checkable tasks, completion badges, persisted lesson progress, and a visible learning-path progress summary.
+This path is a good first slice because it connects existing Level 1 and Level 2 material into one learning story. It now has checkable tasks, prerequisite and next-lesson guidance, completion badges, persisted lesson progress, and a visible learning-path progress summary.
 
 ## Suggested PR Sequence
 
@@ -135,8 +135,9 @@ This path is a good first slice because it connects existing Level 1 and Level 2
 4. Done: persist basic lesson progress.
 5. Done: add checkable tasks to the first path lessons.
 6. Done: show completion badges and aggregate learning-path progress.
+7. Done: show prerequisite and next-lesson guidance in the lesson details panel.
 
-Next slices should focus on adding a second learning path, improving prerequisite/next-lesson guidance, and making progress summaries more useful for students and instructors.
+Next slices should focus on adding a second learning path and making progress summaries more useful for students and instructors.
 
 ## Non-Goals For The First Slice
 

@@ -26,7 +26,7 @@ The shell currently supports:
 - generated intro screens,
 - built-in theory screens,
 - pause and help overlays,
-- guided learning paths with lesson tasks, completion badges, and persisted progress,
+- guided learning paths with lesson tasks, prerequisite/next-lesson guidance, completion badges, and persisted progress,
 - fullscreen, adaptive window size, and fixed-scene scaling settings,
 - persistent app settings,
 - standalone demo entry points for existing demo packages.
