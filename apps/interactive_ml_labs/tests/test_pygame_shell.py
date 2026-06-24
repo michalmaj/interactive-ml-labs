@@ -17,7 +17,11 @@ from interactive_ml_labs.distance_metrics_scene import (
     MOVE_QUERY_TASK_ID,
 )
 from interactive_ml_labs.gradient_scene import GradientDescentSceneAdapter
-from interactive_ml_labs.knn_scene import KNNVoteMapSceneAdapter
+from interactive_ml_labs.knn_scene import (
+    CLASSIFY_QUERY_TASK_ID,
+    KNN_LESSON_ID,
+    KNNVoteMapSceneAdapter,
+)
 from interactive_ml_labs.logistic_scene import (
     LOGISTIC_LESSON_ID,
     MOVE_BOUNDARY_TASK_ID,
@@ -491,6 +495,27 @@ def test_shell_persists_distance_metrics_task_progress(monkeypatch, tmp_path) ->
             MOVE_QUERY_TASK_ID
             in loaded_progress.lessons[DISTANCE_METRICS_LESSON_ID].completed_task_ids
         )
+    finally:
+        pygame.quit()
+
+
+def test_shell_persists_knn_task_progress(monkeypatch, tmp_path) -> None:
+    """k-NN task progress should be saved from active scene events."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    settings_path = tmp_path / "settings.json"
+    app = UnifiedAppShell(settings_path=settings_path)
+
+    try:
+        app.selected_learning_path = LEARNING_PATH_MANIFESTS[1]
+        app.screen_name = ScreenName.LESSONS
+        app.selected_index = 1
+        app._activate_selected()
+        app._start_demo()
+
+        app._handle_active_demo_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_n))
+        loaded_progress = load_app_progress(tmp_path / "progress.json")
+
+        assert CLASSIFY_QUERY_TASK_ID in loaded_progress.lessons[KNN_LESSON_ID].completed_task_ids
     finally:
         pygame.quit()
 
