@@ -578,6 +578,23 @@ class UnifiedAppShell:
             )
             y += 4
 
+        y += 12
+        y = self._draw_wrapped(
+            self._lesson_prerequisite_label(lesson),
+            (content_x, y),
+            content_width,
+            self.font_small,
+            MUTED_TEXT,
+        )
+        y += 4
+        y = self._draw_wrapped(
+            self._lesson_next_label(lesson),
+            (content_x, y),
+            content_width,
+            self.font_small,
+            MUTED_TEXT,
+        )
+
         if lesson.completion_badge is not None:
             y += 12
             self._draw_wrapped(
@@ -650,6 +667,68 @@ class UnifiedAppShell:
             f"Tasks: {completed_count}/{total_count} completed",
             f"Zadania: {completed_count}/{total_count} ukończone",
         )
+
+    def _lesson_prerequisite_label(self, lesson: LessonManifest) -> str:
+        """Return a localized prerequisite summary for one lesson."""
+        if not lesson.prerequisites:
+            return self._text(
+                "Prerequisites: none",
+                "Wymagania: brak",
+            )
+
+        labels = [
+            self._lesson_requirement_label(LESSON_BY_ID[lesson_id])
+            for lesson_id in lesson.prerequisites
+            if lesson_id in LESSON_BY_ID
+        ]
+        if not labels:
+            return self._text(
+                "Prerequisites: none",
+                "Wymagania: brak",
+            )
+
+        prefix = self._text("Prerequisites", "Wymagania")
+        return f"{prefix}: {', '.join(labels)}"
+
+    def _lesson_requirement_label(self, lesson: LessonManifest) -> str:
+        """Return one prerequisite label with completion state."""
+        marker = "[x]" if self._is_lesson_completed(lesson.id) else "[ ]"
+        title = lesson.title.for_language(self.context.settings.language)
+        return f"{marker} {title}"
+
+    def _lesson_next_label(self, lesson: LessonManifest) -> str:
+        """Return a localized next-lesson hint for one lesson."""
+        next_lesson = self._next_lesson_in_selected_path(lesson)
+        if next_lesson is None:
+            return self._text(
+                "Next: final lesson in this path",
+                "Dalej: ostatnia lekcja w tej ścieżce",
+            )
+
+        title = next_lesson.title.for_language(self.context.settings.language)
+        return self._text(f"Next: {title}", f"Dalej: {title}")
+
+    def _next_lesson_in_selected_path(self, lesson: LessonManifest) -> LessonManifest | None:
+        """Return the next lesson in the selected learning path."""
+        path = self.selected_learning_path
+        if path is None:
+            return None
+
+        try:
+            lesson_index = path.lesson_ids.index(lesson.id)
+        except ValueError:
+            return None
+
+        next_index = lesson_index + 1
+        if next_index >= len(path.lesson_ids):
+            return None
+
+        return LESSON_BY_ID[path.lesson_ids[next_index]]
+
+    def _is_lesson_completed(self, lesson_id: str) -> bool:
+        """Return whether one lesson is completed."""
+        progress = self.context.progress.lessons.get(lesson_id)
+        return progress is not None and progress.completed
 
     def _lesson_task_label(self, lesson: LessonManifest, task_id: str, title: str) -> str:
         """Return one task label with a stable checkbox prefix."""

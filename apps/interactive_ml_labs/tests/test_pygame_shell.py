@@ -573,6 +573,50 @@ def test_shell_learning_path_details_render_progress_summary(monkeypatch) -> Non
         pygame.quit()
 
 
+def test_shell_lesson_guidance_labels_reflect_path_order_and_prerequisites(
+    monkeypatch,
+) -> None:
+    """Lesson guidance should show prerequisites and the next lesson."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        app.selected_learning_path = path
+        lesson = LESSON_BY_ID["error_logistic_boundary"]
+
+        assert app._lesson_prerequisite_label(lesson) == (
+            "Prerequisites: [ ] Let an algorithm reduce loss"
+        )
+        assert app._lesson_next_label(lesson) == "Next: Learn from previous mistakes"
+
+        app.context.progress.mark_completed("error_gradient_descent")
+
+        assert app._lesson_prerequisite_label(lesson) == (
+            "Prerequisites: [x] Let an algorithm reduce loss"
+        )
+    finally:
+        pygame.quit()
+
+
+def test_shell_lesson_guidance_labels_handle_first_and_final_lessons(monkeypatch) -> None:
+    """Guidance should handle lessons without prerequisites and final lessons."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        app.selected_learning_path = path
+
+        first_lesson = LESSON_BY_ID[path.lesson_ids[0]]
+        final_lesson = LESSON_BY_ID[path.lesson_ids[-1]]
+
+        assert app._lesson_prerequisite_label(first_lesson) == "Prerequisites: none"
+        assert app._lesson_next_label(final_lesson) == "Next: final lesson in this path"
+    finally:
+        pygame.quit()
+
+
 def test_shell_lesson_details_render_task_checklist(monkeypatch) -> None:
     """Lesson details panel should render task checklist state."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -602,6 +646,7 @@ def test_shell_lesson_details_render_task_checklist(monkeypatch) -> None:
 
     try:
         lesson = LESSON_BY_ID["error_gradient_descent"]
+        app.selected_learning_path = LEARNING_PATH_MANIFESTS[0]
         app.context.progress.complete_task(lesson.id, "find_stable_learning_rate")
         app.context.progress.mark_completed(lesson.id)
         app._draw_text = capture_text
@@ -612,6 +657,8 @@ def test_shell_lesson_details_render_task_checklist(monkeypatch) -> None:
         assert "Tasks: 1/2 completed" in drawn_text
         assert any(text.startswith("[x]") for text in wrapped_text)
         assert any(text.startswith("[ ]") for text in wrapped_text)
+        assert "Prerequisites: [ ] See error in a fitted line" in wrapped_text
+        assert "Next: Turn scores into decisions" in wrapped_text
         assert "Badge unlocked: Loss Navigator" in wrapped_text
     finally:
         pygame.quit()
