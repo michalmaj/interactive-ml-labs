@@ -2,6 +2,9 @@
 
 import pygame
 from interactive_ml_labs.clustering_scene import (
+    ADJUST_DENSITY_TASK_ID,
+    CLUSTERING_LESSON_ID,
+    COMPARE_ALGORITHMS_TASK_ID,
     MAX_K,
     MIN_K,
     PANEL_RECT,
@@ -286,6 +289,83 @@ def test_clustering_scene_drags_nearest_point(monkeypatch) -> None:
         assert len(scene.assignments) == len(scene.points)
         assert len(scene.inertia_history) == initial_history_length
         assert scene.inertia_history[-1] == scene.inertia
+    finally:
+        pygame.quit()
+
+
+def test_clustering_scene_records_algorithm_task_for_guided_lesson(monkeypatch) -> None:
+    """Switching algorithms should complete the algorithm comparison task."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.selected_lesson_id = CLUSTERING_LESSON_ID
+        scene = create_clustering_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        progress = context.progress.lessons[CLUSTERING_LESSON_ID]
+        assert COMPARE_ALGORITHMS_TASK_ID in progress.completed_task_ids
+        assert ADJUST_DENSITY_TASK_ID not in progress.completed_task_ids
+        assert progress.completed is False
+    finally:
+        pygame.quit()
+
+
+def test_clustering_scene_records_density_task_and_completes_lesson(monkeypatch) -> None:
+    """Tuning DBSCAN after comparing algorithms should complete the lesson."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.selected_lesson_id = CLUSTERING_LESSON_ID
+        scene = create_clustering_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+
+        progress = context.progress.lessons[CLUSTERING_LESSON_ID]
+        assert progress.completed_task_ids >= {
+            COMPARE_ALGORITHMS_TASK_ID,
+            ADJUST_DENSITY_TASK_ID,
+        }
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_clustering_scene_does_not_record_density_task_in_kmeans_mode(monkeypatch) -> None:
+    """Changing k in K-Means mode should not complete the DBSCAN density task."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.selected_lesson_id = CLUSTERING_LESSON_ID
+        scene = create_clustering_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+
+        assert CLUSTERING_LESSON_ID not in context.progress.lessons
+    finally:
+        pygame.quit()
+
+
+def test_clustering_scene_ignores_task_progress_outside_guided_lesson(monkeypatch) -> None:
+    """Standalone Clustering interactions should not write lesson progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_clustering_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+
+        assert CLUSTERING_LESSON_ID not in context.progress.lessons
     finally:
         pygame.quit()
 

@@ -34,6 +34,9 @@ AUTO_STEP_SECONDS: Final[float] = 0.55
 DRAG_PICK_RADIUS: Final[int] = 14
 MAX_K: Final[int] = 6
 MIN_K: Final[int] = 2
+CLUSTERING_LESSON_ID: Final[str] = "distance_clustering_shape"
+COMPARE_ALGORITHMS_TASK_ID: Final[str] = "compare_kmeans_dbscan"
+ADJUST_DENSITY_TASK_ID: Final[str] = "adjust_density_controls"
 
 CLUSTER_COLORS: Final[tuple[tuple[int, int, int], ...]] = (
     (119, 190, 240),
@@ -98,6 +101,7 @@ class ClusteringLabScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create a deterministic first Clustering Lab scene."""
+        self._context = context
         self._language = context.settings.language
         self._rng = random.Random(7)
         self._sample_seed = 7
@@ -154,8 +158,10 @@ class ClusteringLabScene:
             self._generate_dataset()
         elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
             self._adjust_cluster_parameter(-1)
+            self._record_density_progress_if_dbscan()
         elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
             self._adjust_cluster_parameter(1)
+            self._record_density_progress_if_dbscan()
         elif key == pygame.K_SPACE:
             self.step()
         elif key == pygame.K_a and self.algorithm_mode == AlgorithmMode.KMEANS:
@@ -164,11 +170,46 @@ class ClusteringLabScene:
             self.show_links = not self.show_links
         elif key == pygame.K_m:
             self._toggle_algorithm_mode()
+            self._record_algorithm_compare_progress()
         elif key == pygame.K_r:
             self._reset_algorithm()
         elif key == pygame.K_n:
             self._sample_seed += 1
             self._generate_dataset()
+
+    def _record_algorithm_compare_progress(self) -> None:
+        """Complete the algorithm comparison task for the guided lesson."""
+        if self._context.selected_lesson_id != CLUSTERING_LESSON_ID:
+            return
+
+        self._context.progress.complete_task(
+            CLUSTERING_LESSON_ID,
+            COMPARE_ALGORITHMS_TASK_ID,
+        )
+        self._mark_lesson_completed_if_ready()
+
+    def _record_density_progress_if_dbscan(self) -> None:
+        """Complete density-control task after tuning DBSCAN parameters."""
+        if self.algorithm_mode != AlgorithmMode.DBSCAN:
+            return
+        if self._context.selected_lesson_id != CLUSTERING_LESSON_ID:
+            return
+
+        self._context.progress.complete_task(
+            CLUSTERING_LESSON_ID,
+            ADJUST_DENSITY_TASK_ID,
+        )
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both tasks are done."""
+        progress = self._context.progress.lessons.get(CLUSTERING_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {COMPARE_ALGORITHMS_TASK_ID, ADJUST_DENSITY_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(CLUSTERING_LESSON_ID)
 
     def update(self, dt: float) -> SceneCommand:
         """Advance auto-run K-Means iterations."""
