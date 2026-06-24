@@ -35,6 +35,9 @@ MIN_COMPONENTS: Final[int] = 2
 MAX_COMPONENTS: Final[int] = 4
 QUERY_STEP: Final[float] = 0.08
 MIN_CONFIDENCE: Final[float] = 0.55
+GAUSSIAN_MIXTURE_LESSON_ID: Final[str] = "distance_soft_clusters"
+COMPARE_SOFT_ASSIGNMENTS_TASK_ID: Final[str] = "compare_soft_assignments"
+ADJUST_COMPONENT_COUNT_TASK_ID: Final[str] = "adjust_component_count"
 
 COMPONENT_COLORS: Final[tuple[tuple[int, int, int], ...]] = (
     (116, 190, 240),
@@ -153,6 +156,7 @@ class GaussianMixtureIntroLabScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create a deterministic Gaussian Mixture intro scene."""
+        self._context = context
         self._language = context.settings.language
         self._rng = random.Random(23)
         self._font_title = make_ui_font(34, bold=True)
@@ -217,21 +221,31 @@ class GaussianMixtureIntroLabScene:
             self.query = self.preset.query_start
             self.points = self._sample_points()
         elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
+            previous_count = self.component_count
             self.component_count = max(MIN_COMPONENTS, self.component_count - 1)
+            if self.component_count != previous_count:
+                self._record_component_count_progress()
         elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
+            previous_count = self.component_count
             self.component_count = min(MAX_COMPONENTS, self.component_count + 1)
+            if self.component_count != previous_count:
+                self._record_component_count_progress()
         elif key == pygame.K_h:
             self.hard_assignment = not self.hard_assignment
         elif key == pygame.K_d:
             self.show_density = not self.show_density
         elif key == pygame.K_LEFT:
             self._move_query(-QUERY_STEP, 0.0)
+            self._record_soft_assignment_progress()
         elif key == pygame.K_RIGHT:
             self._move_query(QUERY_STEP, 0.0)
+            self._record_soft_assignment_progress()
         elif key == pygame.K_UP:
             self._move_query(0.0, QUERY_STEP)
+            self._record_soft_assignment_progress()
         elif key == pygame.K_DOWN:
             self._move_query(0.0, -QUERY_STEP)
+            self._record_soft_assignment_progress()
         elif key == pygame.K_r:
             self.preset_index = 0
             self.component_count = 2
@@ -239,6 +253,38 @@ class GaussianMixtureIntroLabScene:
             self.hard_assignment = False
             self.query = self.preset.query_start
             self.points = self._sample_points()
+
+    def _record_soft_assignment_progress(self) -> None:
+        """Complete the soft-assignment comparison task for the guided lesson."""
+        if self._context.selected_lesson_id != GAUSSIAN_MIXTURE_LESSON_ID:
+            return
+
+        self._context.progress.complete_task(
+            GAUSSIAN_MIXTURE_LESSON_ID,
+            COMPARE_SOFT_ASSIGNMENTS_TASK_ID,
+        )
+        self._mark_lesson_completed_if_ready()
+
+    def _record_component_count_progress(self) -> None:
+        """Complete the component-count adjustment task for the guided lesson."""
+        if self._context.selected_lesson_id != GAUSSIAN_MIXTURE_LESSON_ID:
+            return
+
+        self._context.progress.complete_task(
+            GAUSSIAN_MIXTURE_LESSON_ID,
+            ADJUST_COMPONENT_COUNT_TASK_ID,
+        )
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both tasks are done."""
+        progress = self._context.progress.lessons.get(GAUSSIAN_MIXTURE_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {COMPARE_SOFT_ASSIGNMENTS_TASK_ID, ADJUST_COMPONENT_COUNT_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(GAUSSIAN_MIXTURE_LESSON_ID)
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "Gaussian Mixture Intro Lab", (58, 40), self._font_title, TEXT)
