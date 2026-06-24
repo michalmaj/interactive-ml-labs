@@ -12,6 +12,10 @@ from interactive_ml_labs.boosting_scene import (
     BoostingMistakeLabSceneAdapter,
 )
 from interactive_ml_labs.decision_tree_scene import DecisionTreeSceneAdapter
+from interactive_ml_labs.distance_metrics_scene import (
+    DISTANCE_METRICS_LESSON_ID,
+    MOVE_QUERY_TASK_ID,
+)
 from interactive_ml_labs.gradient_scene import GradientDescentSceneAdapter
 from interactive_ml_labs.knn_scene import KNNVoteMapSceneAdapter
 from interactive_ml_labs.logistic_scene import (
@@ -462,6 +466,30 @@ def test_shell_persists_boosting_task_progress(monkeypatch, tmp_path) -> None:
 
         assert (
             ADVANCE_ROUNDS_TASK_ID in loaded_progress.lessons[BOOSTING_LESSON_ID].completed_task_ids
+        )
+    finally:
+        pygame.quit()
+
+
+def test_shell_persists_distance_metrics_task_progress(monkeypatch, tmp_path) -> None:
+    """Distance Metrics task progress should be saved from active scene events."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    settings_path = tmp_path / "settings.json"
+    app = UnifiedAppShell(settings_path=settings_path)
+
+    try:
+        app.selected_learning_path = LEARNING_PATH_MANIFESTS[1]
+        app.screen_name = ScreenName.LESSONS
+        app.selected_index = 0
+        app._activate_selected()
+        app._start_demo()
+
+        app._handle_active_demo_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+        loaded_progress = load_app_progress(tmp_path / "progress.json")
+
+        assert (
+            MOVE_QUERY_TASK_ID
+            in loaded_progress.lessons[DISTANCE_METRICS_LESSON_ID].completed_task_ids
         )
     finally:
         pygame.quit()
