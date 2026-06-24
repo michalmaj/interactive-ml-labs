@@ -1165,7 +1165,7 @@ def test_learning_path_registry_contains_distance_to_clusters_path() -> None:
     path = next(path for path in LEARNING_PATH_MANIFESTS if path.id == "distance_to_clusters")
 
     assert path.title.en == "From distance to clusters"
-    assert path.title.pl == "Od distance do klastrów"
+    assert path.title.pl == "Od odległości do klastrów"
     assert path.lesson_ids == (
         "distance_choose_metric",
         "distance_knn_vote",
