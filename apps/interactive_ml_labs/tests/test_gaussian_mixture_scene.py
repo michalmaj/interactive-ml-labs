@@ -4,6 +4,9 @@ import pygame
 import pytest
 from interactive_ml_labs.display import DEFAULT_RESOLUTION
 from interactive_ml_labs.gaussian_mixture_scene import (
+    ADJUST_COMPONENT_COUNT_TASK_ID,
+    COMPARE_SOFT_ASSIGNMENTS_TASK_ID,
+    GAUSSIAN_MIXTURE_LESSON_ID,
     MAX_COMPONENTS,
     MIN_COMPONENTS,
     PRESETS,
@@ -88,6 +91,83 @@ def test_gaussian_mixture_scene_controls_components_query_and_reset(monkeypatch)
         assert scene.component_count == 2
         assert scene.show_density is True
         assert scene.hard_assignment is False
+    finally:
+        pygame.quit()
+
+
+def test_gaussian_mixture_scene_records_soft_assignment_task(monkeypatch) -> None:
+    """Moving the query point should complete the soft-assignment task."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=GAUSSIAN_MIXTURE_LESSON_ID)
+        scene = create_gaussian_mixture_intro_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+        lesson_progress = context.progress.lessons[GAUSSIAN_MIXTURE_LESSON_ID]
+
+        assert COMPARE_SOFT_ASSIGNMENTS_TASK_ID in lesson_progress.completed_task_ids
+        assert ADJUST_COMPONENT_COUNT_TASK_ID not in lesson_progress.completed_task_ids
+        assert lesson_progress.completed is False
+    finally:
+        pygame.quit()
+
+
+def test_gaussian_mixture_scene_records_component_count_task(monkeypatch) -> None:
+    """Changing component count should complete the component-count task."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=GAUSSIAN_MIXTURE_LESSON_ID)
+        scene = create_gaussian_mixture_intro_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+        lesson_progress = context.progress.lessons[GAUSSIAN_MIXTURE_LESSON_ID]
+
+        assert ADJUST_COMPONENT_COUNT_TASK_ID in lesson_progress.completed_task_ids
+        assert COMPARE_SOFT_ASSIGNMENTS_TASK_ID not in lesson_progress.completed_task_ids
+        assert lesson_progress.completed is False
+    finally:
+        pygame.quit()
+
+
+def test_gaussian_mixture_scene_completes_guided_lesson(monkeypatch) -> None:
+    """Completing both guided tasks should unlock the lesson completion state."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=GAUSSIAN_MIXTURE_LESSON_ID)
+        scene = create_gaussian_mixture_intro_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+        lesson_progress = context.progress.lessons[GAUSSIAN_MIXTURE_LESSON_ID]
+
+        assert {
+            COMPARE_SOFT_ASSIGNMENTS_TASK_ID,
+            ADJUST_COMPONENT_COUNT_TASK_ID,
+        }.issubset(lesson_progress.completed_task_ids)
+        assert lesson_progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_gaussian_mixture_scene_ignores_progress_outside_guided_lesson(monkeypatch) -> None:
+    """Standalone demo use should not write guided lesson progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_gaussian_mixture_intro_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+
+        assert GAUSSIAN_MIXTURE_LESSON_ID not in context.progress.lessons
     finally:
         pygame.quit()
 
