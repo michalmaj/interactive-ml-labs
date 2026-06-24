@@ -506,11 +506,10 @@ class UnifiedAppShell:
     def _render_lessons(self) -> None:
         path = self._require_learning_path()
         lessons = self._current_learning_path_lessons()
-        language = self.context.settings.language
-        labels = [lesson.title.for_language(language) for lesson in lessons]
+        labels = [self._lesson_menu_label(lesson) for lesson in lessons]
 
         self._draw_title(
-            path.title.for_language(language),
+            path.title.for_language(self.context.settings.language),
             self._text("Select lesson", "Wybierz lekcję"),
         )
         self._draw_menu(labels, top=190, width=520)
@@ -769,6 +768,23 @@ class UnifiedAppShell:
         """Return one task label with a stable checkbox prefix."""
         marker = "[x]" if task_id in self._completed_lesson_task_ids(lesson) else "[ ]"
         return f"{marker} {title}"
+
+    def _lesson_menu_label(self, lesson: LessonManifest) -> str:
+        """Return one lesson menu label with compact progress state."""
+        title = lesson.title.for_language(self.context.settings.language)
+        if self._is_lesson_completed(lesson.id):
+            return f"[x] {title}"
+
+        completed_task_count = len(self._completed_lesson_task_ids(lesson))
+        total_task_count = len(lesson.tasks)
+        if total_task_count > 0 and completed_task_count > 0:
+            return f"[{completed_task_count}/{total_task_count}] {title}"
+
+        progress = self.context.progress.lessons.get(lesson.id)
+        if progress is not None and progress.started:
+            return f"[..] {title}"
+
+        return f"[ ] {title}"
 
     def _completed_lesson_task_ids(self, lesson: LessonManifest) -> set[str]:
         """Return completed task ids for one lesson."""

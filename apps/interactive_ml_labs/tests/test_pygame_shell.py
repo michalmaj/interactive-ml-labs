@@ -624,6 +624,55 @@ def test_shell_lesson_task_labels_reflect_progress(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_lesson_menu_labels_reflect_progress(monkeypatch) -> None:
+    """Lesson menu labels should show compact lesson and task progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        lesson = LESSON_BY_ID["error_gradient_descent"]
+
+        assert app._lesson_menu_label(lesson) == "[ ] Let an algorithm reduce loss"
+
+        app.context.progress.mark_started(lesson.id)
+        assert app._lesson_menu_label(lesson) == "[..] Let an algorithm reduce loss"
+
+        app.context.progress.complete_task(lesson.id, "find_stable_learning_rate")
+        assert app._lesson_menu_label(lesson) == "[1/2] Let an algorithm reduce loss"
+
+        app.context.progress.mark_completed(lesson.id)
+        assert app._lesson_menu_label(lesson) == "[x] Let an algorithm reduce loss"
+    finally:
+        pygame.quit()
+
+
+def test_shell_lessons_screen_renders_progress_markers(monkeypatch) -> None:
+    """Lesson selection should pass progress-aware labels to the menu."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+    menu_labels: list[str] = []
+
+    def capture_menu(
+        labels: list[str],
+        *,
+        top: int,
+        width: int = 640,
+    ) -> None:
+        _ = top, width
+        menu_labels.extend(labels)
+
+    try:
+        app.selected_learning_path = LEARNING_PATH_MANIFESTS[0]
+        app.context.progress.complete_task("error_gradient_descent", "find_stable_learning_rate")
+        app._draw_menu = capture_menu
+
+        app._render_lessons()
+
+        assert "[1/2] Let an algorithm reduce loss" in menu_labels
+    finally:
+        pygame.quit()
+
+
 def test_shell_lesson_badge_label_reflects_completion(monkeypatch) -> None:
     """Lesson badge label should distinguish locked and unlocked badges."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
