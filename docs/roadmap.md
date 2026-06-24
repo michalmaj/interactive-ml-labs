@@ -39,7 +39,7 @@ The shell currently supports:
 - [x] Extract shared UI helpers for repeated demo-scene panel, text, and wrapping patterns.
 - [x] Introduce learning paths, lesson/task manifests, progress, and meaningful completion badges.
 - [x] Expand learning paths beyond the first end-to-end path.
-- [ ] Add checkable task completion to the second learning path.
+- [x] Add checkable task completion to the second learning path.
 - [ ] Continue balancing Level 1, Level 2, and Level 3 with small focused demos.
 - [ ] Add screenshots or short GIFs for the main README and app docs.
 
@@ -47,9 +47,14 @@ The shell currently supports:
 
 ### Learning Platform Layer
 
-The app now has two guided learning paths: one end-to-end path with checkable tasks and one new distance-to-clustering path ready for task completion hooks. The next product step is to make the second path interactive lesson by lesson while keeping the standalone demo browser intact.
+The app now has two guided learning paths with checkable tasks:
 
-The direction is captured in [learning_platform.md](learning_platform.md). Future slices should add task completion hooks for the second path, improve progress summaries, and only introduce richer gamification where it reinforces actual understanding.
+- How models learn from error,
+- From distance to clusters.
+
+Both paths connect lesson manifests to real scene interactions and persisted progress while keeping the standalone demo browser intact.
+
+The direction is captured in [learning_platform.md](learning_platform.md). Future slices should improve progress summaries, add more useful instructor/student feedback, and only introduce richer gamification where it reinforces actual understanding.
 
 ### Shared UI Helpers
 
@@ -84,7 +89,7 @@ New demos should be added in narrow vertical slices:
 4. focused tests,
 5. small polish/UX pass after trying it in the shell.
 
-The current priority is to keep Level 1, Level 2, and Level 3 balanced rather than overbuilding one level.
+The current priority is to keep Level 1, Level 2, and Level 3 balanced rather than overbuilding one level. The next guided path should be chosen for narrative value, not just because a demo already exists.
 
 ## Completed Historical Phases
 

@@ -23,7 +23,7 @@ Each demo should answer three questions:
 2. How does the algorithm work step by step?
 3. What happens when important parameters change?
 
-The next product direction is to connect demos into guided learning paths with lessons, concrete tasks, progress, and meaningful badges. See [docs/learning_platform.md](docs/learning_platform.md) for the learning-platform direction.
+The current product direction is to make the app feel like a guided learning platform: demos are connected into learning paths with lessons, concrete tasks, progress, and meaningful badges. See [docs/learning_platform.md](docs/learning_platform.md) for the learning-platform direction.
 
 ## Planned demo levels
 
@@ -101,7 +101,12 @@ This repository is also intended to demonstrate how real software projects are d
 
 ## Current status
 
-The unified app is now the recommended guided experience. The project is no longer only a collection of separate demos: the app shell provides language selection, level selection, demo intros, in-app theory, help overlays, settings, and scrollable demo lists.
+The unified app is now the recommended guided experience. The project is no longer only a collection of separate demos: the app shell provides language selection, learning paths, level selection, demo intros, in-app theory, help overlays, settings, and scrollable demo lists.
+
+Two guided learning paths now have checkable task completion:
+
+- How models learn from error,
+- From distance to clusters.
 
 Native demo scenes now share small UI helpers for panel drawing, text rendering, and text wrapping. The app shell still keeps its own menu, scroll, viewport, intro, theory, and overlay drawing code because those screens have different interaction and clipping responsibilities.
 
@@ -147,9 +152,10 @@ The original Level 1 and Level 2 demos can still be run as standalone commands. 
 
 Near-term work focuses on balancing the practical Level 2 track with the advanced Level 3 track while keeping the shell stable:
 
-- introduce learning paths, lesson/task manifests, progress, and meaningful badges before adding too many more isolated demos,
+- keep improving the guided learning platform layer now that two learning paths have end-to-end task completion,
 - keep adding focused Level 2 labs around preprocessing, evaluation, robustness, interpretability, and production-readiness,
 - review whether Level 2 has enough guided practice after Feature Scaling, Feature Importance, Gaussian Mixture, Anomaly Detection, Hyperparameter Tuning, and Class Imbalance,
+- decide whether the next guided path should deepen Level 1 fundamentals or connect the practical Level 2 evaluation labs,
 - collect classroom-style feedback on the newer Level 3 labs: t-SNE / UMAP Exploration, Model Monitoring Drift, and Time Series Forecasting,
 - iterate on Level 3 only where the interaction teaches a clear idea, not just where the visual result looks impressive,
 - keep improving in-app theory, mini-challenges, and glossary content across Level 1, Level 2, and Level 3,

@@ -147,7 +147,15 @@ Narrative:
 - then they compare centroid-based and density-based clustering,
 - finally, they see soft cluster membership in Gaussian Mixture Models.
 
-This path has lesson and task metadata first. The next slices should connect its tasks to real scene interactions, just as the first path did.
+This path now has checkable tasks connected to real scene interactions:
+
+- moving the query point in Distance Metrics Lab,
+- classifying a query and comparing `k` in k-NN Vote Map,
+- stepping K-Means iterations and changing cluster count in K-Means Intro Lab,
+- comparing K-Means with DBSCAN and adjusting density behavior in Clustering Lab,
+- moving the query point and changing component count in Gaussian Mixture Intro Lab.
+
+The path is now a second complete proof that lessons, tasks, progress, and badges can be layered onto existing demos without removing the standalone demo workflow.
 
 ## Suggested PR Sequence
 
@@ -159,7 +167,7 @@ This path has lesson and task metadata first. The next slices should connect its
 6. Done: show completion badges and aggregate learning-path progress.
 7. Done: show prerequisite and next-lesson guidance in the lesson details panel.
 
-Next slices should focus on adding task completion hooks to the second learning path and making progress summaries more useful for students and instructors.
+Next slices should focus on making progress summaries more useful for students and instructors, then choosing the third guided path based on the learning story it can tell.
 
 ## Non-Goals For The First Slice
 
