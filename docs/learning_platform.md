@@ -12,7 +12,7 @@ The app should distinguish three concepts:
 - **Lesson**: a demo plus theory, goals, tasks, completion rules, and optional rewards.
 - **Learning path**: an ordered sequence of lessons where later lessons build on ideas from earlier ones.
 
-The current manifest registry is a good foundation for demos. The next layer should introduce lesson and learning-path metadata without breaking existing standalone demo entry points.
+The current manifest registry is a good foundation for demos. The first lesson layer now adds lesson and learning-path metadata without breaking existing standalone demo entry points.
 
 ## Learning Flow
 
@@ -49,7 +49,7 @@ Possible task types:
 - `reached_metric_threshold`
 - `completed_scene_challenge`
 
-Scenes can later report progress through a small API, for example:
+Scenes and adapters can report progress through a small API, for example:
 
 ```python
 context.progress.record("learning_rate_changed")
@@ -105,11 +105,11 @@ class LessonTask:
     hint: LocalizedText | None = None
 ```
 
-The first implementation should keep this declarative and small. More advanced validation can come after the first path works end to end.
+The first implementation keeps this declarative and small. More advanced validation and richer task types can come after more paths work end to end.
 
-## First Proposed Learning Path
+## First Learning Path
 
-The first path should reuse strong existing lessons instead of adding another isolated demo.
+The first path reuses strong existing lessons instead of adding another isolated demo.
 
 **How models learn from error**
 
@@ -125,16 +125,18 @@ Narrative:
 - then they see decisions and thresholds in classification,
 - finally, they see an ensemble focus on previous mistakes.
 
-This path is a good first slice because it connects existing Level 1 and Level 2 material into one learning story.
+This path is a good first slice because it connects existing Level 1 and Level 2 material into one learning story. It now has checkable tasks, completion badges, persisted lesson progress, and a visible learning-path progress summary.
 
 ## Suggested PR Sequence
 
-1. Add `LessonManifest`, `LessonTask`, and a small learning-path registry.
-2. Add the first learning path with four lessons and non-invasive metadata.
-3. Add a lesson/path selection screen in the app shell.
-4. Persist basic lesson progress.
-5. Add the first checkable tasks to Linear Regression or Gradient Descent.
-6. Add badges only after task completion and progress tracking feel solid.
+1. Done: add `LessonManifest`, `LessonTask`, and a small learning-path registry.
+2. Done: add the first learning path with four lessons and non-invasive metadata.
+3. Done: add a lesson/path selection screen in the app shell.
+4. Done: persist basic lesson progress.
+5. Done: add checkable tasks to the first path lessons.
+6. Done: show completion badges and aggregate learning-path progress.
+
+Next slices should focus on adding a second learning path, improving prerequisite/next-lesson guidance, and making progress summaries more useful for students and instructors.
 
 ## Non-Goals For The First Slice
 

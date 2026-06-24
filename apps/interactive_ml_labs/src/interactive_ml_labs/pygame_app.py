@@ -467,7 +467,23 @@ class UnifiedAppShell:
             f"{lesson_count} lekcje" if lesson_count < 5 else f"{lesson_count} lekcji",
         )
         self._draw_text(lesson_label, (content_x, y), self.font_small, ACCENT)
-        y += 34
+        y += 28
+        y = self._draw_wrapped(
+            self._learning_path_progress_label(path),
+            (content_x, y),
+            content_width,
+            self.font_small,
+            TEXT,
+        )
+        y += 6
+        y = self._draw_wrapped(
+            self._learning_path_status_label(path),
+            (content_x, y),
+            content_width,
+            self.font_small,
+            ACCENT,
+        )
+        y += 24
         for lesson_id in path.lesson_ids[:4]:
             lesson = LESSON_BY_ID[lesson_id]
             y = self._draw_wrapped(
@@ -583,6 +599,48 @@ class UnifiedAppShell:
             return self._text("Theory visited", "Teoria przeczytana")
 
         return self._text("Started", "Rozpoczęta")
+
+    def _learning_path_progress_label(self, path: LearningPathManifest) -> str:
+        """Return a localized completion summary for one learning path."""
+        completed_count = self._completed_learning_path_lesson_count(path)
+        total_count = len(path.lesson_ids)
+        return self._text(
+            f"Lessons: {completed_count}/{total_count} completed",
+            f"Lekcje: {completed_count}/{total_count} ukończone",
+        )
+
+    def _learning_path_status_label(self, path: LearningPathManifest) -> str:
+        """Return a localized status label for one learning path."""
+        started_count = self._started_learning_path_lesson_count(path)
+        completed_count = self._completed_learning_path_lesson_count(path)
+        total_count = len(path.lesson_ids)
+
+        if total_count > 0 and completed_count == total_count:
+            return self._text("Path completed", "Ścieżka ukończona")
+        if started_count > 0:
+            return self._text("In progress", "W trakcie")
+
+        return self._text("Not started", "Nie rozpoczęto")
+
+    def _completed_learning_path_lesson_count(self, path: LearningPathManifest) -> int:
+        """Count completed lessons in one learning path."""
+        completed_count = 0
+        for lesson_id in path.lesson_ids:
+            progress = self.context.progress.lessons.get(lesson_id)
+            if progress is not None and progress.completed:
+                completed_count += 1
+
+        return completed_count
+
+    def _started_learning_path_lesson_count(self, path: LearningPathManifest) -> int:
+        """Count started lessons in one learning path."""
+        started_count = 0
+        for lesson_id in path.lesson_ids:
+            progress = self.context.progress.lessons.get(lesson_id)
+            if progress is not None and progress.started:
+                started_count += 1
+
+        return started_count
 
     def _lesson_task_summary(self, lesson: LessonManifest) -> str:
         """Return a short localized task completion summary."""
