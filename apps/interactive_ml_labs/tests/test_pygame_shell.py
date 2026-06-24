@@ -909,6 +909,7 @@ def test_shell_lesson_details_render_task_checklist(monkeypatch) -> None:
         lesson = LESSON_BY_ID["error_gradient_descent"]
         app.selected_learning_path = LEARNING_PATH_MANIFESTS[0]
         app.context.progress.complete_task(lesson.id, "find_stable_learning_rate")
+        app.context.progress.mark_theory_visited(lesson.id)
         app.context.progress.mark_completed(lesson.id)
         app._draw_text = capture_text
         app._draw_wrapped = capture_wrapped
@@ -916,6 +917,7 @@ def test_shell_lesson_details_render_task_checklist(monkeypatch) -> None:
         app._render_lesson_details(lesson)
 
         assert "Tasks: 1/2 completed" in drawn_text
+        assert "Theory: visited" in wrapped_text
         assert any(text.startswith("[x]") for text in wrapped_text)
         assert any(text.startswith("[ ]") for text in wrapped_text)
         assert "Prerequisites: [ ] See error in a fitted line" in wrapped_text
