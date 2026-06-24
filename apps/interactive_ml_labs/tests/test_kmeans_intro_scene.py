@@ -3,9 +3,12 @@
 import pygame
 from interactive_ml_labs.display import DEFAULT_RESOLUTION
 from interactive_ml_labs.kmeans_intro_scene import (
+    COMPARE_CLUSTER_COUNT_TASK_ID,
+    KMEANS_LESSON_ID,
     MAX_K,
     MIN_K,
     PRESETS,
+    STEP_ITERATIONS_TASK_ID,
     KMeansIntroLabScene,
     KMeansStep,
     create_kmeans_intro_lab_scene,
@@ -152,5 +155,67 @@ def test_kmeans_intro_scene_renders_to_shell_surface(monkeypatch) -> None:
 
         assert surface.get_bounding_rect().width > 0
         assert surface.get_bounding_rect().height > 0
+    finally:
+        pygame.quit()
+
+
+def test_kmeans_intro_scene_records_step_task_for_guided_lesson(monkeypatch) -> None:
+    """Stepping K-Means should complete the iteration task."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.selected_lesson_id = KMEANS_LESSON_ID
+        scene = create_kmeans_intro_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE))
+
+        progress = context.progress.lessons[KMEANS_LESSON_ID]
+        assert STEP_ITERATIONS_TASK_ID in progress.completed_task_ids
+        assert COMPARE_CLUSTER_COUNT_TASK_ID not in progress.completed_task_ids
+        assert progress.completed is False
+    finally:
+        pygame.quit()
+
+
+def test_kmeans_intro_scene_records_cluster_count_task_and_completes_lesson(
+    monkeypatch,
+) -> None:
+    """Changing k after stepping should complete the lesson."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.selected_lesson_id = KMEANS_LESSON_ID
+        scene = create_kmeans_intro_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+
+        progress = context.progress.lessons[KMEANS_LESSON_ID]
+        assert progress.completed_task_ids >= {
+            STEP_ITERATIONS_TASK_ID,
+            COMPARE_CLUSTER_COUNT_TASK_ID,
+        }
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_kmeans_intro_scene_ignores_task_progress_outside_guided_lesson(monkeypatch) -> None:
+    """Standalone K-Means interactions should not write lesson progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_kmeans_intro_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+
+        assert KMEANS_LESSON_ID not in context.progress.lessons
     finally:
         pygame.quit()
