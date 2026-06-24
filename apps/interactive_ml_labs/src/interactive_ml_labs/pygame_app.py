@@ -1304,12 +1304,50 @@ class UnifiedAppShell:
         ]
         menu_top = 180 if self.context.settings.resolution[1] >= 700 else 150
         self._draw_menu(labels, top=menu_top)
+        self._draw_pause_lesson_tasks()
         self._draw_footer(
             self._text(
                 "Esc: resume | Enter: select | T: theory | L: language",
                 "Esc: wróć | Enter: wybierz | T: teoria | L: język",
             ),
         )
+
+    def _draw_pause_lesson_tasks(self) -> None:
+        """Draw lesson task progress next to the pause menu."""
+        lesson = self.selected_lesson
+        if lesson is None:
+            return
+
+        language = self.context.settings.language
+        width, height = self.context.settings.resolution
+        left = max(600, width // 2 + 40)
+        top = 180 if height >= 700 else 150
+        content_width = max(280, width - left - 80)
+
+        self._draw_text(
+            self._text("Lesson tasks", "Zadania lekcji"),
+            (left, top),
+            self.font_heading,
+            TEXT,
+        )
+        y = top + 48
+        y = self._draw_wrapped(
+            self._lesson_task_summary(lesson),
+            (left, y),
+            content_width,
+            self.font_small,
+            ACCENT,
+        )
+        y += 12
+        for task in lesson.tasks:
+            y = self._draw_wrapped(
+                self._lesson_task_label(lesson, task.id, task.title.for_language(language)),
+                (left, y),
+                content_width,
+                self.font_small,
+                TEXT,
+            )
+            y += 6
 
     def _render_settings(self) -> None:
         settings = self.context.settings
