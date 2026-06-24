@@ -26,6 +26,7 @@ The shell currently supports:
 - generated intro screens,
 - built-in theory screens,
 - pause and help overlays,
+- guided learning paths with lesson tasks, completion badges, and persisted progress,
 - fullscreen, adaptive window size, and fixed-scene scaling settings,
 - persistent app settings,
 - standalone demo entry points for existing demo packages.
@@ -36,7 +37,8 @@ The shell currently supports:
 - [ ] Keep project docs aligned with the current unified app.
 - [ ] Clean up small repository artifacts and naming drift.
 - [x] Extract shared UI helpers for repeated demo-scene panel, text, and wrapping patterns.
-- [ ] Introduce learning paths, lesson/task manifests, progress, and meaningful completion badges.
+- [x] Introduce learning paths, lesson/task manifests, progress, and meaningful completion badges.
+- [ ] Expand learning paths beyond the first end-to-end path.
 - [ ] Continue balancing Level 1, Level 2, and Level 3 with small focused demos.
 - [ ] Add screenshots or short GIFs for the main README and app docs.
 
@@ -44,9 +46,9 @@ The shell currently supports:
 
 ### Learning Platform Layer
 
-The next product step is to turn the app from a guided demo browser into a guided learning platform. The app should keep demos, but add lessons, ordered learning paths, concrete tasks, progress, and meaningful badges.
+The app now has its first end-to-end learning path with ordered lessons, concrete tasks, persisted progress, and meaningful badges. The next product step is to grow this from one guided path into a broader learning platform while keeping the standalone demo browser intact.
 
-The direction is captured in [learning_platform.md](learning_platform.md). The first slice should be narrow: add lesson/path metadata and one path that reuses existing demos before building richer gamification.
+The direction is captured in [learning_platform.md](learning_platform.md). Future slices should add more paths, improve progress summaries, and only introduce richer gamification where it reinforces actual understanding.
 
 ### Shared UI Helpers
 
