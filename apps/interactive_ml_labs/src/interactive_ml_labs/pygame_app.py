@@ -818,6 +818,14 @@ class UnifiedAppShell:
         marker = "[x]" if task_id in self._completed_lesson_task_ids(lesson) else "[ ]"
         return f"{marker} {title}"
 
+    def _lesson_theory_status_label(self, lesson: LessonManifest) -> str:
+        """Return a localized theory visit status for one lesson."""
+        progress = self.context.progress.lessons.get(lesson.id)
+        if progress is not None and progress.theory_visited:
+            return self._text("Theory: visited", "Teoria: przeczytana")
+
+        return self._text("Theory: not visited", "Teoria: nieprzeczytana")
+
     def _lesson_menu_label(self, lesson: LessonManifest) -> str:
         """Return one lesson menu label with compact progress state."""
         title = lesson.title.for_language(self.context.settings.language)
@@ -1050,7 +1058,8 @@ class UnifiedAppShell:
             )
             y += 4
 
-        y = self._draw_lesson_badge_status(lesson, 80, y + 4, content_width)
+        y = self._draw_lesson_theory_status(lesson, 80, y + 4, content_width)
+        y = self._draw_lesson_badge_status(lesson, 80, y + 6, content_width)
         return y
 
     def _render_theory(self) -> None:
@@ -1339,6 +1348,8 @@ class UnifiedAppShell:
             self.font_small,
             ACCENT,
         )
+        y += 6
+        y = self._draw_lesson_theory_status(lesson, left, y, content_width)
         y += 12
         for task in lesson.tasks:
             y = self._draw_wrapped(
@@ -1351,6 +1362,22 @@ class UnifiedAppShell:
             y += 6
 
         self._draw_lesson_badge_status(lesson, left, y + 6, content_width)
+
+    def _draw_lesson_theory_status(
+        self,
+        lesson: LessonManifest,
+        x: int,
+        y: int,
+        width: int,
+    ) -> int:
+        """Draw one lesson theory status line."""
+        return self._draw_wrapped(
+            self._lesson_theory_status_label(lesson),
+            (x, y),
+            width,
+            self.font_small,
+            MUTED_TEXT,
+        )
 
     def _draw_lesson_badge_status(
         self,

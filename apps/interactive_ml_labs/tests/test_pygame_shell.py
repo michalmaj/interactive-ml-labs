@@ -965,6 +965,7 @@ def test_shell_intro_renders_selected_lesson_task_checklist(monkeypatch) -> None
         assert "Lesson tasks" in drawn_text
         assert "[x] Find a stable learning rate" in wrapped_text
         assert "[ ] Observe the loss drop" in wrapped_text
+        assert "Theory: not visited" in wrapped_text
         assert "Badge locked: Loss Navigator" in wrapped_text
     finally:
         pygame.quit()
@@ -1733,6 +1734,7 @@ def test_shell_pause_renders_selected_lesson_task_checklist(monkeypatch) -> None
 
         assert "Lesson tasks" in drawn_text
         assert "Tasks: 1/2 completed" in wrapped_text
+        assert "Theory: not visited" in wrapped_text
         assert "[x] Find a stable learning rate" in wrapped_text
         assert "[ ] Observe the loss drop" in wrapped_text
         assert "Badge locked: Loss Navigator" in wrapped_text
@@ -1767,6 +1769,24 @@ def test_shell_pause_shows_unlocked_lesson_badge(monkeypatch) -> None:
         app._render_pause()
 
         assert "Badge unlocked: Loss Navigator" in wrapped_text
+    finally:
+        pygame.quit()
+
+
+def test_shell_lesson_theory_status_label_localizes_polish(monkeypatch) -> None:
+    """Theory progress labels should reflect visited state in Polish."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+
+    try:
+        app.context.settings.language = "pl"
+        lesson = LESSON_BY_ID["error_gradient_descent"]
+
+        assert app._lesson_theory_status_label(lesson) == "Teoria: nieprzeczytana"
+
+        app.context.progress.mark_theory_visited(lesson.id)
+
+        assert app._lesson_theory_status_label(lesson) == "Teoria: przeczytana"
     finally:
         pygame.quit()
 
