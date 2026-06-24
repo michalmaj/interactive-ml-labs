@@ -20,6 +20,10 @@ from interactive_ml_labs.distance_metrics_scene import (
     DISTANCE_METRICS_LESSON_ID,
     MOVE_QUERY_TASK_ID,
 )
+from interactive_ml_labs.gaussian_mixture_scene import (
+    COMPARE_SOFT_ASSIGNMENTS_TASK_ID,
+    GAUSSIAN_MIXTURE_LESSON_ID,
+)
 from interactive_ml_labs.gradient_scene import GradientDescentSceneAdapter
 from interactive_ml_labs.kmeans_intro_scene import (
     KMEANS_LESSON_ID,
@@ -570,6 +574,30 @@ def test_shell_persists_clustering_task_progress(monkeypatch, tmp_path) -> None:
         assert (
             COMPARE_ALGORITHMS_TASK_ID
             in loaded_progress.lessons[CLUSTERING_LESSON_ID].completed_task_ids
+        )
+    finally:
+        pygame.quit()
+
+
+def test_shell_persists_gaussian_mixture_task_progress(monkeypatch, tmp_path) -> None:
+    """Gaussian Mixture task progress should be saved from active scene events."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    settings_path = tmp_path / "settings.json"
+    app = UnifiedAppShell(settings_path=settings_path)
+
+    try:
+        app.selected_learning_path = LEARNING_PATH_MANIFESTS[1]
+        app.screen_name = ScreenName.LESSONS
+        app.selected_index = 4
+        app._activate_selected()
+        app._start_demo()
+
+        app._handle_active_demo_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+        loaded_progress = load_app_progress(tmp_path / "progress.json")
+
+        assert (
+            COMPARE_SOFT_ASSIGNMENTS_TASK_ID
+            in loaded_progress.lessons[GAUSSIAN_MIXTURE_LESSON_ID].completed_task_ids
         )
     finally:
         pygame.quit()
