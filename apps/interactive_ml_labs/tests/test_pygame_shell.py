@@ -965,6 +965,7 @@ def test_shell_intro_renders_selected_lesson_task_checklist(monkeypatch) -> None
         assert "Lesson tasks" in drawn_text
         assert "[x] Find a stable learning rate" in wrapped_text
         assert "[ ] Observe the loss drop" in wrapped_text
+        assert "Badge locked: Loss Navigator" in wrapped_text
     finally:
         pygame.quit()
 
@@ -1734,6 +1735,38 @@ def test_shell_pause_renders_selected_lesson_task_checklist(monkeypatch) -> None
         assert "Tasks: 1/2 completed" in wrapped_text
         assert "[x] Find a stable learning rate" in wrapped_text
         assert "[ ] Observe the loss drop" in wrapped_text
+        assert "Badge locked: Loss Navigator" in wrapped_text
+    finally:
+        pygame.quit()
+
+
+def test_shell_pause_shows_unlocked_lesson_badge(monkeypatch) -> None:
+    """Pause menu should show when a guided lesson badge is unlocked."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    wrapped_text: list[str] = []
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = width, font, color
+        wrapped_text.append(text)
+        return position[1] + 24
+
+    try:
+        lesson = LESSON_BY_ID["error_gradient_descent"]
+        app.screen_name = ScreenName.PAUSE
+        app.selected_lesson = lesson
+        app.context.progress.mark_completed(lesson.id)
+        app._draw_wrapped = capture_wrapped
+
+        app._render_pause()
+
+        assert "Badge unlocked: Loss Navigator" in wrapped_text
     finally:
         pygame.quit()
 

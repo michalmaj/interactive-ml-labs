@@ -1050,6 +1050,7 @@ class UnifiedAppShell:
             )
             y += 4
 
+        y = self._draw_lesson_badge_status(lesson, 80, y + 4, content_width)
         return y
 
     def _render_theory(self) -> None:
@@ -1348,6 +1349,27 @@ class UnifiedAppShell:
                 TEXT,
             )
             y += 6
+
+        self._draw_lesson_badge_status(lesson, left, y + 6, content_width)
+
+    def _draw_lesson_badge_status(
+        self,
+        lesson: LessonManifest,
+        x: int,
+        y: int,
+        width: int,
+    ) -> int:
+        """Draw one lesson badge status line if the lesson has a badge."""
+        if lesson.completion_badge is None:
+            return y
+
+        return self._draw_wrapped(
+            self._lesson_badge_label(lesson),
+            (x, y),
+            width,
+            self.font_small,
+            ACCENT,
+        )
 
     def _render_settings(self) -> None:
         settings = self.context.settings
