@@ -925,6 +925,77 @@ def test_shell_lesson_details_render_task_checklist(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_intro_renders_selected_lesson_task_checklist(monkeypatch) -> None:
+    """Intro screen should show lesson tasks when launched from a learning path."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    drawn_text: list[str] = []
+    wrapped_text: list[str] = []
+
+    def capture_text(
+        text: str,
+        position: tuple[int, int],
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> None:
+        _ = position, font, color
+        drawn_text.append(text)
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = width, font, color
+        wrapped_text.append(text)
+        return position[1] + 24
+
+    try:
+        lesson = LESSON_BY_ID["error_gradient_descent"]
+        app.selected_lesson = lesson
+        app.selected_demo = DEMO_BY_ID[lesson.demo_id]
+        app.context.progress.complete_task(lesson.id, "find_stable_learning_rate")
+        app._draw_text = capture_text
+        app._draw_wrapped = capture_wrapped
+
+        app._render_intro()
+
+        assert "Lesson tasks" in drawn_text
+        assert "[x] Find a stable learning rate" in wrapped_text
+        assert "[ ] Observe the loss drop" in wrapped_text
+    finally:
+        pygame.quit()
+
+
+def test_shell_intro_omits_lesson_tasks_for_standalone_demo(monkeypatch) -> None:
+    """Standalone demo intros should keep the original demo-only layout."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    drawn_text: list[str] = []
+
+    def capture_text(
+        text: str,
+        position: tuple[int, int],
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> None:
+        _ = position, font, color
+        drawn_text.append(text)
+
+    try:
+        app.selected_demo = DEMO_BY_ID["gradient_descent_playground"]
+        app.selected_lesson = None
+        app._draw_text = capture_text
+
+        app._render_intro()
+
+        assert "Lesson tasks" not in drawn_text
+    finally:
+        pygame.quit()
+
+
 def test_shell_help_overlay_uses_selected_demo_manifest(monkeypatch) -> None:
     """Help overlay should use manifest text for the selected demo."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")

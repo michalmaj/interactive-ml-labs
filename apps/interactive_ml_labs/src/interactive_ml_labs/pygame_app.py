@@ -969,6 +969,10 @@ class UnifiedAppShell:
         )
         y += 36
 
+        if self.selected_lesson is not None:
+            y = self._draw_intro_lesson_tasks(y)
+            y += 16
+
         if width >= 1000:
             gap = 48
             column_width = (width - 160 - gap) // 2
@@ -1019,6 +1023,34 @@ class UnifiedAppShell:
                 "Enter: start | T: teoria | Esc/Backspace: lista dem | S: ustawienia | L: język",
             ),
         )
+
+    def _draw_intro_lesson_tasks(self, y: int) -> int:
+        """Draw selected lesson tasks on the intro screen."""
+        lesson = self.selected_lesson
+        if lesson is None:
+            return y
+
+        language = self.context.settings.language
+        width, _ = self.context.settings.resolution
+        content_width = min(850, width - 160)
+        self._draw_text(
+            self._text("Lesson tasks", "Zadania lekcji"),
+            (80, y),
+            self.font_small,
+            ACCENT,
+        )
+        y += 24
+        for task in lesson.tasks:
+            y = self._draw_wrapped(
+                self._lesson_task_label(lesson, task.id, task.title.for_language(language)),
+                (80, y),
+                content_width,
+                self.font_small,
+                TEXT,
+            )
+            y += 4
+
+        return y
 
     def _render_theory(self) -> None:
         demo = self._require_demo()
