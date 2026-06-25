@@ -575,6 +575,8 @@ class UnifiedAppShell:
             self.font_small,
             TEXT,
         )
+        y += 6
+        y = self._draw_lesson_theory_status(lesson, content_x, y, content_width)
         y += 18
         self._draw_text(
             self._lesson_task_summary(lesson),
