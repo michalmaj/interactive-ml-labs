@@ -485,6 +485,14 @@ class UnifiedAppShell:
         )
         y += 6
         y = self._draw_wrapped(
+            self._learning_path_badge_progress_label(path),
+            (content_x, y),
+            content_width,
+            self.font_small,
+            TEXT,
+        )
+        y += 6
+        y = self._draw_wrapped(
             self._learning_path_status_label(path),
             (content_x, y),
             content_width,
@@ -652,6 +660,15 @@ class UnifiedAppShell:
             f"Zadania: {completed_count}/{total_count} ukończone",
         )
 
+    def _learning_path_badge_progress_label(self, path: LearningPathManifest) -> str:
+        """Return a localized badge completion summary for one learning path."""
+        unlocked_count = self._unlocked_learning_path_badge_count(path)
+        total_count = self._learning_path_badge_count(path)
+        return self._text(
+            f"Badges: {unlocked_count}/{total_count} unlocked",
+            f"Odznaki: {unlocked_count}/{total_count} zdobyte",
+        )
+
     def _learning_path_status_label(self, path: LearningPathManifest) -> str:
         """Return a localized status label for one learning path."""
         started_count = self._started_learning_path_lesson_count(path)
@@ -726,6 +743,25 @@ class UnifiedAppShell:
             task_count += len(LESSON_BY_ID[lesson_id].tasks)
 
         return task_count
+
+    def _unlocked_learning_path_badge_count(self, path: LearningPathManifest) -> int:
+        """Count unlocked badges across one learning path."""
+        unlocked_count = 0
+        for lesson_id in path.lesson_ids:
+            lesson = LESSON_BY_ID[lesson_id]
+            if lesson.completion_badge is not None and self._is_lesson_completed(lesson_id):
+                unlocked_count += 1
+
+        return unlocked_count
+
+    def _learning_path_badge_count(self, path: LearningPathManifest) -> int:
+        """Count all badges available in one learning path."""
+        badge_count = 0
+        for lesson_id in path.lesson_ids:
+            if LESSON_BY_ID[lesson_id].completion_badge is not None:
+                badge_count += 1
+
+        return badge_count
 
     def _started_learning_path_lesson_count(self, path: LearningPathManifest) -> int:
         """Count started lessons in one learning path."""

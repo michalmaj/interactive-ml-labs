@@ -742,6 +742,7 @@ def test_shell_learning_path_progress_labels_reflect_completion(monkeypatch) -> 
 
         assert app._learning_path_progress_label(path) == "Lessons: 0/4 completed"
         assert app._learning_path_task_progress_label(path) == "Tasks: 0/8 completed"
+        assert app._learning_path_badge_progress_label(path) == "Badges: 0/4 unlocked"
         assert app._learning_path_status_label(path) == "Not started"
         assert app._learning_path_next_action_label(path) == (
             "Next action: start See error in a fitted line"
@@ -754,6 +755,7 @@ def test_shell_learning_path_progress_labels_reflect_completion(monkeypatch) -> 
 
         assert app._learning_path_progress_label(path) == "Lessons: 1/4 completed"
         assert app._learning_path_task_progress_label(path) == "Tasks: 2/8 completed"
+        assert app._learning_path_badge_progress_label(path) == "Badges: 1/4 unlocked"
         assert app._learning_path_status_label(path) == "In progress"
         assert app._learning_path_next_action_label(path) == (
             "Next action: continue See error in a fitted line"
@@ -763,6 +765,7 @@ def test_shell_learning_path_progress_labels_reflect_completion(monkeypatch) -> 
             app.context.progress.mark_completed(lesson_id)
 
         assert app._learning_path_progress_label(path) == "Lessons: 4/4 completed"
+        assert app._learning_path_badge_progress_label(path) == "Badges: 4/4 unlocked"
         assert app._learning_path_status_label(path) == "Path completed"
         assert app._learning_path_next_action_label(path) == (
             "Next action: review completed lessons"
@@ -809,6 +812,7 @@ def test_shell_learning_path_details_render_progress_summary(monkeypatch) -> Non
         assert "4 lessons" in drawn_text
         assert "Lessons: 1/4 completed" in wrapped_text
         assert "Tasks: 0/8 completed" in wrapped_text
+        assert "Badges: 1/4 unlocked" in wrapped_text
         assert "In progress" in wrapped_text
         assert "Next action: start Let an algorithm reduce loss" in wrapped_text
     finally:
@@ -827,6 +831,7 @@ def test_shell_learning_path_task_progress_label_localizes_polish(monkeypatch) -
         app.context.progress.complete_task(first_lesson_id, "move_query")
 
         assert app._learning_path_task_progress_label(path) == "Zadania: 1/10 ukończone"
+        assert app._learning_path_badge_progress_label(path) == "Odznaki: 0/5 zdobyte"
         assert app._learning_path_next_action_label(path) == (
             "Następny krok: kontynuuj Ustal, co znaczy blisko"
         )
