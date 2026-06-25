@@ -485,6 +485,14 @@ class UnifiedAppShell:
         )
         y += 6
         y = self._draw_wrapped(
+            self._learning_path_theory_progress_label(path),
+            (content_x, y),
+            content_width,
+            self.font_small,
+            TEXT,
+        )
+        y += 6
+        y = self._draw_wrapped(
             self._learning_path_badge_progress_label(path),
             (content_x, y),
             content_width,
@@ -671,6 +679,15 @@ class UnifiedAppShell:
             f"Zadania: {completed_count}/{total_count} ukończone",
         )
 
+    def _learning_path_theory_progress_label(self, path: LearningPathManifest) -> str:
+        """Return a localized theory visit summary for one learning path."""
+        visited_count = self._visited_learning_path_theory_count(path)
+        total_count = len(path.lesson_ids)
+        return self._text(
+            f"Theory: {visited_count}/{total_count} visited",
+            f"Teoria: {visited_count}/{total_count} przeczytana",
+        )
+
     def _learning_path_badge_progress_label(self, path: LearningPathManifest) -> str:
         """Return a localized badge completion summary for one learning path."""
         unlocked_count = self._unlocked_learning_path_badge_count(path)
@@ -768,6 +785,16 @@ class UnifiedAppShell:
             task_count += len(LESSON_BY_ID[lesson_id].tasks)
 
         return task_count
+
+    def _visited_learning_path_theory_count(self, path: LearningPathManifest) -> int:
+        """Count lessons with visited theory in one learning path."""
+        visited_count = 0
+        for lesson_id in path.lesson_ids:
+            progress = self.context.progress.lessons.get(lesson_id)
+            if progress is not None and progress.theory_visited:
+                visited_count += 1
+
+        return visited_count
 
     def _unlocked_learning_path_badge_count(self, path: LearningPathManifest) -> int:
         """Count unlocked badges across one learning path."""
