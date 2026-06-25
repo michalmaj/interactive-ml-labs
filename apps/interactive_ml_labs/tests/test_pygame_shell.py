@@ -742,6 +742,7 @@ def test_shell_learning_path_progress_labels_reflect_completion(monkeypatch) -> 
 
         assert app._learning_path_progress_label(path) == "Lessons: 0/4 completed"
         assert app._learning_path_task_progress_label(path) == "Tasks: 0/8 completed"
+        assert app._learning_path_theory_progress_label(path) == "Theory: 0/4 visited"
         assert app._learning_path_badge_progress_label(path) == "Badges: 0/4 unlocked"
         assert app._learning_path_status_label(path) == "Not started"
         assert app._learning_path_next_action_label(path) == (
@@ -749,12 +750,14 @@ def test_shell_learning_path_progress_labels_reflect_completion(monkeypatch) -> 
         )
 
         app.context.progress.mark_started(path.lesson_ids[0])
+        app.context.progress.mark_theory_visited(path.lesson_ids[0])
         app.context.progress.complete_task(path.lesson_ids[0], "move_line")
         app.context.progress.complete_task(path.lesson_ids[0], "balance_residuals")
         app.context.progress.mark_completed(path.lesson_ids[1])
 
         assert app._learning_path_progress_label(path) == "Lessons: 1/4 completed"
         assert app._learning_path_task_progress_label(path) == "Tasks: 2/8 completed"
+        assert app._learning_path_theory_progress_label(path) == "Theory: 1/4 visited"
         assert app._learning_path_badge_progress_label(path) == "Badges: 1/4 unlocked"
         assert app._learning_path_status_label(path) == "In progress"
         assert app._learning_path_next_action_label(path) == (
@@ -812,6 +815,7 @@ def test_shell_learning_path_details_render_progress_summary(monkeypatch) -> Non
         assert "4 lessons" in drawn_text
         assert "Lessons: 1/4 completed" in wrapped_text
         assert "Tasks: 0/8 completed" in wrapped_text
+        assert "Theory: 0/4 visited" in wrapped_text
         assert "Badges: 1/4 unlocked" in wrapped_text
         assert "In progress" in wrapped_text
         assert "Next action: start Let an algorithm reduce loss" in wrapped_text
@@ -851,6 +855,7 @@ def test_shell_learning_path_task_progress_label_localizes_polish(monkeypatch) -
         app.context.progress.complete_task(first_lesson_id, "move_query")
 
         assert app._learning_path_task_progress_label(path) == "Zadania: 1/10 ukończone"
+        assert app._learning_path_theory_progress_label(path) == "Teoria: 0/5 przeczytana"
         assert app._learning_path_badge_progress_label(path) == "Odznaki: 0/5 zdobyte"
         assert app._learning_path_next_action_label(path) == (
             "Następny krok: kontynuuj Ustal, co znaczy blisko"
