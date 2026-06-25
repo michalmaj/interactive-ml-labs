@@ -127,6 +127,14 @@ Narrative:
 
 This path is a good first slice because it connects existing Level 1 and Level 2 material into one learning story. It now has checkable tasks, prerequisite and next-lesson guidance, completion badges, persisted lesson progress, and a visible learning-path progress summary.
 
+The shell now keeps lesson state visible in the places where students make decisions:
+
+- the learning-path panel shows lesson and task progress plus the next action,
+- the lesson list marks not started, started, partially completed, and completed lessons,
+- the lesson detail panel shows task progress, theory status, prerequisites, next lesson, and badge status,
+- the intro screen shows lesson tasks, theory status, and badge status before the demo starts,
+- the pause menu shows the same lesson task, theory, and badge context while the demo is running.
+
 ## Second Learning Path
 
 The second path starts broadening the platform beyond supervised error minimization.

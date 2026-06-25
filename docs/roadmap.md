@@ -26,7 +26,7 @@ The shell currently supports:
 - generated intro screens,
 - built-in theory screens,
 - pause and help overlays,
-- guided learning paths with lesson tasks, prerequisite/next-lesson guidance, completion badges, and persisted progress,
+- guided learning paths with lesson tasks, prerequisite/next-lesson guidance, completion badges, visible theory status, task checklists in intro/pause flow, and persisted progress,
 - fullscreen, adaptive window size, and fixed-scene scaling settings,
 - persistent app settings,
 - standalone demo entry points for existing demo packages.
@@ -55,6 +55,8 @@ The app now has two guided learning paths with checkable tasks:
 Both paths connect lesson manifests to real scene interactions and persisted progress while keeping the standalone demo browser intact.
 
 The direction is captured in [learning_platform.md](learning_platform.md). Future slices should improve progress summaries, add more useful instructor/student feedback, and only introduce richer gamification where it reinforces actual understanding.
+
+Recent shell work made lesson progress visible throughout the student flow: path details point to the next lesson, lesson lists show compact progress markers, and intro/pause screens show lesson tasks, theory status, and badge status.
 
 ### Shared UI Helpers
 

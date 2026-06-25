@@ -103,6 +103,8 @@ This repository is also intended to demonstrate how real software projects are d
 
 The unified app is now the recommended guided experience. The project is no longer only a collection of separate demos: the app shell provides language selection, learning paths, level selection, demo intros, in-app theory, help overlays, settings, and scrollable demo lists.
 
+Guided lessons now keep learning state visible across the main flow: lesson details, intro screens, and pause menus show task progress, theory status, and badge status when a demo is launched from a learning path.
+
 Two guided learning paths now have checkable task completion:
 
 - How models learn from error,
