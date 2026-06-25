@@ -507,7 +507,18 @@ class UnifiedAppShell:
             self.font_small,
             ACCENT,
         )
-        y += 24
+        y += 18
+        for badge_label in self._learning_path_badge_labels(path)[:4]:
+            y = self._draw_wrapped(
+                badge_label,
+                (content_x, y),
+                content_width,
+                self.font_small,
+                MUTED_TEXT,
+            )
+            y += 4
+
+        y += 16
         for lesson_id in path.lesson_ids[:4]:
             lesson = LESSON_BY_ID[lesson_id]
             y = self._draw_wrapped(
@@ -668,6 +679,20 @@ class UnifiedAppShell:
             f"Badges: {unlocked_count}/{total_count} unlocked",
             f"Odznaki: {unlocked_count}/{total_count} zdobyte",
         )
+
+    def _learning_path_badge_labels(self, path: LearningPathManifest) -> list[str]:
+        """Return badge labels with completion markers for one learning path."""
+        labels: list[str] = []
+        for lesson_id in path.lesson_ids:
+            lesson = LESSON_BY_ID[lesson_id]
+            if lesson.completion_badge is None:
+                continue
+
+            marker = "[x]" if self._is_lesson_completed(lesson_id) else "[ ]"
+            badge = lesson.completion_badge.for_language(self.context.settings.language)
+            labels.append(f"{marker} {badge}")
+
+        return labels
 
     def _learning_path_status_label(self, path: LearningPathManifest) -> str:
         """Return a localized status label for one learning path."""

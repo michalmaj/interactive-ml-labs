@@ -815,6 +815,26 @@ def test_shell_learning_path_details_render_progress_summary(monkeypatch) -> Non
         assert "Badges: 1/4 unlocked" in wrapped_text
         assert "In progress" in wrapped_text
         assert "Next action: start Let an algorithm reduce loss" in wrapped_text
+        assert "[x] Residual Reader" in wrapped_text
+        assert "[ ] Loss Navigator" in wrapped_text
+    finally:
+        pygame.quit()
+
+
+def test_shell_learning_path_badge_labels_localize_polish(monkeypatch) -> None:
+    """Learning path badge labels should show localized badge names and markers."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.context.settings.language = "pl"
+        path = LEARNING_PATH_MANIFESTS[1]
+        app.context.progress.mark_completed(path.lesson_ids[0])
+
+        assert app._learning_path_badge_labels(path)[:2] == [
+            "[x] Czytelnik metryk",
+            "[ ] Głos sąsiedztwa",
+        ]
     finally:
         pygame.quit()
 
