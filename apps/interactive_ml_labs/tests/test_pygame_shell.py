@@ -361,6 +361,66 @@ def test_shell_home_renders_learning_progress_panel(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_home_continue_opens_next_guided_lesson(monkeypatch) -> None:
+    """The home continue shortcut should open the next guided lesson intro."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        lesson = LESSON_BY_ID[path.lesson_ids[0]]
+
+        app.screen_name = ScreenName.HOME
+        app._handle_keydown(pygame.K_c)
+
+        assert app.screen_name == ScreenName.INTRO
+        assert app.selected_learning_path == path
+        assert app.selected_lesson == lesson
+        assert app.selected_demo == DEMO_BY_ID[lesson.demo_id]
+        assert app.context.progress.lessons[lesson.id].started is True
+    finally:
+        pygame.quit()
+
+
+def test_shell_home_continue_skips_completed_path(monkeypatch) -> None:
+    """The home continue shortcut should move to the next incomplete path."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        first_path = LEARNING_PATH_MANIFESTS[0]
+        second_path = LEARNING_PATH_MANIFESTS[1]
+        for lesson_id in first_path.lesson_ids:
+            app.context.progress.mark_completed(lesson_id)
+
+        app.screen_name = ScreenName.HOME
+        app._handle_keydown(pygame.K_c)
+
+        assert app.screen_name == ScreenName.INTRO
+        assert app.selected_learning_path == second_path
+        assert app.selected_lesson == LESSON_BY_ID[second_path.lesson_ids[0]]
+    finally:
+        pygame.quit()
+
+
+def test_shell_home_continue_reviews_paths_when_all_complete(monkeypatch) -> None:
+    """Completed guided paths should send the home shortcut back to path review."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        for path in LEARNING_PATH_MANIFESTS:
+            for lesson_id in path.lesson_ids:
+                app.context.progress.mark_completed(lesson_id)
+
+        app.screen_name = ScreenName.HOME
+        app._handle_keydown(pygame.K_c)
+
+        assert app.screen_name == ScreenName.PATHS
+    finally:
+        pygame.quit()
+
+
 def test_shell_learning_path_menu_labels_reflect_progress(monkeypatch) -> None:
     """Learning path menu labels should show compact path progress."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
