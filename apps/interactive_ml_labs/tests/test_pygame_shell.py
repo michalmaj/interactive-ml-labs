@@ -357,6 +357,46 @@ def test_shell_home_renders_learning_progress_panel(monkeypatch) -> None:
 
         assert "Learning progress" in wrapped_text
         assert "Lessons: 0/9 completed" in wrapped_text
+        assert app.home_continue_rect is not None
+    finally:
+        pygame.quit()
+
+
+def test_shell_home_progress_click_opens_next_guided_lesson(monkeypatch) -> None:
+    """Clicking the home progress CTA should open the next guided lesson."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        lesson = LESSON_BY_ID[path.lesson_ids[0]]
+        app.screen_name = ScreenName.HOME
+
+        app._render_home()
+        assert app.home_continue_rect is not None
+        app._handle_mouse_click(app.home_continue_rect.center)
+
+        assert app.screen_name == ScreenName.INTRO
+        assert app.selected_learning_path == path
+        assert app.selected_lesson == lesson
+    finally:
+        pygame.quit()
+
+
+def test_shell_home_progress_click_ignores_other_screens(monkeypatch) -> None:
+    """The stored home CTA hitbox should not affect other screens."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+
+    try:
+        app.screen_name = ScreenName.HOME
+        app._render_home()
+        assert app.home_continue_rect is not None
+
+        app.screen_name = ScreenName.LEVELS
+        app._handle_mouse_click(app.home_continue_rect.center)
+
+        assert app.screen_name == ScreenName.LEVELS
     finally:
         pygame.quit()
 

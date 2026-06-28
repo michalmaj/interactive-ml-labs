@@ -147,6 +147,7 @@ class UnifiedAppShell:
         self.learning_path_details_scroll_offset = 0
         self.learning_path_details_max_scroll = 0
         self.learning_path_details_scroll_path_id: str | None = None
+        self.home_continue_rect: pygame.Rect | None = None
 
         pygame.display.set_caption("Interactive ML Labs")
 
@@ -299,6 +300,8 @@ class UnifiedAppShell:
     def _handle_mouse_click(self, position: tuple[int, int]) -> None:
         if self._handle_demo_scrollbar_click(position):
             return
+        if self._handle_home_continue_click(position):
+            return
         if self._select_menu_item_at(position):
             self._activate_selected()
 
@@ -334,6 +337,17 @@ class UnifiedAppShell:
                 return True
 
         return False
+
+    def _handle_home_continue_click(self, position: tuple[int, int]) -> bool:
+        """Open the suggested home lesson when the progress CTA is clicked."""
+        if self.screen_name != ScreenName.HOME or self.home_continue_rect is None:
+            return False
+
+        if not self.home_continue_rect.collidepoint(position):
+            return False
+
+        self._continue_learning()
+        return True
 
     def _select_demo_item_at(self, position: tuple[int, int]) -> bool:
         """Select a demo under the pointer, accounting for scroll offset."""
@@ -441,8 +455,14 @@ class UnifiedAppShell:
             TEXT,
         )
         y += 14
-        for line in self._home_learning_progress_lines():
-            y = self._draw_wrapped(line, (x, y), content_width, self.font_small, MUTED_TEXT)
+        progress_lines = self._home_learning_progress_lines()
+        self.home_continue_rect = None
+        for index, line in enumerate(progress_lines):
+            line_top = y
+            color = ACCENT if index == len(progress_lines) - 1 else MUTED_TEXT
+            y = self._draw_wrapped(line, (x, y), content_width, self.font_small, color)
+            if index == len(progress_lines) - 1:
+                self.home_continue_rect = pygame.Rect(x, line_top, content_width, y - line_top)
             y += 8
 
     def _render_learning_paths(self) -> None:
