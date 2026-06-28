@@ -455,15 +455,35 @@ class UnifiedAppShell:
             TEXT,
         )
         y += 14
-        progress_lines = self._home_learning_progress_lines()
+        progress_metrics = self._home_learning_progress_metrics()
+        next_action_line = self._home_learning_next_action_label()
         self.home_continue_rect = None
-        for index, line in enumerate(progress_lines):
-            line_top = y
-            color = ACCENT if index == len(progress_lines) - 1 else MUTED_TEXT
-            y = self._draw_wrapped(line, (x, y), content_width, self.font_small, color)
-            if index == len(progress_lines) - 1:
-                self.home_continue_rect = pygame.Rect(x, line_top, content_width, y - line_top)
-            y += 8
+        for label, completed_count, total_count in progress_metrics:
+            y = self._draw_wrapped(label, (x, y), content_width, self.font_small, MUTED_TEXT)
+            self._draw_home_progress_bar(x, y + 2, content_width, completed_count, total_count)
+            y += 20
+
+        line_top = y
+        y = self._draw_wrapped(next_action_line, (x, y), content_width, self.font_small, ACCENT)
+        self.home_continue_rect = pygame.Rect(x, line_top, content_width, y - line_top)
+
+    def _draw_home_progress_bar(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        completed_count: int,
+        total_count: int,
+    ) -> None:
+        """Draw one compact progress bar in the home learning panel."""
+        track_rect = pygame.Rect(x, y, width, 8)
+        pygame.draw.rect(self.screen, (55, 61, 69), track_rect, border_radius=3)
+        if total_count <= 0 or completed_count <= 0:
+            return
+
+        ratio = min(1.0, completed_count / total_count)
+        fill_rect = pygame.Rect(x, y, round(width * ratio), track_rect.height)
+        pygame.draw.rect(self.screen, ACCENT, fill_rect, border_radius=3)
 
     def _render_learning_paths(self) -> None:
         labels = [self._learning_path_menu_label(path) for path in LEARNING_PATH_MANIFESTS]
@@ -823,6 +843,12 @@ class UnifiedAppShell:
 
     def _home_learning_progress_lines(self) -> list[str]:
         """Return localized progress lines for the home learning snapshot."""
+        lines = [label for label, _, _ in self._home_learning_progress_metrics()]
+        lines.append(self._home_learning_next_action_label())
+        return lines
+
+    def _home_learning_progress_metrics(self) -> list[tuple[str, int, int]]:
+        """Return localized progress labels and counts for the home snapshot."""
         completed_lessons = sum(
             self._completed_learning_path_lesson_count(path) for path in LEARNING_PATH_MANIFESTS
         )
@@ -838,22 +864,32 @@ class UnifiedAppShell:
             self._learning_path_badge_count(path) for path in LEARNING_PATH_MANIFESTS
         )
 
-        lines = [
-            self._text(
-                f"Lessons: {completed_lessons}/{total_lessons} completed",
-                f"Lekcje: {completed_lessons}/{total_lessons} ukończone",
+        return [
+            (
+                self._text(
+                    f"Lessons: {completed_lessons}/{total_lessons} completed",
+                    f"Lekcje: {completed_lessons}/{total_lessons} ukończone",
+                ),
+                completed_lessons,
+                total_lessons,
             ),
-            self._text(
-                f"Tasks: {completed_tasks}/{total_tasks} completed",
-                f"Zadania: {completed_tasks}/{total_tasks} ukończone",
+            (
+                self._text(
+                    f"Tasks: {completed_tasks}/{total_tasks} completed",
+                    f"Zadania: {completed_tasks}/{total_tasks} ukończone",
+                ),
+                completed_tasks,
+                total_tasks,
             ),
-            self._text(
-                f"Badges: {unlocked_badges}/{total_badges} unlocked",
-                f"Odznaki: {unlocked_badges}/{total_badges} zdobyte",
+            (
+                self._text(
+                    f"Badges: {unlocked_badges}/{total_badges} unlocked",
+                    f"Odznaki: {unlocked_badges}/{total_badges} zdobyte",
+                ),
+                unlocked_badges,
+                total_badges,
             ),
         ]
-        lines.append(self._home_learning_next_action_label())
-        return lines
 
     def _home_learning_next_action_label(self) -> str:
         """Return a localized next learning action across all paths."""
