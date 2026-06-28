@@ -289,6 +289,58 @@ def test_shell_home_opens_learning_paths(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_learning_path_menu_labels_reflect_progress(monkeypatch) -> None:
+    """Learning path menu labels should show compact path progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+
+        assert app._learning_path_menu_label(path) == "[ ] How models learn from error"
+
+        app.context.progress.mark_started(path.lesson_ids[0])
+        assert app._learning_path_menu_label(path) == "[..] How models learn from error"
+
+        app.context.progress.mark_completed(path.lesson_ids[0])
+        assert app._learning_path_menu_label(path) == "[1/4] How models learn from error"
+
+        for lesson_id in path.lesson_ids:
+            app.context.progress.mark_completed(lesson_id)
+
+        assert app._learning_path_menu_label(path) == "[x] How models learn from error"
+    finally:
+        pygame.quit()
+
+
+def test_shell_learning_paths_screen_renders_progress_markers(monkeypatch) -> None:
+    """Learning path selection should pass progress-aware labels to the menu."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+    menu_labels: list[str] = []
+
+    def capture_menu(
+        labels: list[str],
+        *,
+        top: int,
+        width: int = 640,
+    ) -> None:
+        _ = top, width
+        menu_labels.extend(labels)
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        app.context.progress.mark_completed(path.lesson_ids[0])
+        app.screen_name = ScreenName.PATHS
+        app._draw_menu = capture_menu
+
+        app._render_learning_paths()
+
+        assert "[1/4] How models learn from error" in menu_labels
+    finally:
+        pygame.quit()
+
+
 def test_shell_learning_path_selection_opens_lessons(monkeypatch) -> None:
     """Selecting a learning path should show its ordered lessons."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
