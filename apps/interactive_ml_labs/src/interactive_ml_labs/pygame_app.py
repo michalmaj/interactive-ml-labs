@@ -411,8 +411,7 @@ class UnifiedAppShell:
         )
 
     def _render_learning_paths(self) -> None:
-        language = self.context.settings.language
-        labels = [path.title.for_language(language) for path in LEARNING_PATH_MANIFESTS]
+        labels = [self._learning_path_menu_label(path) for path in LEARNING_PATH_MANIFESTS]
         self._draw_title(
             self._text("Guided learning paths", "Prowadzone ścieżki nauki"),
             self._text(
@@ -710,6 +709,21 @@ class UnifiedAppShell:
             labels.append(f"{marker} {badge}")
 
         return labels
+
+    def _learning_path_menu_label(self, path: LearningPathManifest) -> str:
+        """Return one learning path menu label with compact progress state."""
+        title = path.title.for_language(self.context.settings.language)
+        completed_count = self._completed_learning_path_lesson_count(path)
+        total_count = len(path.lesson_ids)
+
+        if total_count > 0 and completed_count == total_count:
+            return f"[x] {title}"
+        if completed_count > 0:
+            return f"[{completed_count}/{total_count}] {title}"
+        if self._started_learning_path_lesson_count(path) > 0:
+            return f"[..] {title}"
+
+        return f"[ ] {title}"
 
     def _learning_path_status_label(self, path: LearningPathManifest) -> str:
         """Return a localized status label for one learning path."""
