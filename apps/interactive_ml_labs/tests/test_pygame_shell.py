@@ -313,6 +313,26 @@ def test_shell_home_learning_progress_lines_summarize_paths(monkeypatch) -> None
         pygame.quit()
 
 
+def test_shell_home_learning_progress_metrics_track_counts(monkeypatch) -> None:
+    """Home progress metrics should expose labels and numeric progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        lesson = LESSON_BY_ID[path.lesson_ids[0]]
+        app.context.progress.complete_task(lesson.id, lesson.tasks[0].id)
+        app.context.progress.mark_completed(lesson.id)
+
+        assert app._home_learning_progress_metrics() == [
+            ("Lessons: 1/9 completed", 1, 9),
+            ("Tasks: 1/18 completed", 1, 18),
+            ("Badges: 1/9 unlocked", 1, 9),
+        ]
+    finally:
+        pygame.quit()
+
+
 def test_shell_home_learning_progress_lines_localize_polish(monkeypatch) -> None:
     """Home progress snapshot should use natural Polish labels."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -338,6 +358,7 @@ def test_shell_home_renders_learning_progress_panel(monkeypatch) -> None:
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
     wrapped_text: list[str] = []
+    progress_bars: list[tuple[int, int]] = []
 
     def capture_wrapped(
         text: str,
@@ -350,13 +371,25 @@ def test_shell_home_renders_learning_progress_panel(monkeypatch) -> None:
         wrapped_text.append(text)
         return position[1] + 24
 
+    def capture_progress_bar(
+        x: int,
+        y: int,
+        width: int,
+        completed_count: int,
+        total_count: int,
+    ) -> None:
+        _ = x, y, width
+        progress_bars.append((completed_count, total_count))
+
     try:
         app._draw_wrapped = capture_wrapped
+        app._draw_home_progress_bar = capture_progress_bar
 
         app._render_home()
 
         assert "Learning progress" in wrapped_text
         assert "Lessons: 0/9 completed" in wrapped_text
+        assert progress_bars == [(0, 9), (0, 18), (0, 9)]
         assert app.home_continue_rect is not None
     finally:
         pygame.quit()
