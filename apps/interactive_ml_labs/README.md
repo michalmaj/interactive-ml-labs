@@ -13,6 +13,8 @@ Standalone demo entry points remain supported for development, debugging, and fo
 ## Current Scope
 
 - global language selection: English and Polish,
+- guided learning paths with persisted lesson, task, theory, and badge progress,
+- home-screen learning progress with keyboard and mouse continue actions,
 - dynamic level and demo selection from manifests,
 - scrollable demo lists with keyboard and mouse navigation,
 - generated intro screens with objectives and controls,
@@ -27,12 +29,14 @@ Standalone demo entry points remain supported for development, debugging, and fo
 ```text
 Interactive ML Labs
 -> language and settings
--> level selection
--> demo selection
+-> home progress and learning mode selection
+-> guided path lesson selection or level/demo selection
 -> demo intro
 -> theory or experiment
 -> pause / help / objectives / controls
 ```
+
+On the home screen, press `C` or click the highlighted progress next-step line to continue the next recommended guided lesson.
 
 ## Development Notes
 

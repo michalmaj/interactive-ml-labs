@@ -29,12 +29,15 @@ Obecny przepływ aplikacji:
 
 ```text
 wybór języka
--> wybór poziomu
--> wybór demo
+-> ekran główny z postępem nauki
+-> ścieżka nauki albo wybór poziomu
+-> wybór lekcji albo demo
 -> ekran startowy demo
 -> ekran demo
 -> pauza / pomoc
 ```
+
+Ekran główny pokazuje zbiorczy postęp w prowadzonych ścieżkach nauki. Naciśnij `C` albo kliknij podświetloną linię z następnym krokiem w panelu postępu, żeby od razu kontynuować sugerowaną lekcję. Możesz też wejść w "Prowadzone ścieżki nauki", żeby ręcznie przejrzeć ścieżki, lekcje, zadania, odznaki i postęp w teorii.
 
 Unified app jest teraz główną ścieżką przechodzenia przez laboratoria. Wszystkie obecne dema z Level 1 i Level 2 działają już w appce, a Level 3 ma rosnący zestaw zaawansowanych labów app-only. Oryginalne pakiety demo nadal można uruchomić osobno, a natywne laby app-only uruchamia się z unified app.
 
@@ -75,6 +78,8 @@ Podstawowe sterowanie:
 | `Up` / `Down` | Przesuń zaznaczenie |
 | Ruch myszy | Przesuń zaznaczenie na wskazaną pozycję |
 | Klik myszy / `Enter` | Aktywuj zaznaczoną pozycję |
+| `C` na ekranie głównym | Kontynuuj następną lekcję ze ścieżki nauki |
+| Klik w następną lekcję w panelu postępu | Kontynuuj następną lekcję ze ścieżki nauki |
 | `Esc` / `Backspace` | Wróć albo otwórz pauzę |
 | `H` | Pokaż lub ukryj pomoc dla wybranego demo |
 | `L` | Zmień język |

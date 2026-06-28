@@ -29,12 +29,15 @@ Current app shell flow:
 
 ```text
 language selection
--> level selection
--> demo selection
+-> home screen with learning progress
+-> guided learning path or level selection
+-> lesson or demo selection
 -> demo intro screen
 -> demo screen
 -> pause/help overlay
 ```
+
+The home screen shows aggregate learning progress across guided learning paths. Press `C` or click the highlighted next-step line in the progress panel to continue the next recommended lesson. You can also enter "Guided learning paths" to review paths, lessons, tasks, badges, and theory progress manually.
 
 The unified app is now the main guided path. All current Level 1 and Level 2 demos are available through it, and Level 3 contains a growing set of advanced app-only labs. Original package demos can still be run directly, while native app-only labs are launched from the unified app.
 
@@ -75,6 +78,8 @@ Common shell controls:
 | `Up` / `Down` | Move selection |
 | Mouse hover | Move selection |
 | Mouse click / `Enter` | Activate selected item |
+| `C` on the home screen | Continue the next guided lesson |
+| Click the home progress next-step line | Continue the next guided lesson |
 | `Esc` / `Backspace` | Go back or open pause menu |
 | `H` | Toggle the selected demo help overlay |
 | `L` | Toggle language |
