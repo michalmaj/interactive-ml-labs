@@ -289,6 +289,7 @@ class UnifiedAppShell:
             pygame.K_l: self._toggle_language,
             pygame.K_s: self._open_settings,
             pygame.K_t: self._open_theory,
+            pygame.K_c: self._continue_learning,
         }
         handler = handlers.get(key)
 
@@ -412,8 +413,8 @@ class UnifiedAppShell:
         self._render_home_learning_progress()
         self._draw_footer(
             self._text(
-                "Enter: select | Esc/Backspace: language | S: settings | L: language",
-                "Enter: wybierz | Esc/Backspace: język | S: ustawienia | L: język",
+                "Enter: select | C: continue | Esc/Backspace: language | S: settings | L: language",
+                "Enter: wybierz | C: kontynuuj | Esc/Backspace: język | S: ustawienia | L: język",
             ),
         )
 
@@ -836,28 +837,38 @@ class UnifiedAppShell:
 
     def _home_learning_next_action_label(self) -> str:
         """Return a localized next learning action across all paths."""
+        next_path, next_lesson = self._next_learning_path_step()
+        if next_path is None or next_lesson is None:
+            return self._text(
+                "All guided paths completed",
+                "Wszystkie ścieżki ukończone",
+            )
+
+        lesson_title = next_lesson.title.for_language(self.context.settings.language)
+        path_title = next_path.title.for_language(self.context.settings.language)
+        if self._has_lesson_progress(next_lesson.id):
+            return self._text(
+                f"Continue: {lesson_title} ({path_title})",
+                f"Kontynuuj: {lesson_title} ({path_title})",
+            )
+
+        return self._text(
+            f"Start: {lesson_title} ({path_title})",
+            f"Zacznij: {lesson_title} ({path_title})",
+        )
+
+    def _next_learning_path_step(
+        self,
+    ) -> tuple[LearningPathManifest | None, LessonManifest | None]:
+        """Return the next path and lesson to continue from the home screen."""
         for path in LEARNING_PATH_MANIFESTS:
             next_lesson = self._next_learning_path_lesson(path)
             if next_lesson is None:
                 continue
 
-            lesson_title = next_lesson.title.for_language(self.context.settings.language)
-            path_title = path.title.for_language(self.context.settings.language)
-            if self._has_lesson_progress(next_lesson.id):
-                return self._text(
-                    f"Continue: {lesson_title} ({path_title})",
-                    f"Kontynuuj: {lesson_title} ({path_title})",
-                )
+            return path, next_lesson
 
-            return self._text(
-                f"Start: {lesson_title} ({path_title})",
-                f"Zacznij: {lesson_title} ({path_title})",
-            )
-
-        return self._text(
-            "All guided paths completed",
-            "Wszystkie ścieżki ukończone",
-        )
+        return None, None
 
     def _next_learning_path_lesson(
         self,
@@ -2036,6 +2047,10 @@ class UnifiedAppShell:
 
     def _select_lesson(self) -> None:
         lesson = self._current_learning_path_lessons()[self.selected_index]
+        self._open_lesson(lesson)
+
+    def _open_lesson(self, lesson: LessonManifest) -> None:
+        """Open one lesson intro and mark it as started."""
         self.selected_lesson = lesson
         self.selected_demo = DEMO_BY_ID[lesson.demo_id]
         self.context.current_level = self.selected_demo.level
@@ -2044,6 +2059,20 @@ class UnifiedAppShell:
         self.context.progress.mark_started(lesson.id)
         self._save_progress()
         self._go_to(ScreenName.INTRO)
+
+    def _continue_learning(self) -> None:
+        """Open the next guided lesson from the home screen."""
+        if self.screen_name != ScreenName.HOME:
+            return
+
+        next_path, next_lesson = self._next_learning_path_step()
+        if next_path is None or next_lesson is None:
+            self._go_to(ScreenName.PATHS)
+            return
+
+        self.selected_learning_path = next_path
+        self.selected_index = next_path.lesson_ids.index(next_lesson.id)
+        self._open_lesson(next_lesson)
 
     def _select_level(self) -> None:
         levels = levels_from_manifests()
