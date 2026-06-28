@@ -530,7 +530,7 @@ class UnifiedAppShell:
             ACCENT,
         )
         y += 18
-        for badge_label in self._learning_path_badge_labels(path)[:4]:
+        for badge_label in self._learning_path_badge_labels(path):
             y = self._draw_wrapped(
                 badge_label,
                 (content_x, y),
@@ -541,7 +541,7 @@ class UnifiedAppShell:
             y += 4
 
         y += 16
-        for lesson_id in path.lesson_ids[:4]:
+        for lesson_id in path.lesson_ids:
             lesson = LESSON_BY_ID[lesson_id]
             y = self._draw_wrapped(
                 "• " + lesson.title.for_language(language),
