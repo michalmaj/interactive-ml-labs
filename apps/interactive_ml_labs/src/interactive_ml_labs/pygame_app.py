@@ -144,6 +144,9 @@ class UnifiedAppShell:
         self.demo_max_scroll = 0
         self.demo_scrollbar_dragging = False
         self.demo_scrollbar_drag_offset = 0
+        self.learning_path_details_scroll_offset = 0
+        self.learning_path_details_max_scroll = 0
+        self.learning_path_details_scroll_path_id: str | None = None
 
         pygame.display.set_caption("Interactive ML Labs")
 
@@ -316,6 +319,9 @@ class UnifiedAppShell:
             self.demo_scroll_offset -= y * MENU_ITEM_PITCH
             self._clamp_demo_scroll()
             self._select_visible_demo_after_scroll(DEMO_MENU_TOP, self._content_bottom())
+        elif self.screen_name == ScreenName.PATHS:
+            self.learning_path_details_scroll_offset -= y * THEORY_SCROLL_STEP
+            self._clamp_learning_path_details_scroll()
 
     def _select_menu_item_at(self, position: tuple[int, int]) -> bool:
         if self.screen_name == ScreenName.DEMOS:
@@ -441,9 +447,18 @@ class UnifiedAppShell:
         pygame.draw.rect(self.screen, PANEL, rect, border_radius=8)
         pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
 
-        y = rect.y + 28
+        if self.learning_path_details_scroll_path_id != path.id:
+            self.learning_path_details_scroll_path_id = path.id
+            self.learning_path_details_scroll_offset = 0
+
+        viewport = rect.inflate(-28, -28)
+        scrollbar_margin = 14 if self.learning_path_details_max_scroll > 0 else 0
+        old_clip = self.screen.get_clip()
+        self.screen.set_clip(viewport)
+
+        y = rect.y + 28 - self.learning_path_details_scroll_offset
         content_x = rect.x + 28
-        content_width = rect.width - 56
+        content_width = rect.width - 56 - scrollbar_margin
         y = self._draw_wrapped(
             path.title.for_language(language),
             (content_x, y),
@@ -536,6 +551,10 @@ class UnifiedAppShell:
                 TEXT,
             )
             y += 4
+
+        self.screen.set_clip(old_clip)
+        self._update_learning_path_details_scroll_limit(y, viewport.bottom)
+        self._draw_learning_path_details_scroll_indicator(viewport)
 
     def _render_lessons(self) -> None:
         path = self._require_learning_path()
@@ -1703,6 +1722,19 @@ class UnifiedAppShell:
             max_scroll=self.demo_max_scroll,
         )
 
+    def _draw_learning_path_details_scroll_indicator(self, viewport: pygame.Rect) -> None:
+        """Draw a small scrollbar for long learning path details."""
+        if self.learning_path_details_max_scroll <= 0:
+            return
+
+        self._draw_scroll_indicator_at(
+            x=viewport.right - SCROLLBAR_WIDTH,
+            top=viewport.y,
+            bottom=viewport.bottom,
+            scroll_offset=self.learning_path_details_scroll_offset,
+            max_scroll=self.learning_path_details_max_scroll,
+        )
+
     def _draw_scroll_indicator_at(
         self,
         *,
@@ -2064,6 +2096,8 @@ class UnifiedAppShell:
         self.demo_scrollbar_dragging = False
         if screen_name == ScreenName.DEMOS:
             self.demo_scroll_offset = 0
+        elif screen_name == ScreenName.PATHS:
+            self.learning_path_details_scroll_offset = 0
 
     def _handle_scene_command(self, command: SceneCommand) -> None:
         if command.kind == SceneCommandKind.NONE:
@@ -2129,6 +2163,28 @@ class UnifiedAppShell:
     def _clamp_demo_scroll(self) -> None:
         """Keep the demo list scroll offset inside the available scroll range."""
         self.demo_scroll_offset = max(0, min(self.demo_scroll_offset, self.demo_max_scroll))
+
+    def _update_learning_path_details_scroll_limit(
+        self,
+        content_end: int,
+        content_bottom: int,
+    ) -> None:
+        """Update maximum scroll offset for the learning path details panel."""
+        self.learning_path_details_max_scroll = max(
+            0,
+            content_end + self.learning_path_details_scroll_offset - content_bottom,
+        )
+        self._clamp_learning_path_details_scroll()
+
+    def _clamp_learning_path_details_scroll(self) -> None:
+        """Keep the learning path details scroll offset inside the available range."""
+        self.learning_path_details_scroll_offset = max(
+            0,
+            min(
+                self.learning_path_details_scroll_offset,
+                self.learning_path_details_max_scroll,
+            ),
+        )
 
     def _handle_demo_scrollbar_click(self, position: tuple[int, int]) -> bool:
         """Handle click-to-jump and thumb dragging on the demo scrollbar."""

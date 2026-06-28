@@ -877,6 +877,42 @@ def test_shell_learning_path_details_render_progress_summary(monkeypatch) -> Non
         pygame.quit()
 
 
+def test_shell_learning_path_details_scroll_when_content_overflows(monkeypatch) -> None:
+    """Long learning path details should scroll inside the right-side panel."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 520)))
+
+    try:
+        app.screen_name = ScreenName.PATHS
+        app._render_learning_path_details(LEARNING_PATH_MANIFESTS[0])
+
+        assert app.learning_path_details_max_scroll > 0
+
+        app._handle_mouse_wheel(-1)
+        assert app.learning_path_details_scroll_offset > 0
+
+        app._handle_mouse_wheel(100)
+        assert app.learning_path_details_scroll_offset == 0
+    finally:
+        pygame.quit()
+
+
+def test_shell_learning_path_details_scroll_resets_for_new_path(monkeypatch) -> None:
+    """Changing the selected path should start its details at the top."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 520)))
+
+    try:
+        app._render_learning_path_details(LEARNING_PATH_MANIFESTS[0])
+        app.learning_path_details_scroll_offset = app.learning_path_details_max_scroll
+
+        app._render_learning_path_details(LEARNING_PATH_MANIFESTS[1])
+
+        assert app.learning_path_details_scroll_offset == 0
+    finally:
+        pygame.quit()
+
+
 def test_shell_learning_path_badge_labels_localize_polish(monkeypatch) -> None:
     """Learning path badge labels should show localized badge names and markers."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
