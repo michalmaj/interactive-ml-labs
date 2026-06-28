@@ -409,12 +409,40 @@ class UnifiedAppShell:
             self._text("Settings", "Ustawienia"),
         ]
         self._draw_menu(labels, top=210)
+        self._render_home_learning_progress()
         self._draw_footer(
             self._text(
                 "Enter: select | Esc/Backspace: language | S: settings | L: language",
                 "Enter: wybierz | Esc/Backspace: język | S: ustawienia | L: język",
             ),
         )
+
+    def _render_home_learning_progress(self) -> None:
+        """Draw a compact learning progress snapshot on the home screen."""
+        width, height = self.context.settings.resolution
+        left = 660
+        top = 210
+        panel_width = max(360, width - left - 80)
+        panel_height = min(320, max(260, height - top - 130))
+        rect = pygame.Rect(left, top, panel_width, panel_height)
+
+        pygame.draw.rect(self.screen, PANEL, rect, border_radius=8)
+        pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
+
+        x = rect.x + 28
+        y = rect.y + 26
+        content_width = rect.width - 56
+        y = self._draw_wrapped(
+            self._text("Learning progress", "Postęp nauki"),
+            (x, y),
+            content_width,
+            self.font_heading,
+            TEXT,
+        )
+        y += 14
+        for line in self._home_learning_progress_lines():
+            y = self._draw_wrapped(line, (x, y), content_width, self.font_small, MUTED_TEXT)
+            y += 8
 
     def _render_learning_paths(self) -> None:
         labels = [self._learning_path_menu_label(path) for path in LEARNING_PATH_MANIFESTS]
@@ -771,6 +799,65 @@ class UnifiedAppShell:
             return self._text(f"Next action: continue {title}", f"Następny krok: kontynuuj {title}")
 
         return self._text(f"Next action: start {title}", f"Następny krok: zacznij {title}")
+
+    def _home_learning_progress_lines(self) -> list[str]:
+        """Return localized progress lines for the home learning snapshot."""
+        completed_lessons = sum(
+            self._completed_learning_path_lesson_count(path) for path in LEARNING_PATH_MANIFESTS
+        )
+        total_lessons = sum(len(path.lesson_ids) for path in LEARNING_PATH_MANIFESTS)
+        completed_tasks = sum(
+            self._completed_learning_path_task_count(path) for path in LEARNING_PATH_MANIFESTS
+        )
+        total_tasks = sum(self._learning_path_task_count(path) for path in LEARNING_PATH_MANIFESTS)
+        unlocked_badges = sum(
+            self._unlocked_learning_path_badge_count(path) for path in LEARNING_PATH_MANIFESTS
+        )
+        total_badges = sum(
+            self._learning_path_badge_count(path) for path in LEARNING_PATH_MANIFESTS
+        )
+
+        lines = [
+            self._text(
+                f"Lessons: {completed_lessons}/{total_lessons} completed",
+                f"Lekcje: {completed_lessons}/{total_lessons} ukończone",
+            ),
+            self._text(
+                f"Tasks: {completed_tasks}/{total_tasks} completed",
+                f"Zadania: {completed_tasks}/{total_tasks} ukończone",
+            ),
+            self._text(
+                f"Badges: {unlocked_badges}/{total_badges} unlocked",
+                f"Odznaki: {unlocked_badges}/{total_badges} zdobyte",
+            ),
+        ]
+        lines.append(self._home_learning_next_action_label())
+        return lines
+
+    def _home_learning_next_action_label(self) -> str:
+        """Return a localized next learning action across all paths."""
+        for path in LEARNING_PATH_MANIFESTS:
+            next_lesson = self._next_learning_path_lesson(path)
+            if next_lesson is None:
+                continue
+
+            lesson_title = next_lesson.title.for_language(self.context.settings.language)
+            path_title = path.title.for_language(self.context.settings.language)
+            if self._has_lesson_progress(next_lesson.id):
+                return self._text(
+                    f"Continue: {lesson_title} ({path_title})",
+                    f"Kontynuuj: {lesson_title} ({path_title})",
+                )
+
+            return self._text(
+                f"Start: {lesson_title} ({path_title})",
+                f"Zacznij: {lesson_title} ({path_title})",
+            )
+
+        return self._text(
+            "All guided paths completed",
+            "Wszystkie ścieżki ukończone",
+        )
 
     def _next_learning_path_lesson(
         self,

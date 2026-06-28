@@ -289,6 +289,78 @@ def test_shell_home_opens_learning_paths(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_home_learning_progress_lines_summarize_paths(monkeypatch) -> None:
+    """Home progress snapshot should summarize all guided paths."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        first_path = LEARNING_PATH_MANIFESTS[0]
+        first_lesson = LESSON_BY_ID[first_path.lesson_ids[0]]
+
+        assert app._home_learning_progress_lines() == [
+            "Lessons: 0/9 completed",
+            "Tasks: 0/18 completed",
+            "Badges: 0/9 unlocked",
+            f"Start: {first_lesson.title.en} ({first_path.title.en})",
+        ]
+
+        app.context.progress.mark_started(first_lesson.id)
+        assert app._home_learning_progress_lines()[-1] == (
+            f"Continue: {first_lesson.title.en} ({first_path.title.en})"
+        )
+    finally:
+        pygame.quit()
+
+
+def test_shell_home_learning_progress_lines_localize_polish(monkeypatch) -> None:
+    """Home progress snapshot should use natural Polish labels."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.context.settings.language = "pl"
+        first_path = LEARNING_PATH_MANIFESTS[0]
+        first_lesson = LESSON_BY_ID[first_path.lesson_ids[0]]
+
+        assert app._home_learning_progress_lines() == [
+            "Lekcje: 0/9 ukończone",
+            "Zadania: 0/18 ukończone",
+            "Odznaki: 0/9 zdobyte",
+            f"Zacznij: {first_lesson.title.pl} ({first_path.title.pl})",
+        ]
+    finally:
+        pygame.quit()
+
+
+def test_shell_home_renders_learning_progress_panel(monkeypatch) -> None:
+    """Home screen should render a learning progress panel next to the main menu."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    wrapped_text: list[str] = []
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = width, font, color
+        wrapped_text.append(text)
+        return position[1] + 24
+
+    try:
+        app._draw_wrapped = capture_wrapped
+
+        app._render_home()
+
+        assert "Learning progress" in wrapped_text
+        assert "Lessons: 0/9 completed" in wrapped_text
+    finally:
+        pygame.quit()
+
+
 def test_shell_learning_path_menu_labels_reflect_progress(monkeypatch) -> None:
     """Learning path menu labels should show compact path progress."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
