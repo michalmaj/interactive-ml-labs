@@ -913,6 +913,35 @@ def test_shell_learning_path_details_scroll_resets_for_new_path(monkeypatch) -> 
         pygame.quit()
 
 
+def test_shell_learning_path_details_render_all_lessons_and_badges(monkeypatch) -> None:
+    """Scrollable path details should not hide later lessons or badges."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    wrapped_text: list[str] = []
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = width, font, color
+        wrapped_text.append(text)
+        return position[1] + 24
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[1]
+        app._draw_wrapped = capture_wrapped
+
+        app._render_learning_path_details(path)
+
+        assert "[ ] Soft Cluster Reader" in wrapped_text
+        assert "• Read soft cluster membership" in wrapped_text
+    finally:
+        pygame.quit()
+
+
 def test_shell_learning_path_badge_labels_localize_polish(monkeypatch) -> None:
     """Learning path badge labels should show localized badge names and markers."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
