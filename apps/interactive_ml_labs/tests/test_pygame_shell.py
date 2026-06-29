@@ -383,7 +383,7 @@ def test_shell_home_renders_learning_progress_panel(monkeypatch) -> None:
 
     try:
         app._draw_wrapped = capture_wrapped
-        app._draw_home_progress_bar = capture_progress_bar
+        app._draw_compact_progress_bar = capture_progress_bar
 
         app._render_home()
 
@@ -1040,6 +1040,7 @@ def test_shell_learning_path_details_render_progress_summary(monkeypatch) -> Non
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
     drawn_text: list[str] = []
     wrapped_text: list[str] = []
+    progress_bars: list[tuple[int, int]] = []
 
     def capture_text(
         text: str,
@@ -1061,11 +1062,22 @@ def test_shell_learning_path_details_render_progress_summary(monkeypatch) -> Non
         wrapped_text.append(text)
         return position[1] + 24
 
+    def capture_progress_bar(
+        x: int,
+        y: int,
+        width: int,
+        completed_count: int,
+        total_count: int,
+    ) -> None:
+        _ = x, y, width
+        progress_bars.append((completed_count, total_count))
+
     try:
         path = LEARNING_PATH_MANIFESTS[0]
         app.context.progress.mark_completed(path.lesson_ids[0])
         app._draw_text = capture_text
         app._draw_wrapped = capture_wrapped
+        app._draw_compact_progress_bar = capture_progress_bar
 
         app._render_learning_path_details(path)
 
@@ -1074,10 +1086,33 @@ def test_shell_learning_path_details_render_progress_summary(monkeypatch) -> Non
         assert "Tasks: 0/8 completed" in wrapped_text
         assert "Theory: 0/4 visited" in wrapped_text
         assert "Badges: 1/4 unlocked" in wrapped_text
+        assert progress_bars == [(1, 4), (0, 8), (0, 4), (1, 4)]
         assert "In progress" in wrapped_text
         assert "Next action: start Let an algorithm reduce loss" in wrapped_text
         assert "[x] Residual Reader" in wrapped_text
         assert "[ ] Loss Navigator" in wrapped_text
+    finally:
+        pygame.quit()
+
+
+def test_shell_learning_path_progress_metrics_track_counts(monkeypatch) -> None:
+    """Learning path progress metrics should expose labels and numeric progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[1]
+        first_lesson_id = path.lesson_ids[0]
+        app.context.progress.complete_task(first_lesson_id, "move_query")
+        app.context.progress.mark_theory_visited(first_lesson_id)
+        app.context.progress.mark_completed(first_lesson_id)
+
+        assert app._learning_path_progress_metrics(path) == [
+            ("Lessons: 1/5 completed", 1, 5),
+            ("Tasks: 1/10 completed", 1, 10),
+            ("Theory: 1/5 visited", 1, 5),
+            ("Badges: 1/5 unlocked", 1, 5),
+        ]
     finally:
         pygame.quit()
 
