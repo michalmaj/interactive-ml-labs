@@ -1657,7 +1657,15 @@ class UnifiedAppShell:
             self.font_small,
             ACCENT,
         )
-        y += 6
+        completed_tasks, total_tasks = self._lesson_task_progress_counts(lesson)
+        self._draw_compact_progress_bar(
+            left,
+            y + 2,
+            content_width,
+            completed_tasks,
+            total_tasks,
+        )
+        y += 20
         y = self._draw_lesson_theory_status(lesson, left, y, content_width)
         y += 12
         for task in lesson.tasks:
