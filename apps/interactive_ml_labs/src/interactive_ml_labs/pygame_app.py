@@ -460,14 +460,14 @@ class UnifiedAppShell:
         self.home_continue_rect = None
         for label, completed_count, total_count in progress_metrics:
             y = self._draw_wrapped(label, (x, y), content_width, self.font_small, MUTED_TEXT)
-            self._draw_home_progress_bar(x, y + 2, content_width, completed_count, total_count)
+            self._draw_compact_progress_bar(x, y + 2, content_width, completed_count, total_count)
             y += 20
 
         line_top = y
         y = self._draw_wrapped(next_action_line, (x, y), content_width, self.font_small, ACCENT)
         self.home_continue_rect = pygame.Rect(x, line_top, content_width, y - line_top)
 
-    def _draw_home_progress_bar(
+    def _draw_compact_progress_bar(
         self,
         x: int,
         y: int,
@@ -475,7 +475,7 @@ class UnifiedAppShell:
         completed_count: int,
         total_count: int,
     ) -> None:
-        """Draw one compact progress bar in the home learning panel."""
+        """Draw one compact progress bar."""
         track_rect = pygame.Rect(x, y, width, 8)
         pygame.draw.rect(self.screen, (55, 61, 69), track_rect, border_radius=3)
         if total_count <= 0 or completed_count <= 0:
@@ -551,38 +551,23 @@ class UnifiedAppShell:
         )
         self._draw_text(lesson_label, (content_x, y), self.font_small, ACCENT)
         y += 28
-        y = self._draw_wrapped(
-            self._learning_path_progress_label(path),
-            (content_x, y),
-            content_width,
-            self.font_small,
-            TEXT,
-        )
-        y += 6
-        y = self._draw_wrapped(
-            self._learning_path_task_progress_label(path),
-            (content_x, y),
-            content_width,
-            self.font_small,
-            TEXT,
-        )
-        y += 6
-        y = self._draw_wrapped(
-            self._learning_path_theory_progress_label(path),
-            (content_x, y),
-            content_width,
-            self.font_small,
-            TEXT,
-        )
-        y += 6
-        y = self._draw_wrapped(
-            self._learning_path_badge_progress_label(path),
-            (content_x, y),
-            content_width,
-            self.font_small,
-            TEXT,
-        )
-        y += 6
+        for label, completed_count, total_count in self._learning_path_progress_metrics(path):
+            y = self._draw_wrapped(
+                label,
+                (content_x, y),
+                content_width,
+                self.font_small,
+                TEXT,
+            )
+            self._draw_compact_progress_bar(
+                content_x,
+                y + 2,
+                content_width,
+                completed_count,
+                total_count,
+            )
+            y += 20
+
         y = self._draw_wrapped(
             self._learning_path_status_label(path),
             (content_x, y),
@@ -783,6 +768,26 @@ class UnifiedAppShell:
             f"Badges: {unlocked_count}/{total_count} unlocked",
             f"Odznaki: {unlocked_count}/{total_count} zdobyte",
         )
+
+    def _learning_path_progress_metrics(
+        self,
+        path: LearningPathManifest,
+    ) -> list[tuple[str, int, int]]:
+        """Return localized progress labels and counts for one learning path."""
+        completed_lessons = self._completed_learning_path_lesson_count(path)
+        total_lessons = len(path.lesson_ids)
+        completed_tasks = self._completed_learning_path_task_count(path)
+        total_tasks = self._learning_path_task_count(path)
+        visited_theory = self._visited_learning_path_theory_count(path)
+        unlocked_badges = self._unlocked_learning_path_badge_count(path)
+        total_badges = self._learning_path_badge_count(path)
+
+        return [
+            (self._learning_path_progress_label(path), completed_lessons, total_lessons),
+            (self._learning_path_task_progress_label(path), completed_tasks, total_tasks),
+            (self._learning_path_theory_progress_label(path), visited_theory, total_lessons),
+            (self._learning_path_badge_progress_label(path), unlocked_badges, total_badges),
+        ]
 
     def _learning_path_badge_labels(self, path: LearningPathManifest) -> list[str]:
         """Return badge labels with completion markers for one learning path."""
