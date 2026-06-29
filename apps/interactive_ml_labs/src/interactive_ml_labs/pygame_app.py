@@ -1341,6 +1341,22 @@ class UnifiedAppShell:
             ACCENT,
         )
         y += 24
+        y = self._draw_wrapped(
+            self._lesson_task_summary(lesson),
+            (80, y),
+            content_width,
+            self.font_small,
+            TEXT,
+        )
+        completed_tasks, total_tasks = self._lesson_task_progress_counts(lesson)
+        self._draw_compact_progress_bar(
+            80,
+            y + 2,
+            content_width,
+            completed_tasks,
+            total_tasks,
+        )
+        y += 20
         for task in lesson.tasks:
             y = self._draw_wrapped(
                 self._lesson_task_label(lesson, task.id, task.title.for_language(language)),
