@@ -683,7 +683,15 @@ class UnifiedAppShell:
             self.font_small,
             ACCENT,
         )
-        y += 28
+        completed_tasks, total_tasks = self._lesson_task_progress_counts(lesson)
+        self._draw_compact_progress_bar(
+            content_x,
+            y + 26,
+            content_width,
+            completed_tasks,
+            total_tasks,
+        )
+        y += 42
         for task in lesson.tasks[:3]:
             y = self._draw_wrapped(
                 self._lesson_task_label(lesson, task.id, task.title.for_language(language)),
@@ -1019,12 +1027,15 @@ class UnifiedAppShell:
 
     def _lesson_task_summary(self, lesson: LessonManifest) -> str:
         """Return a short localized task completion summary."""
-        completed_count = len(self._completed_lesson_task_ids(lesson))
-        total_count = len(lesson.tasks)
+        completed_count, total_count = self._lesson_task_progress_counts(lesson)
         return self._text(
             f"Tasks: {completed_count}/{total_count} completed",
             f"Zadania: {completed_count}/{total_count} ukończone",
         )
+
+    def _lesson_task_progress_counts(self, lesson: LessonManifest) -> tuple[int, int]:
+        """Return completed and total task counts for one lesson."""
+        return len(self._completed_lesson_task_ids(lesson)), len(lesson.tasks)
 
     def _lesson_prerequisite_label(self, lesson: LessonManifest) -> str:
         """Return a localized prerequisite summary for one lesson."""
