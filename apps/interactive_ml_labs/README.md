@@ -15,6 +15,7 @@ Standalone demo entry points remain supported for development, debugging, and fo
 - global language selection: English and Polish,
 - guided learning paths with persisted lesson, task, theory, and badge progress,
 - home-screen learning progress with keyboard and mouse continue actions,
+- compact progress bars on home, path details, lesson details, intro, and pause screens,
 - dynamic level and demo selection from manifests,
 - scrollable demo lists with keyboard and mouse navigation,
 - generated intro screens with objectives and controls,
