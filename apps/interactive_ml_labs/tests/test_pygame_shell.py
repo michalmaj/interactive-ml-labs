@@ -1271,6 +1271,7 @@ def test_shell_lesson_details_render_task_checklist(monkeypatch) -> None:
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
     drawn_text: list[str] = []
     wrapped_text: list[str] = []
+    progress_bars: list[tuple[int, int]] = []
 
     def capture_text(
         text: str,
@@ -1292,6 +1293,16 @@ def test_shell_lesson_details_render_task_checklist(monkeypatch) -> None:
         wrapped_text.append(text)
         return position[1] + 24
 
+    def capture_progress_bar(
+        x: int,
+        y: int,
+        width: int,
+        completed_count: int,
+        total_count: int,
+    ) -> None:
+        _ = x, y, width
+        progress_bars.append((completed_count, total_count))
+
     try:
         lesson = LESSON_BY_ID["error_gradient_descent"]
         app.selected_learning_path = LEARNING_PATH_MANIFESTS[0]
@@ -1300,10 +1311,12 @@ def test_shell_lesson_details_render_task_checklist(monkeypatch) -> None:
         app.context.progress.mark_completed(lesson.id)
         app._draw_text = capture_text
         app._draw_wrapped = capture_wrapped
+        app._draw_compact_progress_bar = capture_progress_bar
 
         app._render_lesson_details(lesson)
 
         assert "Tasks: 1/2 completed" in drawn_text
+        assert progress_bars == [(1, 2)]
         assert "Theory: visited" in wrapped_text
         assert any(text.startswith("[x]") for text in wrapped_text)
         assert any(text.startswith("[ ]") for text in wrapped_text)
