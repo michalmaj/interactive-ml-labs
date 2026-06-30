@@ -40,6 +40,7 @@ The shell currently supports:
 - [x] Introduce learning paths, lesson/task manifests, progress, and meaningful completion badges.
 - [x] Expand learning paths beyond the first end-to-end path.
 - [x] Add checkable task completion to the second learning path.
+- [ ] Implement the third guided path: From good scores to trustworthy models.
 - [ ] Continue balancing Level 1, Level 2, and Level 3 with small focused demos.
 - [ ] Add screenshots or short GIFs for the main README and app docs.
 
@@ -54,9 +55,11 @@ The app now has two guided learning paths with checkable tasks:
 
 Both paths connect lesson manifests to real scene interactions and persisted progress while keeping the standalone demo browser intact.
 
+The planned third path, **From good scores to trustworthy models**, will connect train/validation/test discipline, leakage, class imbalance, calibration, and production monitoring. Its narrative, measurable tasks, badge drafts, and staged rollout are defined in [learning_platform.md](learning_platform.md). It will not be registered in the app until every lesson can be completed end to end.
+
 The direction is captured in [learning_platform.md](learning_platform.md). Future slices should improve progress summaries, add more useful instructor/student feedback, and only introduce richer gamification where it reinforces actual understanding.
 
-Recent shell work made lesson progress visible throughout the student flow: path details point to the next lesson, lesson lists show compact progress markers, and intro/pause screens show lesson tasks, theory status, and badge status.
+Recent shell work made lesson progress visible throughout the student flow: path details point to the next lesson, lesson lists show compact progress markers, and home/path/lesson/intro/pause screens use consistent progress summaries and bars.
 
 ### Shared UI Helpers
 

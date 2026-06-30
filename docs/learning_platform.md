@@ -165,6 +165,66 @@ This path now has checkable tasks connected to real scene interactions:
 
 The path is now a second complete proof that lessons, tasks, progress, and badges can be layered onto existing demos without removing the standalone demo workflow.
 
+## Planned Third Learning Path
+
+The third path should connect model evaluation, trustworthy metrics, calibrated confidence, and post-deployment monitoring.
+
+**From good scores to trustworthy models**
+
+Polish title: **Od dobrego wyniku do zaufanego modelu**
+
+1. Train / Validation / Test Split Lab
+2. Data Leakage Lab
+3. Class Imbalance Lab
+4. Calibration Lab
+5. Model Monitoring Drift Lab
+
+Narrative:
+
+- first, students choose model complexity with validation and keep test as the final honest check,
+- then they see how leakage can create scores that are excellent but meaningless,
+- next, they learn why accuracy can hide costly minority-class errors,
+- then they connect model confidence with observed correctness through calibration,
+- finally, they see why a trustworthy model still needs monitoring after deployment.
+
+The path should answer one high-level question: **what evidence do we need before trusting a model's result?**
+
+### Draft Lesson Tasks And Badges
+
+**Train / Validation / Test Split Lab**
+
+- compare at least two complexity settings and inspect the train-validation gap,
+- choose the strongest validation candidate without using test score for tuning,
+- badge: **Test Set Guardian / Strażnik test setu**.
+
+**Data Leakage Lab**
+
+- remove the suspicious leakage feature and observe the score drop,
+- compare leakage behavior in at least two scenarios,
+- badge: **Leakage Detective / Tropiciel leakage**.
+
+**Class Imbalance Lab**
+
+- change the decision threshold and observe how precision and recall move,
+- reach a setting with stronger recall and identify the cost in false positives or precision,
+- badge: **Trade-off Reader / Czytelnik kompromisów**.
+
+**Calibration Lab**
+
+- change temperature scaling and improve ECE relative to the raw score,
+- inspect calibration gaps instead of relying on accuracy alone,
+- badge: **Confidence Calibrator / Kalibrator pewności**.
+
+**Model Monitoring Drift Lab**
+
+- compare data drift and metric drift and identify which signal leads,
+- trigger a meaningful alert and acknowledge the investigation,
+- badge: **Model Guardian / Strażnik modelu**.
+
+These tasks are intentionally based on interactions already present in the scenes. Scene adapters should report completion from real state changes rather than from arbitrary key presses.
+
+The path should remain hidden from the app registry until every lesson has working task hooks, localized copy, persistence coverage, and a completion badge. This avoids exposing students to a guided path that cannot yet be completed.
+
 ## Suggested PR Sequence
 
 1. Done: add `LessonManifest`, `LessonTask`, and a small learning-path registry.
@@ -175,7 +235,14 @@ The path is now a second complete proof that lessons, tasks, progress, and badge
 6. Done: show completion badges and aggregate learning-path progress.
 7. Done: show prerequisite and next-lesson guidance in the lesson details panel.
 
-Next slices should focus on making progress summaries more useful for students and instructors, then choosing the third guided path based on the learning story it can tell.
+The next slices should implement the third path without exposing incomplete lessons:
+
+1. Done: document the third path narrative, task conditions, badges, and rollout order.
+2. Add task hooks and tests for Train / Validation / Test Split Lab and Data Leakage Lab.
+3. Add task hooks and tests for Class Imbalance Lab and Calibration Lab.
+4. Add task hooks and tests for Model Monitoring Drift Lab.
+5. Register all lesson manifests and the complete learning path in one final integration PR.
+6. Run a Polish copy and layout pass after completing the path end to end.
 
 ## Non-Goals For The First Slice
 
