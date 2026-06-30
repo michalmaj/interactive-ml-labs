@@ -395,6 +395,21 @@ def test_shell_home_renders_learning_progress_panel(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_home_menu_does_not_overlap_progress_panel(monkeypatch) -> None:
+    """Home menu items should leave clear space before the progress panel."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+
+    try:
+        app._render_home()
+        progress_rect = app._home_learning_progress_rect()
+
+        assert len(app.menu_items) == 3
+        assert all(item.rect.right < progress_rect.left for item in app.menu_items)
+    finally:
+        pygame.quit()
+
+
 def test_shell_home_progress_click_opens_next_guided_lesson(monkeypatch) -> None:
     """Clicking the home progress CTA should open the next guided lesson."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
