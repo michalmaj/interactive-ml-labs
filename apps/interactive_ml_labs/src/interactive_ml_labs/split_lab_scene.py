@@ -31,6 +31,9 @@ WARNING: Final[tuple[int, int, int]] = (246, 132, 134)
 
 DEFAULT_COMPLEXITY_INDEX: Final[int] = 1
 COMPLEXITY_LABELS: Final[tuple[str, str, str]] = ("simple", "balanced", "too flexible")
+SPLIT_LESSON_ID: Final[str] = "trustworthy_split"
+COMPARE_COMPLEXITY_TASK_ID: Final[str] = "compare_complexity_settings"
+CHOOSE_VALIDATION_TASK_ID: Final[str] = "choose_validation_candidate"
 
 
 @dataclass(frozen=True, slots=True)
@@ -115,6 +118,7 @@ class TrainValidationTestLabScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create the deterministic split lab scene."""
+        self._context = context
         self._language = context.settings.language
         self._font_title = make_ui_font(34, bold=True)
         self._font_heading = make_ui_font(23, bold=True)
@@ -122,6 +126,7 @@ class TrainValidationTestLabScene:
         self._font_small = make_ui_font(15)
         self.preset_index = 0
         self.complexity_index = DEFAULT_COMPLEXITY_INDEX
+        self._seen_complexity_indices = {self.complexity_index}
 
     @property
     def preset(self) -> SplitPreset:
@@ -160,13 +165,54 @@ class TrainValidationTestLabScene:
             self.preset_index = key - pygame.K_1
         elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
             self.complexity_index = max(0, self.complexity_index - 1)
+            self._record_complexity_progress()
         elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
             self.complexity_index = min(len(COMPLEXITY_LABELS) - 1, self.complexity_index + 1)
+            self._record_complexity_progress()
         elif key in {pygame.K_0, pygame.K_KP0}:
             self.complexity_index = DEFAULT_COMPLEXITY_INDEX
+            self._record_complexity_progress()
         elif key == pygame.K_r:
             self.preset_index = 0
             self.complexity_index = DEFAULT_COMPLEXITY_INDEX
+            self._seen_complexity_indices = {self.complexity_index}
+
+    def _record_complexity_progress(self) -> None:
+        """Record meaningful complexity comparison for the guided lesson."""
+        if self._context.selected_lesson_id != SPLIT_LESSON_ID:
+            return
+
+        self._seen_complexity_indices.add(self.complexity_index)
+        if len(self._seen_complexity_indices) >= 2:
+            self._context.progress.complete_task(
+                SPLIT_LESSON_ID,
+                COMPARE_COMPLEXITY_TASK_ID,
+            )
+
+            if self.complexity_index == self._best_validation_complexity_index():
+                self._context.progress.complete_task(
+                    SPLIT_LESSON_ID,
+                    CHOOSE_VALIDATION_TASK_ID,
+                )
+
+        self._mark_lesson_completed_if_ready()
+
+    def _best_validation_complexity_index(self) -> int:
+        """Return the complexity with the strongest validation score."""
+        return max(
+            range(len(self.preset.metrics)),
+            key=lambda index: self.preset.metrics[index].validation,
+        )
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both guided tasks are done."""
+        progress = self._context.progress.lessons.get(SPLIT_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {COMPARE_COMPLEXITY_TASK_ID, CHOOSE_VALIDATION_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(SPLIT_LESSON_ID)
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(
