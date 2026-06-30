@@ -423,7 +423,7 @@ class UnifiedAppShell:
             self._text("Browse demos by level", "Przeglądaj dema według poziomu"),
             self._text("Settings", "Ustawienia"),
         ]
-        self._draw_menu(labels, top=210)
+        self._draw_menu(labels, top=210, width=520)
         self._render_home_learning_progress()
         self._draw_footer(
             self._text(
@@ -434,12 +434,7 @@ class UnifiedAppShell:
 
     def _render_home_learning_progress(self) -> None:
         """Draw a compact learning progress snapshot on the home screen."""
-        width, height = self.context.settings.resolution
-        left = 660
-        top = 210
-        panel_width = max(360, width - left - 80)
-        panel_height = min(320, max(260, height - top - 130))
-        rect = pygame.Rect(left, top, panel_width, panel_height)
+        rect = self._home_learning_progress_rect()
 
         pygame.draw.rect(self.screen, PANEL, rect, border_radius=8)
         pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
@@ -466,6 +461,15 @@ class UnifiedAppShell:
         line_top = y
         y = self._draw_wrapped(next_action_line, (x, y), content_width, self.font_small, ACCENT)
         self.home_continue_rect = pygame.Rect(x, line_top, content_width, y - line_top)
+
+    def _home_learning_progress_rect(self) -> pygame.Rect:
+        """Return the fixed home progress panel geometry."""
+        width, height = self.context.settings.resolution
+        left = 660
+        top = 210
+        panel_width = max(360, width - left - 80)
+        panel_height = min(320, max(260, height - top - 130))
+        return pygame.Rect(left, top, panel_width, panel_height)
 
     def _draw_compact_progress_bar(
         self,
