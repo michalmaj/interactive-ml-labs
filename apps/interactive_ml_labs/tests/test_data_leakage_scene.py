@@ -2,7 +2,10 @@
 
 import pygame
 from interactive_ml_labs.data_leakage_scene import (
+    COMPARE_SCENARIOS_TASK_ID,
+    LEAKAGE_LESSON_ID,
     PRESETS,
+    REMOVE_LEAKAGE_TASK_ID,
     DataLeakageLabScene,
     create_data_leakage_lab_scene,
 )
@@ -97,5 +100,67 @@ def test_data_leakage_scene_renders_to_shell_surface(monkeypatch) -> None:
 
         assert surface.get_bounding_rect().width > 0
         assert surface.get_bounding_rect().height > 0
+    finally:
+        pygame.quit()
+
+
+def test_data_leakage_scene_records_removal_for_guided_lesson(monkeypatch) -> None:
+    """Removing leakage should complete the first guided lesson task."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.selected_lesson_id = LEAKAGE_LESSON_ID
+        scene = create_data_leakage_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_l))
+
+        progress = context.progress.lessons[LEAKAGE_LESSON_ID]
+        assert REMOVE_LEAKAGE_TASK_ID in progress.completed_task_ids
+        assert COMPARE_SCENARIOS_TASK_ID not in progress.completed_task_ids
+        assert progress.completed is False
+    finally:
+        pygame.quit()
+
+
+def test_data_leakage_scene_completes_guided_lesson_after_scenario_comparison(
+    monkeypatch,
+) -> None:
+    """Removing leakage and visiting another scenario should complete the lesson."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        context.selected_lesson_id = LEAKAGE_LESSON_ID
+        scene = create_data_leakage_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_l))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+
+        progress = context.progress.lessons[LEAKAGE_LESSON_ID]
+        assert progress.completed_task_ids >= {
+            REMOVE_LEAKAGE_TASK_ID,
+            COMPARE_SCENARIOS_TASK_ID,
+        }
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_data_leakage_scene_ignores_progress_outside_guided_lesson(monkeypatch) -> None:
+    """Standalone Data Leakage Lab use should not mutate guided lesson progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_data_leakage_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_l))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+
+        assert LEAKAGE_LESSON_ID not in context.progress.lessons
     finally:
         pygame.quit()

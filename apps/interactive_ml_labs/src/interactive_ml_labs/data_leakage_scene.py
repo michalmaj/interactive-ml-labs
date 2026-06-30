@@ -28,6 +28,9 @@ ACCENT: Final[tuple[int, int, int]] = (118, 205, 247)
 SECONDARY: Final[tuple[int, int, int]] = (248, 183, 96)
 GOOD: Final[tuple[int, int, int]] = (147, 218, 155)
 WARNING: Final[tuple[int, int, int]] = (246, 132, 134)
+LEAKAGE_LESSON_ID: Final[str] = "trustworthy_leakage"
+REMOVE_LEAKAGE_TASK_ID: Final[str] = "remove_leakage_feature"
+COMPARE_SCENARIOS_TASK_ID: Final[str] = "compare_leakage_scenarios"
 
 
 @dataclass(frozen=True, slots=True)
@@ -117,6 +120,7 @@ class DataLeakageLabScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create the deterministic leakage scene."""
+        self._context = context
         self._language = context.settings.language
         self._font_title = make_ui_font(34, bold=True)
         self._font_heading = make_ui_font(23, bold=True)
@@ -124,6 +128,7 @@ class DataLeakageLabScene:
         self._font_small = make_ui_font(15)
         self.preset_index = 0
         self.leakage_enabled = True
+        self._seen_preset_indices = {self.preset_index}
 
     @property
     def preset(self) -> LeakagePreset:
@@ -155,11 +160,49 @@ class DataLeakageLabScene:
     def _handle_keydown(self, key: int) -> None:
         if key in {pygame.K_1, pygame.K_2, pygame.K_3}:
             self.preset_index = key - pygame.K_1
+            self._record_scenario_progress()
         elif key == pygame.K_l:
             self.leakage_enabled = not self.leakage_enabled
+            self._record_leakage_progress()
         elif key == pygame.K_r:
             self.preset_index = 0
             self.leakage_enabled = True
+            self._seen_preset_indices = {self.preset_index}
+
+    def _record_scenario_progress(self) -> None:
+        """Complete scenario comparison after visiting a second preset."""
+        if self._context.selected_lesson_id != LEAKAGE_LESSON_ID:
+            return
+
+        self._seen_preset_indices.add(self.preset_index)
+        if len(self._seen_preset_indices) >= 2:
+            self._context.progress.complete_task(
+                LEAKAGE_LESSON_ID,
+                COMPARE_SCENARIOS_TASK_ID,
+            )
+        self._mark_lesson_completed_if_ready()
+
+    def _record_leakage_progress(self) -> None:
+        """Complete leakage removal after excluding the suspicious feature."""
+        if self._context.selected_lesson_id != LEAKAGE_LESSON_ID:
+            return
+
+        if not self.leakage_enabled:
+            self._context.progress.complete_task(
+                LEAKAGE_LESSON_ID,
+                REMOVE_LEAKAGE_TASK_ID,
+            )
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both guided tasks are done."""
+        progress = self._context.progress.lessons.get(LEAKAGE_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {REMOVE_LEAKAGE_TASK_ID, COMPARE_SCENARIOS_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(LEAKAGE_LESSON_ID)
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "Data Leakage Lab", (58, 40), self._font_title, TEXT)
