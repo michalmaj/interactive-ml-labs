@@ -238,7 +238,7 @@ The path should remain hidden from the app registry until every lesson has worki
 The next slices should implement the third path without exposing incomplete lessons:
 
 1. Done: document the third path narrative, task conditions, badges, and rollout order.
-2. Add task hooks and tests for Train / Validation / Test Split Lab and Data Leakage Lab.
+2. Done: add task hooks and tests for Train / Validation / Test Split Lab and Data Leakage Lab.
 3. Add task hooks and tests for Class Imbalance Lab and Calibration Lab.
 4. Add task hooks and tests for Model Monitoring Drift Lab.
 5. Register all lesson manifests and the complete learning path in one final integration PR.

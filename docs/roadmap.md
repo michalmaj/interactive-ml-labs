@@ -55,7 +55,7 @@ The app now has two guided learning paths with checkable tasks:
 
 Both paths connect lesson manifests to real scene interactions and persisted progress while keeping the standalone demo browser intact.
 
-The planned third path, **From good scores to trustworthy models**, will connect train/validation/test discipline, leakage, class imbalance, calibration, and production monitoring. Its narrative, measurable tasks, badge drafts, and staged rollout are defined in [learning_platform.md](learning_platform.md). It will not be registered in the app until every lesson can be completed end to end.
+The planned third path, **From good scores to trustworthy models**, will connect train/validation/test discipline, leakage, class imbalance, calibration, and production monitoring. Its narrative, measurable tasks, badge drafts, and staged rollout are defined in [learning_platform.md](learning_platform.md). Train / Validation / Test Split Lab and Data Leakage Lab now have task hooks, but the path will not be registered until every lesson can be completed end to end.
 
 The direction is captured in [learning_platform.md](learning_platform.md). Future slices should improve progress summaries, add more useful instructor/student feedback, and only introduce richer gamification where it reinforces actual understanding.
 
