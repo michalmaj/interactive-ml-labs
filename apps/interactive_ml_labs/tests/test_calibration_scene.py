@@ -2,8 +2,11 @@
 
 import pygame
 from interactive_ml_labs.calibration_scene import (
+    CALIBRATION_LESSON_ID,
     DECISION_THRESHOLD,
     DEFAULT_TEMPERATURE_INDEX,
+    IMPROVE_ECE_TASK_ID,
+    INSPECT_GAPS_TASK_ID,
     PRESETS,
     TEMPERATURE_VALUES,
     CalibrationLabScene,
@@ -215,6 +218,85 @@ def test_calibration_scene_reports_threshold_accuracy(monkeypatch) -> None:
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
 
         assert scene._accuracy_at_threshold() != accuracy
+    finally:
+        pygame.quit()
+
+
+def test_calibration_scene_records_ece_improvement_task(monkeypatch) -> None:
+    """Improving ECE with temperature scaling should complete the guided task."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=CALIBRATION_LESSON_ID)
+        scene = create_calibration_lab_scene(context)
+        baseline_ece = scene._default_temperature_ece()
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+        progress = context.progress.lessons[CALIBRATION_LESSON_ID]
+
+        assert scene._expected_calibration_error() < baseline_ece
+        assert IMPROVE_ECE_TASK_ID in progress.completed_task_ids
+        assert INSPECT_GAPS_TASK_ID not in progress.completed_task_ids
+        assert progress.completed is False
+    finally:
+        pygame.quit()
+
+
+def test_calibration_scene_records_gap_inspection_task(monkeypatch) -> None:
+    """Toggling error bars should complete the gap-inspection task."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=CALIBRATION_LESSON_ID)
+        scene = create_calibration_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_e))
+        progress = context.progress.lessons[CALIBRATION_LESSON_ID]
+
+        assert INSPECT_GAPS_TASK_ID in progress.completed_task_ids
+        assert IMPROVE_ECE_TASK_ID not in progress.completed_task_ids
+        assert progress.completed is False
+    finally:
+        pygame.quit()
+
+
+def test_calibration_scene_completes_guided_lesson(monkeypatch) -> None:
+    """Completing both calibration tasks should unlock the lesson completion state."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=CALIBRATION_LESSON_ID)
+        scene = create_calibration_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_e))
+        progress = context.progress.lessons[CALIBRATION_LESSON_ID]
+
+        assert progress.completed_task_ids >= {
+            IMPROVE_ECE_TASK_ID,
+            INSPECT_GAPS_TASK_ID,
+        }
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_calibration_scene_ignores_progress_outside_guided_lesson(monkeypatch) -> None:
+    """Standalone Calibration Lab use should not mutate guided lesson progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_calibration_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_e))
+
+        assert CALIBRATION_LESSON_ID not in context.progress.lessons
     finally:
         pygame.quit()
 

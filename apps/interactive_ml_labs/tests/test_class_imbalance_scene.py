@@ -2,7 +2,10 @@
 
 import pygame
 from interactive_ml_labs.class_imbalance_scene import (
+    ADJUST_THRESHOLD_TASK_ID,
     DEFAULT_THRESHOLD_INDEX,
+    IMBALANCE_LESSON_ID,
+    INCREASE_RECALL_TASK_ID,
     PRESETS,
     ClassImbalanceLabScene,
     create_class_imbalance_lab_scene,
@@ -80,6 +83,63 @@ def test_class_imbalance_scene_localizes_labels(monkeypatch) -> None:
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
 
         assert scene._diagnosis_label() == "szeroka sieć"
+    finally:
+        pygame.quit()
+
+
+def test_class_imbalance_scene_records_threshold_adjustment(monkeypatch) -> None:
+    """Changing threshold should complete the first guided imbalance task."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=IMBALANCE_LESSON_ID)
+        scene = create_class_imbalance_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+        progress = context.progress.lessons[IMBALANCE_LESSON_ID]
+
+        assert ADJUST_THRESHOLD_TASK_ID in progress.completed_task_ids
+        assert INCREASE_RECALL_TASK_ID not in progress.completed_task_ids
+        assert progress.completed is False
+    finally:
+        pygame.quit()
+
+
+def test_class_imbalance_scene_completes_guided_lesson_at_high_recall(monkeypatch) -> None:
+    """Lowering threshold enough to raise recall should complete the guided lesson."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=IMBALANCE_LESSON_ID)
+        scene = create_class_imbalance_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
+        progress = context.progress.lessons[IMBALANCE_LESSON_ID]
+
+        assert progress.completed_task_ids >= {
+            ADJUST_THRESHOLD_TASK_ID,
+            INCREASE_RECALL_TASK_ID,
+        }
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_class_imbalance_scene_ignores_progress_outside_guided_lesson(monkeypatch) -> None:
+    """Standalone Imbalance Lab use should not mutate guided lesson progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_class_imbalance_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_MINUS))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+
+        assert IMBALANCE_LESSON_ID not in context.progress.lessons
     finally:
         pygame.quit()
 
