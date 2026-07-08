@@ -31,6 +31,9 @@ WARNING: Final[tuple[int, int, int]] = (246, 132, 134)
 
 THRESHOLDS: Final[tuple[float, ...]] = (0.30, 0.50, 0.70)
 DEFAULT_THRESHOLD_INDEX: Final[int] = 1
+IMBALANCE_LESSON_ID: Final[str] = "trustworthy_imbalance"
+ADJUST_THRESHOLD_TASK_ID: Final[str] = "adjust_decision_threshold"
+INCREASE_RECALL_TASK_ID: Final[str] = "increase_minority_recall"
 
 
 @dataclass(frozen=True, slots=True)
@@ -132,6 +135,7 @@ class ClassImbalanceLabScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create the deterministic imbalance scene."""
+        self._context = context
         self._language = context.settings.language
         self._font_title = make_ui_font(34, bold=True)
         self._font_heading = make_ui_font(23, bold=True)
@@ -181,14 +185,49 @@ class ClassImbalanceLabScene:
         if key in {pygame.K_1, pygame.K_2, pygame.K_3}:
             self.preset_index = key - pygame.K_1
         elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
+            previous_threshold_index = self.threshold_index
             self.threshold_index = max(0, self.threshold_index - 1)
+            if self.threshold_index != previous_threshold_index:
+                self._record_threshold_progress()
         elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
+            previous_threshold_index = self.threshold_index
             self.threshold_index = min(len(THRESHOLDS) - 1, self.threshold_index + 1)
+            if self.threshold_index != previous_threshold_index:
+                self._record_threshold_progress()
         elif key in {pygame.K_0, pygame.K_KP0}:
+            previous_threshold_index = self.threshold_index
             self.threshold_index = DEFAULT_THRESHOLD_INDEX
+            if self.threshold_index != previous_threshold_index:
+                self._record_threshold_progress()
         elif key == pygame.K_r:
             self.preset_index = 0
             self.threshold_index = DEFAULT_THRESHOLD_INDEX
+
+    def _record_threshold_progress(self) -> None:
+        """Complete guided threshold tasks when the lesson owns this scene."""
+        if self._context.selected_lesson_id != IMBALANCE_LESSON_ID:
+            return
+
+        self._context.progress.complete_task(
+            IMBALANCE_LESSON_ID,
+            ADJUST_THRESHOLD_TASK_ID,
+        )
+        if self._recall() >= 0.80:
+            self._context.progress.complete_task(
+                IMBALANCE_LESSON_ID,
+                INCREASE_RECALL_TASK_ID,
+            )
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both guided tasks are done."""
+        progress = self._context.progress.lessons.get(IMBALANCE_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {ADJUST_THRESHOLD_TASK_ID, INCREASE_RECALL_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(IMBALANCE_LESSON_ID)
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "Class Imbalance Lab", (58, 40), self._font_title, TEXT)
