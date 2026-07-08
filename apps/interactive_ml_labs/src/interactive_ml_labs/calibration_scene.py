@@ -30,6 +30,9 @@ DEFAULT_TEMPERATURE_INDEX: Final[int] = 2
 DECISION_THRESHOLD: Final[float] = 0.50
 SIDE_ROW_STEP: Final[int] = 24
 SIDE_NOTE_LINE_HEIGHT: Final[int] = 16
+CALIBRATION_LESSON_ID: Final[str] = "trustworthy_calibration"
+IMPROVE_ECE_TASK_ID: Final[str] = "improve_ece_with_temperature"
+INSPECT_GAPS_TASK_ID: Final[str] = "inspect_calibration_gaps"
 
 
 @dataclass(frozen=True, slots=True)
@@ -137,6 +140,7 @@ class CalibrationLabScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create a deterministic calibration preview scene."""
+        self._context = context
         self._language = context.settings.language
         self._font_title = make_ui_font(34, bold=True)
         self._font_heading = make_ui_font(23, bold=True)
@@ -185,11 +189,18 @@ class CalibrationLabScene:
         if key in {pygame.K_1, pygame.K_2, pygame.K_3}:
             self.preset_index = key - pygame.K_1
         elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
+            previous_temperature_index = self.temperature_index
             self.temperature_index = max(0, self.temperature_index - 1)
+            if self.temperature_index != previous_temperature_index:
+                self._record_temperature_progress()
         elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
+            previous_temperature_index = self.temperature_index
             self.temperature_index = min(len(TEMPERATURE_VALUES) - 1, self.temperature_index + 1)
+            if self.temperature_index != previous_temperature_index:
+                self._record_temperature_progress()
         elif key == pygame.K_e:
             self.show_error_bars = not self.show_error_bars
+            self._record_gap_progress()
         elif key == pygame.K_o:
             self.show_raw_scores = not self.show_raw_scores
         elif key == pygame.K_r:
@@ -197,6 +208,39 @@ class CalibrationLabScene:
             self.temperature_index = DEFAULT_TEMPERATURE_INDEX
             self.show_error_bars = True
             self.show_raw_scores = True
+
+    def _record_temperature_progress(self) -> None:
+        """Complete the ECE improvement task for the guided calibration lesson."""
+        if self._context.selected_lesson_id != CALIBRATION_LESSON_ID:
+            return
+
+        if self._expected_calibration_error() < self._default_temperature_ece():
+            self._context.progress.complete_task(
+                CALIBRATION_LESSON_ID,
+                IMPROVE_ECE_TASK_ID,
+            )
+        self._mark_lesson_completed_if_ready()
+
+    def _record_gap_progress(self) -> None:
+        """Complete the gap-inspection task for the guided calibration lesson."""
+        if self._context.selected_lesson_id != CALIBRATION_LESSON_ID:
+            return
+
+        self._context.progress.complete_task(
+            CALIBRATION_LESSON_ID,
+            INSPECT_GAPS_TASK_ID,
+        )
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both guided tasks are done."""
+        progress = self._context.progress.lessons.get(CALIBRATION_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {IMPROVE_ECE_TASK_ID, INSPECT_GAPS_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(CALIBRATION_LESSON_ID)
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "Calibration Lab", (58, 40), self._font_title, TEXT)
@@ -459,6 +503,15 @@ class CalibrationLabScene:
             * abs(calibration_bin["accuracy"] - calibration_bin["confidence"])
             for calibration_bin in self._calibration_bins()
         )
+
+    def _default_temperature_ece(self) -> float:
+        """Return ECE for the active preset before temperature scaling changes."""
+        current_temperature_index = self.temperature_index
+        try:
+            self.temperature_index = DEFAULT_TEMPERATURE_INDEX
+            return self._expected_calibration_error()
+        finally:
+            self.temperature_index = current_temperature_index
 
     def _worst_calibration_gap(self) -> tuple[int, float]:
         """Return index and size of the largest bin-level calibration gap."""
