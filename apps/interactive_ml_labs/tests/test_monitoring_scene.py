@@ -3,7 +3,10 @@
 import pygame
 from interactive_ml_labs.display import DEFAULT_RESOLUTION
 from interactive_ml_labs.monitoring_scene import (
+    ACKNOWLEDGE_ALERT_TASK_ID,
+    COMPARE_SIGNALS_TASK_ID,
     DEFAULT_THRESHOLD_INDEX,
+    MONITORING_LESSON_ID,
     PRESETS,
     ModelMonitoringDriftScene,
     create_model_monitoring_drift_scene,
@@ -327,6 +330,91 @@ def test_monitoring_scene_reports_next_recommendation(monkeypatch) -> None:
         assert "Next: document finding" in scene._active_takeaway()
         assert "first alert" in scene._active_takeaway()
         assert "severity" in scene._active_takeaway()
+    finally:
+        pygame.quit()
+
+
+def test_monitoring_scene_records_signal_comparison_task(monkeypatch) -> None:
+    """Switching between data and metric drift should complete comparison progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=MONITORING_LESSON_ID)
+        scene = create_model_monitoring_drift_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+        progress = context.progress.lessons[MONITORING_LESSON_ID]
+
+        assert COMPARE_SIGNALS_TASK_ID in progress.completed_task_ids
+        assert ACKNOWLEDGE_ALERT_TASK_ID not in progress.completed_task_ids
+        assert progress.completed is False
+    finally:
+        pygame.quit()
+
+
+def test_monitoring_scene_records_alert_acknowledgement_task(monkeypatch) -> None:
+    """Acknowledging an active alert should complete the investigation task."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=MONITORING_LESSON_ID)
+        scene = create_model_monitoring_drift_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_a))
+
+        assert MONITORING_LESSON_ID not in context.progress.lessons
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_a))
+        progress = context.progress.lessons[MONITORING_LESSON_ID]
+
+        assert ACKNOWLEDGE_ALERT_TASK_ID in progress.completed_task_ids
+        assert COMPARE_SIGNALS_TASK_ID not in progress.completed_task_ids
+        assert progress.completed is False
+    finally:
+        pygame.quit()
+
+
+def test_monitoring_scene_completes_guided_lesson(monkeypatch) -> None:
+    """Completing both monitoring tasks should unlock the lesson completion state."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=MONITORING_LESSON_ID)
+        scene = create_model_monitoring_drift_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_d))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_a))
+        progress = context.progress.lessons[MONITORING_LESSON_ID]
+
+        assert progress.completed_task_ids >= {
+            COMPARE_SIGNALS_TASK_ID,
+            ACKNOWLEDGE_ALERT_TASK_ID,
+        }
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_monitoring_scene_ignores_progress_outside_guided_lesson(monkeypatch) -> None:
+    """Standalone Monitoring Lab use should not mutate guided lesson progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_model_monitoring_drift_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_a))
+
+        assert MONITORING_LESSON_ID not in context.progress.lessons
     finally:
         pygame.quit()
 
