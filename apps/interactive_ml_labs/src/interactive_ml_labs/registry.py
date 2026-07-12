@@ -7980,13 +7980,9 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 id=IMPROVE_ECE_TASK_ID,
                 title=LocalizedText(en="Improve ECE", pl="Popraw ECE"),
                 instruction=LocalizedText(
-                    en=(
-                        "Change temperature scaling until ECE improves relative to "
-                        "the raw score."
-                    ),
+                    en=("Change temperature scaling until ECE improves relative to the raw score."),
                     pl=(
-                        "Zmień temperature scaling tak, żeby ECE poprawiło się względem "
-                        "raw score."
+                        "Zmień temperature scaling tak, żeby ECE poprawiło się względem raw score."
                     ),
                 ),
                 success_condition="improved_ece_with_temperature",
