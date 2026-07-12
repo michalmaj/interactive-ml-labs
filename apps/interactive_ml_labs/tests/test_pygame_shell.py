@@ -299,9 +299,9 @@ def test_shell_home_learning_progress_lines_summarize_paths(monkeypatch) -> None
         first_lesson = LESSON_BY_ID[first_path.lesson_ids[0]]
 
         assert app._home_learning_progress_lines() == [
-            "Lessons: 0/9 completed",
-            "Tasks: 0/18 completed",
-            "Badges: 0/9 unlocked",
+            "Lessons: 0/14 completed",
+            "Tasks: 0/28 completed",
+            "Badges: 0/14 unlocked",
             f"Start: {first_lesson.title.en} ({first_path.title.en})",
         ]
 
@@ -325,9 +325,9 @@ def test_shell_home_learning_progress_metrics_track_counts(monkeypatch) -> None:
         app.context.progress.mark_completed(lesson.id)
 
         assert app._home_learning_progress_metrics() == [
-            ("Lessons: 1/9 completed", 1, 9),
-            ("Tasks: 1/18 completed", 1, 18),
-            ("Badges: 1/9 unlocked", 1, 9),
+            ("Lessons: 1/14 completed", 1, 14),
+            ("Tasks: 1/28 completed", 1, 28),
+            ("Badges: 1/14 unlocked", 1, 14),
         ]
     finally:
         pygame.quit()
@@ -344,9 +344,9 @@ def test_shell_home_learning_progress_lines_localize_polish(monkeypatch) -> None
         first_lesson = LESSON_BY_ID[first_path.lesson_ids[0]]
 
         assert app._home_learning_progress_lines() == [
-            "Lekcje: 0/9 ukończone",
-            "Zadania: 0/18 ukończone",
-            "Odznaki: 0/9 zdobyte",
+            "Lekcje: 0/14 ukończone",
+            "Zadania: 0/28 ukończone",
+            "Odznaki: 0/14 zdobyte",
             f"Zacznij: {first_lesson.title.pl} ({first_path.title.pl})",
         ]
     finally:
@@ -388,8 +388,8 @@ def test_shell_home_renders_learning_progress_panel(monkeypatch) -> None:
         app._render_home()
 
         assert "Learning progress" in wrapped_text
-        assert "Lessons: 0/9 completed" in wrapped_text
-        assert progress_bars == [(0, 9), (0, 18), (0, 9)]
+        assert "Lessons: 0/14 completed" in wrapped_text
+        assert progress_bars == [(0, 14), (0, 28), (0, 14)]
         assert app.home_continue_rect is not None
     finally:
         pygame.quit()
@@ -578,6 +578,27 @@ def test_shell_learning_path_selection_opens_lessons(monkeypatch) -> None:
             app._current_learning_path_lessons()[0]
             == LESSON_BY_ID["error_linear_regression_line_fit"]
         )
+        assert app.selected_index == 0
+    finally:
+        pygame.quit()
+
+
+def test_shell_trustworthy_learning_path_selection_opens_lessons(monkeypatch) -> None:
+    """Selecting the trustworthy path should open its evaluation-to-monitoring lessons."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = next(path for path in LEARNING_PATH_MANIFESTS if path.id == "trustworthy_models")
+        app.screen_name = ScreenName.PATHS
+        app.selected_index = LEARNING_PATH_MANIFESTS.index(path)
+
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.LESSONS
+        assert app.selected_learning_path == path
+        assert app._current_learning_path_lessons()[0] == LESSON_BY_ID["trustworthy_split"]
+        assert app._current_learning_path_lessons()[-1] == LESSON_BY_ID["trustworthy_monitoring"]
         assert app.selected_index == 0
     finally:
         pygame.quit()

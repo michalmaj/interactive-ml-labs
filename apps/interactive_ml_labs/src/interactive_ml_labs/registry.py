@@ -7,10 +7,25 @@ from collections.abc import Callable
 from interactive_ml_labs.activation_scene import create_activation_functions_lab_scene
 from interactive_ml_labs.anomaly_detection_scene import create_anomaly_detection_lab_scene
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
-from interactive_ml_labs.calibration_scene import create_calibration_lab_scene
-from interactive_ml_labs.class_imbalance_scene import create_class_imbalance_lab_scene
+from interactive_ml_labs.calibration_scene import (
+    CALIBRATION_LESSON_ID,
+    IMPROVE_ECE_TASK_ID,
+    INSPECT_GAPS_TASK_ID,
+    create_calibration_lab_scene,
+)
+from interactive_ml_labs.class_imbalance_scene import (
+    ADJUST_THRESHOLD_TASK_ID,
+    IMBALANCE_LESSON_ID,
+    INCREASE_RECALL_TASK_ID,
+    create_class_imbalance_lab_scene,
+)
 from interactive_ml_labs.clustering_scene import create_clustering_lab_scene
-from interactive_ml_labs.data_leakage_scene import create_data_leakage_lab_scene
+from interactive_ml_labs.data_leakage_scene import (
+    COMPARE_SCENARIOS_TASK_ID,
+    LEAKAGE_LESSON_ID,
+    REMOVE_LEAKAGE_TASK_ID,
+    create_data_leakage_lab_scene,
+)
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.distance_metrics_scene import create_distance_metrics_lab_scene
 from interactive_ml_labs.feature_importance_scene import create_feature_importance_lab_scene
@@ -34,13 +49,23 @@ from interactive_ml_labs.manifest import (
     TheorySection,
 )
 from interactive_ml_labs.model_comparison_scene import create_model_comparison_lab_scene
-from interactive_ml_labs.monitoring_scene import create_model_monitoring_drift_scene
+from interactive_ml_labs.monitoring_scene import (
+    ACKNOWLEDGE_ALERT_TASK_ID,
+    COMPARE_SIGNALS_TASK_ID,
+    MONITORING_LESSON_ID,
+    create_model_monitoring_drift_scene,
+)
 from interactive_ml_labs.neural_network_scene import create_neural_network_playground_scene
 from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
 from interactive_ml_labs.scene import Scene
-from interactive_ml_labs.split_lab_scene import create_train_validation_test_lab_scene
+from interactive_ml_labs.split_lab_scene import (
+    CHOOSE_VALIDATION_TASK_ID,
+    COMPARE_COMPLEXITY_TASK_ID,
+    SPLIT_LESSON_ID,
+    create_train_validation_test_lab_scene,
+)
 from interactive_ml_labs.svm_margin_scene import create_svm_margin_lab_scene
 from interactive_ml_labs.time_series_scene import create_time_series_forecasting_lab_scene
 from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
@@ -7754,6 +7779,294 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
         ),
         completion_badge=LocalizedText(en="Soft Cluster Reader", pl="Czytelnik soft clusters"),
     ),
+    LessonManifest(
+        id=SPLIT_LESSON_ID,
+        level=2,
+        demo_id="train_validation_test_lab",
+        title=LocalizedText(
+            en="Keep test data honest",
+            pl="Chroń uczciwość test setu",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand why train, validation, and test splits answer different "
+                "questions, and why the test set should stay untouched until the end."
+            ),
+            pl=(
+                "Zrozum, czemu train, validation i test split odpowiadają na różne "
+                "pytania oraz czemu test set powinien zostać nietknięty do końca."
+            ),
+        ),
+        tasks=(
+            LessonTask(
+                id=COMPARE_COMPLEXITY_TASK_ID,
+                title=LocalizedText(
+                    en="Compare model complexity",
+                    pl="Porównaj złożoność modelu",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Switch between complexity settings and watch how train and "
+                        "validation scores separate."
+                    ),
+                    pl=(
+                        "Przełącz ustawienia złożoności i zobacz, jak rozjeżdżają się "
+                        "wyniki train i validation."
+                    ),
+                ),
+                success_condition="compared_complexity_settings",
+                hint=LocalizedText(
+                    en="The best training score is not automatically the best model.",
+                    pl="Najlepszy wynik train nie oznacza automatycznie najlepszego modelu.",
+                ),
+            ),
+            LessonTask(
+                id=CHOOSE_VALIDATION_TASK_ID,
+                title=LocalizedText(
+                    en="Choose by validation score",
+                    pl="Wybierz według validation score",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "After comparing settings, stop on the model that validation "
+                        "would choose before looking at test."
+                    ),
+                    pl=(
+                        "Po porównaniu ustawień zatrzymaj się na modelu, który wybrałby "
+                        "validation score, zanim spojrzysz na test."
+                    ),
+                ),
+                success_condition="selected_validation_candidate",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Test Set Guardian", pl="Strażnik test setu"),
+    ),
+    LessonManifest(
+        id=LEAKAGE_LESSON_ID,
+        level=2,
+        demo_id="data_leakage_lab",
+        title=LocalizedText(
+            en="Detect leakage before it fools you",
+            pl="Wykryj leakage, zanim Cię zmyli",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand how leakage can make metrics look impressive while hiding "
+                "that the model learned information it would not have in production."
+            ),
+            pl=(
+                "Zrozum, jak leakage potrafi sztucznie podbić metryki, gdy model "
+                "korzysta z informacji niedostępnych w produkcji."
+            ),
+        ),
+        prerequisites=(SPLIT_LESSON_ID,),
+        tasks=(
+            LessonTask(
+                id=REMOVE_LEAKAGE_TASK_ID,
+                title=LocalizedText(
+                    en="Remove the suspicious feature",
+                    pl="Usuń podejrzaną cechę",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Turn off the leakage feature and observe whether the score "
+                        "becomes less spectacular but more believable."
+                    ),
+                    pl=(
+                        "Wyłącz cechę z leakage i zobacz, czy wynik robi się mniej "
+                        "efektowny, ale bardziej wiarygodny."
+                    ),
+                ),
+                success_condition="removed_leakage_feature",
+            ),
+            LessonTask(
+                id=COMPARE_SCENARIOS_TASK_ID,
+                title=LocalizedText(
+                    en="Compare leakage scenarios",
+                    pl="Porównaj scenariusze leakage",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Switch scenarios and notice which kind of feature should make "
+                        "you suspicious."
+                    ),
+                    pl=(
+                        "Przełącz scenariusze i zauważ, jaki typ cechy powinien wzbudzać "
+                        "podejrzenia."
+                    ),
+                ),
+                success_condition="compared_leakage_scenarios",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Leakage Detective", pl="Tropiciel leakage"),
+    ),
+    LessonManifest(
+        id=IMBALANCE_LESSON_ID,
+        level=2,
+        demo_id="class_imbalance_lab",
+        title=LocalizedText(
+            en="Read metrics under imbalance",
+            pl="Czytaj metryki przy imbalance",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand why accuracy can hide weak minority-class recall, and why "
+                "threshold choice is a product decision as much as a model decision."
+            ),
+            pl=(
+                "Zrozum, czemu accuracy potrafi ukryć słaby recall klasy mniejszościowej "
+                "i czemu wybór threshold jest też decyzją produktową."
+            ),
+        ),
+        prerequisites=(LEAKAGE_LESSON_ID,),
+        tasks=(
+            LessonTask(
+                id=ADJUST_THRESHOLD_TASK_ID,
+                title=LocalizedText(
+                    en="Adjust the decision threshold",
+                    pl="Dostosuj decision threshold",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Move the threshold and observe how precision, recall, false "
+                        "positives, and false negatives trade off."
+                    ),
+                    pl=(
+                        "Przesuń threshold i obserwuj kompromis między precision, "
+                        "recall, false positives i false negatives."
+                    ),
+                ),
+                success_condition="adjusted_decision_threshold",
+            ),
+            LessonTask(
+                id=INCREASE_RECALL_TASK_ID,
+                title=LocalizedText(en="Reach stronger recall", pl="Uzyskaj mocniejszy recall"),
+                instruction=LocalizedText(
+                    en=(
+                        "Find a setting with stronger recall and identify the cost in "
+                        "precision or review workload."
+                    ),
+                    pl=(
+                        "Znajdź ustawienie z mocniejszym recall i nazwij koszt w "
+                        "precision albo liczbie spraw do ręcznego sprawdzenia."
+                    ),
+                ),
+                success_condition="increased_minority_recall",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Trade-off Reader", pl="Czytelnik kompromisów"),
+    ),
+    LessonManifest(
+        id=CALIBRATION_LESSON_ID,
+        level=2,
+        demo_id="calibration_lab",
+        title=LocalizedText(
+            en="Check whether confidence means confidence",
+            pl="Sprawdź, czy confidence naprawdę coś znaczy",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand that a model can rank examples well and still produce "
+                "probabilities that need calibration."
+            ),
+            pl=(
+                "Zrozum, że model może dobrze porządkować przykłady, a mimo to dawać "
+                "probabilities wymagające kalibracji."
+            ),
+        ),
+        prerequisites=(IMBALANCE_LESSON_ID,),
+        tasks=(
+            LessonTask(
+                id=IMPROVE_ECE_TASK_ID,
+                title=LocalizedText(en="Improve ECE", pl="Popraw ECE"),
+                instruction=LocalizedText(
+                    en=("Change temperature scaling until ECE improves relative to the raw score."),
+                    pl=(
+                        "Zmień temperature scaling tak, żeby ECE poprawiło się względem raw score."
+                    ),
+                ),
+                success_condition="improved_ece_with_temperature",
+            ),
+            LessonTask(
+                id=INSPECT_GAPS_TASK_ID,
+                title=LocalizedText(
+                    en="Inspect calibration gaps",
+                    pl="Sprawdź calibration gaps",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Use the gap/error-bar view to see where confidence and observed "
+                        "frequency disagree."
+                    ),
+                    pl=(
+                        "Użyj widoku gap/error bars i zobacz, gdzie confidence rozmija "
+                        "się z obserwowaną częstością."
+                    ),
+                ),
+                success_condition="inspected_calibration_gaps",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Confidence Calibrator", pl="Kalibrator pewności"),
+    ),
+    LessonManifest(
+        id=MONITORING_LESSON_ID,
+        level=3,
+        demo_id="model_monitoring_drift_lab",
+        title=LocalizedText(
+            en="Monitor a model after deployment",
+            pl="Monitoruj model po wdrożeniu",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand why a trustworthy model still needs monitoring: data drift "
+                "and metric drift can appear at different moments."
+            ),
+            pl=(
+                "Zrozum, czemu nawet zaufany model wymaga monitoringu: data drift i "
+                "metric drift mogą pojawić się w różnym momencie."
+            ),
+        ),
+        prerequisites=(CALIBRATION_LESSON_ID,),
+        tasks=(
+            LessonTask(
+                id=COMPARE_SIGNALS_TASK_ID,
+                title=LocalizedText(
+                    en="Compare drift signals",
+                    pl="Porównaj drift signals",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Switch between data drift and metric drift and identify which "
+                        "signal leads."
+                    ),
+                    pl=(
+                        "Przełącz data drift i metric drift, a potem wskaż, który sygnał "
+                        "pojawia się pierwszy."
+                    ),
+                ),
+                success_condition="compared_drift_signals",
+            ),
+            LessonTask(
+                id=ACKNOWLEDGE_ALERT_TASK_ID,
+                title=LocalizedText(
+                    en="Acknowledge a meaningful alert",
+                    pl="Potwierdź sensowny alert",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Trigger a real alert and acknowledge the investigation only "
+                        "when the current window deserves attention."
+                    ),
+                    pl=(
+                        "Wywołaj realny alert i potwierdź analizę dopiero wtedy, gdy "
+                        "current window naprawdę wymaga uwagi."
+                    ),
+                ),
+                success_condition="acknowledged_drift_investigation",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Model Guardian", pl="Strażnik modelu"),
+    ),
 )
 
 LESSON_BY_ID: dict[str, LessonManifest] = {manifest.id: manifest for manifest in LESSON_MANIFESTS}
@@ -7804,6 +8117,31 @@ LEARNING_PATH_MANIFESTS: tuple[LearningPathManifest, ...] = (
             "distance_soft_clusters",
         ),
         tags=("guided-path", "distance", "knn", "clustering", "unsupervised"),
+    ),
+    LearningPathManifest(
+        id="trustworthy_models",
+        title=LocalizedText(
+            en="From good scores to trustworthy models",
+            pl="Od dobrych wyników do zaufanych modeli",
+        ),
+        summary=LocalizedText(
+            en=(
+                "A guided path from honest validation, through leakage and metric "
+                "trade-offs, to calibrated confidence and post-deployment monitoring."
+            ),
+            pl=(
+                "Ścieżka od uczciwej walidacji, przez leakage i kompromisy metryk, "
+                "po skalibrowaną pewność i monitoring po wdrożeniu."
+            ),
+        ),
+        lesson_ids=(
+            SPLIT_LESSON_ID,
+            LEAKAGE_LESSON_ID,
+            IMBALANCE_LESSON_ID,
+            CALIBRATION_LESSON_ID,
+            MONITORING_LESSON_ID,
+        ),
+        tags=("guided-path", "evaluation", "trustworthy-ml", "monitoring", "level-2"),
     ),
 )
 

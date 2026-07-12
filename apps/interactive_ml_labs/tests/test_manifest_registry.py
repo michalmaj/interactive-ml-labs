@@ -22,10 +22,25 @@ from interactive_ml_labs import (
 from interactive_ml_labs.activation_scene import create_activation_functions_lab_scene
 from interactive_ml_labs.anomaly_detection_scene import create_anomaly_detection_lab_scene
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
-from interactive_ml_labs.calibration_scene import create_calibration_lab_scene
-from interactive_ml_labs.class_imbalance_scene import create_class_imbalance_lab_scene
+from interactive_ml_labs.calibration_scene import (
+    CALIBRATION_LESSON_ID,
+    IMPROVE_ECE_TASK_ID,
+    INSPECT_GAPS_TASK_ID,
+    create_calibration_lab_scene,
+)
+from interactive_ml_labs.class_imbalance_scene import (
+    ADJUST_THRESHOLD_TASK_ID,
+    IMBALANCE_LESSON_ID,
+    INCREASE_RECALL_TASK_ID,
+    create_class_imbalance_lab_scene,
+)
 from interactive_ml_labs.clustering_scene import create_clustering_lab_scene
-from interactive_ml_labs.data_leakage_scene import create_data_leakage_lab_scene
+from interactive_ml_labs.data_leakage_scene import (
+    COMPARE_SCENARIOS_TASK_ID,
+    LEAKAGE_LESSON_ID,
+    REMOVE_LEAKAGE_TASK_ID,
+    create_data_leakage_lab_scene,
+)
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.distance_metrics_scene import create_distance_metrics_lab_scene
 from interactive_ml_labs.feature_importance_scene import create_feature_importance_lab_scene
@@ -37,11 +52,21 @@ from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
 from interactive_ml_labs.linear_regression_scene import create_linear_regression_line_fit_lab_scene
 from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
 from interactive_ml_labs.model_comparison_scene import create_model_comparison_lab_scene
-from interactive_ml_labs.monitoring_scene import create_model_monitoring_drift_scene
+from interactive_ml_labs.monitoring_scene import (
+    ACKNOWLEDGE_ALERT_TASK_ID,
+    COMPARE_SIGNALS_TASK_ID,
+    MONITORING_LESSON_ID,
+    create_model_monitoring_drift_scene,
+)
 from interactive_ml_labs.neural_network_scene import create_neural_network_playground_scene
 from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.random_forest_scene import create_random_forest_scene
-from interactive_ml_labs.split_lab_scene import create_train_validation_test_lab_scene
+from interactive_ml_labs.split_lab_scene import (
+    CHOOSE_VALIDATION_TASK_ID,
+    COMPARE_COMPLEXITY_TASK_ID,
+    SPLIT_LESSON_ID,
+    create_train_validation_test_lab_scene,
+)
 from interactive_ml_labs.svm_margin_scene import create_svm_margin_lab_scene
 from interactive_ml_labs.time_series_scene import create_time_series_forecasting_lab_scene
 from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
@@ -1187,9 +1212,52 @@ def test_learning_path_registry_contains_distance_to_clusters_path() -> None:
     assert LESSON_BY_ID["distance_soft_clusters"].level == 2
 
 
+def test_learning_path_registry_contains_trustworthy_models_path() -> None:
+    """Third learning path should connect evaluation to trustworthy model operation."""
+    path = next(path for path in LEARNING_PATH_MANIFESTS if path.id == "trustworthy_models")
+
+    assert path.title.en == "From good scores to trustworthy models"
+    assert path.title.pl == "Od dobrych wyników do zaufanych modeli"
+    assert path.lesson_ids == (
+        SPLIT_LESSON_ID,
+        LEAKAGE_LESSON_ID,
+        IMBALANCE_LESSON_ID,
+        CALIBRATION_LESSON_ID,
+        MONITORING_LESSON_ID,
+    )
+
+    demos_in_path = [LESSON_BY_ID[lesson_id].demo_id for lesson_id in path.lesson_ids]
+    assert demos_in_path == [
+        "train_validation_test_lab",
+        "data_leakage_lab",
+        "class_imbalance_lab",
+        "calibration_lab",
+        "model_monitoring_drift_lab",
+    ]
+    assert all(demo_id in DEMO_BY_ID for demo_id in demos_in_path)
+    assert LESSON_BY_ID[LEAKAGE_LESSON_ID].prerequisites == (SPLIT_LESSON_ID,)
+    assert LESSON_BY_ID[MONITORING_LESSON_ID].level == 3
+    assert LESSON_BY_ID[MONITORING_LESSON_ID].completion_badge is not None
+    assert LESSON_BY_ID[MONITORING_LESSON_ID].completion_badge.pl == "Strażnik modelu"
+
+
+def test_trustworthy_models_lessons_match_scene_task_hooks() -> None:
+    """Trustworthy path task ids should stay aligned with scene progress hooks."""
+    expected_task_ids_by_lesson = {
+        SPLIT_LESSON_ID: {COMPARE_COMPLEXITY_TASK_ID, CHOOSE_VALIDATION_TASK_ID},
+        LEAKAGE_LESSON_ID: {REMOVE_LEAKAGE_TASK_ID, COMPARE_SCENARIOS_TASK_ID},
+        IMBALANCE_LESSON_ID: {ADJUST_THRESHOLD_TASK_ID, INCREASE_RECALL_TASK_ID},
+        CALIBRATION_LESSON_ID: {IMPROVE_ECE_TASK_ID, INSPECT_GAPS_TASK_ID},
+        MONITORING_LESSON_ID: {COMPARE_SIGNALS_TASK_ID, ACKNOWLEDGE_ALERT_TASK_ID},
+    }
+
+    for lesson_id, expected_task_ids in expected_task_ids_by_lesson.items():
+        assert {task.id for task in LESSON_BY_ID[lesson_id].tasks} == expected_task_ids
+
+
 def test_learning_lessons_define_goals_tasks_and_badges() -> None:
     """Every default lesson should have enough metadata for a future lesson screen."""
-    assert len(LESSON_MANIFESTS) == 9
+    assert len(LESSON_MANIFESTS) == 14
 
     for lesson in LESSON_MANIFESTS:
         assert lesson.title.en
