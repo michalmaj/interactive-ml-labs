@@ -29,6 +29,9 @@ WINDOW_SIZE: Final[int] = 8
 DEFAULT_THRESHOLD_INDEX: Final[int] = 2
 THRESHOLDS: Final[tuple[float, ...]] = (0.10, 0.15, 0.20, 0.25, 0.30)
 SIGNALS: Final[tuple[str, ...]] = ("data drift", "metric drift")
+MONITORING_LESSON_ID: Final[str] = "trustworthy_monitoring"
+COMPARE_SIGNALS_TASK_ID: Final[str] = "compare_drift_signals"
+ACKNOWLEDGE_ALERT_TASK_ID: Final[str] = "acknowledge_drift_investigation"
 
 
 @dataclass(frozen=True, slots=True)
@@ -98,6 +101,7 @@ class ModelMonitoringDriftScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create a deterministic monitoring preview scene."""
+        self._context = context
         self._language = context.settings.language
         self._font_title = make_ui_font(34, bold=True)
         self._font_heading = make_ui_font(23, bold=True)
@@ -105,6 +109,7 @@ class ModelMonitoringDriftScene:
         self._font_small = make_ui_font(15)
         self.preset_index = 0
         self.signal_index = 0
+        self._seen_signal_indices = {self.signal_index}
         self.threshold_index = DEFAULT_THRESHOLD_INDEX
         self.investigation_acknowledged = False
 
@@ -152,9 +157,11 @@ class ModelMonitoringDriftScene:
         elif key == pygame.K_d:
             self.signal_index = 0
             self.investigation_acknowledged = False
+            self._record_signal_progress()
         elif key == pygame.K_m:
             self.signal_index = 1
             self.investigation_acknowledged = False
+            self._record_signal_progress()
         elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
             self.threshold_index = max(0, self.threshold_index - 1)
             self.investigation_acknowledged = False
@@ -168,11 +175,48 @@ class ModelMonitoringDriftScene:
             self.investigation_acknowledged = (
                 self._alert_active() and not self.investigation_acknowledged
             )
+            if self.investigation_acknowledged:
+                self._record_acknowledgement_progress()
         elif key == pygame.K_r:
             self.preset_index = 0
             self.signal_index = 0
+            self._seen_signal_indices = {self.signal_index}
             self.threshold_index = DEFAULT_THRESHOLD_INDEX
             self.investigation_acknowledged = False
+
+    def _record_signal_progress(self) -> None:
+        """Complete the signal-comparison task for the guided monitoring lesson."""
+        self._seen_signal_indices.add(self.signal_index)
+        if self._context.selected_lesson_id != MONITORING_LESSON_ID:
+            return
+
+        if len(self._seen_signal_indices) >= len(SIGNALS):
+            self._context.progress.complete_task(
+                MONITORING_LESSON_ID,
+                COMPARE_SIGNALS_TASK_ID,
+            )
+        self._mark_lesson_completed_if_ready()
+
+    def _record_acknowledgement_progress(self) -> None:
+        """Complete the alert-investigation task for the guided monitoring lesson."""
+        if self._context.selected_lesson_id != MONITORING_LESSON_ID:
+            return
+
+        self._context.progress.complete_task(
+            MONITORING_LESSON_ID,
+            ACKNOWLEDGE_ALERT_TASK_ID,
+        )
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both guided tasks are done."""
+        progress = self._context.progress.lessons.get(MONITORING_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {COMPARE_SIGNALS_TASK_ID, ACKNOWLEDGE_ALERT_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(MONITORING_LESSON_ID)
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "Model Monitoring Drift Lab", (58, 40), self._font_title, TEXT)
