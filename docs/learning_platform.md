@@ -240,7 +240,7 @@ The next slices should implement the third path without exposing incomplete less
 1. Done: document the third path narrative, task conditions, badges, and rollout order.
 2. Done: add task hooks and tests for Train / Validation / Test Split Lab and Data Leakage Lab.
 3. Done: add task hooks and tests for Class Imbalance Lab and Calibration Lab.
-4. Add task hooks and tests for Model Monitoring Drift Lab.
+4. Done: add task hooks and tests for Model Monitoring Drift Lab.
 5. Register all lesson manifests and the complete learning path in one final integration PR.
 6. Run a Polish copy and layout pass after completing the path end to end.
 
