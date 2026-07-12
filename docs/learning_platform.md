@@ -171,7 +171,7 @@ The third path should connect model evaluation, trustworthy metrics, calibrated 
 
 **From good scores to trustworthy models**
 
-Polish title: **Od dobrego wyniku do zaufanego modelu**
+Polish title: **Od dobrych wyników do zaufanych modeli**
 
 1. Train / Validation / Test Split Lab
 2. Data Leakage Lab
@@ -223,7 +223,7 @@ The path should answer one high-level question: **what evidence do we need befor
 
 These tasks are intentionally based on interactions already present in the scenes. Scene adapters should report completion from real state changes rather than from arbitrary key presses.
 
-The path should remain hidden from the app registry until every lesson has working task hooks, localized copy, persistence coverage, and a completion badge. This avoids exposing students to a guided path that cannot yet be completed.
+The path is now registered in the app after every lesson received working task hooks, localized copy, persistence coverage, and a completion badge.
 
 ## Suggested PR Sequence
 
@@ -241,7 +241,7 @@ The next slices should implement the third path without exposing incomplete less
 2. Done: add task hooks and tests for Train / Validation / Test Split Lab and Data Leakage Lab.
 3. Done: add task hooks and tests for Class Imbalance Lab and Calibration Lab.
 4. Done: add task hooks and tests for Model Monitoring Drift Lab.
-5. Register all lesson manifests and the complete learning path in one final integration PR.
+5. Done: register all lesson manifests and the complete learning path in one final integration PR.
 6. Run a Polish copy and layout pass after completing the path end to end.
 
 ## Non-Goals For The First Slice
