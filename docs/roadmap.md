@@ -31,9 +31,12 @@ The shell currently supports:
 - persistent app settings,
 - standalone demo entry points for existing demo packages.
 
+CI runs Ruff, the root pytest suite, package-specific app/core tests, and the
+standalone demo package tests.
+
 ## Near-Term Milestones
 
-- [ ] Run app tests in CI and root pytest.
+- [x] Run app tests in CI and root pytest.
 - [ ] Keep project docs aligned with the current unified app.
 - [ ] Clean up small repository artifacts and naming drift.
 - [x] Extract shared UI helpers for repeated demo-scene panel, text, and wrapping patterns.
