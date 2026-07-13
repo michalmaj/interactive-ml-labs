@@ -7785,7 +7785,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
         demo_id="train_validation_test_lab",
         title=LocalizedText(
             en="Keep test data honest",
-            pl="Chroń uczciwość test setu",
+            pl="Nie podglądaj test setu",
         ),
         learning_goal=LocalizedText(
             en=(
@@ -7839,7 +7839,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 success_condition="selected_validation_candidate",
             ),
         ),
-        completion_badge=LocalizedText(en="Test Set Guardian", pl="Strażnik test setu"),
+        completion_badge=LocalizedText(en="Test Set Guardian", pl="Strażnik test set"),
     ),
     LessonManifest(
         id=LEAKAGE_LESSON_ID,
@@ -7847,7 +7847,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
         demo_id="data_leakage_lab",
         title=LocalizedText(
             en="Detect leakage before it fools you",
-            pl="Wykryj leakage, zanim Cię zmyli",
+            pl="Wykryj leakage, zanim zmyli model",
         ),
         learning_goal=LocalizedText(
             en=(
@@ -7898,7 +7898,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 success_condition="compared_leakage_scenarios",
             ),
         ),
-        completion_badge=LocalizedText(en="Leakage Detective", pl="Tropiciel leakage"),
+        completion_badge=LocalizedText(en="Leakage Detective", pl="Detektyw leakage"),
     ),
     LessonManifest(
         id=IMBALANCE_LESSON_ID,
@@ -7906,7 +7906,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
         demo_id="class_imbalance_lab",
         title=LocalizedText(
             en="Read metrics under imbalance",
-            pl="Czytaj metryki przy imbalance",
+            pl="Czytaj metryki przy niezbalansowanych danych",
         ),
         learning_goal=LocalizedText(
             en=(
@@ -7962,7 +7962,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
         demo_id="calibration_lab",
         title=LocalizedText(
             en="Check whether confidence means confidence",
-            pl="Sprawdź, czy confidence naprawdę coś znaczy",
+            pl="Sprawdź, czy confidence pasuje do rzeczywistości",
         ),
         learning_goal=LocalizedText(
             en=(
@@ -8058,8 +8058,8 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                         "when the current window deserves attention."
                     ),
                     pl=(
-                        "Wywołaj realny alert i potwierdź analizę dopiero wtedy, gdy "
-                        "current window naprawdę wymaga uwagi."
+                        "Wywołaj realny alert i potwierdź analizę dopiero wtedy, "
+                        "gdy current window faktycznie wymaga uwagi."
                     ),
                 ),
                 success_condition="acknowledged_drift_investigation",
@@ -8141,7 +8141,7 @@ LEARNING_PATH_MANIFESTS: tuple[LearningPathManifest, ...] = (
             CALIBRATION_LESSON_ID,
             MONITORING_LESSON_ID,
         ),
-        tags=("guided-path", "evaluation", "trustworthy-ml", "monitoring", "level-2"),
+        tags=("guided-path", "evaluation", "trustworthy-ml", "monitoring", "level-2", "level-3"),
     ),
 )
 
