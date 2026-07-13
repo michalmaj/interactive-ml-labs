@@ -195,13 +195,13 @@ The path should answer one high-level question: **what evidence do we need befor
 
 - compare at least two complexity settings and inspect the train-validation gap,
 - choose the strongest validation candidate without using test score for tuning,
-- badge: **Test Set Guardian / Strażnik test setu**.
+- badge: **Test Set Guardian / Strażnik test set**.
 
 **Data Leakage Lab**
 
 - remove the suspicious leakage feature and observe the score drop,
 - compare leakage behavior in at least two scenarios,
-- badge: **Leakage Detective / Tropiciel leakage**.
+- badge: **Leakage Detective / Detektyw leakage**.
 
 **Class Imbalance Lab**
 

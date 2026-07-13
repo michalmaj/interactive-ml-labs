@@ -1237,8 +1237,24 @@ def test_learning_path_registry_contains_trustworthy_models_path() -> None:
     assert all(demo_id in DEMO_BY_ID for demo_id in demos_in_path)
     assert LESSON_BY_ID[LEAKAGE_LESSON_ID].prerequisites == (SPLIT_LESSON_ID,)
     assert LESSON_BY_ID[MONITORING_LESSON_ID].level == 3
+    assert LESSON_BY_ID[SPLIT_LESSON_ID].completion_badge is not None
+    assert LESSON_BY_ID[SPLIT_LESSON_ID].completion_badge.pl == "Strażnik test set"
+    assert LESSON_BY_ID[LEAKAGE_LESSON_ID].completion_badge is not None
+    assert LESSON_BY_ID[LEAKAGE_LESSON_ID].completion_badge.pl == "Detektyw leakage"
     assert LESSON_BY_ID[MONITORING_LESSON_ID].completion_badge is not None
     assert LESSON_BY_ID[MONITORING_LESSON_ID].completion_badge.pl == "Strażnik modelu"
+
+
+def test_trustworthy_models_polish_copy_stays_natural() -> None:
+    """Trustworthy path Polish copy should avoid rough literal translations."""
+    assert LESSON_BY_ID[SPLIT_LESSON_ID].title.pl == "Nie podglądaj test setu"
+    assert LESSON_BY_ID[IMBALANCE_LESSON_ID].title.pl == (
+        "Czytaj metryki przy niezbalansowanych danych"
+    )
+    assert LESSON_BY_ID[CALIBRATION_LESSON_ID].title.pl == (
+        "Sprawdź, czy confidence pasuje do rzeczywistości"
+    )
+    assert "naprawdę coś znaczy" not in LESSON_BY_ID[CALIBRATION_LESSON_ID].title.pl
 
 
 def test_trustworthy_models_lessons_match_scene_task_hooks() -> None:

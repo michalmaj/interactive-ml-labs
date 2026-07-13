@@ -1236,6 +1236,40 @@ def test_shell_learning_path_badge_labels_localize_polish(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_trustworthy_path_details_localize_polish(monkeypatch) -> None:
+    """Trustworthy path details should show natural Polish lesson and badge copy."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    wrapped_text: list[str] = []
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = position, width, font, color
+        wrapped_text.append(text)
+        return 24
+
+    try:
+        app.context.settings.language = "pl"
+        path = next(path for path in LEARNING_PATH_MANIFESTS if path.id == "trustworthy_models")
+        app._draw_wrapped = capture_wrapped
+
+        app._render_learning_path_details(path)
+
+        assert "[ ] Strażnik test set" in wrapped_text
+        assert "[ ] Detektyw leakage" in wrapped_text
+        assert "[ ] Strażnik modelu" in wrapped_text
+        assert "• Czytaj metryki przy niezbalansowanych danych" in wrapped_text
+        assert "• Sprawdź, czy confidence pasuje do rzeczywistości" in wrapped_text
+        assert "naprawdę coś znaczy" not in " ".join(wrapped_text)
+    finally:
+        pygame.quit()
+
+
 def test_shell_learning_path_task_progress_label_localizes_polish(monkeypatch) -> None:
     """Learning path task summaries should use Polish UI copy."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
