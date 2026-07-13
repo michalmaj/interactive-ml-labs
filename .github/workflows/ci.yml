@@ -33,7 +33,7 @@ jobs:
         run: uv run ruff format --check .
 
       - name: Run root pytest suite
-        run: uv run pytest
+        run: uv run --all-packages pytest
 
       - name: Run ml-lab-core tests
         run: uv run --package ml-lab-core pytest packages/ml_lab_core/tests
