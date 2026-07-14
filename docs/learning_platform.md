@@ -225,6 +225,18 @@ These tasks are intentionally based on interactions already present in the scene
 
 The path is now registered in the app after every lesson received working task hooks, localized copy, persistence coverage, and a completion badge.
 
+## Lesson Completion Summary
+
+The shell should make lesson completion feel like a learning milestone, not just a silent progress update. When a guided lesson is completed for the first time during an active demo, the app now opens a summary screen with:
+
+- the lesson goal,
+- completed tasks,
+- theory visit status,
+- unlocked badge status,
+- a primary action that continues to the next lesson in the selected path.
+
+This is the first small step toward a more course-like flow. Future slices can add short reflection prompts, recap questions, or instructor-facing checkpoints on top of this screen without forcing every demo scene to implement its own completion UI.
+
 ## Suggested PR Sequence
 
 1. Done: add `LessonManifest`, `LessonTask`, and a small learning-path registry.

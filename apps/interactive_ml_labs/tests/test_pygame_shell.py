@@ -43,6 +43,7 @@ from interactive_ml_labs.progress import load_app_progress
 from interactive_ml_labs.pygame_app import (
     DEMO_MENU_TOP,
     DEMO_SCROLLBAR_X,
+    MENU_ITEM_HEIGHT,
     MENU_ITEM_PITCH,
     ScreenName,
     UnifiedAppShell,
@@ -103,6 +104,30 @@ class CountingScene:
     def handle_event(self, event: object) -> SceneCommand:
         """Handle one input event."""
         _ = event
+        return SceneCommand.none()
+
+    def update(self, dt: float) -> SceneCommand:
+        """Advance scene state."""
+        _ = dt
+        return SceneCommand.none()
+
+    def render(self, surface: object) -> None:
+        """Draw the scene."""
+        _ = surface
+
+
+class CompletingLessonScene:
+    """Scene double that completes a guided lesson after one event."""
+
+    def __init__(self, app: UnifiedAppShell, lesson_id: str) -> None:
+        """Store the shell and target lesson id."""
+        self.app = app
+        self.lesson_id = lesson_id
+
+    def handle_event(self, event: object) -> SceneCommand:
+        """Complete the lesson."""
+        _ = event
+        self.app.context.progress.mark_completed(self.lesson_id)
         return SceneCommand.none()
 
     def update(self, dt: float) -> SceneCommand:
@@ -1021,6 +1046,153 @@ def test_shell_lesson_badge_label_reflects_completion(monkeypatch) -> None:
         app.context.progress.mark_completed(lesson.id)
 
         assert app._lesson_badge_label(lesson) == "Badge unlocked: Loss Navigator"
+    finally:
+        pygame.quit()
+
+
+def test_shell_opens_completion_summary_when_guided_lesson_finishes(monkeypatch) -> None:
+    """Newly completed guided lessons should move from demo to completion summary."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        lesson = LESSON_BY_ID[path.lesson_ids[0]]
+        app.selected_learning_path = path
+        app.selected_lesson = lesson
+        app.selected_demo = DEMO_BY_ID[lesson.demo_id]
+        app.screen_name = ScreenName.DEMO
+        app.scene_manager.replace(CompletingLessonScene(app, lesson.id))
+
+        app._handle_active_demo_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE))
+
+        assert app.screen_name == ScreenName.LESSON_COMPLETE
+        assert app.scene_manager.current is None
+        assert app.selected_lesson == lesson
+    finally:
+        pygame.quit()
+
+
+def test_shell_does_not_reopen_completion_for_already_completed_lesson(monkeypatch) -> None:
+    """Already completed guided lessons should not interrupt replay with a summary."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        lesson = LESSON_BY_ID[path.lesson_ids[0]]
+        app.selected_learning_path = path
+        app.selected_lesson = lesson
+        app.selected_demo = DEMO_BY_ID[lesson.demo_id]
+        app.context.progress.mark_completed(lesson.id)
+        app.screen_name = ScreenName.DEMO
+        app.scene_manager.replace(CompletingLessonScene(app, lesson.id))
+
+        app._handle_active_demo_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE))
+
+        assert app.screen_name == ScreenName.DEMO
+        assert app.scene_manager.current is not None
+    finally:
+        pygame.quit()
+
+
+def test_shell_completion_summary_primary_action_opens_next_lesson(monkeypatch) -> None:
+    """The completion summary should continue the selected path."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        lesson = LESSON_BY_ID[path.lesson_ids[0]]
+        next_lesson = LESSON_BY_ID[path.lesson_ids[1]]
+        app.selected_learning_path = path
+        app.selected_lesson = lesson
+        app.screen_name = ScreenName.LESSON_COMPLETE
+        app.selected_index = 0
+
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.INTRO
+        assert app.selected_lesson == next_lesson
+        assert app.selected_demo == DEMO_BY_ID[next_lesson.demo_id]
+        assert app.context.progress.lessons[next_lesson.id].started is True
+    finally:
+        pygame.quit()
+
+
+def test_shell_completion_summary_renders_lesson_progress(monkeypatch) -> None:
+    """The completion summary should show tasks, theory, badge, and next step."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    drawn_text: list[str] = []
+    wrapped_text: list[str] = []
+    menu_labels: list[str] = []
+    menu_tops: list[int] = []
+    progress_bars: list[tuple[int, int]] = []
+
+    def capture_text(
+        text: str,
+        position: tuple[int, int],
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> None:
+        _ = position, font, color
+        drawn_text.append(text)
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = width, font, color
+        wrapped_text.append(text)
+        return position[1] + 24
+
+    def capture_menu(
+        labels: list[str],
+        *,
+        top: int,
+        width: int = 760,
+    ) -> None:
+        _ = top, width
+        menu_labels.extend(labels)
+        menu_tops.append(top)
+
+    def capture_progress_bar(
+        x: int,
+        y: int,
+        width: int,
+        completed_count: int,
+        total_count: int,
+    ) -> None:
+        _ = x, y, width
+        progress_bars.append((completed_count, total_count))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        lesson = LESSON_BY_ID[path.lesson_ids[0]]
+        app.selected_learning_path = path
+        app.selected_lesson = lesson
+        app.context.progress.complete_task(lesson.id, lesson.tasks[0].id)
+        app.context.progress.mark_completed(lesson.id)
+        app._draw_text = capture_text
+        app._draw_wrapped = capture_wrapped
+        app._draw_menu = capture_menu
+        app._draw_compact_progress_bar = capture_progress_bar
+
+        app._render_lesson_complete()
+
+        assert "Lesson complete" in drawn_text
+        assert "What you finished" in drawn_text
+        assert "Tasks: 1/2 completed" in wrapped_text
+        assert "Theory: not visited" in wrapped_text
+        assert app._lesson_badge_label(lesson) in wrapped_text
+        assert progress_bars == [(1, 2)]
+        assert menu_labels[0].startswith("Next lesson:")
+        assert menu_tops
+        assert menu_tops[0] + 2 * MENU_ITEM_PITCH + MENU_ITEM_HEIGHT < app._footer_y()
     finally:
         pygame.quit()
 
