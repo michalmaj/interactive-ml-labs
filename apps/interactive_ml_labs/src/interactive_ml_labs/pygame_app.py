@@ -78,6 +78,7 @@ class ScreenName(StrEnum):
     INTRO = "intro"
     THEORY = "theory"
     DEMO = "demo"
+    LESSON_COMPLETE = "lesson_complete"
     SETTINGS = "settings"
     PAUSE = "pause"
 
@@ -246,12 +247,15 @@ class UnifiedAppShell:
         if scene is None:
             return
 
+        lesson = self.selected_lesson
+        was_completed = lesson is not None and self._is_lesson_completed(lesson.id)
         scene_event = self._event_in_scene_coordinates(event, scene)
         if scene_event is None:
             return
 
         self._handle_scene_command(scene.handle_event(scene_event))
         self._save_progress()
+        self._open_lesson_completion_if_needed(lesson, was_completed)
 
     def _event_in_scene_coordinates(
         self,
@@ -382,8 +386,11 @@ class UnifiedAppShell:
         if scene is None:
             return
 
+        lesson = self.selected_lesson
+        was_completed = lesson is not None and self._is_lesson_completed(lesson.id)
         self._handle_scene_command(scene.update(dt))
         self._save_progress()
+        self._open_lesson_completion_if_needed(lesson, was_completed)
 
     def _render(self) -> None:
         self.screen.fill(BACKGROUND)
@@ -398,6 +405,7 @@ class UnifiedAppShell:
             ScreenName.INTRO: self._render_intro,
             ScreenName.THEORY: self._render_theory,
             ScreenName.DEMO: self._render_demo,
+            ScreenName.LESSON_COMPLETE: self._render_lesson_complete,
             ScreenName.SETTINGS: self._render_settings,
             ScreenName.PAUSE: self._render_pause,
         }
@@ -1081,6 +1089,24 @@ class UnifiedAppShell:
         title = next_lesson.title.for_language(self.context.settings.language)
         return self._text(f"Next: {title}", f"Dalej: {title}")
 
+    def _lesson_completion_menu_labels(self, lesson: LessonManifest | None) -> list[str]:
+        """Return actions shown after a guided lesson is completed."""
+        if lesson is None:
+            return [self._text("Back to home", "Wróć do startu")]
+
+        next_lesson = self._next_lesson_in_selected_path(lesson)
+        if next_lesson is None:
+            primary = self._text("Back to path", "Wróć do ścieżki")
+        else:
+            title = next_lesson.title.for_language(self.context.settings.language)
+            primary = self._text(f"Next lesson: {title}", f"Następna lekcja: {title}")
+
+        return [
+            primary,
+            self._text("Review this lesson", "Powtórz tę lekcję"),
+            self._text("Back to path", "Wróć do ścieżki"),
+        ]
+
     def _next_lesson_in_selected_path(self, lesson: LessonManifest) -> LessonManifest | None:
         """Return the next lesson in the selected learning path."""
         path = self.selected_learning_path
@@ -1719,6 +1745,108 @@ class UnifiedAppShell:
             ACCENT,
         )
 
+    def _render_lesson_complete(self) -> None:
+        """Draw a guided lesson completion summary."""
+        lesson = self.selected_lesson
+        if lesson is None:
+            self._go_to(ScreenName.HOME)
+            return
+
+        language = self.context.settings.language
+        width, height = self.context.settings.resolution
+        content_width = min(960, width - 160)
+        y = 96
+
+        self._draw_text(
+            self._text("Lesson complete", "Lekcja ukończona"),
+            (80, y),
+            self.font_title,
+            TEXT,
+        )
+        y += 58
+        y = self._draw_wrapped(
+            lesson.title.for_language(language),
+            (80, y),
+            content_width,
+            self.font_heading,
+            ACCENT,
+        )
+        y += 22
+        y = self._draw_wrapped(
+            lesson.learning_goal.for_language(language),
+            (80, y),
+            content_width,
+            self.font_body,
+            MUTED_TEXT,
+        )
+        y += 30
+
+        labels = self._lesson_completion_menu_labels(lesson)
+        if width >= 1000:
+            menu_top = y
+            panel_rect = pygame.Rect(
+                660,
+                y,
+                max(360, width - 740),
+                max(260, self._content_bottom() - y),
+            )
+        else:
+            panel_top = y
+            panel_height = max(220, min(300, height - panel_top - 230))
+            panel_rect = pygame.Rect(80, panel_top, content_width, panel_height)
+            menu_top = panel_rect.bottom + 24
+
+        pygame.draw.rect(self.screen, PANEL, panel_rect, border_radius=8)
+        pygame.draw.rect(self.screen, (72, 79, 88), panel_rect, width=1, border_radius=8)
+
+        panel_x = panel_rect.x + 28
+        panel_y = panel_rect.y + 24
+        panel_width = panel_rect.width - 56
+        self._draw_text(
+            self._text("What you finished", "Co masz za sobą"),
+            (panel_x, panel_y),
+            self.font_heading,
+            TEXT,
+        )
+        panel_y += 42
+        panel_y = self._draw_wrapped(
+            self._lesson_task_summary(lesson),
+            (panel_x, panel_y),
+            panel_width,
+            self.font_small,
+            ACCENT,
+        )
+        completed_tasks, total_tasks = self._lesson_task_progress_counts(lesson)
+        self._draw_compact_progress_bar(
+            panel_x,
+            panel_y + 2,
+            panel_width,
+            completed_tasks,
+            total_tasks,
+        )
+        panel_y += 22
+        for task in lesson.tasks:
+            panel_y = self._draw_wrapped(
+                self._lesson_task_label(lesson, task.id, task.title.for_language(language)),
+                (panel_x, panel_y),
+                panel_width,
+                self.font_small,
+                TEXT,
+            )
+            panel_y += 4
+
+        panel_y += 8
+        panel_y = self._draw_lesson_theory_status(lesson, panel_x, panel_y, panel_width)
+        self._draw_lesson_badge_status(lesson, panel_x, panel_y + 8, panel_width)
+
+        self._draw_menu(labels, top=menu_top, width=520)
+        self._draw_footer(
+            self._text(
+                "Enter: select | Esc/Backspace: path | L: language",
+                "Enter: wybierz | Esc/Backspace: ścieżka | L: język",
+            ),
+        )
+
     def _render_settings(self) -> None:
         settings = self.context.settings
         self._draw_title(
@@ -2122,6 +2250,7 @@ class UnifiedAppShell:
             ScreenName.INTRO: self._start_demo,
             ScreenName.THEORY: self._activate_theory,
             ScreenName.DEMO: self._open_pause,
+            ScreenName.LESSON_COMPLETE: self._select_lesson_complete_item,
             ScreenName.SETTINGS: self._select_settings_item,
             ScreenName.PAUSE: self._select_pause_item,
         }
@@ -2214,6 +2343,25 @@ class UnifiedAppShell:
         else:
             self.running = False
 
+    def _select_lesson_complete_item(self) -> None:
+        lesson = self.selected_lesson
+        if lesson is None:
+            self._go_to(ScreenName.HOME)
+            return
+
+        if self.selected_index == 0:
+            next_lesson = self._next_lesson_in_selected_path(lesson)
+            if next_lesson is None:
+                self._go_to(ScreenName.LESSONS)
+                return
+
+            self.selected_index = self._current_learning_path_lessons().index(next_lesson)
+            self._open_lesson(next_lesson)
+        elif self.selected_index == 1:
+            self._open_lesson(lesson)
+        else:
+            self._go_to(ScreenName.LESSONS)
+
     def _select_settings_item(self) -> None:
         settings = self.context.settings
         if self.selected_index == 0:
@@ -2252,6 +2400,8 @@ class UnifiedAppShell:
             self._go_to(self.theory_return_screen)
         elif self.screen_name == ScreenName.DEMO:
             self._open_pause()
+        elif self.screen_name == ScreenName.LESSON_COMPLETE:
+            self._go_to(ScreenName.LESSONS)
         elif self.screen_name == ScreenName.SETTINGS:
             self._go_to(self.settings_return_screen)
         elif self.screen_name == ScreenName.PAUSE:
@@ -2328,6 +2478,22 @@ class UnifiedAppShell:
         elif command.kind == SceneCommandKind.QUIT:
             self.running = False
 
+    def _open_lesson_completion_if_needed(
+        self,
+        lesson: LessonManifest | None,
+        was_completed: bool,
+    ) -> None:
+        """Open the completion screen when an active guided lesson is newly completed."""
+        if self.screen_name != ScreenName.DEMO or lesson is None or was_completed:
+            return
+
+        if not self._is_lesson_completed(lesson.id):
+            return
+
+        self.help_visible = False
+        self.scene_manager.clear()
+        self._go_to(ScreenName.LESSON_COMPLETE)
+
     def _restart_current_demo(self) -> None:
         demo = self._require_demo()
         if demo.create_scene is None:
@@ -2346,6 +2512,9 @@ class UnifiedAppShell:
             ScreenName.INTRO: 1,
             ScreenName.THEORY: 1,
             ScreenName.DEMO: 1,
+            ScreenName.LESSON_COMPLETE: len(
+                self._lesson_completion_menu_labels(self.selected_lesson),
+            ),
             ScreenName.SETTINGS: 6,
             ScreenName.PAUSE: 7,
         }
