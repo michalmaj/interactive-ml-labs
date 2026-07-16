@@ -1127,7 +1127,15 @@ def test_shell_lesson_recap_prompt_uses_default_copy(monkeypatch) -> None:
     app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
 
     try:
-        lesson = LESSON_BY_ID[LEARNING_PATH_MANIFESTS[0].lesson_ids[0]]
+        source_lesson = LESSON_BY_ID[LEARNING_PATH_MANIFESTS[0].lesson_ids[0]]
+        lesson = source_lesson.__class__(
+            id="fallback_recap",
+            level=source_lesson.level,
+            demo_id=source_lesson.demo_id,
+            title=source_lesson.title,
+            learning_goal=source_lesson.learning_goal,
+            tasks=source_lesson.tasks,
+        )
 
         assert app._lesson_recap_prompt(lesson) == (
             "Before moving on, say in one sentence what changed in the model "

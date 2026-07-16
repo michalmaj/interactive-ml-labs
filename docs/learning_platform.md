@@ -243,6 +243,8 @@ Completion summaries should include a short recap prompt. The first implementati
 
 Lesson manifests may define a custom recap prompt. If they do not, the shell uses a generic prompt that still reinforces the habit of turning interaction into an explicit observation.
 
+All currently registered guided lessons now define custom recap prompts. The prompts are intentionally short and concept-specific: each one asks the student to connect the interaction they just completed with the modeling assumption, metric trade-off, or monitoring signal that the lesson was meant to reveal.
+
 ## Suggested PR Sequence
 
 1. Done: add `LessonManifest`, `LessonTask`, and a small learning-path registry.

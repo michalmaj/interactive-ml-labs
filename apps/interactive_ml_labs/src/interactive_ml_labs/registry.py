@@ -7388,6 +7388,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Residual Reader", pl="Czytelnik residuals"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which residual pattern told you the line was still biased, "
+                "and which parameter helped reduce that bias?"
+            ),
+            pl=(
+                "Jaki wzór residuals pokazał Ci, że prosta nadal jest przesunięta, "
+                "i który parametr pomógł to zmniejszyć?"
+            ),
+        ),
     ),
     LessonManifest(
         id="error_gradient_descent",
@@ -7444,6 +7454,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Loss Navigator", pl="Nawigator loss"),
+        recap_prompt=LocalizedText(
+            en=(
+                "What happened to loss when learning rate was too small or too large, "
+                "and what made the stable run different?"
+            ),
+            pl=(
+                "Co działo się z loss, gdy learning rate był za mały albo za duży, "
+                "i czym różnił się stabilny przebieg?"
+            ),
+        ),
     ),
     LessonManifest(
         id="error_logistic_boundary",
@@ -7496,6 +7516,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Boundary Reader", pl="Czytelnik decision boundary"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which points changed class when you moved the decision boundary, "
+                "and why were borderline points less certain?"
+            ),
+            pl=(
+                "Które punkty zmieniły klasę po przesunięciu decision boundary "
+                "i dlaczego punkty graniczne były mniej pewne?"
+            ),
+        ),
     ),
     LessonManifest(
         id="error_boosting_mistakes",
@@ -7551,6 +7581,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Mistake-Driven Learner", pl="Uczenie przez błędy"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which mistakes received more attention in the next boosting round, "
+                "and how did that change the ensemble?"
+            ),
+            pl=(
+                "Które błędy dostały więcej uwagi w kolejnej rundzie boosting "
+                "i jak zmieniło to ensemble?"
+            ),
+        ),
     ),
     LessonManifest(
         id="distance_choose_metric",
@@ -7603,6 +7643,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Metric Reader", pl="Czytelnik metryk"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which metric changed the nearest neighbor, and what does that say "
+                "about how the model reads distance?"
+            ),
+            pl=(
+                "Która metryka zmieniła nearest neighbor i co to mówi o tym, "
+                "jak model czyta distance?"
+            ),
+        ),
     ),
     LessonManifest(
         id="distance_knn_vote",
@@ -7644,6 +7694,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Neighborhood Voter", pl="Głos sąsiedztwa"),
+        recap_prompt=LocalizedText(
+            en=(
+                "How did changing k alter the decision map, and when did the vote "
+                "become too local or too smooth?"
+            ),
+            pl=(
+                "Jak zmiana k wpłynęła na decision map i kiedy głosowanie było "
+                "zbyt lokalne albo zbyt wygładzone?"
+            ),
+        ),
     ),
     LessonManifest(
         id="distance_kmeans_centroids",
@@ -7685,6 +7745,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Centroid Mover", pl="Przesuwacz centroidów"),
+        recap_prompt=LocalizedText(
+            en=(
+                "What moved first: point assignments or centroids, and how did each "
+                "step reduce the clustering error?"
+            ),
+            pl=(
+                "Co zmieniało się najpierw: przypisania punktów czy centroidy, "
+                "i jak każdy krok zmniejszał błąd klastrowania?"
+            ),
+        ),
     ),
     LessonManifest(
         id="distance_clustering_shape",
@@ -7731,6 +7801,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Cluster Shape Reader", pl="Czytelnik kształtu klastrów"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Where did K-Means and DBSCAN disagree, and which assumption about "
+                "cluster shape caused the difference?"
+            ),
+            pl=(
+                "Gdzie K-Means i DBSCAN dały różne wyniki i które założenie "
+                "o kształcie klastrów wywołało tę różnicę?"
+            ),
+        ),
     ),
     LessonManifest(
         id="distance_soft_clusters",
@@ -7778,6 +7858,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Soft Cluster Reader", pl="Czytelnik soft clusters"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which point had mixed membership, and why is a probability more useful "
+                "there than a hard cluster label?"
+            ),
+            pl=(
+                "Który punkt miał mieszaną przynależność i czemu probability jest tam "
+                "bardziej użyteczne niż twarda etykieta klastra?"
+            ),
+        ),
     ),
     LessonManifest(
         id=SPLIT_LESSON_ID,
@@ -7840,6 +7930,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Test Set Guardian", pl="Strażnik test set"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which model would validation choose, and why should the test set "
+                "remain unused until that decision is made?"
+            ),
+            pl=(
+                "Który model wybrałby validation score i dlaczego test set powinien "
+                "zostać nietknięty do momentu tej decyzji?"
+            ),
+        ),
     ),
     LessonManifest(
         id=LEAKAGE_LESSON_ID,
@@ -7899,6 +7999,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Leakage Detective", pl="Detektyw leakage"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which feature made the score suspicious, and why would that feature "
+                "not be safe in production?"
+            ),
+            pl=(
+                "Która cecha sprawiła, że score był podejrzany, i czemu taka cecha "
+                "nie byłaby bezpieczna w produkcji?"
+            ),
+        ),
     ),
     LessonManifest(
         id=IMBALANCE_LESSON_ID,
@@ -7955,6 +8065,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Trade-off Reader", pl="Czytelnik kompromisów"),
+        recap_prompt=LocalizedText(
+            en=(
+                "What did you gain by increasing recall, and what cost appeared "
+                "in precision or review workload?"
+            ),
+            pl=(
+                "Co zyskałeś przez zwiększenie recall i jaki koszt pojawił się "
+                "w precision albo liczbie spraw do sprawdzenia?"
+            ),
+        ),
     ),
     LessonManifest(
         id=CALIBRATION_LESSON_ID,
@@ -8007,6 +8127,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Confidence Calibrator", pl="Kalibrator pewności"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Where did confidence disagree with observed frequency, and how did "
+                "temperature scaling change that gap?"
+            ),
+            pl=(
+                "Gdzie confidence rozmijało się z obserwowaną częstością i jak "
+                "temperature scaling zmienił tę lukę?"
+            ),
+        ),
     ),
     LessonManifest(
         id=MONITORING_LESSON_ID,
@@ -8066,6 +8196,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Model Guardian", pl="Strażnik modelu"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which signal appeared first, data drift or metric drift, and what "
+                "would you investigate before retraining?"
+            ),
+            pl=(
+                "Który sygnał pojawił się pierwszy, data drift czy metric drift, "
+                "i co sprawdziłbyś przed retraining?"
+            ),
+        ),
     ),
 )
 
