@@ -1107,6 +1107,18 @@ class UnifiedAppShell:
             self._text("Back to path", "Wróć do ścieżki"),
         ]
 
+    def _lesson_recap_prompt(self, lesson: LessonManifest) -> str:
+        """Return the recap prompt shown after lesson completion."""
+        if lesson.recap_prompt is not None:
+            return lesson.recap_prompt.for_language(self.context.settings.language)
+
+        return self._text(
+            "Before moving on, say in one sentence what changed in the model "
+            "and what signal convinced you.",
+            "Zanim przejdziesz dalej, powiedz jednym zdaniem, co zmieniło się "
+            "w modelu i po czym to poznajesz.",
+        )
+
     def _next_lesson_in_selected_path(self, lesson: LessonManifest) -> LessonManifest | None:
         """Return the next lesson in the selected learning path."""
         path = self.selected_learning_path
@@ -1837,7 +1849,22 @@ class UnifiedAppShell:
 
         panel_y += 8
         panel_y = self._draw_lesson_theory_status(lesson, panel_x, panel_y, panel_width)
-        self._draw_lesson_badge_status(lesson, panel_x, panel_y + 8, panel_width)
+        panel_y = self._draw_lesson_badge_status(lesson, panel_x, panel_y + 8, panel_width)
+        panel_y += 14
+        self._draw_text(
+            self._text("Pause and recap", "Zatrzymaj się na chwilę"),
+            (panel_x, panel_y),
+            self.font_small,
+            ACCENT,
+        )
+        panel_y += 26
+        self._draw_wrapped(
+            self._lesson_recap_prompt(lesson),
+            (panel_x, panel_y),
+            panel_width,
+            self.font_small,
+            TEXT,
+        )
 
         self._draw_menu(labels, top=menu_top, width=520)
         self._draw_footer(
