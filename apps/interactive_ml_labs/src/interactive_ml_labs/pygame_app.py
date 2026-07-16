@@ -1119,6 +1119,19 @@ class UnifiedAppShell:
             "w modelu i po czym to poznajesz.",
         )
 
+    def _lesson_self_check_lines(self) -> list[str]:
+        """Return self-check lines shown on the completion summary."""
+        return [
+            self._text(
+                "I can explain the result without looking at the controls.",
+                "Umiem wyjaśnić wynik bez patrzenia na sterowanie.",
+            ),
+            self._text(
+                "If not, I should review the lesson before continuing.",
+                "Jeśli nie, warto powtórzyć lekcję przed przejściem dalej.",
+            ),
+        ]
+
     def _next_lesson_in_selected_path(self, lesson: LessonManifest) -> LessonManifest | None:
         """Return the next lesson in the selected learning path."""
         path = self.selected_learning_path
@@ -1858,13 +1871,30 @@ class UnifiedAppShell:
             ACCENT,
         )
         panel_y += 26
-        self._draw_wrapped(
+        panel_y = self._draw_wrapped(
             self._lesson_recap_prompt(lesson),
             (panel_x, panel_y),
             panel_width,
             self.font_small,
             TEXT,
         )
+        panel_y += 14
+        self._draw_text(
+            self._text("Self-check", "Szybki self-check"),
+            (panel_x, panel_y),
+            self.font_small,
+            ACCENT,
+        )
+        panel_y += 26
+        for line in self._lesson_self_check_lines():
+            panel_y = self._draw_wrapped(
+                "- " + line,
+                (panel_x, panel_y),
+                panel_width,
+                self.font_small,
+                MUTED_TEXT,
+            )
+            panel_y += 4
 
         self._draw_menu(labels, top=menu_top, width=520)
         self._draw_footer(

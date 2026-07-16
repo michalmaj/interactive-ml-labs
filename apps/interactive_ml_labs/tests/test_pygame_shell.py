@@ -1178,6 +1178,26 @@ def test_shell_lesson_recap_prompt_can_come_from_manifest(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_lesson_self_check_lines_localize_polish(monkeypatch) -> None:
+    """Completion summaries should provide a lightweight self-check."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        assert app._lesson_self_check_lines() == [
+            "I can explain the result without looking at the controls.",
+            "If not, I should review the lesson before continuing.",
+        ]
+
+        app.context.settings.language = "pl"
+        assert app._lesson_self_check_lines() == [
+            "Umiem wyjaśnić wynik bez patrzenia na sterowanie.",
+            "Jeśli nie, warto powtórzyć lekcję przed przejściem dalej.",
+        ]
+    finally:
+        pygame.quit()
+
+
 def test_shell_completion_summary_renders_lesson_progress(monkeypatch) -> None:
     """The completion summary should show tasks, theory, badge, and next step."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -1245,10 +1265,12 @@ def test_shell_completion_summary_renders_lesson_progress(monkeypatch) -> None:
         assert "Lesson complete" in drawn_text
         assert "What you finished" in drawn_text
         assert "Pause and recap" in drawn_text
+        assert "Self-check" in drawn_text
         assert "Tasks: 1/2 completed" in wrapped_text
         assert "Theory: not visited" in wrapped_text
         assert app._lesson_badge_label(lesson) in wrapped_text
         assert app._lesson_recap_prompt(lesson) in wrapped_text
+        assert "- I can explain the result without looking at the controls." in wrapped_text
         assert progress_bars == [(1, 2)]
         assert menu_labels[0].startswith("Next lesson:")
         assert menu_tops
