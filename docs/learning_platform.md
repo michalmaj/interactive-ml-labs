@@ -237,6 +237,12 @@ The shell should make lesson completion feel like a learning milestone, not just
 
 This is the first small step toward a more course-like flow. Future slices can add short reflection prompts, recap questions, or instructor-facing checkpoints on top of this screen without forcing every demo scene to implement its own completion UI.
 
+## Recap Prompts
+
+Completion summaries should include a short recap prompt. The first implementation keeps this intentionally lightweight: the app asks the student to name the observed model change and the signal that made it visible, but it does not collect or grade typed answers.
+
+Lesson manifests may define a custom recap prompt. If they do not, the shell uses a generic prompt that still reinforces the habit of turning interaction into an explicit observation.
+
 ## Suggested PR Sequence
 
 1. Done: add `LessonManifest`, `LessonTask`, and a small learning-path registry.

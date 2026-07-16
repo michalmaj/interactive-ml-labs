@@ -104,6 +104,7 @@ class LessonManifest:
     tasks: tuple[LessonTask, ...]
     prerequisites: tuple[str, ...] = field(default_factory=tuple)
     completion_badge: LocalizedText | None = None
+    recap_prompt: LocalizedText | None = None
 
 
 @dataclass(frozen=True, slots=True)
