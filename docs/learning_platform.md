@@ -245,6 +245,8 @@ Lesson manifests may define a custom recap prompt. If they do not, the shell use
 
 All currently registered guided lessons now define custom recap prompts. The prompts are intentionally short and concept-specific: each one asks the student to connect the interaction they just completed with the modeling assumption, metric trade-off, or monitoring signal that the lesson was meant to reveal.
 
+Completion summaries should also include a short self-check. This is not a quiz and it is not stored as graded progress; it is a lightweight reminder that the student should be able to explain the result before moving to the next lesson.
+
 ## Suggested PR Sequence
 
 1. Done: add `LessonManifest`, `LessonTask`, and a small learning-path registry.
