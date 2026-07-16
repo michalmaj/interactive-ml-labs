@@ -39,6 +39,7 @@ from interactive_ml_labs.logistic_scene import (
     MOVE_BOUNDARY_TASK_ID,
     LogisticRegressionSceneAdapter,
 )
+from interactive_ml_labs.manifest import LocalizedText
 from interactive_ml_labs.progress import load_app_progress
 from interactive_ml_labs.pygame_app import (
     DEMO_MENU_TOP,
@@ -1120,6 +1121,55 @@ def test_shell_completion_summary_primary_action_opens_next_lesson(monkeypatch) 
         pygame.quit()
 
 
+def test_shell_lesson_recap_prompt_uses_default_copy(monkeypatch) -> None:
+    """Lessons without custom recap prompts should still ask for reflection."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        lesson = LESSON_BY_ID[LEARNING_PATH_MANIFESTS[0].lesson_ids[0]]
+
+        assert app._lesson_recap_prompt(lesson) == (
+            "Before moving on, say in one sentence what changed in the model "
+            "and what signal convinced you."
+        )
+
+        app.context.settings.language = "pl"
+        assert app._lesson_recap_prompt(lesson) == (
+            "Zanim przejdziesz dalej, powiedz jednym zdaniem, co zmieniło się "
+            "w modelu i po czym to poznajesz."
+        )
+    finally:
+        pygame.quit()
+
+
+def test_shell_lesson_recap_prompt_can_come_from_manifest(monkeypatch) -> None:
+    """Lesson manifests should be able to override the generic recap prompt."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        lesson = LESSON_BY_ID[LEARNING_PATH_MANIFESTS[0].lesson_ids[0]].__class__(
+            id="custom_recap",
+            level=1,
+            demo_id="linear_regression_residuals_lab",
+            title=LocalizedText(en="Custom", pl="Własna"),
+            learning_goal=LocalizedText(en="Notice signal", pl="Zauważ sygnał"),
+            tasks=LESSON_BY_ID[LEARNING_PATH_MANIFESTS[0].lesson_ids[0]].tasks,
+            recap_prompt=LocalizedText(
+                en="Which residual pattern mattered most?",
+                pl="Który wzór residuals był najważniejszy?",
+            ),
+        )
+
+        assert app._lesson_recap_prompt(lesson) == "Which residual pattern mattered most?"
+
+        app.context.settings.language = "pl"
+        assert app._lesson_recap_prompt(lesson) == "Który wzór residuals był najważniejszy?"
+    finally:
+        pygame.quit()
+
+
 def test_shell_completion_summary_renders_lesson_progress(monkeypatch) -> None:
     """The completion summary should show tasks, theory, badge, and next step."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -1186,9 +1236,11 @@ def test_shell_completion_summary_renders_lesson_progress(monkeypatch) -> None:
 
         assert "Lesson complete" in drawn_text
         assert "What you finished" in drawn_text
+        assert "Pause and recap" in drawn_text
         assert "Tasks: 1/2 completed" in wrapped_text
         assert "Theory: not visited" in wrapped_text
         assert app._lesson_badge_label(lesson) in wrapped_text
+        assert app._lesson_recap_prompt(lesson) in wrapped_text
         assert progress_bars == [(1, 2)]
         assert menu_labels[0].startswith("Next lesson:")
         assert menu_tops
