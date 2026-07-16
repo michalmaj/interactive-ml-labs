@@ -7643,6 +7643,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Metric Reader", pl="Czytelnik metryk"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which metric changed the nearest neighbor, and what does that say "
+                "about how the model reads distance?"
+            ),
+            pl=(
+                "Która metryka zmieniła nearest neighbor i co to mówi o tym, "
+                "jak model czyta distance?"
+            ),
+        ),
     ),
     LessonManifest(
         id="distance_knn_vote",
@@ -7684,6 +7694,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Neighborhood Voter", pl="Głos sąsiedztwa"),
+        recap_prompt=LocalizedText(
+            en=(
+                "How did changing k alter the decision map, and when did the vote "
+                "become too local or too smooth?"
+            ),
+            pl=(
+                "Jak zmiana k wpłynęła na decision map i kiedy głosowanie było "
+                "zbyt lokalne albo zbyt wygładzone?"
+            ),
+        ),
     ),
     LessonManifest(
         id="distance_kmeans_centroids",
@@ -7725,6 +7745,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Centroid Mover", pl="Przesuwacz centroidów"),
+        recap_prompt=LocalizedText(
+            en=(
+                "What moved first: point assignments or centroids, and how did each "
+                "step reduce the clustering error?"
+            ),
+            pl=(
+                "Co zmieniało się najpierw: przypisania punktów czy centroidy, "
+                "i jak każdy krok zmniejszał błąd klastrowania?"
+            ),
+        ),
     ),
     LessonManifest(
         id="distance_clustering_shape",
@@ -7771,6 +7801,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Cluster Shape Reader", pl="Czytelnik kształtu klastrów"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Where did K-Means and DBSCAN disagree, and which assumption about "
+                "cluster shape caused the difference?"
+            ),
+            pl=(
+                "Gdzie K-Means i DBSCAN dały różne wyniki i które założenie "
+                "o kształcie klastrów wywołało tę różnicę?"
+            ),
+        ),
     ),
     LessonManifest(
         id="distance_soft_clusters",
@@ -7818,6 +7858,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Soft Cluster Reader", pl="Czytelnik soft clusters"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which point had mixed membership, and why is a probability more useful "
+                "there than a hard cluster label?"
+            ),
+            pl=(
+                "Który punkt miał mieszaną przynależność i czemu probability jest tam "
+                "bardziej użyteczne niż twarda etykieta klastra?"
+            ),
+        ),
     ),
     LessonManifest(
         id=SPLIT_LESSON_ID,
