@@ -7388,6 +7388,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Residual Reader", pl="Czytelnik residuals"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which residual pattern told you the line was still biased, "
+                "and which parameter helped reduce that bias?"
+            ),
+            pl=(
+                "Jaki wzór residuals pokazał Ci, że prosta nadal jest przesunięta, "
+                "i który parametr pomógł to zmniejszyć?"
+            ),
+        ),
     ),
     LessonManifest(
         id="error_gradient_descent",
@@ -7444,6 +7454,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Loss Navigator", pl="Nawigator loss"),
+        recap_prompt=LocalizedText(
+            en=(
+                "What happened to loss when learning rate was too small or too large, "
+                "and what made the stable run different?"
+            ),
+            pl=(
+                "Co działo się z loss, gdy learning rate był za mały albo za duży, "
+                "i czym różnił się stabilny przebieg?"
+            ),
+        ),
     ),
     LessonManifest(
         id="error_logistic_boundary",
@@ -7496,6 +7516,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Boundary Reader", pl="Czytelnik decision boundary"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which points changed class when you moved the decision boundary, "
+                "and why were borderline points less certain?"
+            ),
+            pl=(
+                "Które punkty zmieniły klasę po przesunięciu decision boundary "
+                "i dlaczego punkty graniczne były mniej pewne?"
+            ),
+        ),
     ),
     LessonManifest(
         id="error_boosting_mistakes",
@@ -7551,6 +7581,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Mistake-Driven Learner", pl="Uczenie przez błędy"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which mistakes received more attention in the next boosting round, "
+                "and how did that change the ensemble?"
+            ),
+            pl=(
+                "Które błędy dostały więcej uwagi w kolejnej rundzie boosting "
+                "i jak zmieniło to ensemble?"
+            ),
+        ),
     ),
     LessonManifest(
         id="distance_choose_metric",
