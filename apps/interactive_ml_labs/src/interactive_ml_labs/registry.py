@@ -7930,6 +7930,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Test Set Guardian", pl="Strażnik test set"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which model would validation choose, and why should the test set "
+                "remain unused until that decision is made?"
+            ),
+            pl=(
+                "Który model wybrałby validation score i dlaczego test set powinien "
+                "zostać nietknięty do momentu tej decyzji?"
+            ),
+        ),
     ),
     LessonManifest(
         id=LEAKAGE_LESSON_ID,
@@ -7989,6 +7999,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Leakage Detective", pl="Detektyw leakage"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which feature made the score suspicious, and why would that feature "
+                "not be safe in production?"
+            ),
+            pl=(
+                "Która cecha sprawiła, że score był podejrzany, i czemu taka cecha "
+                "nie byłaby bezpieczna w produkcji?"
+            ),
+        ),
     ),
     LessonManifest(
         id=IMBALANCE_LESSON_ID,
@@ -8045,6 +8065,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Trade-off Reader", pl="Czytelnik kompromisów"),
+        recap_prompt=LocalizedText(
+            en=(
+                "What did you gain by increasing recall, and what cost appeared "
+                "in precision or review workload?"
+            ),
+            pl=(
+                "Co zyskałeś przez zwiększenie recall i jaki koszt pojawił się "
+                "w precision albo liczbie spraw do sprawdzenia?"
+            ),
+        ),
     ),
     LessonManifest(
         id=CALIBRATION_LESSON_ID,
@@ -8097,6 +8127,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Confidence Calibrator", pl="Kalibrator pewności"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Where did confidence disagree with observed frequency, and how did "
+                "temperature scaling change that gap?"
+            ),
+            pl=(
+                "Gdzie confidence rozmijało się z obserwowaną częstością i jak "
+                "temperature scaling zmienił tę lukę?"
+            ),
+        ),
     ),
     LessonManifest(
         id=MONITORING_LESSON_ID,
@@ -8156,6 +8196,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
         ),
         completion_badge=LocalizedText(en="Model Guardian", pl="Strażnik modelu"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which signal appeared first, data drift or metric drift, and what "
+                "would you investigate before retraining?"
+            ),
+            pl=(
+                "Który sygnał pojawił się pierwszy, data drift czy metric drift, "
+                "i co sprawdziłbyś przed retraining?"
+            ),
+        ),
     ),
 )
 
