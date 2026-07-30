@@ -79,6 +79,7 @@ class ScreenName(StrEnum):
     THEORY = "theory"
     DEMO = "demo"
     LESSON_COMPLETE = "lesson_complete"
+    PATH_COMPLETE = "path_complete"
     SETTINGS = "settings"
     PAUSE = "pause"
 
@@ -406,6 +407,7 @@ class UnifiedAppShell:
             ScreenName.THEORY: self._render_theory,
             ScreenName.DEMO: self._render_demo,
             ScreenName.LESSON_COMPLETE: self._render_lesson_complete,
+            ScreenName.PATH_COMPLETE: self._render_path_complete,
             ScreenName.SETTINGS: self._render_settings,
             ScreenName.PAUSE: self._render_pause,
         }
@@ -1106,6 +1108,22 @@ class UnifiedAppShell:
             self._text("Review this lesson", "Powtórz tę lekcję"),
             self._text("Back to path", "Wróć do ścieżki"),
         ]
+
+    def _path_completion_menu_labels(self) -> list[str]:
+        """Return actions shown after a guided learning path is completed."""
+        return [
+            self._text("Review this path", "Przejrzyj tę ścieżkę"),
+            self._text("All learning paths", "Wszystkie ścieżki"),
+            self._text("Back to home", "Wróć do startu"),
+        ]
+
+    def _path_completion_recap_label(self) -> str:
+        """Return the final recap prompt for a completed learning path."""
+        return self._text(
+            "Before starting another path, name the one modeling habit this path changed most.",
+            "Zanim zaczniesz kolejną ścieżkę, nazwij jeden nawyk modelarski, "
+            "który ta ścieżka najbardziej zmieniła.",
+        )
 
     def _lesson_recap_prompt(self, lesson: LessonManifest) -> str:
         """Return the recap prompt shown after lesson completion."""
@@ -1904,6 +1922,130 @@ class UnifiedAppShell:
             ),
         )
 
+    def _render_path_complete(self) -> None:
+        """Draw a guided learning path completion summary."""
+        path = self.selected_learning_path
+        if path is None:
+            self._go_to(ScreenName.HOME)
+            return
+
+        language = self.context.settings.language
+        width, _ = self.context.settings.resolution
+        content_width = min(960, width - 160)
+        y = 96
+
+        self._draw_text(
+            self._text("Learning path complete", "Ścieżka ukończona"),
+            (80, y),
+            self.font_title,
+            TEXT,
+        )
+        y += 58
+        y = self._draw_wrapped(
+            path.title.for_language(language),
+            (80, y),
+            content_width,
+            self.font_heading,
+            ACCENT,
+        )
+        y += 22
+        y = self._draw_wrapped(
+            path.summary.for_language(language),
+            (80, y),
+            content_width,
+            self.font_body,
+            MUTED_TEXT,
+        )
+        y += 30
+
+        labels = self._path_completion_menu_labels()
+        if width >= 1000:
+            menu_top = y
+            panel_top = 190
+            panel_rect = pygame.Rect(
+                660,
+                panel_top,
+                max(360, width - 740),
+                max(360, self._content_bottom() - panel_top),
+            )
+        else:
+            panel_top = y
+            panel_height = max(220, self._content_bottom() - panel_top - 180)
+            panel_rect = pygame.Rect(80, panel_top, content_width, panel_height)
+            menu_top = panel_rect.bottom + 24
+
+        pygame.draw.rect(self.screen, PANEL, panel_rect, border_radius=8)
+        pygame.draw.rect(self.screen, (72, 79, 88), panel_rect, width=1, border_radius=8)
+
+        panel_x = panel_rect.x + 28
+        panel_y = panel_rect.y + 24
+        panel_width = panel_rect.width - 56
+        self._draw_text(
+            self._text("Path summary", "Podsumowanie ścieżki"),
+            (panel_x, panel_y),
+            self.font_heading,
+            TEXT,
+        )
+        panel_y += 44
+        for label, completed_count, total_count in self._learning_path_progress_metrics(path):
+            panel_y = self._draw_wrapped(
+                label,
+                (panel_x, panel_y),
+                panel_width,
+                self.font_small,
+                TEXT,
+            )
+            self._draw_compact_progress_bar(
+                panel_x,
+                panel_y + 2,
+                panel_width,
+                completed_count,
+                total_count,
+            )
+            panel_y += 22
+
+        panel_y += 8
+        self._draw_text(
+            self._text("Badges", "Odznaki"),
+            (panel_x, panel_y),
+            self.font_small,
+            ACCENT,
+        )
+        panel_y += 28
+        for badge_label in self._learning_path_badge_labels(path):
+            panel_y = self._draw_wrapped(
+                badge_label,
+                (panel_x, panel_y),
+                panel_width,
+                self.font_small,
+                MUTED_TEXT,
+            )
+            panel_y += 4
+
+        panel_y += 10
+        self._draw_text(
+            self._text("Final recap", "Ostatnie podsumowanie"),
+            (panel_x, panel_y),
+            self.font_small,
+            ACCENT,
+        )
+        panel_y += 26
+        self._draw_wrapped(
+            self._path_completion_recap_label(),
+            (panel_x, panel_y),
+            panel_width,
+            self.font_small,
+            TEXT,
+        )
+
+        self._draw_menu(labels, top=menu_top, width=520)
+        self._draw_footer(
+            self._text(
+                "Enter: select | Esc/Backspace: paths | L: language",
+                "Enter: wybierz | Esc/Backspace: ścieżki | L: język",
+            ),
+        )
+
     def _render_settings(self) -> None:
         settings = self.context.settings
         self._draw_title(
@@ -2308,6 +2450,7 @@ class UnifiedAppShell:
             ScreenName.THEORY: self._activate_theory,
             ScreenName.DEMO: self._open_pause,
             ScreenName.LESSON_COMPLETE: self._select_lesson_complete_item,
+            ScreenName.PATH_COMPLETE: self._select_path_complete_item,
             ScreenName.SETTINGS: self._select_settings_item,
             ScreenName.PAUSE: self._select_pause_item,
         }
@@ -2409,7 +2552,7 @@ class UnifiedAppShell:
         if self.selected_index == 0:
             next_lesson = self._next_lesson_in_selected_path(lesson)
             if next_lesson is None:
-                self._go_to(ScreenName.LESSONS)
+                self._go_to(ScreenName.PATH_COMPLETE)
                 return
 
             self.selected_index = self._current_learning_path_lessons().index(next_lesson)
@@ -2418,6 +2561,14 @@ class UnifiedAppShell:
             self._open_lesson(lesson)
         else:
             self._go_to(ScreenName.LESSONS)
+
+    def _select_path_complete_item(self) -> None:
+        if self.selected_index == 0:
+            self._go_to(ScreenName.LESSONS)
+        elif self.selected_index == 1:
+            self._go_to(ScreenName.PATHS)
+        else:
+            self._go_to(ScreenName.HOME)
 
     def _select_settings_item(self) -> None:
         settings = self.context.settings
@@ -2441,28 +2592,36 @@ class UnifiedAppShell:
     def _escape(self) -> None:
         if self.screen_name == ScreenName.LANGUAGE:
             self.running = False
-        elif self.screen_name == ScreenName.HOME:
-            self._go_to(ScreenName.LANGUAGE)
-        elif self.screen_name == ScreenName.PATHS:
-            self._go_to(ScreenName.HOME)
-        elif self.screen_name == ScreenName.LESSONS:
-            self._go_to(ScreenName.PATHS)
-        elif self.screen_name == ScreenName.LEVELS:
-            self._go_to(ScreenName.HOME)
-        elif self.screen_name == ScreenName.DEMOS:
-            self._go_to(ScreenName.LEVELS)
-        elif self.screen_name == ScreenName.INTRO:
-            self._go_to(ScreenName.DEMOS)
-        elif self.screen_name == ScreenName.THEORY:
+            return
+
+        if self.screen_name == ScreenName.THEORY:
             self._go_to(self.theory_return_screen)
-        elif self.screen_name == ScreenName.DEMO:
+            return
+
+        if self.screen_name == ScreenName.DEMO:
             self._open_pause()
-        elif self.screen_name == ScreenName.LESSON_COMPLETE:
-            self._go_to(ScreenName.LESSONS)
-        elif self.screen_name == ScreenName.SETTINGS:
+            return
+
+        if self.screen_name == ScreenName.SETTINGS:
             self._go_to(self.settings_return_screen)
-        elif self.screen_name == ScreenName.PAUSE:
+            return
+
+        if self.screen_name == ScreenName.PAUSE:
             self._resume()
+            return
+
+        back_targets = {
+            ScreenName.HOME: ScreenName.LANGUAGE,
+            ScreenName.PATHS: ScreenName.HOME,
+            ScreenName.LESSONS: ScreenName.PATHS,
+            ScreenName.LEVELS: ScreenName.HOME,
+            ScreenName.DEMOS: ScreenName.LEVELS,
+            ScreenName.INTRO: ScreenName.DEMOS,
+            ScreenName.LESSON_COMPLETE: ScreenName.LESSONS,
+            ScreenName.PATH_COMPLETE: ScreenName.PATHS,
+        }
+        if target := back_targets.get(self.screen_name):
+            self._go_to(target)
 
     def _open_pause(self) -> None:
         self.previous_screen = self.screen_name
@@ -2572,6 +2731,7 @@ class UnifiedAppShell:
             ScreenName.LESSON_COMPLETE: len(
                 self._lesson_completion_menu_labels(self.selected_lesson),
             ),
+            ScreenName.PATH_COMPLETE: len(self._path_completion_menu_labels()),
             ScreenName.SETTINGS: 6,
             ScreenName.PAUSE: 7,
         }

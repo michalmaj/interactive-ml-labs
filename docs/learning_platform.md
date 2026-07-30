@@ -247,6 +247,8 @@ All currently registered guided lessons now define custom recap prompts. The pro
 
 Completion summaries should also include a short self-check. This is not a quiz and it is not stored as graded progress; it is a lightweight reminder that the student should be able to explain the result before moving to the next lesson.
 
+When the last lesson in a guided path is completed, the shell should open a path completion summary. This gives the student a course-like milestone with aggregate lesson, task, theory, and badge progress before they choose whether to review the path or move back to the path list.
+
 ## Suggested PR Sequence
 
 1. Done: add `LessonManifest`, `LessonTask`, and a small learning-path registry.

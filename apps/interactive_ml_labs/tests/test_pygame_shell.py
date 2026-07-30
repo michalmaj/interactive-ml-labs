@@ -1121,6 +1121,53 @@ def test_shell_completion_summary_primary_action_opens_next_lesson(monkeypatch) 
         pygame.quit()
 
 
+def test_shell_completion_summary_primary_action_opens_path_summary(monkeypatch) -> None:
+    """The last lesson completion should finish the selected learning path."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        lesson = LESSON_BY_ID[path.lesson_ids[-1]]
+        app.selected_learning_path = path
+        app.selected_lesson = lesson
+        app.screen_name = ScreenName.LESSON_COMPLETE
+        app.selected_index = 0
+
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.PATH_COMPLETE
+        assert app.selected_learning_path == path
+    finally:
+        pygame.quit()
+
+
+def test_shell_path_completion_actions_navigate_from_summary(monkeypatch) -> None:
+    """Path completion actions should review, browse paths, or return home."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.selected_learning_path = LEARNING_PATH_MANIFESTS[0]
+        app.screen_name = ScreenName.PATH_COMPLETE
+
+        app.selected_index = 0
+        app._activate_selected()
+        assert app.screen_name == ScreenName.LESSONS
+
+        app.screen_name = ScreenName.PATH_COMPLETE
+        app.selected_index = 1
+        app._activate_selected()
+        assert app.screen_name == ScreenName.PATHS
+
+        app.screen_name = ScreenName.PATH_COMPLETE
+        app.selected_index = 2
+        app._activate_selected()
+        assert app.screen_name == ScreenName.HOME
+    finally:
+        pygame.quit()
+
+
 def test_shell_lesson_recap_prompt_uses_default_copy(monkeypatch) -> None:
     """Lessons without custom recap prompts should still ask for reflection."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -1194,6 +1241,87 @@ def test_shell_lesson_self_check_lines_localize_polish(monkeypatch) -> None:
             "Umiem wyjaśnić wynik bez patrzenia na sterowanie.",
             "Jeśli nie, warto powtórzyć lekcję przed przejściem dalej.",
         ]
+    finally:
+        pygame.quit()
+
+
+def test_shell_path_completion_summary_renders_progress(monkeypatch) -> None:
+    """The path completion summary should show aggregate progress and badges."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    drawn_text: list[str] = []
+    wrapped_text: list[str] = []
+    menu_labels: list[str] = []
+    progress_bars: list[tuple[int, int]] = []
+
+    def capture_text(
+        text: str,
+        position: tuple[int, int],
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> None:
+        _ = position, font, color
+        drawn_text.append(text)
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = width, font, color
+        wrapped_text.append(text)
+        return position[1] + 24
+
+    def capture_menu(
+        labels: list[str],
+        *,
+        top: int,
+        width: int = 760,
+    ) -> None:
+        _ = top, width
+        menu_labels.extend(labels)
+
+    def capture_progress_bar(
+        x: int,
+        y: int,
+        width: int,
+        completed_count: int,
+        total_count: int,
+    ) -> None:
+        _ = x, y, width
+        progress_bars.append((completed_count, total_count))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        app.selected_learning_path = path
+        for lesson_id in path.lesson_ids:
+            lesson = LESSON_BY_ID[lesson_id]
+            app.context.progress.mark_theory_visited(lesson.id)
+            for task in lesson.tasks:
+                app.context.progress.complete_task(lesson.id, task.id)
+            app.context.progress.mark_completed(lesson.id)
+
+        app._draw_text = capture_text
+        app._draw_wrapped = capture_wrapped
+        app._draw_menu = capture_menu
+        app._draw_compact_progress_bar = capture_progress_bar
+
+        app._render_path_complete()
+
+        assert "Learning path complete" in drawn_text
+        assert "Path summary" in drawn_text
+        assert "Badges" in drawn_text
+        assert "Final recap" in drawn_text
+        assert app._learning_path_progress_label(path) in wrapped_text
+        assert app._learning_path_task_progress_label(path) in wrapped_text
+        assert app._learning_path_theory_progress_label(path) in wrapped_text
+        assert app._learning_path_badge_progress_label(path) in wrapped_text
+        assert app._learning_path_badge_labels(path)[0] in wrapped_text
+        assert app._path_completion_recap_label() in wrapped_text
+        assert menu_labels == ["Review this path", "All learning paths", "Back to home"]
+        assert progress_bars == [(4, 4), (8, 8), (4, 4), (4, 4)]
     finally:
         pygame.quit()
 
