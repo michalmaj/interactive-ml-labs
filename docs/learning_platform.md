@@ -78,6 +78,8 @@ Things to avoid:
 - badges that do not represent real understanding.
 
 A badge should mean that the student demonstrated a concrete idea or skill.
+The app should make those badges visible as a learning map: unlocked badges show what
+the student has demonstrated, while locked badges hint at concepts still ahead.
 
 ## Initial Data Model
 

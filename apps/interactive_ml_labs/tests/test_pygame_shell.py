@@ -430,8 +430,41 @@ def test_shell_home_menu_does_not_overlap_progress_panel(monkeypatch) -> None:
         app._render_home()
         progress_rect = app._home_learning_progress_rect()
 
-        assert len(app.menu_items) == 3
+        assert len(app.menu_items) == 4
         assert all(item.rect.right < progress_rect.left for item in app.menu_items)
+    finally:
+        pygame.quit()
+
+
+def test_shell_home_opens_badge_gallery(monkeypatch) -> None:
+    """Home screen should expose the badge gallery."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.screen_name = ScreenName.HOME
+        app.selected_index = 2
+
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.BADGES
+    finally:
+        pygame.quit()
+
+
+def test_shell_home_opens_settings_after_badge_gallery(monkeypatch) -> None:
+    """Home settings should remain available after adding the badge gallery."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.screen_name = ScreenName.HOME
+        app.selected_index = 3
+
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.SETTINGS
+        assert app.settings_return_screen == ScreenName.HOME
     finally:
         pygame.quit()
 
@@ -1448,6 +1481,82 @@ def test_shell_learning_path_progress_labels_reflect_completion(monkeypatch) -> 
         assert app._learning_path_next_action_label(path) == (
             "Next action: review completed lessons"
         )
+    finally:
+        pygame.quit()
+
+
+def test_shell_badge_gallery_summary_tracks_unlocked_badges(monkeypatch) -> None:
+    """Badge gallery summary should count unlocked badges across paths."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+
+        assert app._badge_gallery_summary_label() == "Badges unlocked: 0/14"
+
+        app.context.progress.mark_completed(path.lesson_ids[0])
+
+        assert app._badge_gallery_summary_label() == "Badges unlocked: 1/14"
+
+        app.context.settings.language = "pl"
+        assert app._badge_gallery_summary_label() == "Zdobyte odznaki: 1/14"
+    finally:
+        pygame.quit()
+
+
+def test_shell_badge_gallery_renders_badges_by_path(monkeypatch) -> None:
+    """Badge gallery should show locked and unlocked badges grouped by path."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    drawn_text: list[str] = []
+    wrapped_text: list[str] = []
+    menu_labels: list[str] = []
+
+    def capture_text(
+        text: str,
+        position: tuple[int, int],
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> None:
+        _ = position, font, color
+        drawn_text.append(text)
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = width, font, color
+        wrapped_text.append(text)
+        return position[1] + 24
+
+    def capture_menu(
+        labels: list[str],
+        *,
+        top: int,
+        width: int = 760,
+    ) -> None:
+        _ = top, width
+        menu_labels.extend(labels)
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        app.context.progress.mark_completed(path.lesson_ids[0])
+        app._draw_text = capture_text
+        app._draw_wrapped = capture_wrapped
+        app._draw_menu = capture_menu
+
+        app._render_badges()
+
+        assert "Badges" in drawn_text
+        assert "Badges unlocked: 1/14" in wrapped_text
+        assert path.title.en in wrapped_text
+        assert "[x] Residual Reader" in wrapped_text
+        assert "[ ] Loss Navigator" in wrapped_text
+        assert menu_labels == ["Back"]
     finally:
         pygame.quit()
 
@@ -2972,5 +3081,22 @@ def test_shell_home_escape_returns_to_language(monkeypatch) -> None:
         app._escape()
 
         assert app.screen_name == ScreenName.LANGUAGE
+    finally:
+        pygame.quit()
+
+
+def test_shell_badge_gallery_returns_home(monkeypatch) -> None:
+    """Badge gallery should return home via Enter or Escape."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.screen_name = ScreenName.BADGES
+        app._activate_selected()
+        assert app.screen_name == ScreenName.HOME
+
+        app.screen_name = ScreenName.BADGES
+        app._escape()
+        assert app.screen_name == ScreenName.HOME
     finally:
         pygame.quit()
