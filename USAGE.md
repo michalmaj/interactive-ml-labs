@@ -39,6 +39,12 @@ language selection
 
 The home screen shows aggregate learning progress across guided learning paths. Press `C` or click the highlighted next-step line in the progress panel to continue the next recommended lesson. You can also enter "Guided learning paths" to review paths, lessons, tasks, badges, and theory progress manually. Progress bars are shown on the home screen, path details, lesson details, lesson intro, and pause menu so students can quickly see what remains.
 
+The app currently includes three guided learning paths:
+
+- How models learn from error,
+- From distance to clusters,
+- From good scores to trustworthy models.
+
 The unified app is now the main guided path. All current Level 1 and Level 2 demos are available through it, and Level 3 contains a growing set of advanced app-only labs. Original package demos can still be run directly, while native app-only labs are launched from the unified app.
 
 The unified app includes these app-only Level 1 labs:
