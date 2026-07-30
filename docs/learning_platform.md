@@ -170,9 +170,9 @@ This path now has checkable tasks connected to real scene interactions:
 
 The path is now a second complete proof that lessons, tasks, progress, and badges can be layered onto existing demos without removing the standalone demo workflow.
 
-## Planned Third Learning Path
+## Third Learning Path
 
-The third path should connect model evaluation, trustworthy metrics, calibrated confidence, and post-deployment monitoring.
+The third path connects model evaluation, trustworthy metrics, calibrated confidence, and post-deployment monitoring.
 
 **From good scores to trustworthy models**
 
