@@ -1533,6 +1533,19 @@ def test_shell_badge_gallery_renders_badges_by_path(monkeypatch) -> None:
         wrapped_text.append(text)
         return position[1] + 24
 
+    def capture_wrapped_visible(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+        top: int,
+        bottom: int,
+    ) -> int:
+        _ = width, font, color, top, bottom
+        wrapped_text.append(text)
+        return position[1] + 24
+
     def capture_menu(
         labels: list[str],
         *,
@@ -1547,6 +1560,7 @@ def test_shell_badge_gallery_renders_badges_by_path(monkeypatch) -> None:
         app.context.progress.mark_completed(path.lesson_ids[0])
         app._draw_text = capture_text
         app._draw_wrapped = capture_wrapped
+        app._draw_wrapped_visible = capture_wrapped_visible
         app._draw_menu = capture_menu
 
         app._render_badges()
@@ -1557,6 +1571,26 @@ def test_shell_badge_gallery_renders_badges_by_path(monkeypatch) -> None:
         assert "[x] Residual Reader" in wrapped_text
         assert "[ ] Loss Navigator" in wrapped_text
         assert menu_labels == ["Back"]
+    finally:
+        pygame.quit()
+
+
+def test_shell_badge_gallery_scrolls_without_overlapping_footer(monkeypatch) -> None:
+    """Badge gallery content should scroll above the back button and footer."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 520)))
+
+    try:
+        app.screen_name = ScreenName.BADGES
+        app._render_badges()
+
+        assert app.badge_gallery_max_scroll > 0
+        assert app.menu_items
+        assert max(item.rect.bottom for item in app.menu_items) < app._footer_y()
+
+        app._handle_mouse_wheel(-1)
+
+        assert app.badge_gallery_scroll_offset > 0
     finally:
         pygame.quit()
 
