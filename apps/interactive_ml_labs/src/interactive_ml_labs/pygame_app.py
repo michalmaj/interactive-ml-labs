@@ -80,6 +80,7 @@ class ScreenName(StrEnum):
     DEMO = "demo"
     LESSON_COMPLETE = "lesson_complete"
     PATH_COMPLETE = "path_complete"
+    BADGES = "badges"
     SETTINGS = "settings"
     PAUSE = "pause"
 
@@ -408,6 +409,7 @@ class UnifiedAppShell:
             ScreenName.DEMO: self._render_demo,
             ScreenName.LESSON_COMPLETE: self._render_lesson_complete,
             ScreenName.PATH_COMPLETE: self._render_path_complete,
+            ScreenName.BADGES: self._render_badges,
             ScreenName.SETTINGS: self._render_settings,
             ScreenName.PAUSE: self._render_pause,
         }
@@ -431,9 +433,10 @@ class UnifiedAppShell:
         labels = [
             self._text("Guided learning paths", "Prowadzone ścieżki nauki"),
             self._text("Browse demos by level", "Przeglądaj dema według poziomu"),
+            self._text("Badges", "Odznaki"),
             self._text("Settings", "Ustawienia"),
         ]
-        self._draw_menu(labels, top=210, width=520)
+        self._draw_menu(labels, top=190, width=520)
         self._render_home_learning_progress()
         self._draw_footer(
             self._text(
@@ -1123,6 +1126,17 @@ class UnifiedAppShell:
             "Before starting another path, name the one modeling habit this path changed most.",
             "Zanim zaczniesz kolejną ścieżkę, nazwij jeden nawyk modelarski, "
             "który ta ścieżka najbardziej zmieniła.",
+        )
+
+    def _badge_gallery_summary_label(self) -> str:
+        """Return a localized global badge progress summary."""
+        unlocked_count = sum(
+            self._unlocked_learning_path_badge_count(path) for path in LEARNING_PATH_MANIFESTS
+        )
+        total_count = sum(self._learning_path_badge_count(path) for path in LEARNING_PATH_MANIFESTS)
+        return self._text(
+            f"Badges unlocked: {unlocked_count}/{total_count}",
+            f"Zdobyte odznaki: {unlocked_count}/{total_count}",
         )
 
     def _lesson_recap_prompt(self, lesson: LessonManifest) -> str:
@@ -2046,6 +2060,85 @@ class UnifiedAppShell:
             ),
         )
 
+    def _render_badges(self) -> None:
+        """Draw a gallery of guided learning badges."""
+        language = self.context.settings.language
+        width, _ = self.context.settings.resolution
+        content_width = min(1040, width - 160)
+        y = 82
+
+        self._draw_text(
+            self._text("Badges", "Odznaki"),
+            (80, y),
+            self.font_title,
+            TEXT,
+        )
+        y += 58
+        y = self._draw_wrapped(
+            self._text(
+                "Track the concepts you have demonstrated across guided learning paths.",
+                "Zobacz, które pojęcia masz już przećwiczone w prowadzonych ścieżkach.",
+            ),
+            (80, y),
+            content_width,
+            self.font_body,
+            MUTED_TEXT,
+        )
+        y += 24
+        y = self._draw_wrapped(
+            self._badge_gallery_summary_label(),
+            (80, y),
+            content_width,
+            self.font_heading,
+            ACCENT,
+        )
+        y += 26
+
+        column_count = 2 if width >= 1180 else 1
+        column_gap = 48
+        column_width = (content_width - column_gap) // 2 if column_count == 2 else content_width
+        column_tops = [y for _ in range(column_count)]
+
+        for index, path in enumerate(LEARNING_PATH_MANIFESTS):
+            column = index % column_count
+            x = 80 + column * (column_width + column_gap)
+            path_y = column_tops[column]
+            path_y = self._draw_wrapped(
+                path.title.for_language(language),
+                (x, path_y),
+                column_width,
+                self.font_heading,
+                TEXT,
+            )
+            path_y += 8
+            path_y = self._draw_wrapped(
+                self._learning_path_badge_progress_label(path),
+                (x, path_y),
+                column_width,
+                self.font_small,
+                ACCENT,
+            )
+            path_y += 10
+            for badge_label in self._learning_path_badge_labels(path):
+                path_y = self._draw_wrapped(
+                    badge_label,
+                    (x + 18, path_y),
+                    column_width - 18,
+                    self.font_small,
+                    MUTED_TEXT,
+                )
+                path_y += 4
+
+            column_tops[column] = path_y + 26
+
+        self._draw_menu([self._text("Back", "Wróć")], top=self._content_bottom() - 62, width=260)
+        self._draw_footer(
+            self._text(
+                "Enter/Esc/Backspace: home | L: language",
+                "Enter/Esc/Backspace: start | L: język",
+            ),
+        )
+
     def _render_settings(self) -> None:
         settings = self.context.settings
         self._draw_title(
@@ -2451,6 +2544,7 @@ class UnifiedAppShell:
             ScreenName.DEMO: self._open_pause,
             ScreenName.LESSON_COMPLETE: self._select_lesson_complete_item,
             ScreenName.PATH_COMPLETE: self._select_path_complete_item,
+            ScreenName.BADGES: self._go_home,
             ScreenName.SETTINGS: self._select_settings_item,
             ScreenName.PAUSE: self._select_pause_item,
         }
@@ -2466,6 +2560,8 @@ class UnifiedAppShell:
             self._go_to(ScreenName.PATHS)
         elif self.selected_index == 1:
             self._go_to(ScreenName.LEVELS)
+        elif self.selected_index == 2:
+            self._go_to(ScreenName.BADGES)
         else:
             self._open_settings()
 
@@ -2570,6 +2666,9 @@ class UnifiedAppShell:
         else:
             self._go_to(ScreenName.HOME)
 
+    def _go_home(self) -> None:
+        self._go_to(ScreenName.HOME)
+
     def _select_settings_item(self) -> None:
         settings = self.context.settings
         if self.selected_index == 0:
@@ -2619,6 +2718,7 @@ class UnifiedAppShell:
             ScreenName.INTRO: ScreenName.DEMOS,
             ScreenName.LESSON_COMPLETE: ScreenName.LESSONS,
             ScreenName.PATH_COMPLETE: ScreenName.PATHS,
+            ScreenName.BADGES: ScreenName.HOME,
         }
         if target := back_targets.get(self.screen_name):
             self._go_to(target)
@@ -2720,7 +2820,7 @@ class UnifiedAppShell:
     def _current_menu_item_count(self) -> int:
         counts = {
             ScreenName.LANGUAGE: 2,
-            ScreenName.HOME: 3,
+            ScreenName.HOME: 4,
             ScreenName.PATHS: len(LEARNING_PATH_MANIFESTS),
             ScreenName.LESSONS: len(self._current_learning_path_lessons()),
             ScreenName.LEVELS: len(levels_from_manifests()),
@@ -2732,6 +2832,7 @@ class UnifiedAppShell:
                 self._lesson_completion_menu_labels(self.selected_lesson),
             ),
             ScreenName.PATH_COMPLETE: len(self._path_completion_menu_labels()),
+            ScreenName.BADGES: 1,
             ScreenName.SETTINGS: 6,
             ScreenName.PAUSE: 7,
         }
