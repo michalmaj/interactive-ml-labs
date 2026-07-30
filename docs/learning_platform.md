@@ -272,7 +272,7 @@ The next slices should implement the third path without exposing incomplete less
 3. Done: add task hooks and tests for Class Imbalance Lab and Calibration Lab.
 4. Done: add task hooks and tests for Model Monitoring Drift Lab.
 5. Done: register all lesson manifests and the complete learning path in one final integration PR.
-6. Run a Polish copy and layout pass after completing the path end to end.
+6. Done: run a Polish copy and layout pass after completing the path end to end.
 
 ## Non-Goals For The First Slice
 
