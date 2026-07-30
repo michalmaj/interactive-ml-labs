@@ -7875,7 +7875,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
         demo_id="train_validation_test_lab",
         title=LocalizedText(
             en="Keep test data honest",
-            pl="Nie podglądaj test setu",
+            pl="Nie podglądaj test set",
         ),
         learning_goal=LocalizedText(
             en=(
@@ -7884,7 +7884,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
             pl=(
                 "Zrozum, czemu train, validation i test split odpowiadają na różne "
-                "pytania oraz czemu test set powinien zostać nietknięty do końca."
+                "pytania oraz czemu test set powinien poczekać do samego końca."
             ),
         ),
         tasks=(
@@ -7901,7 +7901,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                     ),
                     pl=(
                         "Przełącz ustawienia złożoności i zobacz, jak rozjeżdżają się "
-                        "wyniki train i validation."
+                        "wyniki na train i validation."
                     ),
                 ),
                 success_condition="compared_complexity_settings",
@@ -7923,7 +7923,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                     ),
                     pl=(
                         "Po porównaniu ustawień zatrzymaj się na modelu, który wybrałby "
-                        "validation score, zanim spojrzysz na test."
+                        "validation score, zanim zajrzysz do test."
                     ),
                 ),
                 success_condition="selected_validation_candidate",
@@ -7937,7 +7937,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
             pl=(
                 "Który model wybrałby validation score i dlaczego test set powinien "
-                "zostać nietknięty do momentu tej decyzji?"
+                "poczekać do momentu tej decyzji?"
             ),
         ),
     ),
@@ -7947,7 +7947,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
         demo_id="data_leakage_lab",
         title=LocalizedText(
             en="Detect leakage before it fools you",
-            pl="Wykryj leakage, zanim zmyli model",
+            pl="Wykryj leakage, zanim zmyli metryki",
         ),
         learning_goal=LocalizedText(
             en=(
@@ -8005,7 +8005,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 "not be safe in production?"
             ),
             pl=(
-                "Która cecha sprawiła, że score był podejrzany, i czemu taka cecha "
+                "Która cecha sprawiła, że score wyglądał podejrzanie, i czemu taka cecha "
                 "nie byłaby bezpieczna w produkcji?"
             ),
         ),
@@ -8016,7 +8016,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
         demo_id="class_imbalance_lab",
         title=LocalizedText(
             en="Read metrics under imbalance",
-            pl="Czytaj metryki przy niezbalansowanych danych",
+            pl="Czytaj metryki dla niezbalansowanych danych",
         ),
         learning_goal=LocalizedText(
             en=(
@@ -8025,7 +8025,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
             pl=(
                 "Zrozum, czemu accuracy potrafi ukryć słaby recall klasy mniejszościowej "
-                "i czemu wybór threshold jest też decyzją produktową."
+                "i czemu wybór threshold jest również decyzją produktową."
             ),
         ),
         prerequisites=(LEAKAGE_LESSON_ID,),
@@ -8034,7 +8034,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 id=ADJUST_THRESHOLD_TASK_ID,
                 title=LocalizedText(
                     en="Adjust the decision threshold",
-                    pl="Dostosuj decision threshold",
+                    pl="Ustaw decision threshold",
                 ),
                 instruction=LocalizedText(
                     en=(
@@ -8082,7 +8082,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
         demo_id="calibration_lab",
         title=LocalizedText(
             en="Check whether confidence means confidence",
-            pl="Sprawdź, czy confidence pasuje do rzeczywistości",
+            pl="Sprawdź, czy confidence mówi prawdę",
         ),
         learning_goal=LocalizedText(
             en=(
@@ -8091,7 +8091,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
             pl=(
                 "Zrozum, że model może dobrze porządkować przykłady, a mimo to dawać "
-                "probabilities wymagające kalibracji."
+                "probabilities, które wymagają kalibracji."
             ),
         ),
         prerequisites=(IMBALANCE_LESSON_ID,),
@@ -8101,9 +8101,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 title=LocalizedText(en="Improve ECE", pl="Popraw ECE"),
                 instruction=LocalizedText(
                     en=("Change temperature scaling until ECE improves relative to the raw score."),
-                    pl=(
-                        "Zmień temperature scaling tak, żeby ECE poprawiło się względem raw score."
-                    ),
+                    pl=("Zmień temperature scaling tak, żeby ECE było lepsze niż przy raw score."),
                 ),
                 success_condition="improved_ece_with_temperature",
             ),
@@ -8119,7 +8117,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                         "frequency disagree."
                     ),
                     pl=(
-                        "Użyj widoku gap/error bars i zobacz, gdzie confidence rozmija "
+                        "Użyj widoku gap/error bars, żeby zobaczyć, gdzie confidence rozmija "
                         "się z obserwowaną częstością."
                     ),
                 ),
@@ -8134,7 +8132,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
             pl=(
                 "Gdzie confidence rozmijało się z obserwowaną częstością i jak "
-                "temperature scaling zmienił tę lukę?"
+                "temperature scaling zmienił tę różnicę?"
             ),
         ),
     ),
@@ -8162,7 +8160,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 id=COMPARE_SIGNALS_TASK_ID,
                 title=LocalizedText(
                     en="Compare drift signals",
-                    pl="Porównaj drift signals",
+                    pl="Porównaj sygnały drift",
                 ),
                 instruction=LocalizedText(
                     en=(
@@ -8189,7 +8187,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                     ),
                     pl=(
                         "Wywołaj realny alert i potwierdź analizę dopiero wtedy, "
-                        "gdy current window faktycznie wymaga uwagi."
+                        "gdy current window naprawdę wymaga uwagi."
                     ),
                 ),
                 success_condition="acknowledged_drift_investigation",
@@ -8203,7 +8201,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
             pl=(
                 "Który sygnał pojawił się pierwszy, data drift czy metric drift, "
-                "i co sprawdziłbyś przed retraining?"
+                "i co sprawdziłbyś przed retrainingiem?"
             ),
         ),
     ),
@@ -8270,7 +8268,7 @@ LEARNING_PATH_MANIFESTS: tuple[LearningPathManifest, ...] = (
                 "trade-offs, to calibrated confidence and post-deployment monitoring."
             ),
             pl=(
-                "Ścieżka od uczciwej walidacji, przez leakage i kompromisy metryk, "
+                "Ścieżka od uczciwej walidacji, przez leakage i kompromisy w metrykach, "
                 "po skalibrowaną pewność i monitoring po wdrożeniu."
             ),
         ),

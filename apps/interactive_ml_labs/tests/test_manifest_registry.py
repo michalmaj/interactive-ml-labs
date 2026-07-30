@@ -1247,14 +1247,19 @@ def test_learning_path_registry_contains_trustworthy_models_path() -> None:
 
 def test_trustworthy_models_polish_copy_stays_natural() -> None:
     """Trustworthy path Polish copy should avoid rough literal translations."""
-    assert LESSON_BY_ID[SPLIT_LESSON_ID].title.pl == "Nie podglądaj test setu"
+    path = next(path for path in LEARNING_PATH_MANIFESTS if path.id == "trustworthy_models")
+    assert path.summary.pl == (
+        "Ścieżka od uczciwej walidacji, przez leakage i kompromisy w metrykach, "
+        "po skalibrowaną pewność i monitoring po wdrożeniu."
+    )
+    assert LESSON_BY_ID[SPLIT_LESSON_ID].title.pl == "Nie podglądaj test set"
     assert LESSON_BY_ID[IMBALANCE_LESSON_ID].title.pl == (
-        "Czytaj metryki przy niezbalansowanych danych"
+        "Czytaj metryki dla niezbalansowanych danych"
     )
-    assert LESSON_BY_ID[CALIBRATION_LESSON_ID].title.pl == (
-        "Sprawdź, czy confidence pasuje do rzeczywistości"
-    )
+    assert LESSON_BY_ID[CALIBRATION_LESSON_ID].title.pl == "Sprawdź, czy confidence mówi prawdę"
+    assert LESSON_BY_ID[MONITORING_LESSON_ID].tasks[0].title.pl == "Porównaj sygnały drift"
     assert "naprawdę coś znaczy" not in LESSON_BY_ID[CALIBRATION_LESSON_ID].title.pl
+    assert "drift signals" not in LESSON_BY_ID[MONITORING_LESSON_ID].tasks[0].title.pl
 
 
 def test_trustworthy_models_lessons_match_scene_task_hooks() -> None:
