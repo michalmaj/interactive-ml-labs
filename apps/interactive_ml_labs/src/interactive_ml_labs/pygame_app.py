@@ -625,10 +625,17 @@ class UnifiedAppShell:
             y += 4
 
         y += 16
-        for lesson_id in path.lesson_ids:
+        self._draw_text(
+            self._text("Course map", "Mapa kursu"),
+            (content_x, y),
+            self.font_small,
+            ACCENT,
+        )
+        y += 28
+        for index, lesson_id in enumerate(path.lesson_ids, start=1):
             lesson = LESSON_BY_ID[lesson_id]
             y = self._draw_wrapped(
-                "• " + lesson.title.for_language(language),
+                self._learning_path_lesson_map_label(lesson, index),
                 (content_x, y),
                 content_width,
                 self.font_small,
@@ -854,6 +861,16 @@ class UnifiedAppShell:
             )
 
         return badges
+
+    def _learning_path_lesson_map_label(self, lesson: LessonManifest, index: int) -> str:
+        """Return one compact lesson row for a learning path course map."""
+        completed_tasks, total_tasks = self._lesson_task_progress_counts(lesson)
+        title = lesson.title.for_language(self.context.settings.language)
+        status = self._lesson_progress_label(lesson)
+        return self._text(
+            f"{index}. {title} - {status}; tasks {completed_tasks}/{total_tasks}",
+            f"{index}. {title} - {status}; zadania {completed_tasks}/{total_tasks}",
+        )
 
     def _learning_path_menu_label(self, path: LearningPathManifest) -> str:
         """Return one learning path menu label with compact progress state."""

@@ -1654,6 +1654,7 @@ def test_shell_learning_path_details_render_progress_summary(monkeypatch) -> Non
         app._render_learning_path_details(path)
 
         assert "4 lessons" in drawn_text
+        assert "Course map" in drawn_text
         assert "Lessons: 1/4 completed" in wrapped_text
         assert "Tasks: 0/8 completed" in wrapped_text
         assert "Theory: 0/4 visited" in wrapped_text
@@ -1749,7 +1750,13 @@ def test_shell_learning_path_details_render_all_lessons_and_badges(monkeypatch) 
         app._render_learning_path_details(path)
 
         assert "[ ] Soft Cluster Reader" in wrapped_text
-        assert "• Read soft cluster membership" in wrapped_text
+        assert (
+            app._learning_path_lesson_map_label(
+                LESSON_BY_ID[path.lesson_ids[-1]],
+                len(path.lesson_ids),
+            )
+            in wrapped_text
+        )
     finally:
         pygame.quit()
 
@@ -1791,6 +1798,27 @@ def test_shell_learning_path_badge_items_track_unlock_state(monkeypatch) -> None
         pygame.quit()
 
 
+def test_shell_learning_path_lesson_map_label_localizes_progress(monkeypatch) -> None:
+    """Learning path course map rows should show lesson and task progress."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        lesson = LESSON_BY_ID[LEARNING_PATH_MANIFESTS[0].lesson_ids[0]]
+        app.context.progress.complete_task(lesson.id, lesson.tasks[0].id)
+
+        assert app._learning_path_lesson_map_label(lesson, 1) == (
+            "1. See error in a fitted line - Started; tasks 1/2"
+        )
+
+        app.context.settings.language = "pl"
+        assert app._learning_path_lesson_map_label(lesson, 1) == (
+            "1. Zobacz błąd dopasowanej prostej - Rozpoczęta; zadania 1/2"
+        )
+    finally:
+        pygame.quit()
+
+
 def test_shell_trustworthy_path_details_localize_polish(monkeypatch) -> None:
     """Trustworthy path details should show natural Polish lesson and badge copy."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -1818,8 +1846,20 @@ def test_shell_trustworthy_path_details_localize_polish(monkeypatch) -> None:
         assert "[ ] Strażnik test set" in wrapped_text
         assert "[ ] Detektyw leakage" in wrapped_text
         assert "[ ] Strażnik modelu" in wrapped_text
-        assert "• Czytaj metryki przy niezbalansowanych danych" in wrapped_text
-        assert "• Sprawdź, czy confidence pasuje do rzeczywistości" in wrapped_text
+        assert (
+            app._learning_path_lesson_map_label(
+                LESSON_BY_ID[path.lesson_ids[2]],
+                3,
+            )
+            in wrapped_text
+        )
+        assert (
+            app._learning_path_lesson_map_label(
+                LESSON_BY_ID[path.lesson_ids[3]],
+                4,
+            )
+            in wrapped_text
+        )
         assert "naprawdę coś znaczy" not in " ".join(wrapped_text)
     finally:
         pygame.quit()
