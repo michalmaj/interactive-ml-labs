@@ -256,6 +256,8 @@ Completion summaries should also include a short self-check. This is not a quiz 
 
 When the last lesson in a guided path is completed, the shell should open a path completion summary. This gives the student a course-like milestone with aggregate lesson, task, theory, and badge progress before they choose whether to review the path or move back to the path list.
 
+Path completion summaries should also name what the student can now explain and suggest a next guided path when one naturally follows. This keeps the course flow moving without turning the app into a heavy LMS.
+
 ## Suggested PR Sequence
 
 1. Done: add `LessonManifest`, `LessonTask`, and a small learning-path registry.

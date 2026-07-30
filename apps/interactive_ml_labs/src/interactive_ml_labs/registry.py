@@ -8240,6 +8240,20 @@ LEARNING_PATH_MANIFESTS: tuple[LearningPathManifest, ...] = (
             "error_boosting_mistakes",
         ),
         tags=("guided-path", "loss", "classification", "boosting"),
+        completion_takeaways=(
+            LocalizedText(
+                en="Read residuals and loss as evidence, not decoration.",
+                pl="Czytać residuals i loss jako dowód, nie ozdobę wykresu.",
+            ),
+            LocalizedText(
+                en="Explain why changing parameters changes model errors.",
+                pl="Wyjaśnić, czemu zmiana parametrów zmienia błędy modelu.",
+            ),
+            LocalizedText(
+                en="See boosting as learning from previous mistakes.",
+                pl="Widzieć boosting jako uczenie się z poprzednich błędów.",
+            ),
+        ),
     ),
     LearningPathManifest(
         id="distance_to_clusters",
@@ -8265,6 +8279,20 @@ LEARNING_PATH_MANIFESTS: tuple[LearningPathManifest, ...] = (
             "distance_soft_clusters",
         ),
         tags=("guided-path", "distance", "knn", "clustering", "unsupervised"),
+        completion_takeaways=(
+            LocalizedText(
+                en="Explain why distance changes the neighborhood a model sees.",
+                pl="Wyjaśnić, czemu distance zmienia sąsiedztwo widziane przez model.",
+            ),
+            LocalizedText(
+                en="Connect centroid movement with cluster assignment.",
+                pl="Połączyć ruch centroidów z przypisaniem punktów do klastrów.",
+            ),
+            LocalizedText(
+                en="Compare hard clusters with soft membership.",
+                pl="Porównać twarde klastry z soft membership.",
+            ),
+        ),
     ),
     LearningPathManifest(
         id="trustworthy_models",
@@ -8290,6 +8318,20 @@ LEARNING_PATH_MANIFESTS: tuple[LearningPathManifest, ...] = (
             MONITORING_LESSON_ID,
         ),
         tags=("guided-path", "evaluation", "trustworthy-ml", "monitoring", "level-2", "level-3"),
+        completion_takeaways=(
+            LocalizedText(
+                en="Separate honest validation from final test evidence.",
+                pl="Oddzielić uczciwą walidację od finalnego dowodu z test set.",
+            ),
+            LocalizedText(
+                en="Spot metrics that look good for the wrong reason.",
+                pl="Rozpoznać metryki, które wyglądają dobrze z niewłaściwego powodu.",
+            ),
+            LocalizedText(
+                en="Treat confidence and monitoring as part of model trust.",
+                pl="Traktować confidence i monitoring jako część zaufania do modelu.",
+            ),
+        ),
     ),
 )
 
