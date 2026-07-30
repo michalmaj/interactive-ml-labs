@@ -116,3 +116,4 @@ class LearningPathManifest:
     summary: LocalizedText
     lesson_ids: tuple[str, ...]
     tags: tuple[str, ...] = field(default_factory=tuple)
+    completion_takeaways: tuple[LocalizedText, ...] = field(default_factory=tuple)

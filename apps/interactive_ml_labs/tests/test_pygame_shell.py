@@ -1346,15 +1346,37 @@ def test_shell_path_completion_summary_renders_progress(monkeypatch) -> None:
         assert "Learning path complete" in drawn_text
         assert "Path summary" in drawn_text
         assert "Badges" in drawn_text
+        assert "You can now" in drawn_text
         assert "Final recap" in drawn_text
         assert app._learning_path_progress_label(path) in wrapped_text
         assert app._learning_path_task_progress_label(path) in wrapped_text
         assert app._learning_path_theory_progress_label(path) in wrapped_text
         assert app._learning_path_badge_progress_label(path) in wrapped_text
         assert app._learning_path_badge_labels(path)[0] in wrapped_text
+        assert "- " + app._path_completion_takeaway_labels(path)[0] in wrapped_text
+        assert app._path_completion_next_path_label(path) in wrapped_text
         assert app._path_completion_recap_label() in wrapped_text
         assert menu_labels == ["Review this path", "All learning paths", "Back to home"]
         assert progress_bars == [(4, 4), (8, 8), (4, 4), (4, 4)]
+    finally:
+        pygame.quit()
+
+
+def test_shell_path_completion_next_path_label_localizes_polish(monkeypatch) -> None:
+    """Path completion should suggest a useful next learning path."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        first_path = LEARNING_PATH_MANIFESTS[0]
+        assert app._path_completion_next_path_label(first_path) == (
+            "Suggested next: From distance to clusters"
+        )
+
+        app.context.settings.language = "pl"
+        assert app._path_completion_next_path_label(first_path) == (
+            "Proponowany kolejny krok: Od odległości do klastrów"
+        )
     finally:
         pygame.quit()
 

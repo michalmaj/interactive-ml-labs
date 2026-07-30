@@ -1172,6 +1172,34 @@ class UnifiedAppShell:
             "który ta ścieżka najbardziej zmieniła.",
         )
 
+    def _path_completion_takeaway_labels(self, path: LearningPathManifest) -> list[str]:
+        """Return localized learning takeaways for a completed path."""
+        return [
+            takeaway.for_language(self.context.settings.language)
+            for takeaway in path.completion_takeaways
+        ]
+
+    def _path_completion_next_path_label(self, path: LearningPathManifest) -> str:
+        """Return a localized suggested next path label."""
+        try:
+            path_index = LEARNING_PATH_MANIFESTS.index(path)
+        except ValueError:
+            return self._text(
+                "Suggested next: review another guided path.",
+                "Proponowany kolejny krok: przejrzyj inną prowadzoną ścieżkę.",
+            )
+
+        next_index = path_index + 1
+        if next_index >= len(LEARNING_PATH_MANIFESTS):
+            return self._text(
+                "Suggested next: revisit any path and explain it without the controls.",
+                "Proponowany kolejny krok: wróć do dowolnej ścieżki i wyjaśnij ją bez sterowania.",
+            )
+
+        next_path = LEARNING_PATH_MANIFESTS[next_index]
+        title = next_path.title.for_language(self.context.settings.language)
+        return self._text(f"Suggested next: {title}", f"Proponowany kolejny krok: {title}")
+
     def _badge_gallery_summary_label(self) -> str:
         """Return a localized global badge progress summary."""
         unlocked_count = sum(
@@ -2080,6 +2108,7 @@ class UnifiedAppShell:
             )
             panel_y += 4
 
+        panel_y = self._draw_path_completion_takeaways(path, panel_x, panel_y + 10, panel_width)
         panel_y += 10
         self._draw_text(
             self._text("Final recap", "Ostatnie podsumowanie"),
@@ -2102,6 +2131,42 @@ class UnifiedAppShell:
                 "Enter: select | Esc/Backspace: paths | L: language",
                 "Enter: wybierz | Esc/Backspace: ścieżki | L: język",
             ),
+        )
+
+    def _draw_path_completion_takeaways(
+        self,
+        path: LearningPathManifest,
+        panel_x: int,
+        panel_y: int,
+        panel_width: int,
+    ) -> int:
+        """Draw compact learning takeaways for a completed path."""
+        takeaways = self._path_completion_takeaway_labels(path)
+        if takeaways:
+            self._draw_text(
+                self._text("You can now", "Umiesz teraz"),
+                (panel_x, panel_y),
+                self.font_small,
+                ACCENT,
+            )
+            panel_y += 26
+            for takeaway in takeaways[:3]:
+                panel_y = self._draw_wrapped(
+                    "- " + takeaway,
+                    (panel_x, panel_y),
+                    panel_width,
+                    self.font_small,
+                    MUTED_TEXT,
+                )
+                panel_y += 4
+
+        panel_y += 4
+        return self._draw_wrapped(
+            self._path_completion_next_path_label(path),
+            (panel_x, panel_y),
+            panel_width,
+            self.font_small,
+            ACCENT,
         )
 
     def _render_badges(self) -> None:

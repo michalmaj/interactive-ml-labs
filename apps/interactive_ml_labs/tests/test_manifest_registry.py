@@ -1245,6 +1245,13 @@ def test_learning_path_registry_contains_trustworthy_models_path() -> None:
     assert LESSON_BY_ID[MONITORING_LESSON_ID].completion_badge.pl == "Strażnik modelu"
 
 
+def test_learning_paths_define_completion_takeaways() -> None:
+    """Completed guided paths should be able to summarize what students learned."""
+    for path in LEARNING_PATH_MANIFESTS:
+        assert 2 <= len(path.completion_takeaways) <= 3
+        assert all(takeaway.en and takeaway.pl for takeaway in path.completion_takeaways)
+
+
 def test_trustworthy_models_polish_copy_stays_natural() -> None:
     """Trustworthy path Polish copy should avoid rough literal translations."""
     assert LESSON_BY_ID[SPLIT_LESSON_ID].title.pl == "Nie podglądaj test setu"
