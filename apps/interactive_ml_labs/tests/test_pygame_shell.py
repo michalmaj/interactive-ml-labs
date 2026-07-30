@@ -1512,6 +1512,7 @@ def test_shell_badge_gallery_renders_badges_by_path(monkeypatch) -> None:
     drawn_text: list[str] = []
     wrapped_text: list[str] = []
     menu_labels: list[str] = []
+    badge_states: list[bool] = []
 
     def capture_text(
         text: str,
@@ -1555,6 +1556,14 @@ def test_shell_badge_gallery_renders_badges_by_path(monkeypatch) -> None:
         _ = top, width
         menu_labels.extend(labels)
 
+    def capture_badge_medallion(
+        center: tuple[int, int],
+        *,
+        unlocked: bool,
+    ) -> None:
+        _ = center
+        badge_states.append(unlocked)
+
     try:
         path = LEARNING_PATH_MANIFESTS[0]
         app.context.progress.mark_completed(path.lesson_ids[0])
@@ -1562,14 +1571,16 @@ def test_shell_badge_gallery_renders_badges_by_path(monkeypatch) -> None:
         app._draw_wrapped = capture_wrapped
         app._draw_wrapped_visible = capture_wrapped_visible
         app._draw_menu = capture_menu
+        app._draw_badge_medallion = capture_badge_medallion
 
         app._render_badges()
 
         assert "Badges" in drawn_text
         assert "Badges unlocked: 1/14" in wrapped_text
         assert path.title.en in wrapped_text
-        assert "[x] Residual Reader" in wrapped_text
-        assert "[ ] Loss Navigator" in wrapped_text
+        assert "Residual Reader" in wrapped_text
+        assert "Loss Navigator" in wrapped_text
+        assert badge_states[:2] == [True, False]
         assert menu_labels == ["Back"]
     finally:
         pygame.quit()
@@ -1757,6 +1768,25 @@ def test_shell_learning_path_badge_labels_localize_polish(monkeypatch) -> None:
             "[x] Czytelnik metryk",
             "[ ] Głos sąsiedztwa",
         ]
+    finally:
+        pygame.quit()
+
+
+def test_shell_learning_path_badge_items_track_unlock_state(monkeypatch) -> None:
+    """Badge gallery data should expose clean labels and unlock state."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        app.context.progress.mark_completed(path.lesson_ids[0])
+
+        badges = app._learning_path_badge_items(path)
+
+        assert badges[0].label == "Residual Reader"
+        assert badges[0].unlocked is True
+        assert badges[1].label == "Loss Navigator"
+        assert badges[1].unlocked is False
     finally:
         pygame.quit()
 

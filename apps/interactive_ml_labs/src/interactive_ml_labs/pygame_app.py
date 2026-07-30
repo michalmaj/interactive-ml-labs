@@ -94,6 +94,14 @@ class MenuItem:
     enabled: bool = True
 
 
+@dataclass(frozen=True, slots=True)
+class BadgeItem:
+    """One visible badge in the guided learning gallery."""
+
+    label: str
+    unlocked: bool
+
+
 class UnifiedAppShell:
     """Small first slice of the unified Pygame app shell."""
 
@@ -822,16 +830,30 @@ class UnifiedAppShell:
     def _learning_path_badge_labels(self, path: LearningPathManifest) -> list[str]:
         """Return badge labels with completion markers for one learning path."""
         labels: list[str] = []
+        for badge in self._learning_path_badge_items(path):
+            marker = "[x]" if badge.unlocked else "[ ]"
+            labels.append(f"{marker} {badge.label}")
+
+        return labels
+
+    def _learning_path_badge_items(self, path: LearningPathManifest) -> list[BadgeItem]:
+        """Return badge labels and unlock state for one learning path."""
+        badges: list[BadgeItem] = []
         for lesson_id in path.lesson_ids:
             lesson = LESSON_BY_ID[lesson_id]
             if lesson.completion_badge is None:
                 continue
 
-            marker = "[x]" if self._is_lesson_completed(lesson_id) else "[ ]"
-            badge = lesson.completion_badge.for_language(self.context.settings.language)
-            labels.append(f"{marker} {badge}")
+            badges.append(
+                BadgeItem(
+                    label=lesson.completion_badge.for_language(
+                        self.context.settings.language,
+                    ),
+                    unlocked=self._is_lesson_completed(lesson_id),
+                ),
+            )
 
-        return labels
+        return badges
 
     def _learning_path_menu_label(self, path: LearningPathManifest) -> str:
         """Return one learning path menu label with compact progress state."""
@@ -2135,13 +2157,18 @@ class UnifiedAppShell:
                     content_bottom,
                 )
                 path_y += 10
-                for badge_label in self._learning_path_badge_labels(path):
+                for badge in self._learning_path_badge_items(path):
+                    icon_y = path_y + self.font_small.get_linesize() // 2
+                    self._draw_badge_medallion(
+                        (x + 12, icon_y),
+                        unlocked=badge.unlocked,
+                    )
                     path_y = self._draw_wrapped_visible(
-                        badge_label,
-                        (x + 18, path_y),
-                        column_width - 18,
+                        badge.label,
+                        (x + 34, path_y),
+                        column_width - 34,
                         self.font_small,
-                        MUTED_TEXT,
+                        TEXT if badge.unlocked else MUTED_TEXT,
                         content_top,
                         content_bottom,
                     )
@@ -2161,6 +2188,31 @@ class UnifiedAppShell:
                 "Kółko: przewijaj | Enter/Esc/Backspace: start | L: język",
             ),
         )
+
+    def _draw_badge_medallion(
+        self,
+        center: tuple[int, int],
+        *,
+        unlocked: bool,
+    ) -> None:
+        """Draw a small local badge icon without external image assets."""
+        fill = (226, 176, 83) if unlocked else (61, 68, 76)
+        outline = (250, 218, 139) if unlocked else (109, 118, 128)
+        detail = BACKGROUND if unlocked else MUTED_TEXT
+        cx, cy = center
+
+        pygame.draw.circle(self.screen, fill, center, 12)
+        pygame.draw.circle(self.screen, outline, center, 12, width=2)
+
+        if unlocked:
+            pygame.draw.line(self.screen, detail, (cx - 5, cy), (cx - 1, cy + 4), width=3)
+            pygame.draw.line(self.screen, detail, (cx - 1, cy + 4), (cx + 6, cy - 5), width=3)
+            return
+
+        shackle = pygame.Rect(cx - 5, cy - 6, 10, 9)
+        body = pygame.Rect(cx - 6, cy - 1, 12, 8)
+        pygame.draw.arc(self.screen, detail, shackle, 3.14, 6.28, width=2)
+        pygame.draw.rect(self.screen, detail, body, border_radius=2)
 
     def _render_settings(self) -> None:
         settings = self.context.settings
