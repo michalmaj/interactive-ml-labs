@@ -5,6 +5,8 @@ Interactive ML Labs is organized into three levels.
 The goal is to support gradual learning: from fundamental intuition, through practical machine learning workflows, to advanced experiments and showcase topics.
 
 The tables below describe the current unified app registry, not a distant wishlist.
+Guided learning paths cut across these levels and provide the course-like route,
+while the level browser remains useful for free exploration.
 
 ## Level 1 — Fundamentals
 

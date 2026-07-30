@@ -71,10 +71,12 @@ It should also show students how real projects are developed:
 - readable commits,
 - clear project structure.
 
-## Planned high-level structure
+## Current high-level structure
 
 ```text
 interactive-ml-labs/
+├── apps/
+│   └── interactive_ml_labs/
 ├── docs/
 ├── packages/
 │   └── ml_lab_core/
@@ -102,15 +104,18 @@ It should not contain demo-specific algorithms.
 
 ## Unified application shell
 
-The project is expected to grow from separately launched demos into one guided Pygame application.
+The project has grown from separately launched demos into one guided Pygame application.
 
-The shell should live outside `ml_lab_core` at first, because it is a concrete application rather than a small reusable primitive. Existing demo entry points should remain available while the shell becomes the recommended guided experience.
+The shell lives outside `ml_lab_core`, because it is a concrete application rather than a small reusable primitive. Existing demo entry points remain available while the shell is the recommended guided experience.
 
 See [Unified App Shell](unified_app_shell.md) for the current architecture direction.
 
 ## Demo packages
 
-Each demo should be self-contained and documented.
+Each standalone demo should be self-contained and documented.
+
+Native app-only labs live in the app package and use manifest metadata, in-app theory,
+help overlays, and guided lesson tasks instead of separate per-demo markdown files.
 
 A typical demo will eventually contain:
 
@@ -124,7 +129,7 @@ demo_name/
 └── assets/
 ```
 
-## Definition of done for a demo
+## Definition of done for a standalone demo
 
 A demo is considered complete when it has:
 
