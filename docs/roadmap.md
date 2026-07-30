@@ -37,7 +37,7 @@ tests, and the standalone demo package tests.
 ## Near-Term Milestones
 
 - [x] Run app tests in CI and root pytest.
-- [ ] Keep project docs aligned with the current unified app.
+- [x] Keep project docs aligned with the current unified app.
 - [ ] Clean up small repository artifacts and naming drift.
 - [x] Extract shared UI helpers for repeated demo-scene panel, text, and wrapping patterns.
 - [x] Introduce learning paths, lesson/task manifests, progress, and meaningful completion badges.
@@ -62,6 +62,9 @@ All paths connect lesson manifests to real scene interactions and persisted prog
 The direction is captured in [learning_platform.md](learning_platform.md). Future slices should improve progress summaries, add more useful instructor/student feedback, and only introduce richer gamification where it reinforces actual understanding.
 
 Recent shell work made lesson progress visible throughout the student flow: path details point to the next lesson, lesson lists show compact progress markers, and home/path/lesson/intro/pause screens use consistent progress summaries and bars.
+
+The path details screen also acts as a compact course map, so students can see
+lesson status and task progress before entering a specific demo.
 
 ### Shared UI Helpers
 
