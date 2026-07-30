@@ -150,6 +150,8 @@ class UnifiedAppShell:
         self.learning_path_details_scroll_offset = 0
         self.learning_path_details_max_scroll = 0
         self.learning_path_details_scroll_path_id: str | None = None
+        self.badge_gallery_scroll_offset = 0
+        self.badge_gallery_max_scroll = 0
         self.home_continue_rect: pygame.Rect | None = None
 
         pygame.display.set_caption("Interactive ML Labs")
@@ -332,6 +334,9 @@ class UnifiedAppShell:
         elif self.screen_name == ScreenName.PATHS:
             self.learning_path_details_scroll_offset -= y * THEORY_SCROLL_STEP
             self._clamp_learning_path_details_scroll()
+        elif self.screen_name == ScreenName.BADGES:
+            self.badge_gallery_scroll_offset -= y * THEORY_SCROLL_STEP
+            self._clamp_badge_gallery_scroll()
 
     def _select_menu_item_at(self, position: tuple[int, int]) -> bool:
         if self.screen_name == ScreenName.DEMOS:
@@ -2092,50 +2097,68 @@ class UnifiedAppShell:
             self.font_heading,
             ACCENT,
         )
-        y += 26
+        content_top = y + 26
+        content_bottom = self._content_bottom() - 76
+        content_y = content_top - self.badge_gallery_scroll_offset
+        content_end = content_y
 
         column_count = 2 if width >= 1180 else 1
         column_gap = 48
         column_width = (content_width - column_gap) // 2 if column_count == 2 else content_width
-        column_tops = [y for _ in range(column_count)]
+        column_tops = [content_y for _ in range(column_count)]
+        previous_clip = self.screen.get_clip()
+        viewport = pygame.Rect(80, content_top, content_width, max(0, content_bottom - content_top))
+        self.screen.set_clip(viewport)
 
-        for index, path in enumerate(LEARNING_PATH_MANIFESTS):
-            column = index % column_count
-            x = 80 + column * (column_width + column_gap)
-            path_y = column_tops[column]
-            path_y = self._draw_wrapped(
-                path.title.for_language(language),
-                (x, path_y),
-                column_width,
-                self.font_heading,
-                TEXT,
-            )
-            path_y += 8
-            path_y = self._draw_wrapped(
-                self._learning_path_badge_progress_label(path),
-                (x, path_y),
-                column_width,
-                self.font_small,
-                ACCENT,
-            )
-            path_y += 10
-            for badge_label in self._learning_path_badge_labels(path):
-                path_y = self._draw_wrapped(
-                    badge_label,
-                    (x + 18, path_y),
-                    column_width - 18,
-                    self.font_small,
-                    MUTED_TEXT,
+        try:
+            for index, path in enumerate(LEARNING_PATH_MANIFESTS):
+                column = index % column_count
+                x = 80 + column * (column_width + column_gap)
+                path_y = column_tops[column]
+                path_y = self._draw_wrapped_visible(
+                    path.title.for_language(language),
+                    (x, path_y),
+                    column_width,
+                    self.font_heading,
+                    TEXT,
+                    content_top,
+                    content_bottom,
                 )
-                path_y += 4
+                path_y += 8
+                path_y = self._draw_wrapped_visible(
+                    self._learning_path_badge_progress_label(path),
+                    (x, path_y),
+                    column_width,
+                    self.font_small,
+                    ACCENT,
+                    content_top,
+                    content_bottom,
+                )
+                path_y += 10
+                for badge_label in self._learning_path_badge_labels(path):
+                    path_y = self._draw_wrapped_visible(
+                        badge_label,
+                        (x + 18, path_y),
+                        column_width - 18,
+                        self.font_small,
+                        MUTED_TEXT,
+                        content_top,
+                        content_bottom,
+                    )
+                    path_y += 4
 
-            column_tops[column] = path_y + 26
+                column_tops[column] = path_y + 26
+        finally:
+            self.screen.set_clip(previous_clip)
 
+        content_end = max(column_tops) if column_tops else content_y
+        self._update_badge_gallery_scroll_limit(content_end, content_bottom)
+        self._draw_badge_gallery_scroll_indicator(viewport)
         self._draw_menu([self._text("Back", "Wróć")], top=self._content_bottom() - 62, width=260)
         self._draw_footer(
             self._text(
-                "Enter/Esc/Backspace: home | L: language",
-                "Enter/Esc/Backspace: start | L: język",
+                "Wheel: scroll | Enter/Esc/Backspace: home | L: language",
+                "Kółko: przewijaj | Enter/Esc/Backspace: start | L: język",
             ),
         )
 
@@ -2351,6 +2374,19 @@ class UnifiedAppShell:
             bottom=viewport.bottom,
             scroll_offset=self.learning_path_details_scroll_offset,
             max_scroll=self.learning_path_details_max_scroll,
+        )
+
+    def _draw_badge_gallery_scroll_indicator(self, viewport: pygame.Rect) -> None:
+        """Draw a small scrollbar for long badge gallery content."""
+        if self.badge_gallery_max_scroll <= 0:
+            return
+
+        self._draw_scroll_indicator_at(
+            x=viewport.right - SCROLLBAR_WIDTH,
+            top=viewport.y,
+            bottom=viewport.bottom,
+            scroll_offset=self.badge_gallery_scroll_offset,
+            max_scroll=self.badge_gallery_max_scroll,
         )
 
     def _draw_scroll_indicator_at(
@@ -2780,6 +2816,8 @@ class UnifiedAppShell:
             self.demo_scroll_offset = 0
         elif screen_name == ScreenName.PATHS:
             self.learning_path_details_scroll_offset = 0
+        elif screen_name == ScreenName.BADGES:
+            self.badge_gallery_scroll_offset = 0
 
     def _handle_scene_command(self, command: SceneCommand) -> None:
         if command.kind == SceneCommandKind.NONE:
@@ -2886,6 +2924,28 @@ class UnifiedAppShell:
             min(
                 self.learning_path_details_scroll_offset,
                 self.learning_path_details_max_scroll,
+            ),
+        )
+
+    def _update_badge_gallery_scroll_limit(
+        self,
+        content_end: int,
+        content_bottom: int,
+    ) -> None:
+        """Update maximum scroll offset for the badge gallery."""
+        self.badge_gallery_max_scroll = max(
+            0,
+            content_end + self.badge_gallery_scroll_offset - content_bottom,
+        )
+        self._clamp_badge_gallery_scroll()
+
+    def _clamp_badge_gallery_scroll(self) -> None:
+        """Keep the badge gallery scroll offset inside the available range."""
+        self.badge_gallery_scroll_offset = max(
+            0,
+            min(
+                self.badge_gallery_scroll_offset,
+                self.badge_gallery_max_scroll,
             ),
         )
 
