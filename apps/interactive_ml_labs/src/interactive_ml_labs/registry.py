@@ -7398,6 +7398,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 "i który parametr pomógł to zmniejszyć?"
             ),
         ),
+        instructor_note=LocalizedText(
+            en=(
+                "Residuals are the evidence. If they lean in one direction, the model "
+                "has not captured the pattern yet."
+            ),
+            pl=(
+                "Residuals są dowodem. Jeśli układają się głównie w jedną stronę, "
+                "model nadal nie uchwycił wzoru."
+            ),
+        ),
     ),
     LessonManifest(
         id="error_gradient_descent",
