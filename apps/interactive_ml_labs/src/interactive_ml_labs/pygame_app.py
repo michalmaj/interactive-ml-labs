@@ -1195,6 +1195,18 @@ class UnifiedAppShell:
             "w modelu i po czym to poznajesz.",
         )
 
+    def _lesson_instructor_note(self, lesson: LessonManifest) -> str:
+        """Return a short instructor-facing hint for completed lesson reflection."""
+        if lesson.instructor_note is not None:
+            return lesson.instructor_note.for_language(self.context.settings.language)
+
+        return self._text(
+            "Look for the visible signal that changed during the task: a metric, "
+            "boundary, error pattern, or alert should now explain the model behavior.",
+            "Poszukaj widocznego sygnału, który zmienił się podczas zadania: metryka, "
+            "granica, wzór błędów albo alert powinny teraz wyjaśniać zachowanie modelu.",
+        )
+
     def _lesson_self_check_lines(self) -> list[str]:
         """Return self-check lines shown on the completion summary."""
         return [
@@ -1939,7 +1951,24 @@ class UnifiedAppShell:
         panel_y += 8
         panel_y = self._draw_lesson_theory_status(lesson, panel_x, panel_y, panel_width)
         panel_y = self._draw_lesson_badge_status(lesson, panel_x, panel_y + 8, panel_width)
-        panel_y += 14
+        self._draw_lesson_reflection_summary(lesson, panel_x, panel_y + 14, panel_width)
+
+        self._draw_menu(labels, top=menu_top, width=520)
+        self._draw_footer(
+            self._text(
+                "Enter: select | Esc/Backspace: path | L: language",
+                "Enter: wybierz | Esc/Backspace: ścieżka | L: język",
+            ),
+        )
+
+    def _draw_lesson_reflection_summary(
+        self,
+        lesson: LessonManifest,
+        panel_x: int,
+        panel_y: int,
+        panel_width: int,
+    ) -> int:
+        """Draw recap, instructor note, and self-check for a completed lesson."""
         self._draw_text(
             self._text("Pause and recap", "Zatrzymaj się na chwilę"),
             (panel_x, panel_y),
@@ -1949,6 +1978,21 @@ class UnifiedAppShell:
         panel_y += 26
         panel_y = self._draw_wrapped(
             self._lesson_recap_prompt(lesson),
+            (panel_x, panel_y),
+            panel_width,
+            self.font_small,
+            TEXT,
+        )
+        panel_y += 14
+        self._draw_text(
+            self._text("What to notice", "Na co zwrócić uwagę"),
+            (panel_x, panel_y),
+            self.font_small,
+            ACCENT,
+        )
+        panel_y += 26
+        panel_y = self._draw_wrapped(
+            self._lesson_instructor_note(lesson),
             (panel_x, panel_y),
             panel_width,
             self.font_small,
@@ -1972,13 +2016,7 @@ class UnifiedAppShell:
             )
             panel_y += 4
 
-        self._draw_menu(labels, top=menu_top, width=520)
-        self._draw_footer(
-            self._text(
-                "Enter: select | Esc/Backspace: path | L: language",
-                "Enter: wybierz | Esc/Backspace: ścieżka | L: język",
-            ),
-        )
+        return panel_y
 
     def _render_path_complete(self) -> None:
         """Draw a guided learning path completion summary."""

@@ -1291,6 +1291,9 @@ def test_learning_lessons_define_goals_tasks_and_badges() -> None:
         assert lesson.recap_prompt is not None
         assert lesson.recap_prompt.en
         assert lesson.recap_prompt.pl
+        if lesson.instructor_note is not None:
+            assert lesson.instructor_note.en
+            assert lesson.instructor_note.pl
         assert len(lesson.tasks) >= 2
         assert all(task.title.en and task.title.pl for task in lesson.tasks)
         assert all(task.instruction.en and task.instruction.pl for task in lesson.tasks)

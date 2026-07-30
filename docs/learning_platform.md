@@ -239,9 +239,10 @@ The shell should make lesson completion feel like a learning milestone, not just
 - completed tasks,
 - theory visit status,
 - unlocked badge status,
+- a short instructor-style note about the signal the student should have noticed,
 - a primary action that continues to the next lesson in the selected path.
 
-This is the first small step toward a more course-like flow. Future slices can add short reflection prompts, recap questions, or instructor-facing checkpoints on top of this screen without forcing every demo scene to implement its own completion UI.
+This is the first small step toward a more course-like flow. Future slices can add richer reflection prompts, recap questions, or instructor-facing checkpoints on top of this screen without forcing every demo scene to implement its own completion UI.
 
 ## Recap Prompts
 

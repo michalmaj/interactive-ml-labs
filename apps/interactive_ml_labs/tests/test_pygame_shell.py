@@ -1258,6 +1258,56 @@ def test_shell_lesson_recap_prompt_can_come_from_manifest(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_lesson_instructor_note_uses_default_copy(monkeypatch) -> None:
+    """Lessons without custom instructor notes should still guide observation."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        source_lesson = LESSON_BY_ID[LEARNING_PATH_MANIFESTS[0].lesson_ids[0]]
+        lesson = source_lesson.__class__(
+            id="fallback_instructor_note",
+            level=source_lesson.level,
+            demo_id=source_lesson.demo_id,
+            title=source_lesson.title,
+            learning_goal=source_lesson.learning_goal,
+            tasks=source_lesson.tasks,
+        )
+
+        assert app._lesson_instructor_note(lesson).startswith(
+            "Look for the visible signal that changed during the task"
+        )
+
+        app.context.settings.language = "pl"
+        assert app._lesson_instructor_note(lesson).startswith(
+            "Poszukaj widocznego sygnału, który zmienił się podczas zadania"
+        )
+    finally:
+        pygame.quit()
+
+
+def test_shell_lesson_instructor_note_can_come_from_manifest(monkeypatch) -> None:
+    """Lesson manifests should be able to provide a concrete instructor note."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        lesson = LESSON_BY_ID[LEARNING_PATH_MANIFESTS[0].lesson_ids[0]]
+
+        assert app._lesson_instructor_note(lesson) == (
+            "Residuals are the evidence. If they lean in one direction, the model "
+            "has not captured the pattern yet."
+        )
+
+        app.context.settings.language = "pl"
+        assert app._lesson_instructor_note(lesson) == (
+            "Residuals są dowodem. Jeśli układają się głównie w jedną stronę, "
+            "model nadal nie uchwycił wzoru."
+        )
+    finally:
+        pygame.quit()
+
+
 def test_shell_lesson_self_check_lines_localize_polish(monkeypatch) -> None:
     """Completion summaries should provide a lightweight self-check."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
