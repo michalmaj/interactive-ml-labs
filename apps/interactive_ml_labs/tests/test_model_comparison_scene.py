@@ -3,11 +3,14 @@
 import pygame
 from interactive_ml_labs.display import DEFAULT_RESOLUTION
 from interactive_ml_labs.model_comparison_scene import (
+    COMPARE_MODEL_FAMILIES_TASK_ID,
     DATASETS,
     DEFAULT_COMPLEXITY_LEVEL,
+    IDENTIFY_MODEL_ASSUMPTION_TASK_ID,
     KNN_K_VALUES,
     MAX_COMPLEXITY_LEVEL,
     MIN_COMPLEXITY_LEVEL,
+    MODEL_COMPARISON_LESSON_ID,
     MODELS,
     ModelComparisonLabScene,
     create_model_comparison_lab_scene,
@@ -167,6 +170,58 @@ def test_model_comparison_scene_adjusts_active_model_parameter(monkeypatch) -> N
             scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
 
         assert scene.complexity_levels[1] == MAX_COMPLEXITY_LEVEL
+    finally:
+        pygame.quit()
+
+
+def test_model_comparison_scene_reports_guided_lesson_progress(monkeypatch) -> None:
+    """Guided mode should complete comparison tasks from model and dataset actions."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=MODEL_COMPARISON_LESSON_ID)
+        scene = create_model_comparison_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+        assert MODEL_COMPARISON_LESSON_ID not in context.progress.lessons
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_3))
+
+        progress = context.progress.lessons[MODEL_COMPARISON_LESSON_ID]
+        assert progress.completed_task_ids == {COMPARE_MODEL_FAMILIES_TASK_ID}
+        assert progress.completed is False
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_d))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+
+        progress = context.progress.lessons[MODEL_COMPARISON_LESSON_ID]
+        assert progress.completed_task_ids == {
+            COMPARE_MODEL_FAMILIES_TASK_ID,
+            IDENTIFY_MODEL_ASSUMPTION_TASK_ID,
+        }
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_model_comparison_scene_standalone_does_not_mutate_guided_progress(
+    monkeypatch,
+) -> None:
+    """Standalone Model Comparison interactions should not complete guided lessons."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_model_comparison_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_3))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_d))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_EQUALS))
+
+        assert context.progress.lessons == {}
     finally:
         pygame.quit()
 
