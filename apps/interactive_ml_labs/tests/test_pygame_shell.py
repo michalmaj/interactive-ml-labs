@@ -54,6 +54,21 @@ from interactive_ml_labs.scene import SceneCommand
 from interactive_ml_labs.settings import AppSettings, save_app_settings
 
 
+def _guided_lesson_ids() -> tuple[str, ...]:
+    """Return lesson ids referenced by registered guided paths."""
+    return tuple(lesson_id for path in LEARNING_PATH_MANIFESTS for lesson_id in path.lesson_ids)
+
+
+def _guided_lesson_total() -> int:
+    """Return total registered guided lessons."""
+    return len(_guided_lesson_ids())
+
+
+def _guided_task_total() -> int:
+    """Return total tasks across registered guided lessons."""
+    return sum(len(LESSON_BY_ID[lesson_id].tasks) for lesson_id in _guided_lesson_ids())
+
+
 class FixedSizeColorScene:
     """Tiny fixed-size scene double for shell scaling tests."""
 
@@ -323,11 +338,13 @@ def test_shell_home_learning_progress_lines_summarize_paths(monkeypatch) -> None
     try:
         first_path = LEARNING_PATH_MANIFESTS[0]
         first_lesson = LESSON_BY_ID[first_path.lesson_ids[0]]
+        lesson_total = _guided_lesson_total()
+        task_total = _guided_task_total()
 
         assert app._home_learning_progress_lines() == [
-            "Lessons: 0/14 completed",
-            "Tasks: 0/28 completed",
-            "Badges: 0/14 unlocked",
+            f"Lessons: 0/{lesson_total} completed",
+            f"Tasks: 0/{task_total} completed",
+            f"Badges: 0/{lesson_total} unlocked",
             f"Start: {first_lesson.title.en} ({first_path.title.en})",
         ]
 
@@ -347,13 +364,15 @@ def test_shell_home_learning_progress_metrics_track_counts(monkeypatch) -> None:
     try:
         path = LEARNING_PATH_MANIFESTS[0]
         lesson = LESSON_BY_ID[path.lesson_ids[0]]
+        lesson_total = _guided_lesson_total()
+        task_total = _guided_task_total()
         app.context.progress.complete_task(lesson.id, lesson.tasks[0].id)
         app.context.progress.mark_completed(lesson.id)
 
         assert app._home_learning_progress_metrics() == [
-            ("Lessons: 1/14 completed", 1, 14),
-            ("Tasks: 1/28 completed", 1, 28),
-            ("Badges: 1/14 unlocked", 1, 14),
+            (f"Lessons: 1/{lesson_total} completed", 1, lesson_total),
+            (f"Tasks: 1/{task_total} completed", 1, task_total),
+            (f"Badges: 1/{lesson_total} unlocked", 1, lesson_total),
         ]
     finally:
         pygame.quit()
@@ -368,11 +387,13 @@ def test_shell_home_learning_progress_lines_localize_polish(monkeypatch) -> None
         app.context.settings.language = "pl"
         first_path = LEARNING_PATH_MANIFESTS[0]
         first_lesson = LESSON_BY_ID[first_path.lesson_ids[0]]
+        lesson_total = _guided_lesson_total()
+        task_total = _guided_task_total()
 
         assert app._home_learning_progress_lines() == [
-            "Lekcje: 0/14 ukończone",
-            "Zadania: 0/28 ukończone",
-            "Odznaki: 0/14 zdobyte",
+            f"Lekcje: 0/{lesson_total} ukończone",
+            f"Zadania: 0/{task_total} ukończone",
+            f"Odznaki: 0/{lesson_total} zdobyte",
             f"Zacznij: {first_lesson.title.pl} ({first_path.title.pl})",
         ]
     finally:
@@ -413,9 +434,11 @@ def test_shell_home_renders_learning_progress_panel(monkeypatch) -> None:
 
         app._render_home()
 
+        lesson_total = _guided_lesson_total()
+        task_total = _guided_task_total()
         assert "Learning progress" in wrapped_text
-        assert "Lessons: 0/14 completed" in wrapped_text
-        assert progress_bars == [(0, 14), (0, 28), (0, 14)]
+        assert f"Lessons: 0/{lesson_total} completed" in wrapped_text
+        assert progress_bars == [(0, lesson_total), (0, task_total), (0, lesson_total)]
         assert app.home_continue_rect is not None
     finally:
         pygame.quit()
@@ -1564,15 +1587,16 @@ def test_shell_badge_gallery_summary_tracks_unlocked_badges(monkeypatch) -> None
 
     try:
         path = LEARNING_PATH_MANIFESTS[0]
+        badge_total = _guided_lesson_total()
 
-        assert app._badge_gallery_summary_label() == "Badges unlocked: 0/14"
+        assert app._badge_gallery_summary_label() == f"Badges unlocked: 0/{badge_total}"
 
         app.context.progress.mark_completed(path.lesson_ids[0])
 
-        assert app._badge_gallery_summary_label() == "Badges unlocked: 1/14"
+        assert app._badge_gallery_summary_label() == f"Badges unlocked: 1/{badge_total}"
 
         app.context.settings.language = "pl"
-        assert app._badge_gallery_summary_label() == "Zdobyte odznaki: 1/14"
+        assert app._badge_gallery_summary_label() == f"Zdobyte odznaki: 1/{badge_total}"
     finally:
         pygame.quit()
 
@@ -1647,8 +1671,9 @@ def test_shell_badge_gallery_renders_badges_by_path(monkeypatch) -> None:
 
         app._render_badges()
 
+        badge_total = _guided_lesson_total()
         assert "Badges" in drawn_text
-        assert "Badges unlocked: 1/14" in wrapped_text
+        assert f"Badges unlocked: 1/{badge_total}" in wrapped_text
         assert path.title.en in wrapped_text
         assert "Residual Reader" in wrapped_text
         assert "Loss Navigator" in wrapped_text

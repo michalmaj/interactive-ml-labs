@@ -34,6 +34,9 @@ MAX_COMPLEXITY_LEVEL: Final[int] = 2
 KNN_K_VALUES: Final[tuple[int, int, int]] = (9, 5, 1)
 LOGISTIC_THRESHOLDS: Final[tuple[float, float, float]] = (0.35, 0.50, 0.65)
 TREE_DEPTHS: Final[tuple[int, int, int]] = (1, 2, 3)
+MODEL_COMPARISON_LESSON_ID: Final[str] = "feature_decision_model_comparison"
+COMPARE_MODEL_FAMILIES_TASK_ID: Final[str] = "compare_model_families"
+IDENTIFY_MODEL_ASSUMPTION_TASK_ID: Final[str] = "identify_model_assumption"
 
 
 @dataclass(frozen=True, slots=True)
@@ -221,6 +224,7 @@ class ModelComparisonLabScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create a deterministic model comparison preview scene."""
+        self._context = context
         self._language = context.settings.language
         self._font_title = make_ui_font(34, bold=True)
         self._font_heading = make_ui_font(23, bold=True)
@@ -231,6 +235,9 @@ class ModelComparisonLabScene:
         self.complexity_levels = [DEFAULT_COMPLEXITY_LEVEL for _model in MODELS]
         self.show_all_boundaries = True
         self.show_error_highlights = True
+        self._seen_model_indices = {self.selected_model_index}
+        self._seen_dataset_indices = {self.selected_dataset_index}
+        self._changed_model_parameter = False
 
     @property
     def selected_model(self) -> ComparisonModel:
@@ -274,22 +281,31 @@ class ModelComparisonLabScene:
     def _handle_keydown(self, key: int) -> None:
         if key in {pygame.K_1, pygame.K_2, pygame.K_3}:
             self.selected_model_index = key - pygame.K_1
+            self._record_model_progress()
         elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
             self._change_selected_complexity(-1)
+            self._record_parameter_progress()
         elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
             self._change_selected_complexity(1)
+            self._record_parameter_progress()
         elif key == pygame.K_d:
             self.selected_dataset_index = (self.selected_dataset_index + 1) % len(DATASETS)
+            self._record_dataset_progress()
         elif key == pygame.K_a:
             self.show_all_boundaries = not self.show_all_boundaries
+            self._record_model_progress()
         elif key == pygame.K_e:
             self.show_error_highlights = not self.show_error_highlights
+            self._record_parameter_progress()
         elif key == pygame.K_r:
             self.selected_model_index = 0
             self.selected_dataset_index = 0
             self.complexity_levels = [DEFAULT_COMPLEXITY_LEVEL for _model in MODELS]
             self.show_all_boundaries = True
             self.show_error_highlights = True
+            self._seen_model_indices = {self.selected_model_index}
+            self._seen_dataset_indices = {self.selected_dataset_index}
+            self._changed_model_parameter = False
 
     def _change_selected_complexity(self, delta: int) -> None:
         current_level = self.complexity_levels[self.selected_model_index]
@@ -297,6 +313,57 @@ class ModelComparisonLabScene:
             MIN_COMPLEXITY_LEVEL,
             min(MAX_COMPLEXITY_LEVEL, current_level + delta),
         )
+
+    def _record_model_progress(self) -> None:
+        """Complete model comparison after all model families have been inspected."""
+        if self._context.selected_lesson_id != MODEL_COMPARISON_LESSON_ID:
+            return
+
+        self._seen_model_indices.add(self.selected_model_index)
+        if self._seen_model_indices == set(range(len(MODELS))):
+            self._context.progress.complete_task(
+                MODEL_COMPARISON_LESSON_ID,
+                COMPARE_MODEL_FAMILIES_TASK_ID,
+            )
+        self._mark_lesson_completed_if_ready()
+
+    def _record_dataset_progress(self) -> None:
+        """Track dataset changes used to reveal assumption mismatch."""
+        if self._context.selected_lesson_id != MODEL_COMPARISON_LESSON_ID:
+            return
+
+        self._seen_dataset_indices.add(self.selected_dataset_index)
+        self._record_assumption_progress()
+
+    def _record_parameter_progress(self) -> None:
+        """Track model parameter or error-view changes."""
+        if self._context.selected_lesson_id != MODEL_COMPARISON_LESSON_ID:
+            return
+
+        self._changed_model_parameter = True
+        self._record_assumption_progress()
+
+    def _record_assumption_progress(self) -> None:
+        """Complete assumption task after changing data and model behavior."""
+        if self._context.selected_lesson_id != MODEL_COMPARISON_LESSON_ID:
+            return
+
+        if len(self._seen_dataset_indices) >= 2 and self._changed_model_parameter:
+            self._context.progress.complete_task(
+                MODEL_COMPARISON_LESSON_ID,
+                IDENTIFY_MODEL_ASSUMPTION_TASK_ID,
+            )
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both guided tasks are done."""
+        progress = self._context.progress.lessons.get(MODEL_COMPARISON_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {COMPARE_MODEL_FAMILIES_TASK_ID, IDENTIFY_MODEL_ASSUMPTION_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(MODEL_COMPARISON_LESSON_ID)
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "Model Comparison Lab", (58, 40), self._font_title, TEXT)

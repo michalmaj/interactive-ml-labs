@@ -66,7 +66,12 @@ from interactive_ml_labs.kmeans_intro_scene import create_kmeans_intro_lab_scene
 from interactive_ml_labs.knn_scene import create_knn_vote_map_scene
 from interactive_ml_labs.linear_regression_scene import create_linear_regression_line_fit_lab_scene
 from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
-from interactive_ml_labs.model_comparison_scene import create_model_comparison_lab_scene
+from interactive_ml_labs.model_comparison_scene import (
+    COMPARE_MODEL_FAMILIES_TASK_ID,
+    IDENTIFY_MODEL_ASSUMPTION_TASK_ID,
+    MODEL_COMPARISON_LESSON_ID,
+    create_model_comparison_lab_scene,
+)
 from interactive_ml_labs.monitoring_scene import (
     ACKNOWLEDGE_ALERT_TASK_ID,
     COMPARE_SIGNALS_TASK_ID,
@@ -1265,6 +1270,36 @@ def test_learning_path_registry_contains_trustworthy_models_path() -> None:
     assert LESSON_BY_ID[MONITORING_LESSON_ID].completion_badge.pl == "Strażnik modelu"
 
 
+def test_learning_path_registry_contains_features_to_decisions_path() -> None:
+    """Fourth learning path should connect feature signal to model decisions."""
+    path = next(
+        path for path in LEARNING_PATH_MANIFESTS if path.id == "features_to_model_decisions"
+    )
+
+    assert path.title.en == "From features to model decisions"
+    assert path.title.pl == "Od cech do decyzji modelu"
+    assert path.lesson_ids == (
+        FEATURE_SCALING_LESSON_ID,
+        FEATURE_IMPORTANCE_LESSON_ID,
+        DECISION_TREE_LESSON_ID,
+        RANDOM_FOREST_LESSON_ID,
+        MODEL_COMPARISON_LESSON_ID,
+    )
+
+    demos_in_path = [LESSON_BY_ID[lesson_id].demo_id for lesson_id in path.lesson_ids]
+    assert demos_in_path == [
+        "feature_scaling_lab",
+        "feature_importance_lab",
+        "decision_tree_splitter",
+        "random_forest_bagging_lab",
+        "model_comparison_lab",
+    ]
+    assert all(demo_id in DEMO_BY_ID for demo_id in demos_in_path)
+    assert LESSON_BY_ID[MODEL_COMPARISON_LESSON_ID].prerequisites == (RANDOM_FOREST_LESSON_ID,)
+    assert LESSON_BY_ID[MODEL_COMPARISON_LESSON_ID].completion_badge is not None
+    assert LESSON_BY_ID[MODEL_COMPARISON_LESSON_ID].completion_badge.pl == ("Czytelnik założeń")
+
+
 def test_learning_paths_define_completion_takeaways() -> None:
     """Completed guided paths should be able to summarize what students learned."""
     for path in LEARNING_PATH_MANIFESTS:
@@ -1322,6 +1357,10 @@ def test_feature_decision_first_lessons_match_scene_task_hooks() -> None:
             COMPARE_FOREST_VOTE_TASK_ID,
             INSPECT_FOREST_CONFIDENCE_TASK_ID,
         },
+        MODEL_COMPARISON_LESSON_ID: {
+            COMPARE_MODEL_FAMILIES_TASK_ID,
+            IDENTIFY_MODEL_ASSUMPTION_TASK_ID,
+        },
     }
 
     for lesson_id, expected_task_ids in expected_task_ids_by_lesson.items():
@@ -1330,7 +1369,7 @@ def test_feature_decision_first_lessons_match_scene_task_hooks() -> None:
 
 def test_learning_lessons_define_goals_tasks_and_badges() -> None:
     """Every default lesson should have enough metadata for a future lesson screen."""
-    assert len(LESSON_MANIFESTS) == 18
+    assert len(LESSON_MANIFESTS) == 19
 
     for lesson in LESSON_MANIFESTS:
         assert lesson.title.en
@@ -1363,6 +1402,7 @@ def test_feature_decision_first_lessons_define_guided_metadata() -> None:
     importance_lesson = LESSON_BY_ID[FEATURE_IMPORTANCE_LESSON_ID]
     tree_lesson = LESSON_BY_ID[DECISION_TREE_LESSON_ID]
     forest_lesson = LESSON_BY_ID[RANDOM_FOREST_LESSON_ID]
+    comparison_lesson = LESSON_BY_ID[MODEL_COMPARISON_LESSON_ID]
 
     assert scaling_lesson.demo_id == "feature_scaling_lab"
     assert scaling_lesson.level == 2
@@ -1383,6 +1423,11 @@ def test_feature_decision_first_lessons_define_guided_metadata() -> None:
     assert forest_lesson.prerequisites == (DECISION_TREE_LESSON_ID,)
     assert forest_lesson.completion_badge
     assert forest_lesson.completion_badge.en == "Vote Stabilizer"
+
+    assert comparison_lesson.demo_id == "model_comparison_lab"
+    assert comparison_lesson.prerequisites == (RANDOM_FOREST_LESSON_ID,)
+    assert comparison_lesson.completion_badge
+    assert comparison_lesson.completion_badge.en == "Assumption Reader"
 
 
 def test_registry_rejects_duplicate_demo_ids() -> None:

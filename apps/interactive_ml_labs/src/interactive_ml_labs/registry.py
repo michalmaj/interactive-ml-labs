@@ -63,7 +63,12 @@ from interactive_ml_labs.manifest import (
     LocalizedText,
     TheorySection,
 )
-from interactive_ml_labs.model_comparison_scene import create_model_comparison_lab_scene
+from interactive_ml_labs.model_comparison_scene import (
+    COMPARE_MODEL_FAMILIES_TASK_ID,
+    IDENTIFY_MODEL_ASSUMPTION_TASK_ID,
+    MODEL_COMPARISON_LESSON_ID,
+    create_model_comparison_lab_scene,
+)
 from interactive_ml_labs.monitoring_scene import (
     ACKNOWLEDGE_ALERT_TASK_ID,
     COMPARE_SIGNALS_TASK_ID,
@@ -8222,6 +8227,89 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
         ),
     ),
     LessonManifest(
+        id=MODEL_COMPARISON_LESSON_ID,
+        level=2,
+        demo_id="model_comparison_lab",
+        title=LocalizedText(
+            en="Compare model assumptions",
+            pl="Porównaj założenia modeli",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand that different model families can make different decisions "
+                "on the same data because their assumptions shape the boundary."
+            ),
+            pl=(
+                "Zrozum, że różne rodziny modeli mogą podejmować różne decyzje na "
+                "tych samych danych, bo ich założenia kształtują boundary."
+            ),
+        ),
+        prerequisites=(RANDOM_FOREST_LESSON_ID,),
+        tasks=(
+            LessonTask(
+                id=COMPARE_MODEL_FAMILIES_TASK_ID,
+                title=LocalizedText(
+                    en="Compare model families",
+                    pl="Porównaj rodziny modeli",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Inspect Logistic Regression, k-NN, and Decision Tree on the same dataset."
+                    ),
+                    pl=(
+                        "Sprawdź Logistic Regression, k-NN i Decision Tree na tym samym datasecie."
+                    ),
+                ),
+                success_condition="compared_model_families",
+            ),
+            LessonTask(
+                id=IDENTIFY_MODEL_ASSUMPTION_TASK_ID,
+                title=LocalizedText(
+                    en="Identify an assumption mismatch",
+                    pl="Rozpoznaj rozjazd założeń",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Change the dataset and a model parameter, then identify which "
+                        "model assumption best explains the visible disagreement."
+                    ),
+                    pl=(
+                        "Zmień dataset i parametr modelu, a potem wskaż, które założenie "
+                        "modelu najlepiej tłumaczy widoczny spór."
+                    ),
+                ),
+                success_condition="identified_model_assumption",
+                hint=LocalizedText(
+                    en="A worse score is often a clue that the model assumption does not fit.",
+                    pl=(
+                        "Słabszy score często podpowiada, że założenie modelu nie pasuje do danych."
+                    ),
+                ),
+            ),
+        ),
+        completion_badge=LocalizedText(en="Assumption Reader", pl="Czytelnik założeń"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which model family disagreed most visibly, and which assumption made "
+                "that disagreement understandable?"
+            ),
+            pl=(
+                "Która rodzina modeli najbardziej się różniła i które założenie "
+                "pomogło zrozumieć ten spór?"
+            ),
+        ),
+        instructor_note=LocalizedText(
+            en=(
+                "Model comparison is not only about picking the highest score. It is "
+                "also about matching assumptions to the data shape."
+            ),
+            pl=(
+                "Porównanie modeli to nie tylko wybór najwyższego score. To także "
+                "dopasowanie założeń do kształtu danych."
+            ),
+        ),
+    ),
+    LessonManifest(
         id=SPLIT_LESSON_ID,
         level=2,
         demo_id="train_validation_test_lab",
@@ -8672,6 +8760,45 @@ LEARNING_PATH_MANIFESTS: tuple[LearningPathManifest, ...] = (
             LocalizedText(
                 en="Treat confidence and monitoring as part of model trust.",
                 pl="Traktować confidence i monitoring jako część zaufania do modelu.",
+            ),
+        ),
+    ),
+    LearningPathManifest(
+        id="features_to_model_decisions",
+        title=LocalizedText(
+            en="From features to model decisions",
+            pl="Od cech do decyzji modelu",
+        ),
+        summary=LocalizedText(
+            en=(
+                "A guided path from feature scale and signal, through tree rules and "
+                "forest voting, to comparing model-family assumptions."
+            ),
+            pl=(
+                "Ścieżka od skali i sygnału cech, przez reguły drzewa i głosowanie "
+                "forest, po porównanie założeń różnych rodzin modeli."
+            ),
+        ),
+        lesson_ids=(
+            FEATURE_SCALING_LESSON_ID,
+            FEATURE_IMPORTANCE_LESSON_ID,
+            DECISION_TREE_LESSON_ID,
+            RANDOM_FOREST_LESSON_ID,
+            MODEL_COMPARISON_LESSON_ID,
+        ),
+        tags=("guided-path", "features", "interpretability", "model-comparison", "level-2"),
+        completion_takeaways=(
+            LocalizedText(
+                en="Explain how scale and feature signal can shape model behavior.",
+                pl="Wyjaśnić, jak skala i sygnał cech wpływają na zachowanie modelu.",
+            ),
+            LocalizedText(
+                en="Read tree splits and forest votes as model decision evidence.",
+                pl="Czytać splity drzewa i głosy forest jako dowody decyzji modelu.",
+            ),
+            LocalizedText(
+                en="Compare model families by assumptions, not only by score.",
+                pl="Porównywać rodziny modeli przez założenia, nie tylko przez score.",
             ),
         ),
     ),

@@ -46,7 +46,7 @@ macOS metadata, and accidental shell files are not tracked in git.
 - [x] Expand learning paths beyond the first end-to-end path.
 - [x] Add checkable task completion to the second learning path.
 - [x] Implement the third guided path: From good scores to trustworthy models.
-- [ ] Implement the fourth guided path: From features to model decisions.
+- [x] Implement the fourth guided path: From features to model decisions.
 - [ ] Continue balancing Level 1, Level 2, and Level 3 with small focused demos.
 - [ ] Add screenshots or short GIFs for the main README and app docs.
 
@@ -54,19 +54,18 @@ macOS metadata, and accidental shell files are not tracked in git.
 
 ### Learning Platform Layer
 
-The app now has three guided learning paths with checkable tasks:
+The app now has four guided learning paths with checkable tasks:
 
 - How models learn from error,
 - From distance to clusters,
 - From good scores to trustworthy models.
+- From features to model decisions.
 
-All paths connect lesson manifests to real scene interactions and persisted progress while keeping the standalone demo browser intact. The third path, **From good scores to trustworthy models**, now connects train/validation/test discipline, leakage, class imbalance, calibration, and production monitoring in one registered guided sequence.
+All paths connect lesson manifests to real scene interactions and persisted progress while keeping the standalone demo browser intact. The third path, **From good scores to trustworthy models**, connects train/validation/test discipline, leakage, class imbalance, calibration, and production monitoring in one registered guided sequence.
 
-The next planned path is **From features to model decisions**, focused on feature scale,
-feature signal, tree splits, ensemble voting, and model-family assumptions. Its first
-implementation slices add lesson metadata and scene task hooks for Feature Scaling Lab,
-Feature Importance Lab, Decision Tree Splitter, and Random Forest Bagging Lab; the path
-should stay unregistered until every lesson has real progress hooks.
+The fourth path, **From features to model decisions**, is now registered with task hooks
+for feature scale, feature signal, tree splits, ensemble voting, and model-family
+assumptions.
 
 The direction is captured in [learning_platform.md](learning_platform.md). Future slices should improve progress summaries, add more useful instructor/student feedback, and only introduce richer gamification where it reinforces actual understanding.
 
