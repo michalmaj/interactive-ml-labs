@@ -231,6 +231,75 @@ These tasks are intentionally based on interactions already present in the scene
 
 The path is now registered in the app after every lesson received working task hooks, localized copy, persistence coverage, and a completion badge.
 
+## Planned Fourth Learning Path
+
+The fourth path should help students connect raw model inputs with the final decision. This fills a common intuition gap: students often know that a model predicted something, but not how feature scale, feature signal, model family, and ensemble stability shaped that prediction.
+
+**From features to model decisions**
+
+Polish title: **Od cech do decyzji modelu**
+
+1. Feature Scaling Lab
+2. Feature Importance Lab
+3. Decision Tree Splitter
+4. Random Forest Bagging Lab
+5. Model Comparison Lab
+
+Narrative:
+
+- first, students see that a model receives numbers, not human meaning, so feature scale can dominate the behavior,
+- then they see that features carry different amounts of signal and that importance can be unstable or misleading,
+- next, they build a decision as a sequence of simple feature-threshold questions,
+- then they compare a single tree with an ensemble that stabilizes decisions by voting,
+- finally, they compare model families and see that different assumptions produce different decision shapes on the same data.
+
+The path should answer one high-level question: **why did the model make this decision?**
+
+This path should not become a full interpretability course. The first slice should stay practical and visual: a student should leave able to say which feature signal mattered, which model assumption shaped the boundary, and why two models may disagree for understandable reasons.
+
+### Draft Lesson Tasks And Badges
+
+**Feature Scaling Lab**
+
+- toggle scaling and compare how scale-sensitive behavior changes,
+- identify which feature dominates before scaling and why that dominance is not always meaningful,
+- badge: **Scale Spotter / Tropiciel skali**.
+
+**Feature Importance Lab**
+
+- compare at least two importance methods or scenarios,
+- identify a strong feature signal and notice when correlation or leakage can distort the story,
+- badge: **Signal Reader / Czytelnik sygnału**.
+
+**Decision Tree Splitter**
+
+- move or choose a split and observe how impurity changes,
+- explain the first split as a human-readable question about one feature,
+- badge: **Split Builder / Budowniczy splitów**.
+
+**Random Forest Bagging Lab**
+
+- compare one tree with the forest vote,
+- use confidence or tree disagreement to identify where the ensemble is less certain,
+- badge: **Vote Stabilizer / Stabilizator głosowania**.
+
+**Model Comparison Lab**
+
+- compare Logistic Regression, k-NN, and Decision Tree on the same dataset,
+- identify which model assumption explains the most visible disagreement,
+- badge: **Assumption Reader / Czytelnik założeń**.
+
+These tasks should be based on interactions already present in the scenes where possible. If a scene does not expose enough state yet, add a small progress hook rather than weakening the task into a key-press checklist.
+
+### Suggested Rollout
+
+1. Document the path narrative, lesson order, draft tasks, badges, and non-goals.
+2. Add or verify task hooks for Feature Scaling Lab and Feature Importance Lab.
+3. Add or verify task hooks for Decision Tree Splitter and Random Forest Bagging Lab.
+4. Add or verify task hooks for Model Comparison Lab.
+5. Register the complete path only after every lesson has real task progress, localized copy, recap prompts, instructor notes, and completion badges.
+6. Run a Polish copy and layout pass after completing the path end to end.
+
 ## Lesson Completion Summary
 
 The shell should make lesson completion feel like a learning milestone, not just a silent progress update. When a guided lesson is completed for the first time during an active demo, the app now opens a summary screen with:
