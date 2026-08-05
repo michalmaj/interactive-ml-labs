@@ -65,7 +65,8 @@ All paths connect lesson manifests to real scene interactions and persisted prog
 
 The fourth path, **From features to model decisions**, is now registered with task hooks
 for feature scale, feature signal, tree splits, ensemble voting, and model-family
-assumptions.
+assumptions. A post-registration Polish copy and shell-selection test pass keeps the
+new path aligned with the guided course UI.
 
 The direction is captured in [learning_platform.md](learning_platform.md). Future slices should improve progress summaries, add more useful instructor/student feedback, and only introduce richer gamification where it reinforces actual understanding.
 
