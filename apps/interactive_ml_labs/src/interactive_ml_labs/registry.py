@@ -7919,16 +7919,16 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
             pl=(
                 "Zrozum, że model dostaje liczby, więc cecha o większym zakresie może "
-                "przed scaling dominować distance, coefficients albo optymalizację."
+                "przed scalingiem dominować distance, coefficients albo optymalizację."
             ),
         ),
         tasks=(
             LessonTask(
                 id=TOGGLE_SCALING_TASK_ID,
-                title=LocalizedText(en="Toggle scaling", pl="Przełącz scaling"),
+                title=LocalizedText(en="Toggle scaling", pl="Włącz i wyłącz scaling"),
                 instruction=LocalizedText(
                     en=("Toggle scaling and compare the raw feature ranges with the scaled view."),
-                    pl=("Przełącz scaling i porównaj surowe zakresy cech z widokiem po scaling."),
+                    pl=("Przełącz scaling i porównaj surowe zakresy cech z widokiem po scalingu."),
                 ),
                 success_condition="toggled_feature_scaling",
                 hint=LocalizedText(
@@ -7965,7 +7965,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 "became comparable?"
             ),
             pl=(
-                "Która cecha dominowała przed scaling i co zmieniło się, gdy zakresy "
+                "Która cecha dominowała przed scalingiem i co zmieniło się, gdy zakresy "
                 "stały się porównywalne?"
             ),
         ),
@@ -7986,7 +7986,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
         demo_id="feature_importance_lab",
         title=LocalizedText(
             en="Read feature signal carefully",
-            pl="Czytaj sygnał cech ostrożnie",
+            pl="Ostrożnie czytaj sygnał z cech",
         ),
         learning_goal=LocalizedText(
             en=(
@@ -8077,8 +8077,8 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 "feature-threshold questions in sequence."
             ),
             pl=(
-                "Zrozum, że decision tree przewiduje wynik przez sekwencję prostych "
-                "pytań o feature i threshold."
+                "Zrozum, że decision tree przewiduje wynik przez sekwencję prostych pytań "
+                "o cechę i threshold."
             ),
         ),
         prerequisites=(FEATURE_IMPORTANCE_LESSON_ID,),
@@ -8092,7 +8092,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                         "and observe how the classes separate."
                     ),
                     pl=(
-                        "Przełącz tryb manual split, zmień feature albo threshold "
+                        "Przełącz tryb manual split, zmień cechę albo threshold "
                         "i zobacz, jak rozdzielają się klasy."
                     ),
                 ),
@@ -8131,7 +8131,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 "that question separate the data?"
             ),
             pl=(
-                "Jakie pytanie feature-threshold drzewo zadało jako pierwsze i jak "
+                "Jakie pytanie o cechę i threshold drzewo zadało jako pierwsze i jak "
                 "to pytanie rozdzieliło dane?"
             ),
         ),
@@ -8170,14 +8170,17 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 id=COMPARE_FOREST_VOTE_TASK_ID,
                 title=LocalizedText(
                     en="Compare one tree with a forest",
-                    pl="Porównaj jedno drzewo z forest",
+                    pl="Porównaj jedno drzewo z Random Forest",
                 ),
                 instruction=LocalizedText(
                     en=(
                         "Change the number of trees and compare the single-tree result "
                         "with the forest vote."
                     ),
-                    pl=("Zmień liczbę drzew i porównaj wynik pojedynczego drzewa z głosem forest."),
+                    pl=(
+                        "Zmień liczbę drzew i porównaj wynik pojedynczego drzewa "
+                        "z głosowaniem Random Forest."
+                    ),
                 ),
                 success_condition="compared_forest_vote",
             ),
@@ -8185,7 +8188,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 id=INSPECT_FOREST_CONFIDENCE_TASK_ID,
                 title=LocalizedText(
                     en="Inspect forest confidence",
-                    pl="Sprawdź confidence forest",
+                    pl="Sprawdź confidence Random Forest",
                 ),
                 instruction=LocalizedText(
                     en=(
@@ -8211,8 +8214,8 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 "the confidence view still show uncertainty?"
             ),
             pl=(
-                "Gdzie forest wyglądał stabilniej niż jedno drzewo i gdzie confidence "
-                "view nadal pokazywał niepewność?"
+                "Gdzie Random Forest wyglądał stabilniej niż jedno drzewo i gdzie "
+                "confidence view nadal pokazywał niepewność?"
             ),
         ),
         instructor_note=LocalizedText(
@@ -8221,8 +8224,8 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 "through votes, confidence, and model comparison."
             ),
             pl=(
-                "Forest nie usuwa niepewności. Pokazuje ją przez głosy, confidence "
-                "i porównanie modeli."
+                "Random Forest nie usuwa niepewności. Pokazuje ją przez głosy, "
+                "confidence i porównanie modeli."
             ),
         ),
     ),
@@ -8241,7 +8244,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
             pl=(
                 "Zrozum, że różne rodziny modeli mogą podejmować różne decyzje na "
-                "tych samych danych, bo ich założenia kształtują boundary."
+                "tych samych danych, bo ich założenia kształtują decision boundary."
             ),
         ),
         prerequisites=(RANDOM_FOREST_LESSON_ID,),
@@ -8257,7 +8260,8 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                         "Inspect Logistic Regression, k-NN, and Decision Tree on the same dataset."
                     ),
                     pl=(
-                        "Sprawdź Logistic Regression, k-NN i Decision Tree na tym samym datasecie."
+                        "Sprawdź Logistic Regression, k-NN i Decision Tree na tym samym "
+                        "zbiorze danych."
                     ),
                 ),
                 success_condition="compared_model_families",
