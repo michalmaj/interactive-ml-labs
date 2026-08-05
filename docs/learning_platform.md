@@ -271,6 +271,11 @@ This path should not become a full interpretability course. The first slice shou
 - identify a strong feature signal and notice when correlation or leakage can distort the story,
 - badge: **Signal Reader / Czytelnik sygnału**.
 
+The first two lessons now have real lesson manifests and scene progress hooks.
+They are intentionally not registered as a complete learning path yet; the path
+should appear in the guided menu only after every lesson in the sequence reports
+meaningful task progress.
+
 **Decision Tree Splitter**
 
 - move or choose a split and observe how impurity changes,
@@ -293,8 +298,8 @@ These tasks should be based on interactions already present in the scenes where 
 
 ### Suggested Rollout
 
-1. Document the path narrative, lesson order, draft tasks, badges, and non-goals.
-2. Add or verify task hooks for Feature Scaling Lab and Feature Importance Lab.
+1. Document the path narrative, lesson order, draft tasks, badges, and non-goals. Done.
+2. Add or verify task hooks for Feature Scaling Lab and Feature Importance Lab. Done.
 3. Add or verify task hooks for Decision Tree Splitter and Random Forest Bagging Lab.
 4. Add or verify task hooks for Model Comparison Lab.
 5. Register the complete path only after every lesson has real task progress, localized copy, recap prompts, instructor notes, and completion badges.
