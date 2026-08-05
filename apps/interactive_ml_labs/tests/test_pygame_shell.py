@@ -686,6 +686,30 @@ def test_shell_trustworthy_learning_path_selection_opens_lessons(monkeypatch) ->
         pygame.quit()
 
 
+def test_shell_feature_decision_learning_path_selection_opens_lessons(monkeypatch) -> None:
+    """Selecting the feature-decision path should open its ordered lessons."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = next(
+            path for path in LEARNING_PATH_MANIFESTS if path.id == "features_to_model_decisions"
+        )
+        app.screen_name = ScreenName.PATHS
+        app.selected_index = LEARNING_PATH_MANIFESTS.index(path)
+
+        app._activate_selected()
+
+        lessons = app._current_learning_path_lessons()
+        assert app.screen_name == ScreenName.LESSONS
+        assert app.selected_learning_path == path
+        assert lessons[0].demo_id == "feature_scaling_lab"
+        assert lessons[-1].demo_id == "model_comparison_lab"
+        assert app.selected_index == 0
+    finally:
+        pygame.quit()
+
+
 def test_shell_learning_path_selection_focuses_next_incomplete_lesson(monkeypatch) -> None:
     """Selecting a path should highlight the first incomplete lesson."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")

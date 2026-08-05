@@ -302,7 +302,7 @@ These tasks should be based on interactions already present in the scenes where 
 3. Add or verify task hooks for Decision Tree Splitter and Random Forest Bagging Lab. Done.
 4. Add or verify task hooks for Model Comparison Lab. Done.
 5. Register the complete path only after every lesson has real task progress, localized copy, recap prompts, instructor notes, and completion badges. Done.
-6. Run a Polish copy and layout pass after completing the path end to end.
+6. Run a Polish copy and layout pass after completing the path end to end. Done.
 
 ## Lesson Completion Summary
 

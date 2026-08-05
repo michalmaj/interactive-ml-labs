@@ -1324,6 +1324,44 @@ def test_trustworthy_models_polish_copy_stays_natural() -> None:
     assert "drift signals" not in LESSON_BY_ID[MONITORING_LESSON_ID].tasks[0].title.pl
 
 
+def test_feature_decision_polish_copy_stays_natural() -> None:
+    """Feature-decision Polish copy should keep ML terms but avoid rough phrasing."""
+    path = next(
+        path for path in LEARNING_PATH_MANIFESTS if path.id == "features_to_model_decisions"
+    )
+    lessons = [LESSON_BY_ID[lesson_id] for lesson_id in path.lesson_ids]
+    polish_text = " ".join(
+        [
+            path.title.pl,
+            path.summary.pl,
+            *[takeaway.pl for takeaway in path.completion_takeaways],
+            *[lesson.title.pl for lesson in lessons],
+            *[lesson.learning_goal.pl for lesson in lessons],
+            *[lesson.recap_prompt.pl for lesson in lessons if lesson.recap_prompt is not None],
+            *[
+                lesson.instructor_note.pl
+                for lesson in lessons
+                if lesson.instructor_note is not None
+            ],
+            *[task.title.pl for lesson in lessons for task in lesson.tasks],
+            *[task.instruction.pl for lesson in lessons for task in lesson.tasks],
+            *[task.hint.pl for lesson in lessons for task in lesson.tasks if task.hint is not None],
+        ]
+    )
+
+    assert path.title.pl == "Od cech do decyzji modelu"
+    assert LESSON_BY_ID[FEATURE_SCALING_LESSON_ID].tasks[0].title.pl == ("Włącz i wyłącz scaling")
+    assert LESSON_BY_ID[RANDOM_FOREST_LESSON_ID].tasks[0].title.pl == (
+        "Porównaj jedno drzewo z Random Forest"
+    )
+    assert "przed scaling " not in polish_text
+    assert "po scaling." not in polish_text
+    assert "z forest" not in polish_text
+    assert "confidence forest" not in polish_text
+    assert "datasecie" not in polish_text
+    assert "pytań o feature" not in polish_text
+
+
 def test_trustworthy_models_lessons_match_scene_task_hooks() -> None:
     """Trustworthy path task ids should stay aligned with scene progress hooks."""
     expected_task_ids_by_lesson = {
