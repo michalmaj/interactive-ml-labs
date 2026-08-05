@@ -64,9 +64,9 @@ All paths connect lesson manifests to real scene interactions and persisted prog
 
 The next planned path is **From features to model decisions**, focused on feature scale,
 feature signal, tree splits, ensemble voting, and model-family assumptions. Its first
-implementation slice adds lesson metadata and scene task hooks for Feature Scaling Lab
-and Feature Importance Lab; the path should stay unregistered until every lesson has
-real progress hooks.
+implementation slices add lesson metadata and scene task hooks for Feature Scaling Lab,
+Feature Importance Lab, Decision Tree Splitter, and Random Forest Bagging Lab; the path
+should stay unregistered until every lesson has real progress hooks.
 
 The direction is captured in [learning_platform.md](learning_platform.md). Future slices should improve progress summaries, add more useful instructor/student feedback, and only introduce richer gamification where it reinforces actual understanding.
 
