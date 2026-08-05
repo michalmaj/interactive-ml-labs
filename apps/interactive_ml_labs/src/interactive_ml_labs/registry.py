@@ -28,8 +28,18 @@ from interactive_ml_labs.data_leakage_scene import (
 )
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.distance_metrics_scene import create_distance_metrics_lab_scene
-from interactive_ml_labs.feature_importance_scene import create_feature_importance_lab_scene
-from interactive_ml_labs.feature_scaling_scene import create_feature_scaling_lab_scene
+from interactive_ml_labs.feature_importance_scene import (
+    COMPARE_IMPORTANCE_METHODS_TASK_ID,
+    FEATURE_IMPORTANCE_LESSON_ID,
+    INSPECT_DISTORTED_SIGNAL_TASK_ID,
+    create_feature_importance_lab_scene,
+)
+from interactive_ml_labs.feature_scaling_scene import (
+    COMPARE_SCALE_SENSITIVE_MODEL_TASK_ID,
+    FEATURE_SCALING_LESSON_ID,
+    TOGGLE_SCALING_TASK_ID,
+    create_feature_scaling_lab_scene,
+)
 from interactive_ml_labs.gaussian_mixture_scene import create_gaussian_mixture_intro_lab_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.kmeans_intro_scene import create_kmeans_intro_lab_scene
@@ -7876,6 +7886,165 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             pl=(
                 "Który punkt miał mieszaną przynależność i czemu probability jest tam "
                 "bardziej użyteczne niż twarda etykieta klastra?"
+            ),
+        ),
+    ),
+    LessonManifest(
+        id=FEATURE_SCALING_LESSON_ID,
+        level=2,
+        demo_id="feature_scaling_lab",
+        title=LocalizedText(
+            en="Notice when scale shapes the model",
+            pl="Zauważ, kiedy skala steruje modelem",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand that models receive numbers, so a feature with a larger "
+                "range can dominate distance, coefficients, or optimization before scaling."
+            ),
+            pl=(
+                "Zrozum, że model dostaje liczby, więc cecha o większym zakresie może "
+                "przed scaling dominować distance, coefficients albo optymalizację."
+            ),
+        ),
+        tasks=(
+            LessonTask(
+                id=TOGGLE_SCALING_TASK_ID,
+                title=LocalizedText(en="Toggle scaling", pl="Przełącz scaling"),
+                instruction=LocalizedText(
+                    en=("Toggle scaling and compare the raw feature ranges with the scaled view."),
+                    pl=("Przełącz scaling i porównaj surowe zakresy cech z widokiem po scaling."),
+                ),
+                success_condition="toggled_feature_scaling",
+                hint=LocalizedText(
+                    en="The values may describe useful features, but their units still matter.",
+                    pl=(
+                        "Wartości mogą opisywać sensowne cechy, ale ich jednostki nadal "
+                        "mają znaczenie."
+                    ),
+                ),
+            ),
+            LessonTask(
+                id=COMPARE_SCALE_SENSITIVE_MODEL_TASK_ID,
+                title=LocalizedText(
+                    en="Compare scale-sensitive behavior",
+                    pl="Porównaj zachowanie wrażliwe na skalę",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Switch models after enabling scaling and notice how the result "
+                        "or convergence changes."
+                    ),
+                    pl=(
+                        "Po włączeniu scaling przełącz modele i zauważ, jak zmienia się "
+                        "wynik albo zbieżność."
+                    ),
+                ),
+                success_condition="compared_scale_sensitive_model",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Scale Spotter", pl="Tropiciel skali"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which feature dominated before scaling, and what changed after ranges "
+                "became comparable?"
+            ),
+            pl=(
+                "Która cecha dominowała przed scaling i co zmieniło się, gdy zakresy "
+                "stały się porównywalne?"
+            ),
+        ),
+        instructor_note=LocalizedText(
+            en=(
+                "Scaling is not cosmetic: it changes the geometry or optimization signal "
+                "that the model receives."
+            ),
+            pl=(
+                "Scaling nie jest kosmetyką: zmienia geometrię albo sygnał optymalizacji, "
+                "który dostaje model."
+            ),
+        ),
+    ),
+    LessonManifest(
+        id=FEATURE_IMPORTANCE_LESSON_ID,
+        level=2,
+        demo_id="feature_importance_lab",
+        title=LocalizedText(
+            en="Read feature signal carefully",
+            pl="Czytaj sygnał cech ostrożnie",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand that feature importance can highlight useful signal, but "
+                "correlation, leakage, and unstable rankings can distort the story."
+            ),
+            pl=(
+                "Zrozum, że feature importance może pokazać użyteczny sygnał, ale "
+                "korelacja, leakage i niestabilne rankingi mogą zniekształcić obraz."
+            ),
+        ),
+        prerequisites=(FEATURE_SCALING_LESSON_ID,),
+        tasks=(
+            LessonTask(
+                id=COMPARE_IMPORTANCE_METHODS_TASK_ID,
+                title=LocalizedText(
+                    en="Compare importance methods",
+                    pl="Porównaj metody importance",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Switch between permutation and model importance and compare "
+                        "which features move."
+                    ),
+                    pl=(
+                        "Przełącz permutation i model importance, a potem porównaj, "
+                        "które cechy zmieniają pozycję."
+                    ),
+                ),
+                success_condition="compared_importance_methods",
+            ),
+            LessonTask(
+                id=INSPECT_DISTORTED_SIGNAL_TASK_ID,
+                title=LocalizedText(
+                    en="Inspect distorted signal",
+                    pl="Sprawdź zniekształcony sygnał",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Visit a scenario with correlation, leakage, or unstable ranking "
+                        "and identify why the top bar is not the whole story."
+                    ),
+                    pl=(
+                        "Wejdź w scenariusz z korelacją, leakage albo niestabilnym "
+                        "rankingiem i nazwij, czemu najwyższy słupek nie mówi wszystkiego."
+                    ),
+                ),
+                success_condition="inspected_distorted_signal",
+                hint=LocalizedText(
+                    en="Importance explains model behavior, not automatically causality.",
+                    pl="Importance wyjaśnia zachowanie modelu, a nie automatycznie przyczynowość.",
+                ),
+            ),
+        ),
+        completion_badge=LocalizedText(en="Signal Reader", pl="Czytelnik sygnału"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which feature looked strongest, and what made you cautious about "
+                "trusting that ranking too literally?"
+            ),
+            pl=(
+                "Która cecha wyglądała na najmocniejszą i co kazało Ci uważać, "
+                "żeby nie traktować rankingu zbyt dosłownie?"
+            ),
+        ),
+        instructor_note=LocalizedText(
+            en=(
+                "Feature importance is a clue about model behavior. It still needs "
+                "context from data collection, correlation, and leakage checks."
+            ),
+            pl=(
+                "Feature importance jest wskazówką o zachowaniu modelu. Nadal wymaga "
+                "kontekstu: skąd są dane, czy cechy są skorelowane i czy nie ma leakage."
             ),
         ),
     ),

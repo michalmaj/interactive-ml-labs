@@ -62,7 +62,11 @@ The app now has three guided learning paths with checkable tasks:
 
 All paths connect lesson manifests to real scene interactions and persisted progress while keeping the standalone demo browser intact. The third path, **From good scores to trustworthy models**, now connects train/validation/test discipline, leakage, class imbalance, calibration, and production monitoring in one registered guided sequence.
 
-The next planned path is **From features to model decisions**, focused on feature scale, feature signal, tree splits, ensemble voting, and model-family assumptions.
+The next planned path is **From features to model decisions**, focused on feature scale,
+feature signal, tree splits, ensemble voting, and model-family assumptions. Its first
+implementation slice adds lesson metadata and scene task hooks for Feature Scaling Lab
+and Feature Importance Lab; the path should stay unregistered until every lesson has
+real progress hooks.
 
 The direction is captured in [learning_platform.md](learning_platform.md). Future slices should improve progress summaries, add more useful instructor/student feedback, and only introduce richer gamification where it reinforces actual understanding.
 

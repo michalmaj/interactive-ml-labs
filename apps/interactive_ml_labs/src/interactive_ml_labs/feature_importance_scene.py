@@ -29,6 +29,9 @@ ACCENT: Final[tuple[int, int, int]] = (118, 205, 247)
 SECONDARY: Final[tuple[int, int, int]] = (248, 183, 96)
 GOOD: Final[tuple[int, int, int]] = (147, 218, 155)
 WARNING: Final[tuple[int, int, int]] = (246, 132, 134)
+FEATURE_IMPORTANCE_LESSON_ID: Final[str] = "feature_decision_importance"
+COMPARE_IMPORTANCE_METHODS_TASK_ID: Final[str] = "compare_importance_methods"
+INSPECT_DISTORTED_SIGNAL_TASK_ID: Final[str] = "inspect_distorted_signal"
 
 
 class ImportanceMethod(StrEnum):
@@ -141,6 +144,7 @@ class FeatureImportanceLabScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create a deterministic feature importance lab."""
+        self._context = context
         self._language = context.settings.language
         self._font_title = make_ui_font(34, bold=True)
         self._font_heading = make_ui_font(23, bold=True)
@@ -150,6 +154,7 @@ class FeatureImportanceLabScene:
         self.method = ImportanceMethod.PERMUTATION
         self.show_correlation_groups = True
         self.show_leakage_warning = True
+        self._seen_methods = {self.method}
 
     @property
     def preset(self) -> ImportancePreset:
@@ -181,21 +186,64 @@ class FeatureImportanceLabScene:
     def _handle_keydown(self, key: int) -> None:
         if key in {pygame.K_1, pygame.K_2, pygame.K_3}:
             self.preset_index = key - pygame.K_1
+            self._record_signal_progress()
         elif key == pygame.K_m:
             self.method = (
                 ImportanceMethod.MODEL
                 if self.method == ImportanceMethod.PERMUTATION
                 else ImportanceMethod.PERMUTATION
             )
+            self._record_method_progress()
         elif key == pygame.K_c:
             self.show_correlation_groups = not self.show_correlation_groups
+            self._record_signal_progress()
         elif key == pygame.K_l:
             self.show_leakage_warning = not self.show_leakage_warning
+            self._record_signal_progress()
         elif key == pygame.K_r:
             self.preset_index = 0
             self.method = ImportanceMethod.PERMUTATION
             self.show_correlation_groups = True
             self.show_leakage_warning = True
+            self._seen_methods = {self.method}
+
+    def _record_method_progress(self) -> None:
+        """Complete method comparison after both importance views are used."""
+        if self._context.selected_lesson_id != FEATURE_IMPORTANCE_LESSON_ID:
+            return
+
+        self._seen_methods.add(self.method)
+        if self._seen_methods == {ImportanceMethod.PERMUTATION, ImportanceMethod.MODEL}:
+            self._context.progress.complete_task(
+                FEATURE_IMPORTANCE_LESSON_ID,
+                COMPARE_IMPORTANCE_METHODS_TASK_ID,
+            )
+        self._mark_lesson_completed_if_ready()
+
+    def _record_signal_progress(self) -> None:
+        """Complete signal-inspection after visiting a distorted importance scenario."""
+        if self._context.selected_lesson_id != FEATURE_IMPORTANCE_LESSON_ID:
+            return
+
+        distorted_signal_visible = any(
+            feature.leakage_risk for feature in self.preset.features
+        ) or self._diagnosis_key() in {"correlated", "unstable"}
+        if distorted_signal_visible:
+            self._context.progress.complete_task(
+                FEATURE_IMPORTANCE_LESSON_ID,
+                INSPECT_DISTORTED_SIGNAL_TASK_ID,
+            )
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both guided tasks are done."""
+        progress = self._context.progress.lessons.get(FEATURE_IMPORTANCE_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {COMPARE_IMPORTANCE_METHODS_TASK_ID, INSPECT_DISTORTED_SIGNAL_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(FEATURE_IMPORTANCE_LESSON_ID)
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "Feature Importance Lab", (58, 40), self._font_title, TEXT)
