@@ -33,12 +33,14 @@ The shell currently supports:
 
 CI runs Ruff, the workspace-aware root pytest suite, package-specific app/core
 tests, and the standalone demo package tests.
+The root pytest suite also checks that local artifacts such as caches, bytecode,
+macOS metadata, and accidental shell files are not tracked in git.
 
 ## Near-Term Milestones
 
 - [x] Run app tests in CI and root pytest.
 - [x] Keep project docs aligned with the current unified app.
-- [ ] Clean up small repository artifacts and naming drift.
+- [x] Clean up small repository artifacts and naming drift.
 - [x] Extract shared UI helpers for repeated demo-scene panel, text, and wrapping patterns.
 - [x] Introduce learning paths, lesson/task manifests, progress, and meaningful completion badges.
 - [x] Expand learning paths beyond the first end-to-end path.

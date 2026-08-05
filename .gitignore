@@ -41,9 +41,16 @@ dist/
 .idea/
 *.swp
 *.swo
+*.bak
+*.tmp
+*~
 
 # Operating system files
 .DS_Store
+._*
+.Spotlight-V100/
+.Trashes/
+.fseventsd/
 Thumbs.db
 
 # Logs
