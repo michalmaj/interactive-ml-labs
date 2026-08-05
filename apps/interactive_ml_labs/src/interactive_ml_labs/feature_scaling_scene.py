@@ -30,6 +30,9 @@ GOOD: Final[tuple[int, int, int]] = (147, 218, 155)
 WARNING: Final[tuple[int, int, int]] = (246, 132, 134)
 
 MODELS: Final[tuple[str, ...]] = ("k-NN", "Logistic Regression", "Gradient Descent")
+FEATURE_SCALING_LESSON_ID: Final[str] = "feature_decision_scaling"
+TOGGLE_SCALING_TASK_ID: Final[str] = "toggle_feature_scaling"
+COMPARE_SCALE_SENSITIVE_MODEL_TASK_ID: Final[str] = "compare_scale_sensitive_model"
 
 
 @dataclass(frozen=True, slots=True)
@@ -153,6 +156,7 @@ class FeatureScalingLabScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create the deterministic feature scaling scene."""
+        self._context = context
         self._language = context.settings.language
         self._font_title = make_ui_font(34, bold=True)
         self._font_heading = make_ui_font(23, bold=True)
@@ -161,6 +165,8 @@ class FeatureScalingLabScene:
         self.preset_index = 0
         self.model_index = 0
         self.scaling_enabled = False
+        self._seen_scaling_states = {self.scaling_enabled}
+        self._seen_model_indices = {self.model_index}
 
     @property
     def preset(self) -> ScalingPreset:
@@ -204,12 +210,52 @@ class FeatureScalingLabScene:
             self.preset_index = key - pygame.K_1
         elif key == pygame.K_s:
             self.scaling_enabled = not self.scaling_enabled
+            self._record_scaling_progress()
         elif key == pygame.K_m:
             self.model_index = (self.model_index + 1) % len(MODELS)
+            self._record_model_progress()
         elif key == pygame.K_r:
             self.preset_index = 0
             self.model_index = 0
             self.scaling_enabled = False
+            self._seen_scaling_states = {self.scaling_enabled}
+            self._seen_model_indices = {self.model_index}
+
+    def _record_scaling_progress(self) -> None:
+        """Complete the scaling task after observing raw and scaled ranges."""
+        if self._context.selected_lesson_id != FEATURE_SCALING_LESSON_ID:
+            return
+
+        self._seen_scaling_states.add(self.scaling_enabled)
+        if self._seen_scaling_states == {False, True}:
+            self._context.progress.complete_task(
+                FEATURE_SCALING_LESSON_ID,
+                TOGGLE_SCALING_TASK_ID,
+            )
+        self._record_model_progress()
+
+    def _record_model_progress(self) -> None:
+        """Complete the model comparison task after scaling and model changes."""
+        if self._context.selected_lesson_id != FEATURE_SCALING_LESSON_ID:
+            return
+
+        self._seen_model_indices.add(self.model_index)
+        if True in self._seen_scaling_states and len(self._seen_model_indices) >= 2:
+            self._context.progress.complete_task(
+                FEATURE_SCALING_LESSON_ID,
+                COMPARE_SCALE_SENSITIVE_MODEL_TASK_ID,
+            )
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both guided tasks are done."""
+        progress = self._context.progress.lessons.get(FEATURE_SCALING_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {TOGGLE_SCALING_TASK_ID, COMPARE_SCALE_SENSITIVE_MODEL_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(FEATURE_SCALING_LESSON_ID)
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "Feature Scaling Lab", (58, 40), self._font_title, TEXT)

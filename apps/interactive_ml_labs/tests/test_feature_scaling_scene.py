@@ -3,8 +3,11 @@
 import pygame
 from interactive_ml_labs.display import DEFAULT_RESOLUTION
 from interactive_ml_labs.feature_scaling_scene import (
+    COMPARE_SCALE_SENSITIVE_MODEL_TASK_ID,
+    FEATURE_SCALING_LESSON_ID,
     MODELS,
     PRESETS,
+    TOGGLE_SCALING_TASK_ID,
     FeatureScalingLabScene,
     create_feature_scaling_lab_scene,
 )
@@ -85,6 +88,50 @@ def test_feature_scaling_scene_localizes_labels(monkeypatch) -> None:
         assert scene._scaling_state_label() == "scaled"
         assert scene._diagnosis_label() == "porównywalne zakresy"
         assert "Zakresy są porównywalne" in scene._active_takeaway()
+    finally:
+        pygame.quit()
+
+
+def test_feature_scaling_scene_reports_guided_lesson_progress(monkeypatch) -> None:
+    """Guided mode should complete scaling tasks from real interactions."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=FEATURE_SCALING_LESSON_ID)
+        scene = create_feature_scaling_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_s))
+
+        progress = context.progress.lessons[FEATURE_SCALING_LESSON_ID]
+        assert progress.completed_task_ids == {TOGGLE_SCALING_TASK_ID}
+        assert progress.completed is False
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        progress = context.progress.lessons[FEATURE_SCALING_LESSON_ID]
+        assert progress.completed_task_ids == {
+            TOGGLE_SCALING_TASK_ID,
+            COMPARE_SCALE_SENSITIVE_MODEL_TASK_ID,
+        }
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_feature_scaling_scene_standalone_does_not_mutate_guided_progress(monkeypatch) -> None:
+    """Standalone demo interactions should not complete guided lessons."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_feature_scaling_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_s))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        assert context.progress.lessons == {}
     finally:
         pygame.quit()
 

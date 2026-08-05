@@ -3,6 +3,9 @@
 import pygame
 from interactive_ml_labs.display import DEFAULT_RESOLUTION
 from interactive_ml_labs.feature_importance_scene import (
+    COMPARE_IMPORTANCE_METHODS_TASK_ID,
+    FEATURE_IMPORTANCE_LESSON_ID,
+    INSPECT_DISTORTED_SIGNAL_TASK_ID,
     PRESETS,
     FeatureImportanceLabScene,
     ImportanceMethod,
@@ -102,6 +105,52 @@ def test_feature_importance_scene_localizes_labels(monkeypatch) -> None:
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
         assert scene._diagnosis_label() == "możliwy leakage"
+    finally:
+        pygame.quit()
+
+
+def test_feature_importance_scene_reports_guided_lesson_progress(monkeypatch) -> None:
+    """Guided mode should complete importance tasks from interpretation actions."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=FEATURE_IMPORTANCE_LESSON_ID)
+        scene = create_feature_importance_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        progress = context.progress.lessons[FEATURE_IMPORTANCE_LESSON_ID]
+        assert progress.completed_task_ids == {COMPARE_IMPORTANCE_METHODS_TASK_ID}
+        assert progress.completed is False
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+
+        progress = context.progress.lessons[FEATURE_IMPORTANCE_LESSON_ID]
+        assert progress.completed_task_ids == {
+            COMPARE_IMPORTANCE_METHODS_TASK_ID,
+            INSPECT_DISTORTED_SIGNAL_TASK_ID,
+        }
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_feature_importance_scene_standalone_does_not_mutate_guided_progress(
+    monkeypatch,
+) -> None:
+    """Standalone demo interactions should not complete guided lessons."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_feature_importance_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2))
+
+        assert context.progress.lessons == {}
     finally:
         pygame.quit()
 

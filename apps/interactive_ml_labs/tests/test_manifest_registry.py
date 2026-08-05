@@ -43,8 +43,18 @@ from interactive_ml_labs.data_leakage_scene import (
 )
 from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
 from interactive_ml_labs.distance_metrics_scene import create_distance_metrics_lab_scene
-from interactive_ml_labs.feature_importance_scene import create_feature_importance_lab_scene
-from interactive_ml_labs.feature_scaling_scene import create_feature_scaling_lab_scene
+from interactive_ml_labs.feature_importance_scene import (
+    COMPARE_IMPORTANCE_METHODS_TASK_ID,
+    FEATURE_IMPORTANCE_LESSON_ID,
+    INSPECT_DISTORTED_SIGNAL_TASK_ID,
+    create_feature_importance_lab_scene,
+)
+from interactive_ml_labs.feature_scaling_scene import (
+    COMPARE_SCALE_SENSITIVE_MODEL_TASK_ID,
+    FEATURE_SCALING_LESSON_ID,
+    TOGGLE_SCALING_TASK_ID,
+    create_feature_scaling_lab_scene,
+)
 from interactive_ml_labs.gaussian_mixture_scene import create_gaussian_mixture_intro_lab_scene
 from interactive_ml_labs.gradient_scene import create_gradient_descent_scene
 from interactive_ml_labs.kmeans_intro_scene import create_kmeans_intro_lab_scene
@@ -1283,9 +1293,26 @@ def test_trustworthy_models_lessons_match_scene_task_hooks() -> None:
         assert {task.id for task in LESSON_BY_ID[lesson_id].tasks} == expected_task_ids
 
 
+def test_feature_decision_first_lessons_match_scene_task_hooks() -> None:
+    """First feature-decision lessons should align with scene progress hooks."""
+    expected_task_ids_by_lesson = {
+        FEATURE_SCALING_LESSON_ID: {
+            TOGGLE_SCALING_TASK_ID,
+            COMPARE_SCALE_SENSITIVE_MODEL_TASK_ID,
+        },
+        FEATURE_IMPORTANCE_LESSON_ID: {
+            COMPARE_IMPORTANCE_METHODS_TASK_ID,
+            INSPECT_DISTORTED_SIGNAL_TASK_ID,
+        },
+    }
+
+    for lesson_id, expected_task_ids in expected_task_ids_by_lesson.items():
+        assert {task.id for task in LESSON_BY_ID[lesson_id].tasks} == expected_task_ids
+
+
 def test_learning_lessons_define_goals_tasks_and_badges() -> None:
     """Every default lesson should have enough metadata for a future lesson screen."""
-    assert len(LESSON_MANIFESTS) == 14
+    assert len(LESSON_MANIFESTS) == 16
 
     for lesson in LESSON_MANIFESTS:
         assert lesson.title.en
@@ -1310,6 +1337,22 @@ def test_learning_lessons_define_goals_tasks_and_badges() -> None:
         "error_linear_regression_line_fit",
     )
     assert LESSON_BY_ID["error_boosting_mistakes"].level == 2
+
+
+def test_feature_decision_first_lessons_define_guided_metadata() -> None:
+    """Feature-decision lessons should be ready before the path is registered."""
+    scaling_lesson = LESSON_BY_ID[FEATURE_SCALING_LESSON_ID]
+    importance_lesson = LESSON_BY_ID[FEATURE_IMPORTANCE_LESSON_ID]
+
+    assert scaling_lesson.demo_id == "feature_scaling_lab"
+    assert scaling_lesson.level == 2
+    assert scaling_lesson.completion_badge
+    assert scaling_lesson.completion_badge.pl == "Tropiciel skali"
+
+    assert importance_lesson.demo_id == "feature_importance_lab"
+    assert importance_lesson.prerequisites == (FEATURE_SCALING_LESSON_ID,)
+    assert importance_lesson.completion_badge
+    assert importance_lesson.completion_badge.en == "Signal Reader"
 
 
 def test_registry_rejects_duplicate_demo_ids() -> None:
