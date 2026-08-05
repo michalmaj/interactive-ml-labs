@@ -231,7 +231,7 @@ These tasks are intentionally based on interactions already present in the scene
 
 The path is now registered in the app after every lesson received working task hooks, localized copy, persistence coverage, and a completion badge.
 
-## Planned Fourth Learning Path
+## Fourth Learning Path
 
 The fourth path should help students connect raw model inputs with the final decision. This fills a common intuition gap: students often know that a model predicted something, but not how feature scale, feature signal, model family, and ensemble stability shaped that prediction.
 
@@ -271,10 +271,9 @@ This path should not become a full interpretability course. The first slice shou
 - identify a strong feature signal and notice when correlation or leakage can distort the story,
 - badge: **Signal Reader / Czytelnik sygnału**.
 
-The first four lessons now have real lesson manifests and scene progress hooks.
-They are intentionally not registered as a complete learning path yet; the path
-should appear in the guided menu only after every lesson in the sequence reports
-meaningful task progress.
+All five lessons now have real lesson manifests, scene progress hooks, localized
+copy, recap prompts, instructor notes, and completion badges. The path is
+registered in the guided menu.
 
 **Decision Tree Splitter**
 
@@ -301,8 +300,8 @@ These tasks should be based on interactions already present in the scenes where 
 1. Document the path narrative, lesson order, draft tasks, badges, and non-goals. Done.
 2. Add or verify task hooks for Feature Scaling Lab and Feature Importance Lab. Done.
 3. Add or verify task hooks for Decision Tree Splitter and Random Forest Bagging Lab. Done.
-4. Add or verify task hooks for Model Comparison Lab.
-5. Register the complete path only after every lesson has real task progress, localized copy, recap prompts, instructor notes, and completion badges.
+4. Add or verify task hooks for Model Comparison Lab. Done.
+5. Register the complete path only after every lesson has real task progress, localized copy, recap prompts, instructor notes, and completion badges. Done.
 6. Run a Polish copy and layout pass after completing the path end to end.
 
 ## Lesson Completion Summary
