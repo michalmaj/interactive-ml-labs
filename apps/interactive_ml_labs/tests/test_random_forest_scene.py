@@ -2,6 +2,9 @@
 
 import pygame
 from interactive_ml_labs.random_forest_scene import (
+    COMPARE_FOREST_VOTE_TASK_ID,
+    INSPECT_FOREST_CONFIDENCE_TASK_ID,
+    RANDOM_FOREST_LESSON_ID,
     RandomForestSceneAdapter,
     create_random_forest_scene,
 )
@@ -50,6 +53,52 @@ def test_random_forest_scene_adapter_passes_shell_language(monkeypatch) -> None:
         scene = create_random_forest_scene(context)
 
         assert scene._scene._renderer._language == "pl"
+    finally:
+        pygame.quit()
+
+
+def test_random_forest_scene_adapter_reports_guided_lesson_progress(monkeypatch) -> None:
+    """Guided mode should complete forest tasks from vote and confidence controls."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=RANDOM_FOREST_LESSON_ID)
+        scene = create_random_forest_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP))
+
+        progress = context.progress.lessons[RANDOM_FOREST_LESSON_ID]
+        assert progress.completed_task_ids == {COMPARE_FOREST_VOTE_TASK_ID}
+        assert progress.completed is False
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_c))
+
+        progress = context.progress.lessons[RANDOM_FOREST_LESSON_ID]
+        assert progress.completed_task_ids == {
+            COMPARE_FOREST_VOTE_TASK_ID,
+            INSPECT_FOREST_CONFIDENCE_TASK_ID,
+        }
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_random_forest_scene_adapter_standalone_does_not_mutate_guided_progress(
+    monkeypatch,
+) -> None:
+    """Standalone Random Forest interactions should not complete guided lessons."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_random_forest_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_c))
+
+        assert context.progress.lessons == {}
     finally:
         pygame.quit()
 

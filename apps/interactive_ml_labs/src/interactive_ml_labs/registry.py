@@ -26,7 +26,12 @@ from interactive_ml_labs.data_leakage_scene import (
     REMOVE_LEAKAGE_TASK_ID,
     create_data_leakage_lab_scene,
 )
-from interactive_ml_labs.decision_tree_scene import create_decision_tree_scene
+from interactive_ml_labs.decision_tree_scene import (
+    DECISION_TREE_LESSON_ID,
+    INSPECT_FIRST_SPLIT_TASK_ID,
+    MOVE_TREE_SPLIT_TASK_ID,
+    create_decision_tree_scene,
+)
 from interactive_ml_labs.distance_metrics_scene import create_distance_metrics_lab_scene
 from interactive_ml_labs.feature_importance_scene import (
     COMPARE_IMPORTANCE_METHODS_TASK_ID,
@@ -68,7 +73,12 @@ from interactive_ml_labs.monitoring_scene import (
 from interactive_ml_labs.neural_network_scene import create_neural_network_playground_scene
 from interactive_ml_labs.pca_scene import create_pca_lab_scene
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
-from interactive_ml_labs.random_forest_scene import create_random_forest_scene
+from interactive_ml_labs.random_forest_scene import (
+    COMPARE_FOREST_VOTE_TASK_ID,
+    INSPECT_FOREST_CONFIDENCE_TASK_ID,
+    RANDOM_FOREST_LESSON_ID,
+    create_random_forest_scene,
+)
 from interactive_ml_labs.scene import Scene
 from interactive_ml_labs.split_lab_scene import (
     CHOOSE_VALIDATION_TASK_ID,
@@ -8045,6 +8055,169 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             pl=(
                 "Feature importance jest wskazówką o zachowaniu modelu. Nadal wymaga "
                 "kontekstu: skąd są dane, czy cechy są skorelowane i czy nie ma leakage."
+            ),
+        ),
+    ),
+    LessonManifest(
+        id=DECISION_TREE_LESSON_ID,
+        level=1,
+        demo_id="decision_tree_splitter",
+        title=LocalizedText(
+            en="Build a decision from feature questions",
+            pl="Zbuduj decyzję z pytań o cechy",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand that a decision tree makes a prediction by asking simple "
+                "feature-threshold questions in sequence."
+            ),
+            pl=(
+                "Zrozum, że decision tree przewiduje wynik przez sekwencję prostych "
+                "pytań o feature i threshold."
+            ),
+        ),
+        prerequisites=(FEATURE_IMPORTANCE_LESSON_ID,),
+        tasks=(
+            LessonTask(
+                id=MOVE_TREE_SPLIT_TASK_ID,
+                title=LocalizedText(en="Move a tree split", pl="Przesuń split drzewa"),
+                instruction=LocalizedText(
+                    en=(
+                        "Switch to manual split mode, change the feature or threshold, "
+                        "and observe how the classes separate."
+                    ),
+                    pl=(
+                        "Przełącz tryb manual split, zmień feature albo threshold "
+                        "i zobacz, jak rozdzielają się klasy."
+                    ),
+                ),
+                success_condition="moved_tree_split",
+                hint=LocalizedText(
+                    en="A split is just a question: is this feature below or above a value?",
+                    pl=(
+                        "Split to po prostu pytanie: czy ta cecha jest poniżej albo "
+                        "powyżej danej wartości?"
+                    ),
+                ),
+            ),
+            LessonTask(
+                id=INSPECT_FIRST_SPLIT_TASK_ID,
+                title=LocalizedText(
+                    en="Inspect the first split",
+                    pl="Sprawdź pierwszy split",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Change criterion or max depth and read how the first split "
+                        "changes the tree structure."
+                    ),
+                    pl=(
+                        "Zmień criterion albo max depth i odczytaj, jak pierwszy split "
+                        "zmienia strukturę drzewa."
+                    ),
+                ),
+                success_condition="inspected_first_split",
+            ),
+        ),
+        completion_badge=LocalizedText(en="Split Builder", pl="Budowniczy splitów"),
+        recap_prompt=LocalizedText(
+            en=(
+                "What feature-threshold question did the tree ask first, and how did "
+                "that question separate the data?"
+            ),
+            pl=(
+                "Jakie pytanie feature-threshold drzewo zadało jako pierwsze i jak "
+                "to pytanie rozdzieliło dane?"
+            ),
+        ),
+        instructor_note=LocalizedText(
+            en=(
+                "Tree decisions feel readable because each split is a local rule, "
+                "but the final prediction still depends on the sequence of rules."
+            ),
+            pl=(
+                "Decyzje drzewa są czytelne, bo każdy split jest lokalną regułą, "
+                "ale finalna predykcja nadal zależy od sekwencji reguł."
+            ),
+        ),
+    ),
+    LessonManifest(
+        id=RANDOM_FOREST_LESSON_ID,
+        level=2,
+        demo_id="random_forest_bagging_lab",
+        title=LocalizedText(
+            en="Stabilize decisions by voting",
+            pl="Stabilizuj decyzje przez głosowanie",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand how a random forest combines many trees so unstable single-tree "
+                "decisions can become a more stable vote."
+            ),
+            pl=(
+                "Zrozum, jak random forest łączy wiele drzew, żeby niestabilne decyzje "
+                "pojedynczego drzewa zamienić w stabilniejsze głosowanie."
+            ),
+        ),
+        prerequisites=(DECISION_TREE_LESSON_ID,),
+        tasks=(
+            LessonTask(
+                id=COMPARE_FOREST_VOTE_TASK_ID,
+                title=LocalizedText(
+                    en="Compare one tree with a forest",
+                    pl="Porównaj jedno drzewo z forest",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Change the number of trees and compare the single-tree result "
+                        "with the forest vote."
+                    ),
+                    pl=("Zmień liczbę drzew i porównaj wynik pojedynczego drzewa z głosem forest."),
+                ),
+                success_condition="compared_forest_vote",
+            ),
+            LessonTask(
+                id=INSPECT_FOREST_CONFIDENCE_TASK_ID,
+                title=LocalizedText(
+                    en="Inspect forest confidence",
+                    pl="Sprawdź confidence forest",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Turn on the confidence view and adjust bootstrap or noise to "
+                        "find where the vote is less certain."
+                    ),
+                    pl=(
+                        "Włącz confidence view i zmień bootstrap albo noise, żeby znaleźć "
+                        "miejsca, gdzie głosowanie jest mniej pewne."
+                    ),
+                ),
+                success_condition="inspected_forest_confidence",
+                hint=LocalizedText(
+                    en="A majority vote can be correct and still show low agreement.",
+                    pl="Majority vote może być poprawny, a jednocześnie mieć niską zgodność.",
+                ),
+            ),
+        ),
+        completion_badge=LocalizedText(en="Vote Stabilizer", pl="Stabilizator głosowania"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Where did the forest look more stable than one tree, and where did "
+                "the confidence view still show uncertainty?"
+            ),
+            pl=(
+                "Gdzie forest wyglądał stabilniej niż jedno drzewo i gdzie confidence "
+                "view nadal pokazywał niepewność?"
+            ),
+        ),
+        instructor_note=LocalizedText(
+            en=(
+                "A forest does not remove uncertainty. It makes disagreement visible "
+                "through votes, confidence, and model comparison."
+            ),
+            pl=(
+                "Forest nie usuwa niepewności. Pokazuje ją przez głosy, confidence "
+                "i porównanie modeli."
             ),
         ),
     ),

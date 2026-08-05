@@ -3,6 +3,9 @@
 import pygame
 from decision_tree_splitter.renderer import WINDOW_SIZE
 from interactive_ml_labs.decision_tree_scene import (
+    DECISION_TREE_LESSON_ID,
+    INSPECT_FIRST_SPLIT_TASK_ID,
+    MOVE_TREE_SPLIT_TASK_ID,
     DecisionTreeSceneAdapter,
     create_decision_tree_scene,
 )
@@ -50,6 +53,52 @@ def test_decision_tree_scene_adapter_passes_shell_language(monkeypatch) -> None:
         scene = create_decision_tree_scene(context)
 
         assert scene._scene._renderer._language == "pl"
+    finally:
+        pygame.quit()
+
+
+def test_decision_tree_scene_adapter_reports_guided_lesson_progress(monkeypatch) -> None:
+    """Guided mode should complete tree tasks from meaningful split controls."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=DECISION_TREE_LESSON_ID)
+        scene = create_decision_tree_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        progress = context.progress.lessons[DECISION_TREE_LESSON_ID]
+        assert progress.completed_task_ids == {MOVE_TREE_SPLIT_TASK_ID}
+        assert progress.completed is False
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP))
+
+        progress = context.progress.lessons[DECISION_TREE_LESSON_ID]
+        assert progress.completed_task_ids == {
+            MOVE_TREE_SPLIT_TASK_ID,
+            INSPECT_FIRST_SPLIT_TASK_ID,
+        }
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_decision_tree_scene_adapter_standalone_does_not_mutate_guided_progress(
+    monkeypatch,
+) -> None:
+    """Standalone Decision Tree interactions should not complete guided lessons."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_decision_tree_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP))
+
+        assert context.progress.lessons == {}
     finally:
         pygame.quit()
 
