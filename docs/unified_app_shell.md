@@ -149,6 +149,11 @@ Current state:
 - all current demos provide theory content,
 - all current demos can be launched through the shell.
 
+Guided coverage is tracked separately from demo count. The app currently has
+four guided paths and 19 guided lessons, but Level 3 has only one guided lesson,
+so future balancing work should focus on advanced guided learning before adding
+more standalone demos.
+
 ## Intro, Theory, Pause, And Help
 
 The shell generates consistent screens and overlays from manifest metadata.

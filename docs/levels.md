@@ -8,6 +8,21 @@ The tables below describe the current unified app registry, not a distant wishli
 Guided learning paths cut across these levels and provide the course-like route,
 while the level browser remains useful for free exploration.
 
+Current demo coverage is fairly balanced by count:
+
+- Level 1: 10 demos,
+- Level 2: 10 demos,
+- Level 3: 7 demos.
+
+Guided lesson coverage is not balanced yet:
+
+- Level 1: 7 guided lessons,
+- Level 2: 11 guided lessons,
+- Level 3: 1 guided lesson.
+
+That means the next balancing work should focus less on adding another isolated
+demo and more on turning advanced Level 3 material into a guided learning path.
+
 ## Level 1 — Fundamentals
 
 Level 1 focuses on core machine learning intuition.
