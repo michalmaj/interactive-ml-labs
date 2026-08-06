@@ -1,5 +1,7 @@
 """Tests for the unified app shell manifest registry."""
 
+from collections import Counter
+
 import pytest
 from interactive_ml_labs import (
     DEMO_BY_ID,
@@ -1305,6 +1307,21 @@ def test_learning_paths_define_completion_takeaways() -> None:
     for path in LEARNING_PATH_MANIFESTS:
         assert 2 <= len(path.completion_takeaways) <= 3
         assert all(takeaway.en and takeaway.pl for takeaway in path.completion_takeaways)
+
+
+def test_guided_lesson_level_distribution_tracks_current_balance() -> None:
+    """Guided lessons should make the current level balance explicit."""
+    demos_by_level = Counter(manifest.level for manifest in DEMO_MANIFESTS)
+    lessons_by_level = Counter(lesson.level for lesson in LESSON_MANIFESTS)
+    path_lesson_ids = {
+        lesson_id for path in LEARNING_PATH_MANIFESTS for lesson_id in path.lesson_ids
+    }
+
+    assert dict(sorted(demos_by_level.items())) == {1: 10, 2: 10, 3: 7}
+    assert dict(sorted(lessons_by_level.items())) == {1: 7, 2: 11, 3: 1}
+    assert len(path_lesson_ids) == len(LESSON_MANIFESTS)
+    assert lessons_by_level[3] < lessons_by_level[1]
+    assert lessons_by_level[3] < lessons_by_level[2]
 
 
 def test_trustworthy_models_polish_copy_stays_natural() -> None:
