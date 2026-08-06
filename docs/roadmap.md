@@ -18,6 +18,12 @@ Current registry coverage:
 - Level 2: 10 practical ML demos,
 - Level 3: 7 advanced/showcase demos.
 
+Current guided lesson coverage:
+
+- Level 1: 7 guided lessons,
+- Level 2: 11 guided lessons,
+- Level 3: 1 guided lesson.
+
 The shell currently supports:
 
 - English and Polish UI,
@@ -47,7 +53,7 @@ macOS metadata, and accidental shell files are not tracked in git.
 - [x] Add checkable task completion to the second learning path.
 - [x] Implement the third guided path: From good scores to trustworthy models.
 - [x] Implement the fourth guided path: From features to model decisions.
-- [ ] Continue balancing Level 1, Level 2, and Level 3 with small focused demos.
+- [ ] Continue balancing Level 1, Level 2, and Level 3 with guided Level 3 coverage.
 - [ ] Add screenshots or short GIFs for the main README and app docs.
 
 ## Next Engineering Themes
@@ -98,7 +104,7 @@ Near-term docs work:
 - add screenshots/GIFs once the UI stabilizes further,
 - keep Polish copy natural rather than literal.
 
-### Demo Growth
+### Demo Growth And Level Balance
 
 New demos should be added in narrow vertical slices:
 
@@ -108,7 +114,11 @@ New demos should be added in narrow vertical slices:
 4. focused tests,
 5. small polish/UX pass after trying it in the shell.
 
-The current priority is to keep Level 1, Level 2, and Level 3 balanced rather than overbuilding one level. The next guided path should be chosen for narrative value, not just because a demo already exists.
+The current demo registry is balanced enough to pause before adding more demos by
+default. The larger imbalance is in guided lesson coverage: Level 3 has several
+advanced demos but only one guided lesson. The next learning-platform slice should
+therefore turn selected Level 3 material into a guided path before expanding the
+demo count again.
 
 ## Completed Historical Phases
 

@@ -105,11 +105,12 @@ The unified app is now the recommended guided experience. The project is no long
 
 Guided lessons now keep learning state visible across the main flow: lesson details, intro screens, and pause menus show task progress, theory status, and badge status when a demo is launched from a learning path.
 
-Three guided learning paths now have checkable task completion:
+Four guided learning paths now have checkable task completion:
 
 - How models learn from error,
 - From distance to clusters,
-- From good scores to trustworthy models.
+- From good scores to trustworthy models,
+- From features to model decisions.
 
 Native demo scenes now share small UI helpers for panel drawing, text rendering, and text wrapping. The app shell still keeps its own menu, scroll, viewport, intro, theory, and overlay drawing code because those screens have different interaction and clipping responsibilities.
 
@@ -153,12 +154,12 @@ The original Level 1 and Level 2 demos can still be run as standalone commands. 
 
 ## Next milestones
 
-Near-term work focuses on balancing the practical Level 2 track with the advanced Level 3 track while keeping the shell stable:
+Near-term work focuses on balancing guided coverage across Level 1, Level 2, and Level 3 while keeping the shell stable:
 
-- keep improving the guided learning platform layer now that three learning paths have end-to-end task completion,
-- keep adding focused Level 2 labs around preprocessing, evaluation, robustness, interpretability, and production-readiness,
-- review whether Level 2 has enough guided practice after Feature Scaling, Feature Importance, Gaussian Mixture, Anomaly Detection, Hyperparameter Tuning, and Class Imbalance,
-- decide whether the next guided path should deepen Level 1 fundamentals or connect the practical Level 2 evaluation labs,
+- keep improving the guided learning platform layer now that four learning paths have end-to-end task completion,
+- prioritize Level 3 guided learning next, because the demo registry is fairly balanced by count but guided lessons still heavily favor Level 1 and Level 2,
+- review whether Level 3 should become a short advanced path around dimensionality reduction, calibration, monitoring, and forecasting,
+- add focused Level 2 labs only when they fill a clear teaching gap rather than simply increasing the demo count,
 - collect classroom-style feedback on the newer Level 3 labs: t-SNE / UMAP Exploration, Model Monitoring Drift, and Time Series Forecasting,
 - iterate on Level 3 only where the interaction teaches a clear idea, not just where the visual result looks impressive,
 - keep improving in-app theory, mini-challenges, and glossary content across Level 1, Level 2, and Level 3,
