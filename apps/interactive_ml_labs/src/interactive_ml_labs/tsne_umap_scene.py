@@ -32,6 +32,9 @@ CLASS_COLORS: Final[tuple[tuple[int, int, int], ...]] = (
 NEIGHBOR_VALUES: Final[tuple[int, ...]] = (5, 10, 15, 30, 50)
 DEFAULT_NEIGHBOR_INDEX: Final[int] = 1
 ALGORITHMS: Final[tuple[str, ...]] = ("t-SNE", "UMAP")
+TSNE_UMAP_LESSON_ID: Final[str] = "representation_embedding_skeptic"
+COMPARE_RAW_EMBEDDING_TASK_ID: Final[str] = "compare_raw_and_embedding"
+INSPECT_EMBEDDING_STABILITY_TASK_ID: Final[str] = "inspect_embedding_stability"
 
 
 @dataclass(frozen=True, slots=True)
@@ -146,6 +149,7 @@ class TSNEUMAPExplorationScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create a deterministic embedding preview scene."""
+        self._context = context
         self._language = context.settings.language
         self._font_title = make_ui_font(34, bold=True)
         self._font_heading = make_ui_font(23, bold=True)
@@ -157,6 +161,10 @@ class TSNEUMAPExplorationScene:
         self.seed_index = 0
         self.show_links = True
         self.show_raw_layout = True
+        self._seen_algorithms = {self.algorithm}
+        self._seen_neighbor_indices = {self.neighbor_index}
+        self._seen_seed_indices = {self.seed_index}
+        self._raw_layout_toggled = False
 
     @property
     def preset(self) -> EmbeddingPreset:
@@ -209,16 +217,22 @@ class TSNEUMAPExplorationScene:
             self.preset_index = key - pygame.K_1
         elif key == pygame.K_m:
             self.algorithm_index = (self.algorithm_index + 1) % len(ALGORITHMS)
+            self._record_stability_progress()
         elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
             self.neighbor_index = max(0, self.neighbor_index - 1)
+            self._record_stability_progress()
         elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
             self.neighbor_index = min(len(NEIGHBOR_VALUES) - 1, self.neighbor_index + 1)
+            self._record_stability_progress()
         elif key == pygame.K_s:
             self.seed_index = (self.seed_index + 1) % 4
+            self._record_stability_progress()
         elif key == pygame.K_l:
             self.show_links = not self.show_links
         elif key == pygame.K_o:
             self.show_raw_layout = not self.show_raw_layout
+            self._raw_layout_toggled = True
+            self._record_raw_embedding_progress()
         elif key == pygame.K_r:
             self.preset_index = 0
             self.algorithm_index = 0
@@ -226,6 +240,51 @@ class TSNEUMAPExplorationScene:
             self.seed_index = 0
             self.show_links = True
             self.show_raw_layout = True
+            self._seen_algorithms = {self.algorithm}
+            self._seen_neighbor_indices = {self.neighbor_index}
+            self._seen_seed_indices = {self.seed_index}
+            self._raw_layout_toggled = False
+
+    def _record_raw_embedding_progress(self) -> None:
+        """Complete raw-vs-embedding comparison after the raw panel is used."""
+        if self._context.selected_lesson_id != TSNE_UMAP_LESSON_ID:
+            return
+
+        if self._raw_layout_toggled:
+            self._context.progress.complete_task(
+                TSNE_UMAP_LESSON_ID,
+                COMPARE_RAW_EMBEDDING_TASK_ID,
+            )
+        self._mark_lesson_completed_if_ready()
+
+    def _record_stability_progress(self) -> None:
+        """Complete stability task after changing embedding assumptions."""
+        if self._context.selected_lesson_id != TSNE_UMAP_LESSON_ID:
+            return
+
+        self._seen_algorithms.add(self.algorithm)
+        self._seen_neighbor_indices.add(self.neighbor_index)
+        self._seen_seed_indices.add(self.seed_index)
+        if (
+            len(self._seen_algorithms) >= 2
+            or len(self._seen_neighbor_indices) >= 2
+            or len(self._seen_seed_indices) >= 2
+        ):
+            self._context.progress.complete_task(
+                TSNE_UMAP_LESSON_ID,
+                INSPECT_EMBEDDING_STABILITY_TASK_ID,
+            )
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both guided tasks are done."""
+        progress = self._context.progress.lessons.get(TSNE_UMAP_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {COMPARE_RAW_EMBEDDING_TASK_ID, INSPECT_EMBEDDING_STABILITY_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(TSNE_UMAP_LESSON_ID)
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "t-SNE / UMAP Exploration Lab", (58, 40), self._font_title, TEXT)

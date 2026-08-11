@@ -6,10 +6,13 @@ from interactive_ml_labs.scene import FixedSizeScene, SceneCommandKind
 from interactive_ml_labs.settings import AppContext
 from interactive_ml_labs.tsne_umap_scene import (
     ACCENT,
+    COMPARE_RAW_EMBEDDING_TASK_ID,
     DEFAULT_NEIGHBOR_INDEX,
+    INSPECT_EMBEDDING_STABILITY_TASK_ID,
     MUTED_TEXT,
     NEIGHBOR_VALUES,
     PRESETS,
+    TSNE_UMAP_LESSON_ID,
     TSNEUMAPExplorationScene,
     create_tsne_umap_exploration_scene,
 )
@@ -219,6 +222,50 @@ def test_tsne_umap_scene_formats_reading_cues(monkeypatch) -> None:
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
 
         assert "Reading cue:" in scene._active_takeaway()
+    finally:
+        pygame.quit()
+
+
+def test_tsne_umap_scene_reports_guided_lesson_progress(monkeypatch) -> None:
+    """Guided mode should complete embedding tasks from real interactions."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=TSNE_UMAP_LESSON_ID)
+        scene = create_tsne_umap_exploration_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_o))
+
+        progress = context.progress.lessons[TSNE_UMAP_LESSON_ID]
+        assert progress.completed_task_ids == {COMPARE_RAW_EMBEDDING_TASK_ID}
+        assert progress.completed is False
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        progress = context.progress.lessons[TSNE_UMAP_LESSON_ID]
+        assert progress.completed_task_ids == {
+            COMPARE_RAW_EMBEDDING_TASK_ID,
+            INSPECT_EMBEDDING_STABILITY_TASK_ID,
+        }
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_tsne_umap_scene_standalone_does_not_mutate_guided_progress(monkeypatch) -> None:
+    """Standalone t-SNE / UMAP interactions should not complete guided lessons."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_tsne_umap_exploration_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_o))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_m))
+
+        assert context.progress.lessons == {}
     finally:
         pygame.quit()
 
