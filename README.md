@@ -158,7 +158,7 @@ Near-term work focuses on balancing guided coverage across Level 1, Level 2, and
 
 - keep improving the guided learning platform layer now that four learning paths have end-to-end task completion,
 - prioritize Level 3 guided learning next, because the demo registry is fairly balanced by count but guided lessons still heavily favor Level 1 and Level 2,
-- review whether Level 3 should become a short advanced path around dimensionality reduction, calibration, monitoring, and forecasting,
+- plan and then implement **From representation to model behavior**, a Level 3 guided path around dimensionality reduction, calibration, monitoring, and forecasting,
 - add focused Level 2 labs only when they fill a clear teaching gap rather than simply increasing the demo count,
 - collect classroom-style feedback on the newer Level 3 labs: t-SNE / UMAP Exploration, Model Monitoring Drift, and Time Series Forecasting,
 - iterate on Level 3 only where the interaction teaches a clear idea, not just where the visual result looks impressive,

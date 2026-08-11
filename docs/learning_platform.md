@@ -304,6 +304,87 @@ These tasks should be based on interactions already present in the scenes where 
 5. Register the complete path only after every lesson has real task progress, localized copy, recap prompts, instructor notes, and completion badges. Done.
 6. Run a Polish copy and layout pass after completing the path end to end. Done.
 
+## Planned Level 3 Learning Path
+
+The next guided-path slice should make Level 3 feel like part of the course,
+not only a gallery of advanced visual demos.
+
+**From representation to model behavior**
+
+Polish title: **Od reprezentacji do zachowania modelu**
+
+1. Explained Variance Lab
+2. t-SNE / UMAP Exploration Lab
+3. Calibration Lab
+4. Model Monitoring Drift Lab
+5. Time Series Forecasting Lab
+
+Narrative:
+
+- first, students compress a high-dimensional signal and watch retained variance,
+  lost variance, and reconstruction error,
+- then they compare raw space with embeddings and learn that a pretty projection
+  can preserve local neighborhoods while distorting the global picture,
+- next, they test whether model confidence matches observed correctness,
+- then they monitor whether data and model behavior drift after deployment,
+- finally, they forecast over time and see why validation becomes fragile when
+  examples are ordered instead of exchangeable.
+
+The path should answer one high-level question: **how do we keep model behavior
+understandable when data becomes compressed, visualized, calibrated, deployed,
+and time-dependent?**
+
+This path should stay visual and conceptual. It is not a full MLOps course, a
+full time-series course, or a deep mathematical treatment of dimensionality
+reduction. The student should leave with a practical mental model: advanced ML
+work often means preserving enough signal, reading uncertainty honestly, and
+checking whether old assumptions still hold.
+
+### Draft Lesson Tasks And Badges
+
+**Explained Variance Lab**
+
+- change the component count and compare retained variance with lost variance,
+- inspect reconstruction residuals after reducing dimensions,
+- badge: **Variance Keeper / Strażnik wariancji**.
+
+**t-SNE / UMAP Exploration Lab**
+
+- compare raw space with an embedding view,
+- adjust neighborhood or seed controls and identify one misleading cluster
+  impression,
+- badge: **Embedding Skeptic / Sceptyk embeddingów**.
+
+**Calibration Lab**
+
+- improve ECE with temperature scaling,
+- inspect calibration gaps instead of trusting accuracy alone,
+- badge: **Confidence Calibrator / Kalibrator pewności**.
+
+**Model Monitoring Drift Lab**
+
+- compare data drift with metric drift,
+- acknowledge a meaningful alert and connect it with the investigation plan,
+- badge: **Model Guardian / Strażnik modelu**.
+
+**Time Series Forecasting Lab**
+
+- compare forecast horizon or model choices,
+- identify leakage or fragile validation in a time-dependent split,
+- badge: **Forecast Checker / Kontroler prognoz**.
+
+### Suggested Rollout
+
+1. Document the path narrative, lesson order, draft tasks, badges, and non-goals. Done.
+2. Add or verify task hooks for Explained Variance Lab and t-SNE / UMAP Exploration Lab.
+3. Decide whether Calibration Lab and Model Monitoring Drift Lab should reuse their
+   existing lesson manifests or receive Level 3-specific variants before the path
+   is registered.
+4. Add or verify task hooks for Time Series Forecasting Lab.
+5. Register the complete path only after every lesson has real task progress,
+   localized copy, recap prompts, instructor notes, and completion badges.
+6. Run a Polish copy and layout pass after completing the path end to end.
+
 ## Lesson Completion Summary
 
 The shell should make lesson completion feel like a learning milestone, not just a silent progress update. When a guided lesson is completed for the first time during an active demo, the app now opens a summary screen with:
