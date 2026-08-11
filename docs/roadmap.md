@@ -53,7 +53,8 @@ macOS metadata, and accidental shell files are not tracked in git.
 - [x] Add checkable task completion to the second learning path.
 - [x] Implement the third guided path: From good scores to trustworthy models.
 - [x] Implement the fourth guided path: From features to model decisions.
-- [ ] Continue balancing Level 1, Level 2, and Level 3 with guided Level 3 coverage.
+- [x] Plan the first Level 3 guided path: From representation to model behavior.
+- [ ] Implement the Level 3 guided path after its lesson hooks and lesson-reuse policy are ready.
 - [ ] Add screenshots or short GIFs for the main README and app docs.
 
 ## Next Engineering Themes
@@ -119,6 +120,13 @@ default. The larger imbalance is in guided lesson coverage: Level 3 has several
 advanced demos but only one guided lesson. The next learning-platform slice should
 therefore turn selected Level 3 material into a guided path before expanding the
 demo count again.
+
+The planned Level 3 path is **From representation to model behavior**. It connects
+Explained Variance, t-SNE / UMAP, Calibration, Model Monitoring Drift, and Time
+Series Forecasting into one advanced learning story. It should remain planned
+until the app has real task hooks for the dimensionality-reduction and forecasting
+lessons and we decide whether Calibration and Monitoring are reused from the
+trustworthy-models path or split into Level 3-specific lesson variants.
 
 ## Completed Historical Phases
 
