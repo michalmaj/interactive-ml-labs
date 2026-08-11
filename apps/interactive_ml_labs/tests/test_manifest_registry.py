@@ -81,7 +81,12 @@ from interactive_ml_labs.monitoring_scene import (
     create_model_monitoring_drift_scene,
 )
 from interactive_ml_labs.neural_network_scene import create_neural_network_playground_scene
-from interactive_ml_labs.pca_scene import create_pca_lab_scene
+from interactive_ml_labs.pca_scene import (
+    COMPARE_VARIANCE_TASK_ID,
+    INSPECT_RESIDUALS_TASK_ID,
+    PCA_LESSON_ID,
+    create_pca_lab_scene,
+)
 from interactive_ml_labs.random_forest_scene import (
     COMPARE_FOREST_VOTE_TASK_ID,
     INSPECT_FOREST_CONFIDENCE_TASK_ID,
@@ -96,7 +101,12 @@ from interactive_ml_labs.split_lab_scene import (
 )
 from interactive_ml_labs.svm_margin_scene import create_svm_margin_lab_scene
 from interactive_ml_labs.time_series_scene import create_time_series_forecasting_lab_scene
-from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
+from interactive_ml_labs.tsne_umap_scene import (
+    COMPARE_RAW_EMBEDDING_TASK_ID,
+    INSPECT_EMBEDDING_STABILITY_TASK_ID,
+    TSNE_UMAP_LESSON_ID,
+    create_tsne_umap_exploration_scene,
+)
 from interactive_ml_labs.tuning_scene import create_hyperparameter_tuning_lab_scene
 
 
@@ -1302,6 +1312,38 @@ def test_learning_path_registry_contains_features_to_decisions_path() -> None:
     assert LESSON_BY_ID[MODEL_COMPARISON_LESSON_ID].completion_badge.pl == ("Czytelnik założeń")
 
 
+def test_registry_contains_planned_level_three_dimensionality_lessons() -> None:
+    """Planned Level 3 path should have its first two lesson manifests ready."""
+    pca_lesson = LESSON_BY_ID[PCA_LESSON_ID]
+    embedding_lesson = LESSON_BY_ID[TSNE_UMAP_LESSON_ID]
+
+    assert pca_lesson.level == 3
+    assert pca_lesson.demo_id == "pca_lab"
+    assert pca_lesson.title.en == "Preserve signal with fewer dimensions"
+    assert pca_lesson.title.pl == "Zachowaj sygnał w mniejszej liczbie wymiarów"
+    assert {task.id for task in pca_lesson.tasks} == {
+        COMPARE_VARIANCE_TASK_ID,
+        INSPECT_RESIDUALS_TASK_ID,
+    }
+    assert pca_lesson.completion_badge is not None
+    assert pca_lesson.completion_badge.pl == "Strażnik wariancji"
+
+    assert embedding_lesson.level == 3
+    assert embedding_lesson.demo_id == "tsne_umap_exploration_lab"
+    assert embedding_lesson.prerequisites == (PCA_LESSON_ID,)
+    assert embedding_lesson.title.en == "Question beautiful embeddings"
+    assert embedding_lesson.title.pl == "Kwestionuj ładne embeddingi"
+    assert {task.id for task in embedding_lesson.tasks} == {
+        COMPARE_RAW_EMBEDDING_TASK_ID,
+        INSPECT_EMBEDDING_STABILITY_TASK_ID,
+    }
+    assert embedding_lesson.completion_badge is not None
+    assert embedding_lesson.completion_badge.pl == "Sceptyk embeddingów"
+
+    registered_path_ids = {path.id for path in LEARNING_PATH_MANIFESTS}
+    assert "representation_to_model_behavior" not in registered_path_ids
+
+
 def test_learning_paths_define_completion_takeaways() -> None:
     """Completed guided paths should be able to summarize what students learned."""
     for path in LEARNING_PATH_MANIFESTS:
@@ -1318,8 +1360,9 @@ def test_guided_lesson_level_distribution_tracks_current_balance() -> None:
     }
 
     assert dict(sorted(demos_by_level.items())) == {1: 10, 2: 10, 3: 7}
-    assert dict(sorted(lessons_by_level.items())) == {1: 7, 2: 11, 3: 1}
-    assert len(path_lesson_ids) == len(LESSON_MANIFESTS)
+    assert dict(sorted(lessons_by_level.items())) == {1: 7, 2: 11, 3: 3}
+    assert len(path_lesson_ids) == len(LESSON_MANIFESTS) - 2
+    assert {PCA_LESSON_ID, TSNE_UMAP_LESSON_ID}.isdisjoint(path_lesson_ids)
     assert lessons_by_level[3] < lessons_by_level[1]
     assert lessons_by_level[3] < lessons_by_level[2]
 
@@ -1416,6 +1459,14 @@ def test_feature_decision_first_lessons_match_scene_task_hooks() -> None:
             COMPARE_MODEL_FAMILIES_TASK_ID,
             IDENTIFY_MODEL_ASSUMPTION_TASK_ID,
         },
+        PCA_LESSON_ID: {
+            COMPARE_VARIANCE_TASK_ID,
+            INSPECT_RESIDUALS_TASK_ID,
+        },
+        TSNE_UMAP_LESSON_ID: {
+            COMPARE_RAW_EMBEDDING_TASK_ID,
+            INSPECT_EMBEDDING_STABILITY_TASK_ID,
+        },
     }
 
     for lesson_id, expected_task_ids in expected_task_ids_by_lesson.items():
@@ -1424,7 +1475,7 @@ def test_feature_decision_first_lessons_match_scene_task_hooks() -> None:
 
 def test_learning_lessons_define_goals_tasks_and_badges() -> None:
     """Every default lesson should have enough metadata for a future lesson screen."""
-    assert len(LESSON_MANIFESTS) == 19
+    assert len(LESSON_MANIFESTS) == 21
 
     for lesson in LESSON_MANIFESTS:
         assert lesson.title.en

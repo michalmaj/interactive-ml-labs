@@ -376,7 +376,7 @@ checking whether old assumptions still hold.
 ### Suggested Rollout
 
 1. Document the path narrative, lesson order, draft tasks, badges, and non-goals. Done.
-2. Add or verify task hooks for Explained Variance Lab and t-SNE / UMAP Exploration Lab.
+2. Add or verify task hooks for Explained Variance Lab and t-SNE / UMAP Exploration Lab. Done.
 3. Decide whether Calibration Lab and Model Monitoring Drift Lab should reuse their
    existing lesson manifests or receive Level 3-specific variants before the path
    is registered.

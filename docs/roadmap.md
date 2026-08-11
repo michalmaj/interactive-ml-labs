@@ -22,7 +22,7 @@ Current guided lesson coverage:
 
 - Level 1: 7 guided lessons,
 - Level 2: 11 guided lessons,
-- Level 3: 1 guided lesson.
+- Level 3: 3 guided lessons.
 
 The shell currently supports:
 
@@ -54,7 +54,8 @@ macOS metadata, and accidental shell files are not tracked in git.
 - [x] Implement the third guided path: From good scores to trustworthy models.
 - [x] Implement the fourth guided path: From features to model decisions.
 - [x] Plan the first Level 3 guided path: From representation to model behavior.
-- [ ] Implement the Level 3 guided path after its lesson hooks and lesson-reuse policy are ready.
+- [x] Add the first Level 3 lesson hooks for Explained Variance and t-SNE / UMAP.
+- [ ] Finish the Level 3 guided path after the remaining hooks and lesson-reuse policy are ready.
 - [ ] Add screenshots or short GIFs for the main README and app docs.
 
 ## Next Engineering Themes
@@ -124,9 +125,11 @@ demo count again.
 The planned Level 3 path is **From representation to model behavior**. It connects
 Explained Variance, t-SNE / UMAP, Calibration, Model Monitoring Drift, and Time
 Series Forecasting into one advanced learning story. It should remain planned
-until the app has real task hooks for the dimensionality-reduction and forecasting
-lessons and we decide whether Calibration and Monitoring are reused from the
-trustworthy-models path or split into Level 3-specific lesson variants.
+until the forecasting lesson has real task hooks and we decide whether Calibration
+and Monitoring are reused from the trustworthy-models path or split into Level
+3-specific lesson variants. The first two planned lessons now have real task hooks:
+Explained Variance covers retained variance and reconstruction residuals, while
+t-SNE / UMAP covers raw-vs-embedding comparison and embedding stability.
 
 ## Completed Historical Phases
 

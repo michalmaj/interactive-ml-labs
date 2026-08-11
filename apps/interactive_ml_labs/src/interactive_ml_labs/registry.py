@@ -76,7 +76,12 @@ from interactive_ml_labs.monitoring_scene import (
     create_model_monitoring_drift_scene,
 )
 from interactive_ml_labs.neural_network_scene import create_neural_network_playground_scene
-from interactive_ml_labs.pca_scene import create_pca_lab_scene
+from interactive_ml_labs.pca_scene import (
+    COMPARE_VARIANCE_TASK_ID,
+    INSPECT_RESIDUALS_TASK_ID,
+    PCA_LESSON_ID,
+    create_pca_lab_scene,
+)
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.random_forest_scene import (
     COMPARE_FOREST_VOTE_TASK_ID,
@@ -93,7 +98,12 @@ from interactive_ml_labs.split_lab_scene import (
 )
 from interactive_ml_labs.svm_margin_scene import create_svm_margin_lab_scene
 from interactive_ml_labs.time_series_scene import create_time_series_forecasting_lab_scene
-from interactive_ml_labs.tsne_umap_scene import create_tsne_umap_exploration_scene
+from interactive_ml_labs.tsne_umap_scene import (
+    COMPARE_RAW_EMBEDDING_TASK_ID,
+    INSPECT_EMBEDDING_STABILITY_TASK_ID,
+    TSNE_UMAP_LESSON_ID,
+    create_tsne_umap_exploration_scene,
+)
 from interactive_ml_labs.tuning_scene import create_hyperparameter_tuning_lab_scene
 
 LEVEL_MANIFESTS: tuple[LevelManifest, ...] = (
@@ -8310,6 +8320,180 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             pl=(
                 "Porównanie modeli to nie tylko wybór najwyższego score. To także "
                 "dopasowanie założeń do kształtu danych."
+            ),
+        ),
+    ),
+    LessonManifest(
+        id=PCA_LESSON_ID,
+        level=3,
+        demo_id="pca_lab",
+        title=LocalizedText(
+            en="Preserve signal with fewer dimensions",
+            pl="Zachowaj sygnał w mniejszej liczbie wymiarów",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand that PCA is a compression trade-off: a projection can keep "
+                "most variance while still losing reconstruction detail."
+            ),
+            pl=(
+                "Zrozum, że PCA to kompromis kompresji: projekcja może zachować większość "
+                "wariancji, ale nadal tracić część szczegółów rekonstrukcji."
+            ),
+        ),
+        tasks=(
+            LessonTask(
+                id=COMPARE_VARIANCE_TASK_ID,
+                title=LocalizedText(
+                    en="Compare retained and lost variance",
+                    pl="Porównaj zachowaną i utraconą wariancję",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Rotate the projection or fit PCA, then compare how much variance "
+                        "is kept and how much is lost."
+                    ),
+                    pl=(
+                        "Obróć projekcję albo dopasuj PCA, a potem porównaj, ile wariancji "
+                        "zostaje i ile tracimy."
+                    ),
+                ),
+                success_condition="compared_explained_variance",
+            ),
+            LessonTask(
+                id=INSPECT_RESIDUALS_TASK_ID,
+                title=LocalizedText(
+                    en="Inspect reconstruction residuals",
+                    pl="Sprawdź residuals rekonstrukcji",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Toggle residual lines and use them as the visible cost of reducing "
+                        "the data to one dimension."
+                    ),
+                    pl=(
+                        "Przełącz linie residuals i potraktuj je jako widoczny koszt "
+                        "redukcji danych do jednego wymiaru."
+                    ),
+                ),
+                success_condition="inspected_reconstruction_residuals",
+                hint=LocalizedText(
+                    en=(
+                        "High retained variance does not mean every point is reconstructed "
+                        "perfectly."
+                    ),
+                    pl=(
+                        "Wysoka zachowana wariancja nie znaczy, że każdy punkt jest "
+                        "odtworzony idealnie."
+                    ),
+                ),
+            ),
+        ),
+        completion_badge=LocalizedText(en="Variance Keeper", pl="Strażnik wariancji"),
+        recap_prompt=LocalizedText(
+            en=(
+                "What did the fitted PCA direction preserve, and where did the residuals "
+                "show information loss?"
+            ),
+            pl=(
+                "Co zachował kierunek dopasowany przez PCA i gdzie residuals pokazały "
+                "utratę informacji?"
+            ),
+        ),
+        instructor_note=LocalizedText(
+            en=(
+                "PCA is easiest to trust when students read retained variance together "
+                "with reconstruction error, not as a single magic score."
+            ),
+            pl=(
+                "PCA najłatwiej zrozumieć wtedy, gdy student czyta zachowaną wariancję "
+                "razem z błędem rekonstrukcji, a nie jak jedną magiczną metrykę."
+            ),
+        ),
+    ),
+    LessonManifest(
+        id=TSNE_UMAP_LESSON_ID,
+        level=3,
+        demo_id="tsne_umap_exploration_lab",
+        title=LocalizedText(
+            en="Question beautiful embeddings",
+            pl="Kwestionuj ładne embeddingi",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand that t-SNE and UMAP are useful views of neighborhood "
+                "structure, but their 2D layout can invite misleading visual stories."
+            ),
+            pl=(
+                "Zrozum, że t-SNE i UMAP są użytecznymi widokami struktury sąsiedztwa, "
+                "ale ich układ 2D może kusić mylącą interpretacją."
+            ),
+        ),
+        prerequisites=(PCA_LESSON_ID,),
+        tasks=(
+            LessonTask(
+                id=COMPARE_RAW_EMBEDDING_TASK_ID,
+                title=LocalizedText(
+                    en="Compare raw and embedded views",
+                    pl="Porównaj raw view i embedding",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Show or hide the raw layout and compare it with the active embedding "
+                        "before trusting the 2D picture."
+                    ),
+                    pl=(
+                        "Pokaż albo ukryj raw layout i porównaj go z aktywnym embeddingiem, "
+                        "zanim zaufasz obrazowi 2D."
+                    ),
+                ),
+                success_condition="compared_raw_and_embedding",
+            ),
+            LessonTask(
+                id=INSPECT_EMBEDDING_STABILITY_TASK_ID,
+                title=LocalizedText(
+                    en="Inspect embedding stability",
+                    pl="Sprawdź stabilność embeddingu",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Change the algorithm, neighborhood parameter, or seed and notice "
+                        "which visual story changes."
+                    ),
+                    pl=(
+                        "Zmień algorytm, parametr sąsiedztwa albo seed i zauważ, która "
+                        "historia na wykresie się zmienia."
+                    ),
+                ),
+                success_condition="inspected_embedding_stability",
+                hint=LocalizedText(
+                    en="A cluster that appears only after one setting change deserves skepticism.",
+                    pl=(
+                        "Klaster, który pojawia się tylko po jednej zmianie ustawień, "
+                        "zasługuje na sceptycyzm."
+                    ),
+                ),
+            ),
+        ),
+        completion_badge=LocalizedText(en="Embedding Skeptic", pl="Sceptyk embeddingów"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which part of the embedding looked stable, and which part changed when "
+                "you adjusted the assumptions?"
+            ),
+            pl=(
+                "Która część embeddingu wyglądała stabilnie, a która zmieniła się po "
+                "ruszeniu założeń?"
+            ),
+        ),
+        instructor_note=LocalizedText(
+            en=(
+                "Embeddings are powerful discussion tools, but the lesson is to compare "
+                "views and parameters before treating the picture as structure."
+            ),
+            pl=(
+                "Embeddingi są świetne do rozmowy o danych, ale sednem lekcji jest "
+                "porównywanie widoków i parametrów, zanim uznamy obraz za strukturę."
             ),
         ),
     ),
