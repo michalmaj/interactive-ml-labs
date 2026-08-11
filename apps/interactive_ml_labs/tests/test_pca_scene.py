@@ -4,10 +4,13 @@ import pygame
 from interactive_ml_labs.display import DEFAULT_RESOLUTION
 from interactive_ml_labs.pca_scene import (
     ANGLE_STEP_DEGREES,
+    COMPARE_VARIANCE_TASK_ID,
     DATA_PRESETS,
     DEFAULT_PROJECTION_ANGLE_DEGREES,
+    INSPECT_RESIDUALS_TASK_ID,
     MAX_NOISE_LEVEL,
     MIN_NOISE_LEVEL,
+    PCA_LESSON_ID,
     PCALabScene,
     PCAProjectionMode,
     create_pca_lab_scene,
@@ -231,6 +234,50 @@ def test_pca_scene_status_rows_report_variance(monkeypatch) -> None:
         rows = dict(scene._status_rows())
 
         assert rows["tryb"] == "fit PCA"
+    finally:
+        pygame.quit()
+
+
+def test_pca_scene_reports_guided_lesson_progress(monkeypatch) -> None:
+    """Guided mode should complete PCA tasks from real interactions."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext(selected_lesson_id=PCA_LESSON_ID)
+        scene = create_pca_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_f))
+
+        progress = context.progress.lessons[PCA_LESSON_ID]
+        assert progress.completed_task_ids == {COMPARE_VARIANCE_TASK_ID}
+        assert progress.completed is False
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_c))
+
+        progress = context.progress.lessons[PCA_LESSON_ID]
+        assert progress.completed_task_ids == {
+            COMPARE_VARIANCE_TASK_ID,
+            INSPECT_RESIDUALS_TASK_ID,
+        }
+        assert progress.completed is True
+    finally:
+        pygame.quit()
+
+
+def test_pca_scene_standalone_does_not_mutate_guided_progress(monkeypatch) -> None:
+    """Standalone PCA interactions should not complete guided lessons."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        context = AppContext()
+        scene = create_pca_lab_scene(context)
+
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_f))
+        scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_c))
+
+        assert context.progress.lessons == {}
     finally:
         pygame.quit()
 

@@ -30,6 +30,9 @@ DEFAULT_PROJECTION_ANGLE_DEGREES: Final[int] = 31
 ANGLE_STEP_DEGREES: Final[int] = 5
 MIN_NOISE_LEVEL: Final[int] = 0
 MAX_NOISE_LEVEL: Final[int] = 5
+PCA_LESSON_ID: Final[str] = "representation_explained_variance"
+COMPARE_VARIANCE_TASK_ID: Final[str] = "compare_explained_variance"
+INSPECT_RESIDUALS_TASK_ID: Final[str] = "inspect_reconstruction_residuals"
 
 
 @dataclass(frozen=True, slots=True)
@@ -69,6 +72,7 @@ class PCALabScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create a deterministic PCA preview scene."""
+        self._context = context
         self._language = context.settings.language
         self._font_title = make_ui_font(34, bold=True)
         self._font_heading = make_ui_font(23, bold=True)
@@ -81,6 +85,7 @@ class PCALabScene:
         self.projection_angle_degrees = DEFAULT_PROJECTION_ANGLE_DEGREES
         self.projection_mode = PCAProjectionMode.MANUAL
         self.show_residuals = True
+        self._seen_variance_ratios = {round(self._explained_variance_ratio(), 2)}
 
     @property
     def preset(self) -> PCADataPreset:
@@ -294,11 +299,14 @@ class PCALabScene:
             self._rotate_projection(ANGLE_STEP_DEGREES)
         elif key == pygame.K_f:
             self._toggle_fit_mode()
+            self._record_variance_progress()
         elif key == pygame.K_c:
             self.show_residuals = not self.show_residuals
+            self._record_residual_progress()
         elif key == pygame.K_r:
             self.projection_mode = PCAProjectionMode.MANUAL
             self.projection_angle_degrees = DEFAULT_PROJECTION_ANGLE_DEGREES
+            self._seen_variance_ratios = {round(self._explained_variance_ratio(), 2)}
         elif key == pygame.K_n:
             self.sample_seed += 1
             self._generate_dataset()
@@ -309,12 +317,14 @@ class PCALabScene:
 
     def _generate_dataset(self) -> None:
         self._points = self._build_preview_points()
+        self._record_variance_progress()
 
     def _rotate_projection(self, delta_degrees: int) -> None:
         if self.projection_mode == PCAProjectionMode.FIT:
             self.projection_angle_degrees = self._fitted_pca_angle_degrees()
             self.projection_mode = PCAProjectionMode.MANUAL
         self.projection_angle_degrees = (self.projection_angle_degrees + delta_degrees) % 180
+        self._record_variance_progress()
 
     def _toggle_fit_mode(self) -> None:
         if self.projection_mode == PCAProjectionMode.FIT:
@@ -322,6 +332,34 @@ class PCALabScene:
             return
 
         self.projection_mode = PCAProjectionMode.FIT
+
+    def _record_variance_progress(self) -> None:
+        """Complete the variance comparison task after meaningful PCA changes."""
+        if self._context.selected_lesson_id != PCA_LESSON_ID:
+            return
+
+        self._seen_variance_ratios.add(round(self._explained_variance_ratio(), 2))
+        if self.projection_mode == PCAProjectionMode.FIT or len(self._seen_variance_ratios) >= 2:
+            self._context.progress.complete_task(PCA_LESSON_ID, COMPARE_VARIANCE_TASK_ID)
+        self._mark_lesson_completed_if_ready()
+
+    def _record_residual_progress(self) -> None:
+        """Complete the residual task after the student inspects reconstruction lines."""
+        if self._context.selected_lesson_id != PCA_LESSON_ID:
+            return
+
+        self._context.progress.complete_task(PCA_LESSON_ID, INSPECT_RESIDUALS_TASK_ID)
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both guided tasks are done."""
+        progress = self._context.progress.lessons.get(PCA_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {COMPARE_VARIANCE_TASK_ID, INSPECT_RESIDUALS_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(PCA_LESSON_ID)
 
     def _draw_grid(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         pygame.draw.rect(surface, PLOT_BG, rect, border_radius=6)
