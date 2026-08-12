@@ -1318,7 +1318,7 @@ def test_learning_path_registry_contains_features_to_decisions_path() -> None:
 
 
 def test_registry_contains_planned_level_three_representation_lessons() -> None:
-    """Planned Level 3 path should have its new lesson manifests ready."""
+    """Level 3 representation path should have its new lesson manifests ready."""
     pca_lesson = LESSON_BY_ID[PCA_LESSON_ID]
     embedding_lesson = LESSON_BY_ID[TSNE_UMAP_LESSON_ID]
     time_series_lesson = LESSON_BY_ID[TIME_SERIES_LESSON_ID]
@@ -1358,8 +1358,38 @@ def test_registry_contains_planned_level_three_representation_lessons() -> None:
     assert time_series_lesson.completion_badge is not None
     assert time_series_lesson.completion_badge.pl == "Kontroler prognoz"
 
-    registered_path_ids = {path.id for path in LEARNING_PATH_MANIFESTS}
-    assert "representation_to_model_behavior" not in registered_path_ids
+
+
+def test_learning_path_registry_contains_representation_to_behavior_path() -> None:
+    """Fifth learning path should connect Level 3 representation and behavior lessons."""
+    path = next(
+        path for path in LEARNING_PATH_MANIFESTS if path.id == "representation_to_model_behavior"
+    )
+
+    assert path.title.en == "From representation to model behavior"
+    assert path.title.pl == "Od reprezentacji do zachowania modelu"
+    assert path.lesson_ids == (
+        PCA_LESSON_ID,
+        TSNE_UMAP_LESSON_ID,
+        CALIBRATION_LESSON_ID,
+        MONITORING_LESSON_ID,
+        TIME_SERIES_LESSON_ID,
+    )
+
+    demos_in_path = [LESSON_BY_ID[lesson_id].demo_id for lesson_id in path.lesson_ids]
+    assert demos_in_path == [
+        "pca_lab",
+        "tsne_umap_exploration_lab",
+        "calibration_lab",
+        "model_monitoring_drift_lab",
+        "time_series_forecasting_lab",
+    ]
+    assert all(demo_id in DEMO_BY_ID for demo_id in demos_in_path)
+    assert LESSON_BY_ID[CALIBRATION_LESSON_ID].prerequisites == (IMBALANCE_LESSON_ID,)
+    assert LESSON_BY_ID[MONITORING_LESSON_ID].prerequisites == (CALIBRATION_LESSON_ID,)
+    assert LESSON_BY_ID[TIME_SERIES_LESSON_ID].prerequisites == (TSNE_UMAP_LESSON_ID,)
+    assert "level-3" in path.tags
+    assert len(path.completion_takeaways) == 3
 
 
 def test_learning_paths_define_completion_takeaways() -> None:
@@ -1379,8 +1409,7 @@ def test_guided_lesson_level_distribution_tracks_current_balance() -> None:
 
     assert dict(sorted(demos_by_level.items())) == {1: 10, 2: 10, 3: 7}
     assert dict(sorted(lessons_by_level.items())) == {1: 7, 2: 11, 3: 4}
-    assert len(path_lesson_ids) == len(LESSON_MANIFESTS) - 3
-    assert {PCA_LESSON_ID, TSNE_UMAP_LESSON_ID, TIME_SERIES_LESSON_ID}.isdisjoint(path_lesson_ids)
+    assert len(path_lesson_ids) == len(LESSON_MANIFESTS)
     assert lessons_by_level[3] < lessons_by_level[1]
     assert lessons_by_level[3] < lessons_by_level[2]
 

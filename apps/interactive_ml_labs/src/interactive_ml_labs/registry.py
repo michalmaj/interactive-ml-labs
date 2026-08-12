@@ -9078,6 +9078,60 @@ LEARNING_PATH_MANIFESTS: tuple[LearningPathManifest, ...] = (
             ),
         ),
     ),
+    LearningPathManifest(
+        id="representation_to_model_behavior",
+        title=LocalizedText(
+            en="From representation to model behavior",
+            pl="Od reprezentacji do zachowania modelu",
+        ),
+        summary=LocalizedText(
+            en=(
+                "A guided Level 3 path from dimensionality reduction and embeddings, "
+                "through calibrated confidence and monitoring, to time-aware forecasting."
+            ),
+            pl=(
+                "Ścieżka Level 3 od dimensionality reduction i embeddingów, przez "
+                "skalibrowaną pewność i monitoring, po forecasting zależny od czasu."
+            ),
+        ),
+        lesson_ids=(
+            PCA_LESSON_ID,
+            TSNE_UMAP_LESSON_ID,
+            CALIBRATION_LESSON_ID,
+            MONITORING_LESSON_ID,
+            TIME_SERIES_LESSON_ID,
+        ),
+        tags=(
+            "guided-path",
+            "level-3",
+            "dimensionality-reduction",
+            "calibration",
+            "monitoring",
+            "forecasting",
+        ),
+        completion_takeaways=(
+            LocalizedText(
+                en="Treat projections and embeddings as compressed views, not ground truth.",
+                pl=(
+                    "Traktować projekcje i embeddingi jako skompresowane widoki, "
+                    "nie ground truth."
+                ),
+            ),
+            LocalizedText(
+                en="Read confidence and monitoring signals before trusting behavior over time.",
+                pl=(
+                    "Czytać confidence i sygnały monitoringu, zanim zaufasz zachowaniu "
+                    "modelu w czasie."
+                ),
+            ),
+            LocalizedText(
+                en="Judge forecasts on future holdout behavior, residuals, and horizon risk.",
+                pl=(
+                    "Oceniać forecasty po przyszłym holdout, residuals i ryzyku horyzontu."
+                ),
+            ),
+        ),
+    ),
 )
 
 
