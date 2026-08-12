@@ -380,7 +380,7 @@ checking whether old assumptions still hold.
 3. Decide whether Calibration Lab and Model Monitoring Drift Lab should reuse their
    existing lesson manifests or receive Level 3-specific variants before the path
    is registered.
-4. Add or verify task hooks for Time Series Forecasting Lab.
+4. Add or verify task hooks for Time Series Forecasting Lab. Done.
 5. Register the complete path only after every lesson has real task progress,
    localized copy, recap prompts, instructor notes, and completion badges.
 6. Run a Polish copy and layout pass after completing the path end to end.

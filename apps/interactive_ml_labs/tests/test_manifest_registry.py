@@ -100,7 +100,12 @@ from interactive_ml_labs.split_lab_scene import (
     create_train_validation_test_lab_scene,
 )
 from interactive_ml_labs.svm_margin_scene import create_svm_margin_lab_scene
-from interactive_ml_labs.time_series_scene import create_time_series_forecasting_lab_scene
+from interactive_ml_labs.time_series_scene import (
+    COMPARE_FORECAST_CHOICES_TASK_ID,
+    INSPECT_FORECAST_RISK_TASK_ID,
+    TIME_SERIES_LESSON_ID,
+    create_time_series_forecasting_lab_scene,
+)
 from interactive_ml_labs.tsne_umap_scene import (
     COMPARE_RAW_EMBEDDING_TASK_ID,
     INSPECT_EMBEDDING_STABILITY_TASK_ID,
@@ -1312,10 +1317,11 @@ def test_learning_path_registry_contains_features_to_decisions_path() -> None:
     assert LESSON_BY_ID[MODEL_COMPARISON_LESSON_ID].completion_badge.pl == ("Czytelnik założeń")
 
 
-def test_registry_contains_planned_level_three_dimensionality_lessons() -> None:
-    """Planned Level 3 path should have its first two lesson manifests ready."""
+def test_registry_contains_planned_level_three_representation_lessons() -> None:
+    """Planned Level 3 path should have its new lesson manifests ready."""
     pca_lesson = LESSON_BY_ID[PCA_LESSON_ID]
     embedding_lesson = LESSON_BY_ID[TSNE_UMAP_LESSON_ID]
+    time_series_lesson = LESSON_BY_ID[TIME_SERIES_LESSON_ID]
 
     assert pca_lesson.level == 3
     assert pca_lesson.demo_id == "pca_lab"
@@ -1340,6 +1346,18 @@ def test_registry_contains_planned_level_three_dimensionality_lessons() -> None:
     assert embedding_lesson.completion_badge is not None
     assert embedding_lesson.completion_badge.pl == "Sceptyk embeddingów"
 
+    assert time_series_lesson.level == 3
+    assert time_series_lesson.demo_id == "time_series_forecasting_lab"
+    assert time_series_lesson.prerequisites == (TSNE_UMAP_LESSON_ID,)
+    assert time_series_lesson.title.en == "Check forecasts against time"
+    assert time_series_lesson.title.pl == "Sprawdź forecast względem czasu"
+    assert {task.id for task in time_series_lesson.tasks} == {
+        COMPARE_FORECAST_CHOICES_TASK_ID,
+        INSPECT_FORECAST_RISK_TASK_ID,
+    }
+    assert time_series_lesson.completion_badge is not None
+    assert time_series_lesson.completion_badge.pl == "Kontroler prognoz"
+
     registered_path_ids = {path.id for path in LEARNING_PATH_MANIFESTS}
     assert "representation_to_model_behavior" not in registered_path_ids
 
@@ -1360,9 +1378,9 @@ def test_guided_lesson_level_distribution_tracks_current_balance() -> None:
     }
 
     assert dict(sorted(demos_by_level.items())) == {1: 10, 2: 10, 3: 7}
-    assert dict(sorted(lessons_by_level.items())) == {1: 7, 2: 11, 3: 3}
-    assert len(path_lesson_ids) == len(LESSON_MANIFESTS) - 2
-    assert {PCA_LESSON_ID, TSNE_UMAP_LESSON_ID}.isdisjoint(path_lesson_ids)
+    assert dict(sorted(lessons_by_level.items())) == {1: 7, 2: 11, 3: 4}
+    assert len(path_lesson_ids) == len(LESSON_MANIFESTS) - 3
+    assert {PCA_LESSON_ID, TSNE_UMAP_LESSON_ID, TIME_SERIES_LESSON_ID}.isdisjoint(path_lesson_ids)
     assert lessons_by_level[3] < lessons_by_level[1]
     assert lessons_by_level[3] < lessons_by_level[2]
 
@@ -1467,6 +1485,10 @@ def test_feature_decision_first_lessons_match_scene_task_hooks() -> None:
             COMPARE_RAW_EMBEDDING_TASK_ID,
             INSPECT_EMBEDDING_STABILITY_TASK_ID,
         },
+        TIME_SERIES_LESSON_ID: {
+            COMPARE_FORECAST_CHOICES_TASK_ID,
+            INSPECT_FORECAST_RISK_TASK_ID,
+        },
     }
 
     for lesson_id, expected_task_ids in expected_task_ids_by_lesson.items():
@@ -1475,7 +1497,7 @@ def test_feature_decision_first_lessons_match_scene_task_hooks() -> None:
 
 def test_learning_lessons_define_goals_tasks_and_badges() -> None:
     """Every default lesson should have enough metadata for a future lesson screen."""
-    assert len(LESSON_MANIFESTS) == 21
+    assert len(LESSON_MANIFESTS) == 22
 
     for lesson in LESSON_MANIFESTS:
         assert lesson.title.en

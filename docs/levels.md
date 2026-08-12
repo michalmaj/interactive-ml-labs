@@ -18,7 +18,7 @@ Guided lesson coverage is not balanced yet:
 
 - Level 1: 7 guided lessons,
 - Level 2: 11 guided lessons,
-- Level 3: 3 guided lessons.
+- Level 3: 4 guided lessons.
 
 That means the next balancing work should focus less on adding another isolated
 demo and more on turning advanced Level 3 material into a guided learning path.
