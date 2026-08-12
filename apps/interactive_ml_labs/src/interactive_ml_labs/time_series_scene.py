@@ -34,6 +34,9 @@ BAND: Final[tuple[int, int, int, int]] = (118, 205, 247, 36)
 
 HORIZONS: Final[tuple[int, ...]] = (4, 6, 8)
 SEASON_LENGTH: Final[int] = 6
+TIME_SERIES_LESSON_ID: Final[str] = "representation_forecast_checker"
+COMPARE_FORECAST_CHOICES_TASK_ID: Final[str] = "compare_forecast_choices"
+INSPECT_FORECAST_RISK_TASK_ID: Final[str] = "inspect_forecast_risk"
 
 
 class ForecastModel(StrEnum):
@@ -141,6 +144,7 @@ class TimeSeriesForecastingLabScene:
 
     def __init__(self, context: AppContext) -> None:
         """Create a deterministic forecasting scene."""
+        self._context = context
         self._language = context.settings.language
         self._font_title = make_ui_font(34, bold=True)
         self._font_heading = make_ui_font(23, bold=True)
@@ -151,6 +155,9 @@ class TimeSeriesForecastingLabScene:
         self.horizon_index = 1
         self.show_uncertainty = True
         self.show_residuals = True
+        self._seen_models = {self.model}
+        self._seen_horizon_indices = {self.horizon_index}
+        self._inspected_risk_helpers = False
 
     @property
     def preset(self) -> TimeSeriesPreset:
@@ -187,22 +194,67 @@ class TimeSeriesForecastingLabScene:
     def _handle_keydown(self, key: int) -> None:
         if key in {pygame.K_1, pygame.K_2, pygame.K_3}:
             self.preset_index = key - pygame.K_1
+            self._record_forecast_risk_progress()
         elif key == pygame.K_m:
             self.model = self._next_model()
+            self._record_forecast_choice_progress()
         elif key in {pygame.K_MINUS, pygame.K_KP_MINUS}:
             self.horizon_index = max(0, self.horizon_index - 1)
+            self._record_forecast_choice_progress()
         elif key in {pygame.K_EQUALS, pygame.K_PLUS, pygame.K_KP_PLUS}:
             self.horizon_index = min(len(HORIZONS) - 1, self.horizon_index + 1)
+            self._record_forecast_choice_progress()
         elif key == pygame.K_u:
             self.show_uncertainty = not self.show_uncertainty
+            self._record_forecast_risk_progress()
         elif key == pygame.K_e:
             self.show_residuals = not self.show_residuals
+            self._record_forecast_risk_progress()
         elif key == pygame.K_r:
             self.preset_index = 0
             self.model = ForecastModel.TREND_SEASONAL
             self.horizon_index = 1
             self.show_uncertainty = True
             self.show_residuals = True
+            self._seen_models = {self.model}
+            self._seen_horizon_indices = {self.horizon_index}
+            self._inspected_risk_helpers = False
+
+    def _record_forecast_choice_progress(self) -> None:
+        """Complete forecast comparison after changing model or horizon."""
+        if self._context.selected_lesson_id != TIME_SERIES_LESSON_ID:
+            return
+
+        self._seen_models.add(self.model)
+        self._seen_horizon_indices.add(self.horizon_index)
+        if len(self._seen_models) >= 2 or len(self._seen_horizon_indices) >= 2:
+            self._context.progress.complete_task(
+                TIME_SERIES_LESSON_ID,
+                COMPARE_FORECAST_CHOICES_TASK_ID,
+            )
+        self._mark_lesson_completed_if_ready()
+
+    def _record_forecast_risk_progress(self) -> None:
+        """Complete risk inspection after the student uses validation helpers."""
+        if self._context.selected_lesson_id != TIME_SERIES_LESSON_ID:
+            return
+
+        self._inspected_risk_helpers = True
+        self._context.progress.complete_task(
+            TIME_SERIES_LESSON_ID,
+            INSPECT_FORECAST_RISK_TASK_ID,
+        )
+        self._mark_lesson_completed_if_ready()
+
+    def _mark_lesson_completed_if_ready(self) -> None:
+        """Complete the lesson once both guided tasks are done."""
+        progress = self._context.progress.lessons.get(TIME_SERIES_LESSON_ID)
+        if progress is None:
+            return
+
+        required_tasks = {COMPARE_FORECAST_CHOICES_TASK_ID, INSPECT_FORECAST_RISK_TASK_ID}
+        if required_tasks.issubset(progress.completed_task_ids):
+            self._context.progress.mark_completed(TIME_SERIES_LESSON_ID)
 
     def _draw_header(self, surface: pygame.Surface) -> None:
         self._draw_text(surface, "Time Series Forecasting Lab", (58, 40), self._font_title, TEXT)
