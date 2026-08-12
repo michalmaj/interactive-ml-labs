@@ -97,7 +97,12 @@ from interactive_ml_labs.split_lab_scene import (
     create_train_validation_test_lab_scene,
 )
 from interactive_ml_labs.svm_margin_scene import create_svm_margin_lab_scene
-from interactive_ml_labs.time_series_scene import create_time_series_forecasting_lab_scene
+from interactive_ml_labs.time_series_scene import (
+    COMPARE_FORECAST_CHOICES_TASK_ID,
+    INSPECT_FORECAST_RISK_TASK_ID,
+    TIME_SERIES_LESSON_ID,
+    create_time_series_forecasting_lab_scene,
+)
 from interactive_ml_labs.tsne_umap_scene import (
     COMPARE_RAW_EMBEDDING_TASK_ID,
     INSPECT_EMBEDDING_STABILITY_TASK_ID,
@@ -8494,6 +8499,91 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             pl=(
                 "Embeddingi są świetne do rozmowy o danych, ale sednem lekcji jest "
                 "porównywanie widoków i parametrów, zanim uznamy obraz za strukturę."
+            ),
+        ),
+    ),
+    LessonManifest(
+        id=TIME_SERIES_LESSON_ID,
+        level=3,
+        demo_id="time_series_forecasting_lab",
+        title=LocalizedText(
+            en="Check forecasts against time",
+            pl="Sprawdź forecast względem czasu",
+        ),
+        learning_goal=LocalizedText(
+            en=(
+                "Understand that time series validation depends on order: a forecast "
+                "must be judged on future holdout values, residuals, and horizon risk."
+            ),
+            pl=(
+                "Zrozum, że walidacja time series zależy od kolejności: forecast trzeba "
+                "oceniać na przyszłym holdout, residuals i ryzyku horyzontu."
+            ),
+        ),
+        prerequisites=(TSNE_UMAP_LESSON_ID,),
+        tasks=(
+            LessonTask(
+                id=COMPARE_FORECAST_CHOICES_TASK_ID,
+                title=LocalizedText(
+                    en="Compare forecast choices",
+                    pl="Porównaj wybory forecastu",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Change the model or forecast horizon and compare how MAE, RMSE, "
+                        "bias, and the forecast line respond."
+                    ),
+                    pl=(
+                        "Zmień model albo forecast horizon i porównaj, jak reagują MAE, "
+                        "RMSE, bias oraz linia forecastu."
+                    ),
+                ),
+                success_condition="compared_forecast_choices",
+            ),
+            LessonTask(
+                id=INSPECT_FORECAST_RISK_TASK_ID,
+                title=LocalizedText(
+                    en="Inspect forecast risk",
+                    pl="Sprawdź ryzyko forecastu",
+                ),
+                instruction=LocalizedText(
+                    en=(
+                        "Use residuals, uncertainty, or another time-series preset to see "
+                        "where the holdout forecast becomes fragile."
+                    ),
+                    pl=(
+                        "Użyj residuals, uncertainty albo innego preset time series, żeby "
+                        "zobaczyć, gdzie forecast na holdout robi się kruchy."
+                    ),
+                ),
+                success_condition="inspected_forecast_risk",
+                hint=LocalizedText(
+                    en="A smooth line can still be wrong when the future changes shape.",
+                    pl=(
+                        "Gładka linia nadal może się mylić, gdy przyszłość zmienia kształt."
+                    ),
+                ),
+            ),
+        ),
+        completion_badge=LocalizedText(en="Forecast Checker", pl="Kontroler prognoz"),
+        recap_prompt=LocalizedText(
+            en=(
+                "Which forecast choice changed the holdout error most, and what warning "
+                "did residuals or uncertainty show?"
+            ),
+            pl=(
+                "Który wybór forecastu najmocniej zmienił holdout error i jakie "
+                "ostrzeżenie pokazały residuals albo uncertainty?"
+            ),
+        ),
+        instructor_note=LocalizedText(
+            en=(
+                "Time-series work is where validation discipline becomes visible: the "
+                "model can only be trusted when future holdout behavior supports it."
+            ),
+            pl=(
+                "Time series pokazuje dyscyplinę walidacji bardzo wyraźnie: modelowi "
+                "można ufać dopiero wtedy, gdy potwierdza to przyszły holdout."
             ),
         ),
     ),
