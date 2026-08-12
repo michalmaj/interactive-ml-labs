@@ -1359,7 +1359,6 @@ def test_registry_contains_planned_level_three_representation_lessons() -> None:
     assert time_series_lesson.completion_badge.pl == "Kontroler prognoz"
 
 
-
 def test_learning_path_registry_contains_representation_to_behavior_path() -> None:
     """Fifth learning path should connect Level 3 representation and behavior lessons."""
     path = next(

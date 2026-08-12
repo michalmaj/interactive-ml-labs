@@ -9113,8 +9113,7 @@ LEARNING_PATH_MANIFESTS: tuple[LearningPathManifest, ...] = (
             LocalizedText(
                 en="Treat projections and embeddings as compressed views, not ground truth.",
                 pl=(
-                    "Traktować projekcje i embeddingi jako skompresowane widoki, "
-                    "nie ground truth."
+                    "Traktować projekcje i embeddingi jako skompresowane widoki, nie ground truth."
                 ),
             ),
             LocalizedText(
@@ -9126,9 +9125,7 @@ LEARNING_PATH_MANIFESTS: tuple[LearningPathManifest, ...] = (
             ),
             LocalizedText(
                 en="Judge forecasts on future holdout behavior, residuals, and horizon risk.",
-                pl=(
-                    "Oceniać forecasty po przyszłym holdout, residuals i ryzyku horyzontu."
-                ),
+                pl=("Oceniać forecasty po przyszłym holdout, residuals i ryzyku horyzontu."),
             ),
         ),
     ),
