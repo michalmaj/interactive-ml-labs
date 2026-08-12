@@ -20,11 +20,11 @@ Guided lesson coverage is not balanced yet:
 - Level 2: 11 guided lessons,
 - Level 3: 4 guided lessons.
 
-That means the next balancing work should focus less on adding another isolated
-demo and more on turning advanced Level 3 material into a guided learning path.
-The planned Level 3 path is **From representation to model behavior** / **Od
-reprezentacji do zachowania modelu**, connecting Explained Variance, t-SNE /
-UMAP, Calibration, Model Monitoring Drift, and Time Series Forecasting.
+That means future balancing work should focus less on adding another isolated
+demo and more on making guided paths feel coherent. The Level 3 path **From
+representation to model behavior** / **Od reprezentacji do zachowania modelu**
+connects Explained Variance, t-SNE / UMAP, Calibration, Model Monitoring Drift,
+and Time Series Forecasting.
 
 ## Level 1 — Fundamentals
 

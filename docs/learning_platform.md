@@ -304,10 +304,10 @@ These tasks should be based on interactions already present in the scenes where 
 5. Register the complete path only after every lesson has real task progress, localized copy, recap prompts, instructor notes, and completion badges. Done.
 6. Run a Polish copy and layout pass after completing the path end to end. Done.
 
-## Planned Level 3 Learning Path
+## Fifth Learning Path
 
-The next guided-path slice should make Level 3 feel like part of the course,
-not only a gallery of advanced visual demos.
+The fifth path makes Level 3 feel like part of the course, not only a gallery of
+advanced visual demos.
 
 **From representation to model behavior**
 
@@ -340,7 +340,12 @@ reduction. The student should leave with a practical mental model: advanced ML
 work often means preserving enough signal, reading uncertainty honestly, and
 checking whether old assumptions still hold.
 
-### Draft Lesson Tasks And Badges
+The path reuses the existing Calibration Lab and Model Monitoring Drift Lab
+lessons instead of duplicating them. That makes progress intentionally shared:
+confidence calibration and monitoring are useful concepts in both the trustworthy
+models path and the Level 3 representation path.
+
+### Lesson Tasks And Badges
 
 **Explained Variance Lab**
 
@@ -379,10 +384,10 @@ checking whether old assumptions still hold.
 2. Add or verify task hooks for Explained Variance Lab and t-SNE / UMAP Exploration Lab. Done.
 3. Decide whether Calibration Lab and Model Monitoring Drift Lab should reuse their
    existing lesson manifests or receive Level 3-specific variants before the path
-   is registered.
+   is registered. Done: reuse existing lessons and share progress.
 4. Add or verify task hooks for Time Series Forecasting Lab. Done.
 5. Register the complete path only after every lesson has real task progress,
-   localized copy, recap prompts, instructor notes, and completion badges.
+   localized copy, recap prompts, instructor notes, and completion badges. Done.
 6. Run a Polish copy and layout pass after completing the path end to end.
 
 ## Lesson Completion Summary

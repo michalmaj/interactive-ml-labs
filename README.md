@@ -105,12 +105,13 @@ The unified app is now the recommended guided experience. The project is no long
 
 Guided lessons now keep learning state visible across the main flow: lesson details, intro screens, and pause menus show task progress, theory status, and badge status when a demo is launched from a learning path.
 
-Four guided learning paths now have checkable task completion:
+Five guided learning paths now have checkable task completion:
 
 - How models learn from error,
 - From distance to clusters,
 - From good scores to trustworthy models,
-- From features to model decisions.
+- From features to model decisions,
+- From representation to model behavior.
 
 Native demo scenes now share small UI helpers for panel drawing, text rendering, and text wrapping. The app shell still keeps its own menu, scroll, viewport, intro, theory, and overlay drawing code because those screens have different interaction and clipping responsibilities.
 
@@ -156,9 +157,8 @@ The original Level 1 and Level 2 demos can still be run as standalone commands. 
 
 Near-term work focuses on balancing guided coverage across Level 1, Level 2, and Level 3 while keeping the shell stable:
 
-- keep improving the guided learning platform layer now that four learning paths have end-to-end task completion,
-- prioritize Level 3 guided learning next, because the demo registry is fairly balanced by count but guided lessons still heavily favor Level 1 and Level 2,
-- continue implementing **From representation to model behavior**, a Level 3 guided path around dimensionality reduction, calibration, monitoring, and forecasting,
+- keep improving the guided learning platform layer now that five learning paths have end-to-end task completion,
+- polish the registered **From representation to model behavior** Level 3 path around dimensionality reduction, calibration, monitoring, and forecasting,
 - add focused Level 2 labs only when they fill a clear teaching gap rather than simply increasing the demo count,
 - collect classroom-style feedback on the newer Level 3 labs: t-SNE / UMAP Exploration, Model Monitoring Drift, and Time Series Forecasting,
 - iterate on Level 3 only where the interaction teaches a clear idea, not just where the visual result looks impressive,
