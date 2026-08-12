@@ -56,19 +56,20 @@ macOS metadata, and accidental shell files are not tracked in git.
 - [x] Plan the first Level 3 guided path: From representation to model behavior.
 - [x] Add the first Level 3 lesson hooks for Explained Variance and t-SNE / UMAP.
 - [x] Add Time Series Forecasting lesson hooks for the planned Level 3 path.
-- [ ] Finish the Level 3 guided path after the Calibration/Monitoring lesson-reuse policy is ready.
+- [x] Register the Level 3 guided path with shared Calibration and Monitoring lessons.
 - [ ] Add screenshots or short GIFs for the main README and app docs.
 
 ## Next Engineering Themes
 
 ### Learning Platform Layer
 
-The app now has four guided learning paths with checkable tasks:
+The app now has five guided learning paths with checkable tasks:
 
 - How models learn from error,
 - From distance to clusters,
-- From good scores to trustworthy models.
-- From features to model decisions.
+- From good scores to trustworthy models,
+- From features to model decisions,
+- From representation to model behavior.
 
 All paths connect lesson manifests to real scene interactions and persisted progress while keeping the standalone demo browser intact. The third path, **From good scores to trustworthy models**, connects train/validation/test discipline, leakage, class imbalance, calibration, and production monitoring in one registered guided sequence.
 
@@ -76,6 +77,11 @@ The fourth path, **From features to model decisions**, is now registered with ta
 for feature scale, feature signal, tree splits, ensemble voting, and model-family
 assumptions. A post-registration Polish copy and shell-selection test pass keeps the
 new path aligned with the guided course UI.
+
+The fifth path, **From representation to model behavior**, is now registered as a
+Level 3 sequence. It reuses the existing Calibration and Monitoring lessons so
+confidence and drift progress carry across learning contexts instead of forcing
+duplicate work.
 
 The direction is captured in [learning_platform.md](learning_platform.md). Future slices should improve progress summaries, add more useful instructor/student feedback, and only introduce richer gamification where it reinforces actual understanding.
 
@@ -118,19 +124,9 @@ New demos should be added in narrow vertical slices:
 5. small polish/UX pass after trying it in the shell.
 
 The current demo registry is balanced enough to pause before adding more demos by
-default. The larger imbalance is in guided lesson coverage: Level 3 has several
-advanced demos but only one guided lesson. The next learning-platform slice should
-therefore turn selected Level 3 material into a guided path before expanding the
-demo count again.
-
-The planned Level 3 path is **From representation to model behavior**. It connects
-Explained Variance, t-SNE / UMAP, Calibration, Model Monitoring Drift, and Time
-Series Forecasting into one advanced learning story. It should remain planned
-until we decide whether Calibration and Monitoring are reused from the
-trustworthy-models path or split into Level 3-specific lesson variants. The new
-Level 3 lesson hooks now cover Explained Variance, t-SNE / UMAP, and Time Series
-Forecasting; Calibration and Monitoring already have working guided tasks from the
-trustworthy-models path.
+default. Guided lesson coverage is now healthier after registering a Level 3 path
+for representation, calibration, monitoring, and forecasting. Future demo growth
+should be driven by clear teaching gaps rather than by balancing counts alone.
 
 ## Completed Historical Phases
 
