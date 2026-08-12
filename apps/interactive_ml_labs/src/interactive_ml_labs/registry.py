@@ -8559,9 +8559,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 success_condition="inspected_forecast_risk",
                 hint=LocalizedText(
                     en="A smooth line can still be wrong when the future changes shape.",
-                    pl=(
-                        "Gładka linia nadal może się mylić, gdy przyszłość zmienia kształt."
-                    ),
+                    pl=("Gładka linia nadal może się mylić, gdy przyszłość zmienia kształt."),
                 ),
             ),
         ),

@@ -1380,9 +1380,7 @@ def test_guided_lesson_level_distribution_tracks_current_balance() -> None:
     assert dict(sorted(demos_by_level.items())) == {1: 10, 2: 10, 3: 7}
     assert dict(sorted(lessons_by_level.items())) == {1: 7, 2: 11, 3: 4}
     assert len(path_lesson_ids) == len(LESSON_MANIFESTS) - 3
-    assert {PCA_LESSON_ID, TSNE_UMAP_LESSON_ID, TIME_SERIES_LESSON_ID}.isdisjoint(
-        path_lesson_ids
-    )
+    assert {PCA_LESSON_ID, TSNE_UMAP_LESSON_ID, TIME_SERIES_LESSON_ID}.isdisjoint(path_lesson_ids)
     assert lessons_by_level[3] < lessons_by_level[1]
     assert lessons_by_level[3] < lessons_by_level[2]
 
