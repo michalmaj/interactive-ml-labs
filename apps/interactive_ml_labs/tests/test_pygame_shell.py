@@ -2013,6 +2013,55 @@ def test_shell_trustworthy_path_details_localize_polish(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_representation_path_details_localize_polish(monkeypatch) -> None:
+    """Level 3 representation path details should show natural Polish guided copy."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    wrapped_text: list[str] = []
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = position, width, font, color
+        wrapped_text.append(text)
+        return 24
+
+    try:
+        app.context.settings.language = "pl"
+        path = next(
+            path
+            for path in LEARNING_PATH_MANIFESTS
+            if path.id == "representation_to_model_behavior"
+        )
+        app._draw_wrapped = capture_wrapped
+
+        app._render_learning_path_details(path)
+
+        assert "[ ] Strażnik wariancji" in wrapped_text
+        assert "[ ] Sceptyk embeddingów" in wrapped_text
+        assert "[ ] Kontroler prognoz" in wrapped_text
+        assert (
+            app._learning_path_lesson_map_label(
+                LESSON_BY_ID[path.lesson_ids[0]],
+                1,
+            )
+            in wrapped_text
+        )
+        assert (
+            app._learning_path_lesson_map_label(
+                LESSON_BY_ID[path.lesson_ids[-1]],
+                len(path.lesson_ids),
+            )
+            in wrapped_text
+        )
+    finally:
+        pygame.quit()
+
+
 def test_shell_learning_path_task_progress_label_localizes_polish(monkeypatch) -> None:
     """Learning path task summaries should use Polish UI copy."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
