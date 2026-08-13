@@ -8360,7 +8360,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                     ),
                     pl=(
                         "Obróć projekcję albo dopasuj PCA, a potem porównaj, ile wariancji "
-                        "zostaje i ile tracimy."
+                        "zostaje, a ile znika."
                     ),
                 ),
                 success_condition="compared_explained_variance",
@@ -8449,7 +8449,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                     ),
                     pl=(
                         "Pokaż albo ukryj raw layout i porównaj go z aktywnym embeddingiem, "
-                        "zanim zaufasz obrazowi 2D."
+                        "zanim wyciągniesz wnioski z obrazu 2D."
                     ),
                 ),
                 success_condition="compared_raw_and_embedding",
@@ -8488,7 +8488,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
             ),
             pl=(
                 "Która część embeddingu wyglądała stabilnie, a która zmieniła się po "
-                "ruszeniu założeń?"
+                "zmianie założeń?"
             ),
         ),
         instructor_note=LocalizedText(
@@ -8553,7 +8553,7 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                     ),
                     pl=(
                         "Użyj residuals, uncertainty albo innego preset time series, żeby "
-                        "zobaczyć, gdzie forecast na holdout robi się kruchy."
+                        "zobaczyć, gdzie forecast na holdout staje się mniej wiarygodny."
                     ),
                 ),
                 success_condition="inspected_forecast_risk",

@@ -1468,6 +1468,53 @@ def test_feature_decision_polish_copy_stays_natural() -> None:
     assert "pytań o feature" not in polish_text
 
 
+def test_representation_path_polish_copy_stays_natural() -> None:
+    """Level 3 representation path copy should keep ML terms without rough phrasing."""
+    path = next(
+        path for path in LEARNING_PATH_MANIFESTS if path.id == "representation_to_model_behavior"
+    )
+    lessons = [LESSON_BY_ID[lesson_id] for lesson_id in path.lesson_ids]
+    polish_text = " ".join(
+        [
+            path.title.pl,
+            path.summary.pl,
+            *[takeaway.pl for takeaway in path.completion_takeaways],
+            *[lesson.title.pl for lesson in lessons],
+            *[lesson.learning_goal.pl for lesson in lessons],
+            *[lesson.recap_prompt.pl for lesson in lessons if lesson.recap_prompt is not None],
+            *[
+                lesson.instructor_note.pl
+                for lesson in lessons
+                if lesson.instructor_note is not None
+            ],
+            *[task.title.pl for lesson in lessons for task in lesson.tasks],
+            *[task.instruction.pl for lesson in lessons for task in lesson.tasks],
+            *[task.hint.pl for lesson in lessons for task in lesson.tasks if task.hint is not None],
+        ]
+    )
+
+    assert path.title.pl == "Od reprezentacji do zachowania modelu"
+    assert (
+        LESSON_BY_ID[PCA_LESSON_ID]
+        .tasks[0]
+        .instruction.pl.endswith("ile wariancji zostaje, a ile znika.")
+    )
+    assert (
+        LESSON_BY_ID[TSNE_UMAP_LESSON_ID]
+        .tasks[0]
+        .instruction.pl.endswith("zanim wyciągniesz wnioski z obrazu 2D.")
+    )
+    assert (
+        LESSON_BY_ID[TIME_SERIES_LESSON_ID]
+        .tasks[1]
+        .instruction.pl.endswith("gdzie forecast na holdout staje się mniej wiarygodny.")
+    )
+    assert "zaufasz obrazowi" not in polish_text
+    assert "ruszeniu założeń" not in polish_text
+    assert "robi się kruchy" not in polish_text
+    assert "tracimy." not in polish_text
+
+
 def test_trustworthy_models_lessons_match_scene_task_hooks() -> None:
     """Trustworthy path task ids should stay aligned with scene progress hooks."""
     expected_task_ids_by_lesson = {
