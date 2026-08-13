@@ -14,6 +14,42 @@ The app should distinguish three concepts:
 
 The current manifest registry is a good foundation for demos. The first lesson layer now adds lesson and learning-path metadata without breaking existing standalone demo entry points.
 
+## Current Priority: v0.0.9a
+
+The current priority is the `v0.0.9a` student-facing alpha release. The release
+plan is captured in [release_v0_0_9a.md](release_v0_0_9a.md).
+
+Before packaging the app for students, the platform should gain three product
+layers:
+
+1. a course-level map above individual learning paths,
+2. better student feedback through concept checks and stronger summaries,
+3. accessibility and classroom comfort settings.
+
+The order matters. The app should first feel like a coherent guided course, then
+become easier to install and distribute.
+
+## Course Layer Above Paths
+
+Learning paths are now useful, but they are still separate routes. The next
+learning-platform slice should add a course-level layer that helps students
+answer three questions:
+
+1. Where should I start?
+2. What should I do next?
+3. Why does this next path build on what I just learned?
+
+This layer should not remove free exploration. It should make the recommended
+route visible while keeping the existing level browser and path browser intact.
+
+Good course-map behavior:
+
+- show the recommended first path,
+- explain how paths build on each other,
+- highlight the next useful path after completion,
+- keep progress visible at the path level,
+- use short, student-friendly copy instead of curriculum jargon.
+
 ## Learning Flow
 
 A student should be able to follow a path like this:

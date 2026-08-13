@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/michalmaj/interactive-ml-labs/actions/workflows/ci.yml/badge.svg)](https://github.com/michalmaj/interactive-ml-labs/actions/workflows/ci.yml)
 
-Interactive ML Labs is a collection of visual, interactive machine learning demos designed for teaching and experimentation.
+Interactive ML Labs is a guided collection of visual, interactive machine learning labs designed for teaching and experimentation.
 
 The project is built as a professional Python repository with:
 
@@ -23,7 +23,7 @@ Each demo should answer three questions:
 2. How does the algorithm work step by step?
 3. What happens when important parameters change?
 
-The current product direction is to make the app feel like a guided learning platform: demos are connected into learning paths with lessons, concrete tasks, progress, and meaningful badges. See [docs/learning_platform.md](docs/learning_platform.md) for the learning-platform direction.
+The current product direction is to make the app feel like a guided learning platform: demos are connected into learning paths with lessons, concrete tasks, progress, and meaningful badges. The next release target is `v0.0.9a`, a student-facing alpha focused on course-level guidance, better student feedback, and classroom comfort. See [docs/learning_platform.md](docs/learning_platform.md) and [docs/release_v0_0_9a.md](docs/release_v0_0_9a.md) for the learning-platform direction.
 
 ## Planned demo levels
 
@@ -157,9 +157,11 @@ The original Level 1 and Level 2 demos can still be run as standalone commands. 
 
 Near-term work focuses on balancing guided coverage across Level 1, Level 2, and Level 3 while keeping the shell stable:
 
-- keep improving the guided learning platform layer now that five learning paths have end-to-end task completion,
-- polish the registered **From representation to model behavior** Level 3 path around dimensionality reduction, calibration, monitoring, and forecasting,
-- add focused Level 2 labs only when they fill a clear teaching gap rather than simply increasing the demo count,
+- prepare the `v0.0.9a` student-facing alpha release,
+- add course-level guidance above individual learning paths,
+- improve student feedback with concept checks and stronger completion summaries,
+- add accessibility and classroom comfort settings,
+- add focused labs only when they fill a clear teaching gap rather than simply increasing the demo count,
 - collect classroom-style feedback on the newer Level 3 labs: t-SNE / UMAP Exploration, Model Monitoring Drift, and Time Series Forecasting,
 - iterate on Level 3 only where the interaction teaches a clear idea, not just where the visual result looks impressive,
 - keep improving in-app theory, mini-challenges, and glossary content across Level 1, Level 2, and Level 3,
