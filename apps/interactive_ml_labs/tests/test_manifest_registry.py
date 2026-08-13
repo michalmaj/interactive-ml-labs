@@ -1494,14 +1494,20 @@ def test_representation_path_polish_copy_stays_natural() -> None:
     )
 
     assert path.title.pl == "Od reprezentacji do zachowania modelu"
-    assert LESSON_BY_ID[PCA_LESSON_ID].tasks[0].instruction.pl.endswith(
-        "ile wariancji zostaje, a ile znika."
+    assert (
+        LESSON_BY_ID[PCA_LESSON_ID]
+        .tasks[0]
+        .instruction.pl.endswith("ile wariancji zostaje, a ile znika.")
     )
-    assert LESSON_BY_ID[TSNE_UMAP_LESSON_ID].tasks[0].instruction.pl.endswith(
-        "zanim wyciągniesz wnioski z obrazu 2D."
+    assert (
+        LESSON_BY_ID[TSNE_UMAP_LESSON_ID]
+        .tasks[0]
+        .instruction.pl.endswith("zanim wyciągniesz wnioski z obrazu 2D.")
     )
-    assert LESSON_BY_ID[TIME_SERIES_LESSON_ID].tasks[1].instruction.pl.endswith(
-        "gdzie forecast na holdout staje się mniej wiarygodny."
+    assert (
+        LESSON_BY_ID[TIME_SERIES_LESSON_ID]
+        .tasks[1]
+        .instruction.pl.endswith("gdzie forecast na holdout staje się mniej wiarygodny.")
     )
     assert "zaufasz obrazowi" not in polish_text
     assert "ruszeniu założeń" not in polish_text
