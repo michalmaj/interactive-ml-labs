@@ -57,6 +57,7 @@ macOS metadata, and accidental shell files are not tracked in git.
 - [x] Add the first Level 3 lesson hooks for Explained Variance and t-SNE / UMAP.
 - [x] Add Time Series Forecasting lesson hooks for the planned Level 3 path.
 - [x] Register the Level 3 guided path with shared Calibration and Monitoring lessons.
+- [x] Run a Polish copy and shell-details pass for the Level 3 guided path.
 - [ ] Add screenshots or short GIFs for the main README and app docs.
 
 ## Next Engineering Themes
@@ -81,7 +82,8 @@ new path aligned with the guided course UI.
 The fifth path, **From representation to model behavior**, is now registered as a
 Level 3 sequence. It reuses the existing Calibration and Monitoring lessons so
 confidence and drift progress carry across learning contexts instead of forcing
-duplicate work.
+duplicate work. A post-registration Polish copy and shell-details test pass keeps
+the new path readable in the guided course UI.
 
 The direction is captured in [learning_platform.md](learning_platform.md). Future slices should improve progress summaries, add more useful instructor/student feedback, and only introduce richer gamification where it reinforces actual understanding.
 
