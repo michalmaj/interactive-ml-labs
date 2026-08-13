@@ -58,7 +58,25 @@ macOS metadata, and accidental shell files are not tracked in git.
 - [x] Add Time Series Forecasting lesson hooks for the planned Level 3 path.
 - [x] Register the Level 3 guided path with shared Calibration and Monitoring lessons.
 - [x] Run a Polish copy and shell-details pass for the Level 3 guided path.
-- [ ] Add screenshots or short GIFs for the main README and app docs.
+- [ ] Prepare the `v0.0.9a` student-facing alpha release.
+
+The current release plan is captured in [release_v0_0_9a.md](release_v0_0_9a.md).
+The next priority is to make the app feel like a guided course before packaging
+it for students.
+
+Required product work before `v0.0.9a`:
+
+1. Add a course-level map above individual learning paths.
+2. Improve student feedback with concept checks and stronger summaries.
+3. Add accessibility and classroom comfort settings.
+
+Release preparation after those product slices:
+
+- add screenshots or short GIFs for the main README and app docs,
+- add a license,
+- add GitHub issue templates for student feedback,
+- refresh the README for the release state,
+- prepare repository metadata and wiki structure.
 
 ## Next Engineering Themes
 
@@ -85,7 +103,7 @@ confidence and drift progress carry across learning contexts instead of forcing
 duplicate work. A post-registration Polish copy and shell-details test pass keeps
 the new path readable in the guided course UI.
 
-The direction is captured in [learning_platform.md](learning_platform.md). Future slices should improve progress summaries, add more useful instructor/student feedback, and only introduce richer gamification where it reinforces actual understanding.
+The direction is captured in [learning_platform.md](learning_platform.md). Future slices should improve course-level guidance, add more useful instructor/student feedback, and only introduce richer gamification where it reinforces actual understanding.
 
 Recent shell work made lesson progress visible throughout the student flow: path details point to the next lesson, lesson lists show compact progress markers, and home/path/lesson/intro/pause screens use consistent progress summaries and bars.
 
@@ -112,8 +130,21 @@ Near-term docs work:
 
 - keep `USAGE.md` and `USAGE.pl.md` aligned with the app,
 - keep `docs/levels.md` aligned with the registry,
-- add screenshots/GIFs once the UI stabilizes further,
+- add screenshots/GIFs as part of `v0.0.9a` release preparation,
 - keep Polish copy natural rather than literal.
+
+The release preparation should also add GitHub issue templates so students can
+report broken behavior, confusing lessons, missing topics, and rough classroom
+UX without needing to know the codebase.
+
+### Distribution
+
+Student-friendly distribution should follow the `v0.0.9a` learning-platform
+polish. The initial direction is to use GitHub Actions to build downloadable
+artifacts for Windows, macOS, and Linux and attach them to GitHub releases.
+
+The release should first be worth installing: course guidance, feedback, and
+classroom comfort come before packaged binaries.
 
 ### Demo Growth And Level Balance
 
