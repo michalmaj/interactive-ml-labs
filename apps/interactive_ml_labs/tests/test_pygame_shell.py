@@ -5,7 +5,13 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pygame
-from interactive_ml_labs import DEMO_BY_ID, LEARNING_PATH_MANIFESTS, LESSON_BY_ID, demos_for_level
+from interactive_ml_labs import (
+    COURSE_MAP_STEPS,
+    DEMO_BY_ID,
+    LEARNING_PATH_MANIFESTS,
+    LESSON_BY_ID,
+    demos_for_level,
+)
 from interactive_ml_labs.boosting_scene import (
     ADVANCE_ROUNDS_TASK_ID,
     BOOSTING_LESSON_ID,
@@ -314,14 +320,93 @@ def test_shell_language_selection_opens_home_screen(monkeypatch) -> None:
         pygame.quit()
 
 
-def test_shell_home_opens_learning_paths(monkeypatch) -> None:
-    """Home screen should expose guided learning paths as the first option."""
+def test_shell_home_opens_course_map(monkeypatch) -> None:
+    """Home screen should expose the course map as the first learning option."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
 
     try:
         app.screen_name = ScreenName.HOME
         app.selected_index = 0
+
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.COURSE_MAP
+    finally:
+        pygame.quit()
+
+
+def test_shell_course_map_renders_recommended_steps(monkeypatch) -> None:
+    """Course map should render ordered path steps before the full path browser."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    menu_labels: list[str] = []
+    wrapped_text: list[str] = []
+
+    def capture_menu(
+        labels: list[str],
+        *,
+        top: int,
+        width: int = 640,
+    ) -> None:
+        _ = top, width
+        menu_labels.extend(labels)
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = width, font, color
+        wrapped_text.append(text)
+        return position[1] + 24
+
+    try:
+        app.screen_name = ScreenName.COURSE_MAP
+        app._draw_menu = capture_menu
+        app._draw_wrapped = capture_wrapped
+
+        app._render_course_map()
+
+        assert menu_labels[0] == "[ ] Step 1: How models learn from error"
+        assert menu_labels[-1] == "All guided paths"
+        assert COURSE_MAP_STEPS[0].rationale.en in wrapped_text
+        assert COURSE_MAP_STEPS[0].next_reason is not None
+        assert COURSE_MAP_STEPS[0].next_reason.en in wrapped_text
+    finally:
+        pygame.quit()
+
+
+def test_shell_course_map_opens_selected_path_lessons(monkeypatch) -> None:
+    """Selecting a course-map step should open that path at the next lesson."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[1]
+        app.context.progress.mark_completed(path.lesson_ids[0])
+        app.screen_name = ScreenName.COURSE_MAP
+        app.selected_index = 1
+
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.LESSONS
+        assert app.selected_learning_path == path
+        assert app.selected_index == 1
+    finally:
+        pygame.quit()
+
+
+def test_shell_course_map_can_open_full_path_browser(monkeypatch) -> None:
+    """The last course-map item should keep the old full path browser available."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.screen_name = ScreenName.COURSE_MAP
+        app.selected_index = len(COURSE_MAP_STEPS)
 
         app._activate_selected()
 
@@ -574,7 +659,7 @@ def test_shell_home_continue_skips_completed_path(monkeypatch) -> None:
 
 
 def test_shell_home_continue_reviews_paths_when_all_complete(monkeypatch) -> None:
-    """Completed guided paths should send the home shortcut back to path review."""
+    """Completed guided paths should send the home shortcut back to the course map."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
 
@@ -586,7 +671,7 @@ def test_shell_home_continue_reviews_paths_when_all_complete(monkeypatch) -> Non
         app.screen_name = ScreenName.HOME
         app._handle_keydown(pygame.K_c)
 
-        assert app.screen_name == ScreenName.PATHS
+        assert app.screen_name == ScreenName.COURSE_MAP
     finally:
         pygame.quit()
 
@@ -661,6 +746,21 @@ def test_shell_learning_path_selection_opens_lessons(monkeypatch) -> None:
             == LESSON_BY_ID["error_linear_regression_line_fit"]
         )
         assert app.selected_index == 0
+    finally:
+        pygame.quit()
+
+
+def test_shell_lesson_escape_returns_to_course_map(monkeypatch) -> None:
+    """Lesson lists should return to the course map as the higher-level guide."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.screen_name = ScreenName.LESSONS
+
+        app._escape()
+
+        assert app.screen_name == ScreenName.COURSE_MAP
     finally:
         pygame.quit()
 
