@@ -118,3 +118,12 @@ class LearningPathManifest:
     lesson_ids: tuple[str, ...]
     tags: tuple[str, ...] = field(default_factory=tuple)
     completion_takeaways: tuple[LocalizedText, ...] = field(default_factory=tuple)
+
+
+@dataclass(frozen=True, slots=True)
+class CourseMapStep:
+    """One recommended step in the course-level learning route."""
+
+    path_id: str
+    rationale: LocalizedText
+    next_reason: LocalizedText | None = None

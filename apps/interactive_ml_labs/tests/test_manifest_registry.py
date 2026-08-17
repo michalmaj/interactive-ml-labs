@@ -4,6 +4,7 @@ from collections import Counter
 
 import pytest
 from interactive_ml_labs import (
+    COURSE_MAP_STEPS,
     DEMO_BY_ID,
     DEMO_MANIFESTS,
     LEARNING_PATH_MANIFESTS,
@@ -985,6 +986,24 @@ def test_manifests_have_required_teaching_content() -> None:
         assert manifest.controls
         assert manifest.tags
         assert manifest.create_scene is not None
+
+
+def test_course_map_covers_learning_paths_once_in_recommended_order() -> None:
+    """The course-level map should describe every guided path exactly once."""
+    path_ids = tuple(path.id for path in LEARNING_PATH_MANIFESTS)
+    step_path_ids = tuple(step.path_id for step in COURSE_MAP_STEPS)
+
+    assert step_path_ids == path_ids
+
+    for index, step in enumerate(COURSE_MAP_STEPS):
+        assert step.rationale.en
+        assert step.rationale.pl
+        if index < len(COURSE_MAP_STEPS) - 1:
+            assert step.next_reason is not None
+            assert step.next_reason.en
+            assert step.next_reason.pl
+        else:
+            assert step.next_reason is None
 
 
 def test_boosting_manifest_has_demo_specific_teaching_content() -> None:

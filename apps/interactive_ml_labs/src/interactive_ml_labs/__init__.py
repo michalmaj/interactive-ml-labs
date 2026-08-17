@@ -114,6 +114,8 @@ from interactive_ml_labs.random_forest_scene import (
     create_random_forest_scene,
 )
 from interactive_ml_labs.registry import (
+    COURSE_MAP_STEP_BY_PATH_ID,
+    COURSE_MAP_STEPS,
     DEMO_BY_ID,
     DEMO_MANIFESTS,
     LEARNING_PATH_MANIFESTS,
@@ -162,6 +164,8 @@ from interactive_ml_labs.tuning_scene import (
 
 __all__ = [
     "BOOSTING_FIXED_SCENE_SIZE",
+    "COURSE_MAP_STEPS",
+    "COURSE_MAP_STEP_BY_PATH_ID",
     "DEFAULT_RESOLUTION",
     "DEMO_BY_ID",
     "DEMO_MANIFESTS",
