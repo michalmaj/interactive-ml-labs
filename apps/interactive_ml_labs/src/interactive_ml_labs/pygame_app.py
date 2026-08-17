@@ -158,6 +158,9 @@ class UnifiedAppShell:
         self.demo_max_scroll = 0
         self.demo_scrollbar_dragging = False
         self.demo_scrollbar_drag_offset = 0
+        self.course_map_details_scroll_offset = 0
+        self.course_map_details_max_scroll = 0
+        self.course_map_details_scroll_step_index: int | None = None
         self.learning_path_details_scroll_offset = 0
         self.learning_path_details_max_scroll = 0
         self.learning_path_details_scroll_path_id: str | None = None
@@ -342,6 +345,9 @@ class UnifiedAppShell:
             self.demo_scroll_offset -= y * MENU_ITEM_PITCH
             self._clamp_demo_scroll()
             self._select_visible_demo_after_scroll(DEMO_MENU_TOP, self._content_bottom())
+        elif self.screen_name == ScreenName.COURSE_MAP:
+            self.course_map_details_scroll_offset -= y * THEORY_SCROLL_STEP
+            self._clamp_course_map_details_scroll()
         elif self.screen_name == ScreenName.PATHS:
             self.learning_path_details_scroll_offset -= y * THEORY_SCROLL_STEP
             self._clamp_learning_path_details_scroll()
@@ -558,9 +564,18 @@ class UnifiedAppShell:
         pygame.draw.rect(self.screen, PANEL, rect, border_radius=8)
         pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
 
+        if self.course_map_details_scroll_step_index != step_index:
+            self.course_map_details_scroll_step_index = step_index
+            self.course_map_details_scroll_offset = 0
+
+        viewport = rect.inflate(-28, -28)
+        scrollbar_margin = 14 if self.course_map_details_max_scroll > 0 else 0
+        old_clip = self.screen.get_clip()
+        self.screen.set_clip(viewport)
+
         x = rect.x + 28
-        y = rect.y + 26
-        content_width = rect.width - 56
+        y = rect.y + 26 - self.course_map_details_scroll_offset
+        content_width = rect.width - 56 - scrollbar_margin
 
         self._draw_text(
             self._text(f"Step {step_index + 1}", f"Krok {step_index + 1}"),
@@ -632,6 +647,10 @@ class UnifiedAppShell:
             )
             y += 4
 
+        self.screen.set_clip(old_clip)
+        self._update_course_map_details_scroll_limit(y, viewport.bottom)
+        self._draw_course_map_details_scroll_indicator(viewport)
+
     def _render_course_map_overview(self) -> None:
         """Draw the overview panel shown before entering the full path browser."""
         width, height = self.context.settings.resolution
@@ -644,9 +663,18 @@ class UnifiedAppShell:
         pygame.draw.rect(self.screen, PANEL, rect, border_radius=8)
         pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
 
+        if self.course_map_details_scroll_step_index is not None:
+            self.course_map_details_scroll_step_index = None
+            self.course_map_details_scroll_offset = 0
+
+        viewport = rect.inflate(-28, -28)
+        scrollbar_margin = 14 if self.course_map_details_max_scroll > 0 else 0
+        old_clip = self.screen.get_clip()
+        self.screen.set_clip(viewport)
+
         x = rect.x + 28
-        y = rect.y + 26
-        content_width = rect.width - 56
+        y = rect.y + 26 - self.course_map_details_scroll_offset
+        content_width = rect.width - 56 - scrollbar_margin
         y = self._draw_wrapped(
             self._text("Free exploration", "Swobodna eksploracja"),
             (x, y),
@@ -678,6 +706,10 @@ class UnifiedAppShell:
             )
             self._draw_compact_progress_bar(x, y + 2, content_width, completed_count, total_count)
             y += 20
+
+        self.screen.set_clip(old_clip)
+        self._update_course_map_details_scroll_limit(y, viewport.bottom)
+        self._draw_course_map_details_scroll_indicator(viewport)
 
     def _course_map_path_for_step(self, step_index: int) -> LearningPathManifest:
         """Return the learning path connected to one course-map step."""
@@ -2745,6 +2777,19 @@ class UnifiedAppShell:
             max_scroll=self.learning_path_details_max_scroll,
         )
 
+    def _draw_course_map_details_scroll_indicator(self, viewport: pygame.Rect) -> None:
+        """Draw a small scrollbar for long course-map details."""
+        if self.course_map_details_max_scroll <= 0:
+            return
+
+        self._draw_scroll_indicator_at(
+            x=viewport.right - SCROLLBAR_WIDTH,
+            top=viewport.y,
+            bottom=viewport.bottom,
+            scroll_offset=self.course_map_details_scroll_offset,
+            max_scroll=self.course_map_details_max_scroll,
+        )
+
     def _draw_badge_gallery_scroll_indicator(self, viewport: pygame.Rect) -> None:
         """Draw a small scrollbar for long badge gallery content."""
         if self.badge_gallery_max_scroll <= 0:
@@ -3195,6 +3240,8 @@ class UnifiedAppShell:
         self.demo_scrollbar_dragging = False
         if screen_name == ScreenName.DEMOS:
             self.demo_scroll_offset = 0
+        elif screen_name == ScreenName.COURSE_MAP:
+            self.course_map_details_scroll_offset = 0
         elif screen_name == ScreenName.PATHS:
             self.learning_path_details_scroll_offset = 0
         elif screen_name == ScreenName.BADGES:
@@ -3306,6 +3353,28 @@ class UnifiedAppShell:
             min(
                 self.learning_path_details_scroll_offset,
                 self.learning_path_details_max_scroll,
+            ),
+        )
+
+    def _update_course_map_details_scroll_limit(
+        self,
+        content_end: int,
+        content_bottom: int,
+    ) -> None:
+        """Update maximum scroll offset for the course-map details panel."""
+        self.course_map_details_max_scroll = max(
+            0,
+            content_end + self.course_map_details_scroll_offset - content_bottom,
+        )
+        self._clamp_course_map_details_scroll()
+
+    def _clamp_course_map_details_scroll(self) -> None:
+        """Keep the course-map details scroll offset inside the available range."""
+        self.course_map_details_scroll_offset = max(
+            0,
+            min(
+                self.course_map_details_scroll_offset,
+                self.course_map_details_max_scroll,
             ),
         )
 

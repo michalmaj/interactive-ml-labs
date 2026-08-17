@@ -415,6 +415,46 @@ def test_shell_course_map_can_open_full_path_browser(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_shell_course_map_details_scroll_when_content_overflows(monkeypatch) -> None:
+    """Long course-map details should scroll inside the right-side panel."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 540)))
+
+    try:
+        app.screen_name = ScreenName.COURSE_MAP
+        app.selected_index = 0
+        app._render_course_map()
+
+        assert app.course_map_details_max_scroll > 0
+
+        app._handle_mouse_wheel(-1)
+        assert app.course_map_details_scroll_offset > 0
+
+        app._handle_mouse_wheel(100)
+        assert app.course_map_details_scroll_offset == 0
+    finally:
+        pygame.quit()
+
+
+def test_shell_course_map_details_scroll_resets_for_new_step(monkeypatch) -> None:
+    """Changing course-map steps should reset the details panel scroll."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 540)))
+
+    try:
+        app.screen_name = ScreenName.COURSE_MAP
+        app.selected_index = 0
+        app._render_course_map()
+        app.course_map_details_scroll_offset = app.course_map_details_max_scroll
+
+        app.selected_index = 1
+        app._render_course_map()
+
+        assert app.course_map_details_scroll_offset == 0
+    finally:
+        pygame.quit()
+
+
 def test_shell_home_learning_progress_lines_summarize_paths(monkeypatch) -> None:
     """Home progress snapshot should summarize all guided paths."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
