@@ -53,6 +53,7 @@ from interactive_ml_labs.linear_regression_scene import create_linear_regression
 from interactive_ml_labs.logistic_scene import create_logistic_regression_scene
 from interactive_ml_labs.manifest import (
     ControlBinding,
+    CourseMapStep,
     DemoManifest,
     DemoTheory,
     GlossaryTerm,
@@ -9130,6 +9131,100 @@ LEARNING_PATH_MANIFESTS: tuple[LearningPathManifest, ...] = (
         ),
     ),
 )
+
+COURSE_MAP_STEPS: tuple[CourseMapStep, ...] = (
+    CourseMapStep(
+        path_id="models_learn_from_error",
+        rationale=LocalizedText(
+            en=(
+                "Start here: see that models improve by reading error, loss, "
+                "and visible mistakes."
+            ),
+            pl=(
+                "Zacznij tutaj: zobacz, że modele poprawiają się dzięki błędom, "
+                "loss i widocznym pomyłkom."
+            ),
+        ),
+        next_reason=LocalizedText(
+            en="Next, turn error intuition into geometry: distance decides what looks similar.",
+            pl=(
+                "Potem przejdź do geometrii: odległość decyduje, co model uznaje "
+                "za podobne."
+            ),
+        ),
+    ),
+    CourseMapStep(
+        path_id="distance_to_clusters",
+        rationale=LocalizedText(
+            en=(
+                "Use distance to understand neighborhoods, hard clusters, "
+                "and soft membership."
+            ),
+            pl=(
+                "Użyj odległości, żeby zrozumieć sąsiedztwa, twarde klastry "
+                "i soft membership."
+            ),
+        ),
+        next_reason=LocalizedText(
+            en="Then ask whether a good-looking score is evidence you can trust.",
+            pl="Następnie sprawdź, czy dobry score naprawdę jest dowodem, któremu można ufać.",
+        ),
+    ),
+    CourseMapStep(
+        path_id="trustworthy_models",
+        rationale=LocalizedText(
+            en=(
+                "Learn when validation, calibration, imbalance, and monitoring "
+                "make model evidence trustworthy."
+            ),
+            pl=(
+                "Zobacz, kiedy walidacja, kalibracja, imbalance i monitoring "
+                "sprawiają, że dowody modelu są wiarygodne."
+            ),
+        ),
+        next_reason=LocalizedText(
+            en="After trusting a result, inspect what shaped the model decision.",
+            pl="Gdy wynik wygląda wiarygodnie, sprawdź, co ukształtowało decyzję modelu.",
+        ),
+    ),
+    CourseMapStep(
+        path_id="features_to_model_decisions",
+        rationale=LocalizedText(
+            en=(
+                "Connect feature scale, signal, tree rules, and model-family "
+                "assumptions to final predictions."
+            ),
+            pl=(
+                "Połącz skalę cech, sygnał, reguły drzewa i założenia rodzin modeli "
+                "z finalnymi predykcjami."
+            ),
+        ),
+        next_reason=LocalizedText(
+            en="Finally, move into advanced behavior: compressed views, drift, and time.",
+            pl=(
+                "Na końcu przejdź do zaawansowanego zachowania: kompresji, driftu "
+                "i czasu."
+            ),
+        ),
+    ),
+    CourseMapStep(
+        path_id="representation_to_model_behavior",
+        rationale=LocalizedText(
+            en=(
+                "Finish by reading advanced behavior through representations, "
+                "confidence, monitoring, and forecasts."
+            ),
+            pl=(
+                "Zakończ, czytając zaawansowane zachowanie przez reprezentacje, "
+                "confidence, monitoring i forecasty."
+            ),
+        ),
+    ),
+)
+
+COURSE_MAP_STEP_BY_PATH_ID: dict[str, CourseMapStep] = {
+    step.path_id: step for step in COURSE_MAP_STEPS
+}
 
 
 def levels_from_manifests(manifests: tuple[DemoManifest, ...] = DEMO_MANIFESTS) -> tuple[int, ...]:
