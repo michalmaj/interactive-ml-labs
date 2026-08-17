@@ -22,9 +22,9 @@ plan is captured in [release_v0_0_9a.md](release_v0_0_9a.md).
 Before packaging the app for students, the platform should gain three product
 layers:
 
-1. a course-level map above individual learning paths,
-2. better student feedback through concept checks and stronger summaries,
-3. accessibility and classroom comfort settings.
+- [x] a course-level map above individual learning paths,
+- [ ] better student feedback through concept checks and stronger summaries,
+- [ ] accessibility and classroom comfort settings.
 
 The order matters. The app should first feel like a coherent guided course, then
 become easier to install and distribute.
@@ -49,6 +49,10 @@ Good course-map behavior:
 - highlight the next useful path after completion,
 - keep progress visible at the path level,
 - use short, student-friendly copy instead of curriculum jargon.
+
+The first course-map screen is now part of the shell. The home screen opens this
+recommended route before the full guided path browser, while `C` still continues
+the next incomplete lesson directly.
 
 ## Learning Flow
 

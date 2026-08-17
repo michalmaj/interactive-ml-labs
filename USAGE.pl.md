@@ -30,20 +30,23 @@ Obecny przepływ aplikacji:
 ```text
 wybór języka
 -> ekran główny z postępem nauki
--> ścieżka nauki albo wybór poziomu
+-> mapa kursu albo wybór poziomu
+-> prowadzona ścieżka nauki
 -> wybór lekcji albo demo
 -> ekran startowy demo
 -> ekran demo
 -> pauza / pomoc
 ```
 
-Ekran główny pokazuje zbiorczy postęp w prowadzonych ścieżkach nauki. Naciśnij `C` albo kliknij podświetloną linię z następnym krokiem w panelu postępu, żeby od razu kontynuować sugerowaną lekcję. Możesz też wejść w "Prowadzone ścieżki nauki", żeby ręcznie przejrzeć ścieżki, lekcje, zadania, odznaki i postęp w teorii. Paski postępu są widoczne na ekranie głównym, w szczegółach ścieżki, szczegółach lekcji, intro lekcji i pauzie, więc student szybko widzi, co zostało do zrobienia.
+Ekran główny pokazuje zbiorczy postęp w prowadzonych ścieżkach nauki. Naciśnij `C` albo kliknij podświetloną linię z następnym krokiem w panelu postępu, żeby od razu kontynuować sugerowaną lekcję. Możesz też wejść w "Prowadzone ścieżki nauki", żeby otworzyć mapę kursu, która pokazuje rekomendowaną trasę ponad pojedynczymi ścieżkami. Pełna lista ścieżek nadal jest dostępna z mapy kursu, gdy chcesz ręcznie przejrzeć ścieżki, lekcje, zadania, odznaki i postęp w teorii. Paski postępu są widoczne na ekranie głównym, mapie kursu, w szczegółach ścieżki, szczegółach lekcji, intro lekcji i pauzie, więc student szybko widzi, co zostało do zrobienia.
 
-Appka ma teraz trzy prowadzone ścieżki nauki:
+Appka ma teraz pięć prowadzonych ścieżek nauki:
 
 - Jak modele uczą się z błędów,
 - Od odległości do klastrów,
-- Od dobrych wyników do zaufanych modeli.
+- Od dobrych wyników do zaufanych modeli,
+- Od cech do decyzji modelu,
+- Od reprezentacji do zachowania modelu.
 
 Unified app jest teraz główną ścieżką przechodzenia przez laboratoria. Wszystkie obecne dema z Level 1 i Level 2 działają już w appce, a Level 3 ma rosnący zestaw zaawansowanych labów app-only. Oryginalne pakiety demo nadal można uruchomić osobno, a natywne laby app-only uruchamia się z unified app.
 

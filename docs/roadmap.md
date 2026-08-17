@@ -66,9 +66,9 @@ it for students.
 
 Required product work before `v0.0.9a`:
 
-1. Add a course-level map above individual learning paths.
-2. Improve student feedback with concept checks and stronger summaries.
-3. Add accessibility and classroom comfort settings.
+- [x] Add a course-level map above individual learning paths.
+- [ ] Improve student feedback with concept checks and stronger summaries.
+- [ ] Add accessibility and classroom comfort settings.
 
 Release preparation after those product slices:
 
@@ -107,7 +107,11 @@ The direction is captured in [learning_platform.md](learning_platform.md). Futur
 
 Recent shell work made lesson progress visible throughout the student flow: path details point to the next lesson, lesson lists show compact progress markers, and home/path/lesson/intro/pause screens use consistent progress summaries and bars.
 
-The path details screen also acts as a compact course map, so students can see
+The course map now sits above individual guided paths. It shows the recommended
+route, explains why each path follows the previous one, and keeps the full path
+browser available for free exploration.
+
+The path details screen still acts as a compact lesson map, so students can see
 lesson status and task progress before entering a specific demo.
 
 ### Shared UI Helpers
