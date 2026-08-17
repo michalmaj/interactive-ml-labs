@@ -9137,8 +9137,7 @@ COURSE_MAP_STEPS: tuple[CourseMapStep, ...] = (
         path_id="models_learn_from_error",
         rationale=LocalizedText(
             en=(
-                "Start here: see that models improve by reading error, loss, "
-                "and visible mistakes."
+                "Start here: see that models improve by reading error, loss, and visible mistakes."
             ),
             pl=(
                 "Zacznij tutaj: zobacz, że modele poprawiają się dzięki błędom, "
@@ -9147,23 +9146,14 @@ COURSE_MAP_STEPS: tuple[CourseMapStep, ...] = (
         ),
         next_reason=LocalizedText(
             en="Next, turn error intuition into geometry: distance decides what looks similar.",
-            pl=(
-                "Potem przejdź do geometrii: odległość decyduje, co model uznaje "
-                "za podobne."
-            ),
+            pl=("Potem przejdź do geometrii: odległość decyduje, co model uznaje za podobne."),
         ),
     ),
     CourseMapStep(
         path_id="distance_to_clusters",
         rationale=LocalizedText(
-            en=(
-                "Use distance to understand neighborhoods, hard clusters, "
-                "and soft membership."
-            ),
-            pl=(
-                "Użyj odległości, żeby zrozumieć sąsiedztwa, twarde klastry "
-                "i soft membership."
-            ),
+            en=("Use distance to understand neighborhoods, hard clusters, and soft membership."),
+            pl=("Użyj odległości, żeby zrozumieć sąsiedztwa, twarde klastry i soft membership."),
         ),
         next_reason=LocalizedText(
             en="Then ask whether a good-looking score is evidence you can trust.",
@@ -9201,10 +9191,7 @@ COURSE_MAP_STEPS: tuple[CourseMapStep, ...] = (
         ),
         next_reason=LocalizedText(
             en="Finally, move into advanced behavior: compressed views, drift, and time.",
-            pl=(
-                "Na końcu przejdź do zaawansowanego zachowania: kompresji, driftu "
-                "i czasu."
-            ),
+            pl=("Na końcu przejdź do zaawansowanego zachowania: kompresji, driftu i czasu."),
         ),
     ),
     CourseMapStep(
