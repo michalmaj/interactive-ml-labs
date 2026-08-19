@@ -68,7 +68,7 @@ Required product work before `v0.0.9a`:
 
 - [x] Add a course-level map above individual learning paths.
 - [x] Improve student feedback with concept checks and stronger summaries.
-- [ ] Add accessibility and classroom comfort settings.
+- [x] Add accessibility and classroom comfort settings.
 
 Release preparation after those product slices:
 

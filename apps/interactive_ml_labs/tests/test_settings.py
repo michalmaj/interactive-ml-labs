@@ -132,6 +132,9 @@ def test_settings_serialization_persists_user_preferences_only() -> None:
         adaptive_window_enabled=True,
         fixed_scene_scaling_enabled=False,
         sound_enabled=True,
+        large_text_enabled=True,
+        high_contrast_enabled=True,
+        colorblind_palette_enabled=True,
     )
 
     data = settings_to_json(settings)
@@ -142,6 +145,9 @@ def test_settings_serialization_persists_user_preferences_only() -> None:
         "fullscreen_enabled": True,
         "adaptive_window_enabled": True,
         "fixed_scene_scaling_enabled": False,
+        "large_text_enabled": True,
+        "high_contrast_enabled": True,
+        "colorblind_palette_enabled": True,
     }
 
 
@@ -153,6 +159,9 @@ def test_settings_from_json_uses_defaults_for_invalid_values() -> None:
             "fullscreen_enabled": "yes",
             "adaptive_window_enabled": True,
             "fixed_scene_scaling_enabled": False,
+            "large_text_enabled": "yes",
+            "high_contrast_enabled": True,
+            "colorblind_palette_enabled": False,
         },
     )
 
@@ -160,6 +169,9 @@ def test_settings_from_json_uses_defaults_for_invalid_values() -> None:
     assert settings.fullscreen_enabled is False
     assert settings.adaptive_window_enabled is True
     assert settings.fixed_scene_scaling_enabled is False
+    assert settings.large_text_enabled is False
+    assert settings.high_contrast_enabled is True
+    assert settings.colorblind_palette_enabled is False
 
 
 def test_load_app_settings_returns_defaults_when_file_is_missing(tmp_path) -> None:
@@ -177,6 +189,9 @@ def test_save_and_load_app_settings_round_trip(tmp_path) -> None:
         fullscreen_enabled=True,
         adaptive_window_enabled=True,
         fixed_scene_scaling_enabled=False,
+        large_text_enabled=True,
+        high_contrast_enabled=True,
+        colorblind_palette_enabled=True,
     )
 
     save_app_settings(settings, settings_path)
@@ -186,6 +201,9 @@ def test_save_and_load_app_settings_round_trip(tmp_path) -> None:
     assert loaded_settings.fullscreen_enabled is True
     assert loaded_settings.adaptive_window_enabled is True
     assert loaded_settings.fixed_scene_scaling_enabled is False
+    assert loaded_settings.large_text_enabled is True
+    assert loaded_settings.high_contrast_enabled is True
+    assert loaded_settings.colorblind_palette_enabled is True
     assert loaded_settings.resolution == DEFAULT_RESOLUTION
     assert json.loads(settings_path.read_text(encoding="utf-8")) == settings_to_json(settings)
 

@@ -55,6 +55,27 @@ PANEL_SELECTED: Final[tuple[int, int, int]] = (55, 97, 126)
 TEXT: Final[tuple[int, int, int]] = (235, 238, 241)
 MUTED_TEXT: Final[tuple[int, int, int]] = (166, 173, 181)
 ACCENT: Final[tuple[int, int, int]] = (113, 204, 152)
+HIGH_CONTRAST_COLORS: Final[dict[tuple[int, int, int], tuple[int, int, int]]] = {
+    BACKGROUND: (0, 0, 0),
+    PANEL: (20, 20, 20),
+    PANEL_SELECTED: (74, 74, 74),
+    TEXT: (255, 255, 255),
+    MUTED_TEXT: (222, 222, 222),
+    ACCENT: (255, 220, 96),
+    (12, 14, 17): (0, 0, 0),
+    (55, 61, 69): (92, 92, 92),
+    (72, 79, 88): (188, 188, 188),
+    (226, 176, 83): (255, 220, 96),
+    (250, 218, 139): (255, 255, 255),
+    (61, 68, 76): (42, 42, 42),
+    (109, 118, 128): (190, 190, 190),
+}
+COLORBLIND_COLORS: Final[dict[tuple[int, int, int], tuple[int, int, int]]] = {
+    PANEL_SELECTED: (0, 114, 178),
+    ACCENT: (230, 159, 0),
+    (226, 176, 83): (230, 159, 0),
+    (250, 218, 139): (240, 228, 66),
+}
 FOOTER_OFFSET: Final[int] = 50
 FOOTER_RESERVED_HEIGHT: Final[int] = 84
 THEORY_SCROLL_STEP: Final[int] = 72
@@ -135,10 +156,7 @@ class UnifiedAppShell:
             self._display_flags(),
         )
         self.clock = pygame.time.Clock()
-        self.font_title = make_ui_font(44, bold=True)
-        self.font_heading = make_ui_font(30, bold=True)
-        self.font_body = make_ui_font(22)
-        self.font_small = make_ui_font(18)
+        self._refresh_fonts()
         self.running = True
         self.screen_name = ScreenName.LANGUAGE
         self.previous_screen = ScreenName.INTRO
@@ -187,6 +205,23 @@ class UnifiedAppShell:
             return pygame.FULLSCREEN
 
         return 0
+
+    def _refresh_fonts(self) -> None:
+        """Rebuild shell fonts from current comfort settings."""
+        scale = 1.15 if self.context.settings.large_text_enabled else 1.0
+        self.font_title = make_ui_font(round(44 * scale), bold=True)
+        self.font_heading = make_ui_font(round(30 * scale), bold=True)
+        self.font_body = make_ui_font(round(22 * scale))
+        self.font_small = make_ui_font(round(18 * scale))
+
+    def _ui_color(self, color: tuple[int, int, int]) -> tuple[int, int, int]:
+        """Return the shell color adjusted for accessibility settings."""
+        if self.context.settings.high_contrast_enabled:
+            return HIGH_CONTRAST_COLORS.get(color, color)
+        if self.context.settings.colorblind_palette_enabled:
+            return COLORBLIND_COLORS.get(color, color)
+
+        return color
 
     def _apply_display_mode(self) -> None:
         """Recreate the display surface using current display settings."""
@@ -417,7 +452,7 @@ class UnifiedAppShell:
         self._open_lesson_completion_if_needed(lesson, was_completed)
 
     def _render(self) -> None:
-        self.screen.fill(BACKGROUND)
+        self.screen.fill(self._ui_color(BACKGROUND))
 
         renderers = {
             ScreenName.LANGUAGE: self._render_language,
@@ -736,13 +771,13 @@ class UnifiedAppShell:
     ) -> None:
         """Draw one compact progress bar."""
         track_rect = pygame.Rect(x, y, width, 8)
-        pygame.draw.rect(self.screen, (55, 61, 69), track_rect, border_radius=3)
+        pygame.draw.rect(self.screen, self._ui_color((55, 61, 69)), track_rect, border_radius=3)
         if total_count <= 0 or completed_count <= 0:
             return
 
         ratio = min(1.0, completed_count / total_count)
         fill_rect = pygame.Rect(x, y, round(width * ratio), track_rect.height)
-        pygame.draw.rect(self.screen, ACCENT, fill_rect, border_radius=3)
+        pygame.draw.rect(self.screen, self._ui_color(ACCENT), fill_rect, border_radius=3)
 
     def _render_learning_paths(self) -> None:
         labels = [self._learning_path_menu_label(path) for path in LEARNING_PATH_MANIFESTS]
@@ -2583,9 +2618,9 @@ class UnifiedAppShell:
         unlocked: bool,
     ) -> None:
         """Draw a small local badge icon without external image assets."""
-        fill = (226, 176, 83) if unlocked else (61, 68, 76)
-        outline = (250, 218, 139) if unlocked else (109, 118, 128)
-        detail = BACKGROUND if unlocked else MUTED_TEXT
+        fill = self._ui_color((226, 176, 83) if unlocked else (61, 68, 76))
+        outline = self._ui_color((250, 218, 139) if unlocked else (109, 118, 128))
+        detail = self._ui_color(BACKGROUND if unlocked else MUTED_TEXT)
         cx, cy = center
 
         pygame.draw.circle(self.screen, fill, center, 12)
@@ -2614,14 +2649,20 @@ class UnifiedAppShell:
             + self._on_off(settings.adaptive_window_enabled),
             self._text("Fixed-scene scaling: ", "Skalowanie stałych scen: ")
             + self._on_off(settings.fixed_scene_scaling_enabled),
+            self._text("Large text: ", "Większy tekst: ")
+            + self._on_off(settings.large_text_enabled),
+            self._text("High contrast: ", "Wysoki kontrast: ")
+            + self._on_off(settings.high_contrast_enabled),
+            self._text("Colorblind-friendly palette: ", "Paleta przyjazna daltonizmowi: ")
+            + self._on_off(settings.colorblind_palette_enabled),
             self._text("Sound: ", "Dźwięk: ") + self._on_off(settings.sound_enabled),
             self._text("Back", "Wróć"),
         ]
-        self._draw_menu(labels, top=190)
+        self._draw_menu(labels, top=168, item_height=44, item_pitch=52)
         self._draw_footer(
             self._text(
-                "Enter: toggle/select | Esc/Backspace: back | Adaptive size applies next launch",
-                "Enter: przełącz | Esc/Backspace: wróć | Adaptacyjny rozmiar od następnego startu",
+                "Enter: toggle/select | Esc/Backspace: back | Most comfort settings apply now",
+                "Enter: przełącz | Esc/Backspace: wróć | Większość opcji komfortu działa od razu",
             ),
         )
 
@@ -2629,16 +2670,31 @@ class UnifiedAppShell:
         self._draw_text(title, (80, 70), self.font_title, TEXT)
         self._draw_text(subtitle, (82, 128), self.font_body, MUTED_TEXT)
 
-    def _draw_menu(self, labels: list[str], *, top: int, width: int = 760) -> None:
+    def _draw_menu(
+        self,
+        labels: list[str],
+        *,
+        top: int,
+        width: int = 760,
+        item_height: int = MENU_ITEM_HEIGHT,
+        item_pitch: int = MENU_ITEM_PITCH,
+    ) -> None:
         self.menu_items = []
         left = 80
 
         for index, label in enumerate(labels):
-            rect = pygame.Rect(left, top + index * MENU_ITEM_PITCH, width, MENU_ITEM_HEIGHT)
+            rect = pygame.Rect(left, top + index * item_pitch, width, item_height)
             color = PANEL_SELECTED if index == self.selected_index else PANEL
-            pygame.draw.rect(self.screen, color, rect, border_radius=8)
-            pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
-            self._draw_text(label, (rect.x + 20, rect.y + 14), self.font_body, TEXT)
+            pygame.draw.rect(self.screen, self._ui_color(color), rect, border_radius=8)
+            pygame.draw.rect(
+                self.screen,
+                self._ui_color((72, 79, 88)),
+                rect,
+                width=1,
+                border_radius=8,
+            )
+            label_y = rect.y + max(0, (rect.height - self.font_body.get_height()) // 2)
+            self._draw_text(label, (rect.x + 20, label_y), self.font_body, TEXT)
             self.menu_items.append(MenuItem(label=label, rect=rect))
 
     def _draw_scrollable_demo_menu(self, labels: list[str], *, top: int, bottom: int) -> None:
@@ -2659,8 +2715,14 @@ class UnifiedAppShell:
                 if not rect.colliderect(viewport):
                     continue
                 color = PANEL_SELECTED if index == self.selected_index else PANEL
-                pygame.draw.rect(self.screen, color, rect, border_radius=8)
-                pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
+                pygame.draw.rect(self.screen, self._ui_color(color), rect, border_radius=8)
+                pygame.draw.rect(
+                    self.screen,
+                    self._ui_color((72, 79, 88)),
+                    rect,
+                    width=1,
+                    border_radius=8,
+                )
                 self._draw_text(label, (rect.x + 20, rect.y + 14), self.font_body, TEXT)
                 self.menu_items.append(MenuItem(label=label, rect=rect))
         finally:
@@ -2686,7 +2748,7 @@ class UnifiedAppShell:
         font: pygame.font.Font,
         color: tuple[int, int, int],
     ) -> None:
-        rendered = font.render(text, True, color)
+        rendered = font.render(text, True, self._ui_color(color))
         self.screen.blit(rendered, position)
 
     def _draw_wrapped(
@@ -2858,10 +2920,10 @@ class UnifiedAppShell:
             scroll_offset=scroll_offset,
             max_scroll=max_scroll,
         )
-        pygame.draw.rect(self.screen, (55, 61, 69), track_rect, border_radius=2)
+        pygame.draw.rect(self.screen, self._ui_color((55, 61, 69)), track_rect, border_radius=2)
         pygame.draw.rect(
             self.screen,
-            ACCENT,
+            self._ui_color(ACCENT),
             thumb_rect,
             border_radius=2,
         )
@@ -2895,8 +2957,8 @@ class UnifiedAppShell:
             width - 2 * margin_x,
             height - 2 * margin_y,
         )
-        pygame.draw.rect(self.screen, (12, 14, 17), rect, border_radius=8)
-        pygame.draw.rect(self.screen, ACCENT, rect, width=2, border_radius=8)
+        pygame.draw.rect(self.screen, self._ui_color((12, 14, 17)), rect, border_radius=8)
+        pygame.draw.rect(self.screen, self._ui_color(ACCENT), rect, width=2, border_radius=8)
         language = self.context.settings.language
         demo = self._active_help_demo()
 
@@ -3183,6 +3245,16 @@ class UnifiedAppShell:
             settings.fixed_scene_scaling_enabled = not settings.fixed_scene_scaling_enabled
             self._save_settings()
         elif self.selected_index == 4:
+            settings.large_text_enabled = not settings.large_text_enabled
+            self._refresh_fonts()
+            self._save_settings()
+        elif self.selected_index == 5:
+            settings.high_contrast_enabled = not settings.high_contrast_enabled
+            self._save_settings()
+        elif self.selected_index == 6:
+            settings.colorblind_palette_enabled = not settings.colorblind_palette_enabled
+            self._save_settings()
+        elif self.selected_index == 7:
             settings.sound_enabled = not settings.sound_enabled
         else:
             self._go_to(self.settings_return_screen)
@@ -3338,7 +3410,7 @@ class UnifiedAppShell:
             ),
             ScreenName.PATH_COMPLETE: len(self._path_completion_menu_labels()),
             ScreenName.BADGES: 1,
-            ScreenName.SETTINGS: 6,
+            ScreenName.SETTINGS: 9,
             ScreenName.PAUSE: 7,
         }
         return max(1, counts[self.screen_name])

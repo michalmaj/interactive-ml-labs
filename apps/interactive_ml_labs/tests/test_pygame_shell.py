@@ -48,10 +48,13 @@ from interactive_ml_labs.logistic_scene import (
 from interactive_ml_labs.manifest import LocalizedText
 from interactive_ml_labs.progress import load_app_progress
 from interactive_ml_labs.pygame_app import (
+    ACCENT,
     DEMO_MENU_TOP,
     DEMO_SCROLLBAR_X,
     MENU_ITEM_HEIGHT,
     MENU_ITEM_PITCH,
+    PANEL_SELECTED,
+    TEXT,
     ScreenName,
     UnifiedAppShell,
 )
@@ -3396,8 +3399,8 @@ def test_shell_s_key_opens_settings_outside_demo(monkeypatch) -> None:
         pygame.quit()
 
 
-def test_shell_settings_menu_toggles_display_flags(monkeypatch) -> None:
-    """Settings menu should mutate in-memory display options."""
+def test_shell_settings_menu_toggles_display_and_comfort_flags(monkeypatch) -> None:
+    """Settings menu should mutate in-memory display and comfort options."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
 
@@ -3414,6 +3417,69 @@ def test_shell_settings_menu_toggles_display_flags(monkeypatch) -> None:
         app.selected_index = 3
         app._activate_selected()
         assert app.context.settings.fixed_scene_scaling_enabled is False
+
+        body_height = app.font_body.get_height()
+        app.selected_index = 4
+        app._activate_selected()
+        assert app.context.settings.large_text_enabled is True
+        assert app.font_body.get_height() > body_height
+
+        app.selected_index = 5
+        app._activate_selected()
+        assert app.context.settings.high_contrast_enabled is True
+
+        app.selected_index = 6
+        app._activate_selected()
+        assert app.context.settings.colorblind_palette_enabled is True
+    finally:
+        pygame.quit()
+
+
+def test_shell_settings_menu_lists_accessibility_options(monkeypatch) -> None:
+    """Settings should expose accessibility options directly in the shell."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+    labels: list[str] = []
+
+    def record_menu(
+        menu_labels: list[str],
+        *,
+        top: int,
+        width: int = 760,
+        item_height: int = MENU_ITEM_HEIGHT,
+        item_pitch: int = MENU_ITEM_PITCH,
+    ) -> None:
+        del top, width, item_height, item_pitch
+        labels.extend(menu_labels)
+
+    try:
+        app.screen_name = ScreenName.SETTINGS
+        app._draw_menu = record_menu  # type: ignore[method-assign]
+        app._render_settings()
+
+        assert "Large text: Off" in labels
+        assert "High contrast: Off" in labels
+        assert "Colorblind-friendly palette: Off" in labels
+    finally:
+        pygame.quit()
+
+
+def test_shell_ui_color_respects_accessibility_palettes(monkeypatch) -> None:
+    """Shell drawing helpers should adapt core colors for comfort settings."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        assert app._ui_color(TEXT) == TEXT
+        assert app._ui_color(ACCENT) == ACCENT
+
+        app.context.settings.colorblind_palette_enabled = True
+        assert app._ui_color(ACCENT) != ACCENT
+        assert app._ui_color(PANEL_SELECTED) != PANEL_SELECTED
+
+        app.context.settings.high_contrast_enabled = True
+        assert app._ui_color(TEXT) == (255, 255, 255)
+        assert app._ui_color(ACCENT) == (255, 220, 96)
     finally:
         pygame.quit()
 
@@ -3490,7 +3556,7 @@ def test_shell_settings_back_returns_to_previous_screen(monkeypatch) -> None:
     try:
         app.screen_name = ScreenName.DEMOS
         app._open_settings()
-        app.selected_index = 5
+        app.selected_index = 8
         app._activate_selected()
 
         assert app.screen_name == ScreenName.DEMOS
