@@ -23,6 +23,9 @@ class AppSettings:
     fixed_scene_scaling_enabled: bool = True
     fullscreen_enabled: bool = False
     sound_enabled: bool = False
+    large_text_enabled: bool = False
+    high_contrast_enabled: bool = False
+    colorblind_palette_enabled: bool = False
 
 
 @dataclass(slots=True)
@@ -59,6 +62,9 @@ def settings_to_json(settings: AppSettings) -> dict[str, object]:
         "fullscreen_enabled": settings.fullscreen_enabled,
         "adaptive_window_enabled": settings.adaptive_window_enabled,
         "fixed_scene_scaling_enabled": settings.fixed_scene_scaling_enabled,
+        "large_text_enabled": settings.large_text_enabled,
+        "high_contrast_enabled": settings.high_contrast_enabled,
+        "colorblind_palette_enabled": settings.colorblind_palette_enabled,
     }
 
 
@@ -76,6 +82,9 @@ def settings_from_json(data: object) -> AppSettings:
         "fullscreen_enabled",
         "adaptive_window_enabled",
         "fixed_scene_scaling_enabled",
+        "large_text_enabled",
+        "high_contrast_enabled",
+        "colorblind_palette_enabled",
     ):
         value = data.get(field_name)
         if isinstance(value, bool):
