@@ -37,3 +37,22 @@ def test_level_three_guided_path_is_documented_after_registration() -> None:
 
     registered_path_ids = {path.id for path in LEARNING_PATH_MANIFESTS}
     assert PLANNED_LEVEL_3_PATH_ID in registered_path_ids
+
+
+def test_v0_0_9a_release_docs_are_linked() -> None:
+    """The release plan should point to the concrete checklist and student notes."""
+    release_plan = (REPO_ROOT / "docs/release_v0_0_9a.md").read_text()
+    roadmap = (REPO_ROOT / "docs/roadmap.md").read_text()
+    readme = (REPO_ROOT / "README.md").read_text()
+
+    required_docs = (
+        "release_checklist_v0_0_9a.md",
+        "student_alpha_v0_0_9a.md",
+        "student_alpha_v0_0_9a.pl.md",
+    )
+    for doc_name in required_docs:
+        assert doc_name in release_plan
+        assert (REPO_ROOT / "docs" / doc_name).exists()
+
+    assert "release_checklist_v0_0_9a.md" in roadmap
+    assert "release_checklist_v0_0_9a.md" in readme

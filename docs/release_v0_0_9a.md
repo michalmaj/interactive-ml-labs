@@ -21,6 +21,10 @@ stay lightweight, local-first, and demo-driven.
 
 ## Required Product Work
 
+Current status: the required product work is complete. The remaining work is
+release preparation: repository metadata, issue templates, license, final
+verification, and publishing the tag/release.
+
 ### 1. Course Feeling Above Individual Paths
 
 Students should understand where to start, what to do next, and why the next
@@ -74,6 +78,14 @@ and are persisted with the rest of the user settings. Demo-specific readability
 passes can follow incrementally when individual scenes need deeper layout work.
 
 ## Release Preparation
+
+The concrete release runbook is captured in
+[release_checklist_v0_0_9a.md](release_checklist_v0_0_9a.md).
+
+The draft student-facing release notes are:
+
+- [student_alpha_v0_0_9a.md](student_alpha_v0_0_9a.md),
+- [student_alpha_v0_0_9a.pl.md](student_alpha_v0_0_9a.pl.md).
 
 After the required product work is complete:
 
