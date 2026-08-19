@@ -1607,6 +1607,9 @@ def test_learning_lessons_define_goals_tasks_and_badges() -> None:
         if lesson.instructor_note is not None:
             assert lesson.instructor_note.en
             assert lesson.instructor_note.pl
+        for check in lesson.understanding_checks:
+            assert check.en
+            assert check.pl
         assert len(lesson.tasks) >= 2
         assert all(task.title.en and task.title.pl for task in lesson.tasks)
         assert all(task.instruction.en and task.instruction.pl for task in lesson.tasks)
@@ -1616,6 +1619,7 @@ def test_learning_lessons_define_goals_tasks_and_badges() -> None:
         "error_linear_regression_line_fit",
     )
     assert LESSON_BY_ID["error_boosting_mistakes"].level == 2
+    assert LESSON_BY_ID["error_linear_regression_line_fit"].understanding_checks
 
 
 def test_feature_decision_first_lessons_define_guided_metadata() -> None:

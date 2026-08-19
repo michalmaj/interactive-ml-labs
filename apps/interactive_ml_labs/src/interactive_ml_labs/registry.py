@@ -7449,6 +7449,12 @@ LESSON_MANIFESTS: tuple[LessonManifest, ...] = (
                 "model nadal nie uchwycił wzoru."
             ),
         ),
+        understanding_checks=(
+            LocalizedText(
+                en="Can you point to residuals that prove the line is still biased?",
+                pl="Czy umiesz wskazać residuals, które pokazują, że prosta nadal ma bias?",
+            ),
+        ),
     ),
     LessonManifest(
         id="error_gradient_descent",
@@ -9327,6 +9333,10 @@ def _validate_lesson_manifest(
 
     for task in lesson.tasks:
         _validate_lesson_task(task, lesson_id=lesson.id)
+
+    for check in lesson.understanding_checks:
+        if not check.en or not check.pl:
+            raise ValueError(f"Lesson {lesson.id!r} has an incomplete understanding check")
 
 
 def _validate_lesson_task(task: LessonTask, *, lesson_id: str) -> None:

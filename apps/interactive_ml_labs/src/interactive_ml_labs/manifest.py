@@ -106,6 +106,7 @@ class LessonManifest:
     completion_badge: LocalizedText | None = None
     recap_prompt: LocalizedText | None = None
     instructor_note: LocalizedText | None = None
+    understanding_checks: tuple[LocalizedText, ...] = field(default_factory=tuple)
 
 
 @dataclass(frozen=True, slots=True)
