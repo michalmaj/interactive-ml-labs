@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Interactive logistic regression classification demo for machine learning education."
 readme = "README.md"
 requires-python = ">=3.12"
+license = "MIT"
 dependencies = [
     "ml-lab-core",
     "numpy>=2.4.4",

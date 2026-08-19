@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Unified Pygame app shell for Interactive ML Labs."
 readme = "README.md"
 requires-python = ">=3.12"
+license = "MIT"
 dependencies = [
     "boosting-mistake-lab",
     "decision-tree-splitter",
