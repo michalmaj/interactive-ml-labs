@@ -30,6 +30,14 @@ TRACKED_ARTIFACT_SUFFIXES = (
 
 TRACKED_ARTIFACT_FILENAMES = {"git", "switch"}
 
+REQUIRED_ISSUE_TEMPLATES = (
+    "bug_report.yml",
+    "confusing_lesson.yml",
+    "missing_topic.yml",
+    "classroom_feedback.yml",
+    "config.yml",
+)
+
 
 def test_no_local_artifacts_are_tracked() -> None:
     """Tracked files should not include local caches or accidental shell artifacts."""
@@ -46,6 +54,18 @@ def test_no_local_artifacts_are_tracked() -> None:
     offenders = [path for path in tracked_files if _is_local_artifact(path)]
 
     assert offenders == []
+
+
+def test_release_readiness_files_exist() -> None:
+    """The student alpha release should include license and feedback entry points."""
+    repo_root = Path(__file__).resolve().parents[1]
+
+    assert (repo_root / "LICENSE").read_text(encoding="utf-8").startswith("MIT License")
+    assert (repo_root / "docs/github_repository_setup.md").exists()
+
+    issue_template_dir = repo_root / ".github/ISSUE_TEMPLATE"
+    for template_name in REQUIRED_ISSUE_TEMPLATES:
+        assert (issue_template_dir / template_name).exists()
 
 
 def _is_local_artifact(path: str) -> bool:

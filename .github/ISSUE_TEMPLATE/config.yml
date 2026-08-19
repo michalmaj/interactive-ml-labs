@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Student alpha notes
+    url: https://github.com/michalmaj/interactive-ml-labs/blob/main/docs/student_alpha_v0_0_9a.md
+    about: Read this before reporting alpha feedback.
+  - name: Notatki dla studentow
+    url: https://github.com/michalmaj/interactive-ml-labs/blob/main/docs/student_alpha_v0_0_9a.pl.md
+    about: Przeczytaj przed dodaniem feedbacku do wersji alfa.

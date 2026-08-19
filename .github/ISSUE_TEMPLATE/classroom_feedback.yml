@@ -1,0 +1,44 @@
+name: Classroom usability feedback
+description: Report feedback from using the app during a class, workshop, or presentation.
+title: "[Classroom]: "
+labels:
+  - classroom-feedback
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for real teaching feedback: readability, pacing, controls, projector use, or student reactions. English or Polish is fine.
+  - type: textarea
+    id: context
+    attributes:
+      label: Classroom context
+      description: Group size, student level, device/projector setup, and lesson duration.
+    validations:
+      required: true
+  - type: textarea
+    id: worked
+    attributes:
+      label: What worked well?
+      description: Which demo, task, or explanation helped students?
+  - type: textarea
+    id: friction
+    attributes:
+      label: What caused friction?
+      description: Mention readability, controls, pacing, language, or navigation issues.
+    validations:
+      required: true
+  - type: textarea
+    id: suggested_change
+    attributes:
+      label: Suggested change
+      description: What should be changed before the next class?
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: Priority
+      options:
+        - Nice to have
+        - Should improve before wider student use
+        - Blocking for classroom use
+    validations:
+      required: true

@@ -1,0 +1,59 @@
+name: Bug report
+description: Report a crash, broken control, wrong screen behavior, or failing workflow.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. English or Polish is fine.
+  - type: input
+    id: app_area
+    attributes:
+      label: Where did it happen?
+      description: Name the screen, level, learning path, or demo if you can.
+      placeholder: "Example: Course map, Calibration Lab, Settings"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What did you click or press before the problem happened?
+      placeholder: |
+        1. Open ...
+        2. Press ...
+        3. See ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead?
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Windows
+        - Linux
+        - Other / not sure
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Extra context
+      description: Add screenshots, terminal output, or classroom context if useful.

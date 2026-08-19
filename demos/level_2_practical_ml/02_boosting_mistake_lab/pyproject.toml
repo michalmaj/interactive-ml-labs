@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Interactive boosting demo showing how sequential learners focus on previous mistakes."
 readme = "README.md"
 requires-python = ">=3.12"
+license = "MIT"
 dependencies = [
     "ml-lab-core",
     "numpy>=2.4.4",
