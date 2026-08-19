@@ -1,0 +1,44 @@
+name: Confusing lesson feedback
+description: Tell us where a lesson, task, theory screen, or concept check was unclear.
+title: "[Lesson]: "
+labels:
+  - lesson-feedback
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this when the app works, but the learning flow or explanation is confusing. English or Polish is fine.
+  - type: input
+    id: lesson
+    attributes:
+      label: Lesson or demo
+      placeholder: "Example: K-Means Intro Lab, From good scores to trustworthy models"
+    validations:
+      required: true
+  - type: textarea
+    id: confusing_part
+    attributes:
+      label: What was confusing?
+      description: Point to the exact task, theory paragraph, screen, or control if possible.
+    validations:
+      required: true
+  - type: textarea
+    id: student_expectation
+    attributes:
+      label: What did you think it meant?
+      description: This helps identify misleading copy or missing context.
+  - type: textarea
+    id: better_explanation
+    attributes:
+      label: What would make it clearer?
+      description: A suggested sentence, example, or visual cue is very helpful.
+  - type: dropdown
+    id: severity
+    attributes:
+      label: How blocking was it?
+      options:
+        - Small wording issue
+        - I could continue, but the idea was unclear
+        - I could not complete the lesson
+    validations:
+      required: true

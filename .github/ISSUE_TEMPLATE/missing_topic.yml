@@ -1,0 +1,45 @@
+name: Missing topic suggestion
+description: Suggest an ML topic, lesson, or demo that would improve the course.
+title: "[Topic]: "
+labels:
+  - topic-suggestion
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Suggest topics that would help students build intuition. English or Polish is fine.
+  - type: input
+    id: topic
+    attributes:
+      label: Topic
+      placeholder: "Example: ROC curves, regularization, cross-validation"
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why should this be added?
+      description: What misunderstanding or teaching gap would it solve?
+    validations:
+      required: true
+  - type: dropdown
+    id: level
+    attributes:
+      label: Best level
+      options:
+        - Level 1 - fundamentals
+        - Level 2 - practical ML
+        - Level 3 - advanced / showcase
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: interaction
+    attributes:
+      label: Suggested interaction
+      description: What should a student be able to change, observe, or explain?
+  - type: textarea
+    id: references
+    attributes:
+      label: References or classroom context
+      description: Optional links, course context, or examples.
