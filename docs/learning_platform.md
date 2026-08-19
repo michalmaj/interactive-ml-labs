@@ -23,7 +23,7 @@ Before packaging the app for students, the platform should gain three product
 layers:
 
 - [x] a course-level map above individual learning paths,
-- [ ] better student feedback through concept checks and stronger summaries,
+- [x] better student feedback through concept checks and stronger summaries,
 - [ ] accessibility and classroom comfort settings.
 
 The order matters. The app should first feel like a coherent guided course, then
@@ -451,7 +451,13 @@ Lesson manifests may define a custom recap prompt. If they do not, the shell use
 
 All currently registered guided lessons now define custom recap prompts. The prompts are intentionally short and concept-specific: each one asks the student to connect the interaction they just completed with the modeling assumption, metric trade-off, or monitoring signal that the lesson was meant to reveal.
 
-Completion summaries should also include a short self-check. This is not a quiz and it is not stored as graded progress; it is a lightweight reminder that the student should be able to explain the result before moving to the next lesson.
+Completion summaries should also include short concept checks and a short
+self-check. Concept checks ask whether the student can explain the key idea and
+name the visible signal that proved it in the demo. A lesson may provide custom
+understanding checks; otherwise the shell derives supportive questions from the
+lesson goal. This is not a quiz and it is not stored as graded progress; it is a
+lightweight reminder that the student should be able to explain the result before
+moving to the next lesson.
 
 When the last lesson in a guided path is completed, the shell should open a path completion summary. This gives the student a course-like milestone with aggregate lesson, task, theory, and badge progress before they choose whether to review the path or move back to the path list.
 

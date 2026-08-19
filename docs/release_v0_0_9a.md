@@ -52,6 +52,10 @@ Target outcome:
 This should stay supportive rather than exam-like. The goal is understanding and
 confidence, not grading.
 
+Current status: lesson completion summaries now include lightweight concept
+checks. They are not graded or persisted; they help students pause and verify
+whether they can explain the key idea before continuing.
+
 ### 3. Accessibility And Classroom Comfort
 
 The app should be more comfortable on projectors, small laptop screens, and in
@@ -93,4 +97,3 @@ Target direction:
 
 Distribution should follow the learning-platform polish, not precede it. The
 release should first be worth installing.
-
