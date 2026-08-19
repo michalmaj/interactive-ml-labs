@@ -3,6 +3,10 @@
 This document captures the repository settings recommended for the `v0.0.9a`
 student-facing alpha.
 
+Current status: description, topics, Issues, and Wiki were applied on GitHub for
+the alpha release preparation. The website field is intentionally empty until a
+public project site exists.
+
 ## Description
 
 Use this short repository description:
