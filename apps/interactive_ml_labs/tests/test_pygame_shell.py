@@ -1522,6 +1522,56 @@ def test_shell_lesson_instructor_note_can_come_from_manifest(monkeypatch) -> Non
         pygame.quit()
 
 
+def test_shell_understanding_checks_use_lesson_goal_fallback(monkeypatch) -> None:
+    """Lessons without custom checks should still ask concept-level questions."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        source_lesson = LESSON_BY_ID[LEARNING_PATH_MANIFESTS[0].lesson_ids[0]]
+        lesson = source_lesson.__class__(
+            id="fallback_understanding_check",
+            level=source_lesson.level,
+            demo_id=source_lesson.demo_id,
+            title=source_lesson.title,
+            learning_goal=LocalizedText(en="Read residuals", pl="Czytaj residuals"),
+            tasks=source_lesson.tasks,
+        )
+
+        assert app._lesson_understanding_check_lines(lesson) == [
+            "Can you explain this goal in your own words: Read residuals",
+            "Can you name the visible signal that proved it in the demo?",
+        ]
+
+        app.context.settings.language = "pl"
+        assert app._lesson_understanding_check_lines(lesson) == [
+            "Czy umiesz wyjaśnić własnymi słowami ten cel: Czytaj residuals",
+            "Czy umiesz nazwać widoczny sygnał z demo, który to potwierdził?",
+        ]
+    finally:
+        pygame.quit()
+
+
+def test_shell_understanding_checks_can_come_from_manifest(monkeypatch) -> None:
+    """Lesson manifests should be able to define custom concept checks."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        lesson = LESSON_BY_ID["error_linear_regression_line_fit"]
+
+        assert app._lesson_understanding_check_lines(lesson) == [
+            "Can you point to residuals that prove the line is still biased?"
+        ]
+
+        app.context.settings.language = "pl"
+        assert app._lesson_understanding_check_lines(lesson) == [
+            "Czy umiesz wskazać residuals, które pokazują, że prosta nadal ma bias?"
+        ]
+    finally:
+        pygame.quit()
+
+
 def test_shell_lesson_self_check_lines_localize_polish(monkeypatch) -> None:
     """Completion summaries should provide a lightweight self-check."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -1722,6 +1772,49 @@ def test_shell_completion_summary_renders_lesson_progress(monkeypatch) -> None:
         assert menu_labels[0].startswith("Next lesson:")
         assert menu_tops
         assert menu_tops[0] + 2 * MENU_ITEM_PITCH + MENU_ITEM_HEIGHT < app._footer_y()
+    finally:
+        pygame.quit()
+
+
+def test_shell_completion_summary_renders_understanding_checks(monkeypatch) -> None:
+    """Completion summaries should ask concept-level understanding questions."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
+    drawn_text: list[str] = []
+    wrapped_text: list[str] = []
+
+    def capture_text(
+        text: str,
+        position: tuple[int, int],
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> None:
+        _ = position, font, color
+        drawn_text.append(text)
+
+    def capture_wrapped(
+        text: str,
+        position: tuple[int, int],
+        width: int,
+        font: pygame.font.Font,
+        color: tuple[int, int, int],
+    ) -> int:
+        _ = width, font, color
+        wrapped_text.append(text)
+        return position[1] + 24
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        lesson = LESSON_BY_ID[path.lesson_ids[0]]
+        app.selected_learning_path = path
+        app.selected_lesson = lesson
+        app._draw_text = capture_text
+        app._draw_wrapped = capture_wrapped
+
+        app._render_lesson_complete()
+
+        assert "Concept check" in drawn_text
+        assert "- " + app._lesson_understanding_check_lines(lesson)[0] in wrapped_text
     finally:
         pygame.quit()
 

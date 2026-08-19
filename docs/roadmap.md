@@ -67,7 +67,7 @@ it for students.
 Required product work before `v0.0.9a`:
 
 - [x] Add a course-level map above individual learning paths.
-- [ ] Improve student feedback with concept checks and stronger summaries.
+- [x] Improve student feedback with concept checks and stronger summaries.
 - [ ] Add accessibility and classroom comfort settings.
 
 Release preparation after those product slices:
@@ -110,6 +110,11 @@ Recent shell work made lesson progress visible throughout the student flow: path
 The course map now sits above individual guided paths. It shows the recommended
 route, explains why each path follows the previous one, and keeps the full path
 browser available for free exploration.
+
+Lesson completion summaries now include concept-level understanding checks. The
+checks stay lightweight and supportive: they ask students whether they can
+explain the key idea and name the visible signal from the demo, without storing
+graded answers.
 
 The path details screen still acts as a compact lesson map, so students can see
 lesson status and task progress before entering a specific demo.
