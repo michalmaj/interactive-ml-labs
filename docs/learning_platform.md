@@ -24,10 +24,15 @@ layers:
 
 - [x] a course-level map above individual learning paths,
 - [x] better student feedback through concept checks and stronger summaries,
-- [ ] accessibility and classroom comfort settings.
+- [x] accessibility and classroom comfort settings.
 
 The order matters. The app should first feel like a coherent guided course, then
 become easier to install and distribute.
+
+The first comfort slice is now available in the shell settings: large text, high
+contrast, and a colorblind-friendly palette. These settings affect the shell
+screens first; individual demo internals can adopt the same direction
+incrementally when they need more specialized layout work.
 
 ## Course Layer Above Paths
 

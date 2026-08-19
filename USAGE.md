@@ -21,9 +21,9 @@ The unified Pygame app is the recommended entry point for browsing demos:
 uv run --package interactive-ml-labs-app interactive-ml-labs
 ```
 
-The app opens as a `1280x720` window by default. Fixed-scene scaling is enabled so larger fixed-canvas demos fit safely, and adaptive window sizing plus fullscreen are available from the in-app settings menu.
+The app opens as a `1280x720` window by default. Fixed-scene scaling is enabled so larger fixed-canvas demos fit safely, and adaptive window sizing plus fullscreen are available from the in-app settings menu. The settings menu also includes shell-level comfort options: large text, high contrast, and a colorblind-friendly palette.
 
-The app remembers language, fullscreen, adaptive window sizing, and fixed-scene scaling in a small per-user settings file. Window resolution is not persisted, because adaptive sizing is recalculated for the current display.
+The app remembers language, fullscreen, adaptive window sizing, fixed-scene scaling, and accessibility comfort settings in a small per-user settings file. Window resolution is not persisted, because adaptive sizing is recalculated for the current display.
 
 Current app shell flow:
 

@@ -63,13 +63,15 @@ mixed classroom conditions.
 
 Target outcome:
 
-- larger readable text mode or presentation-friendly sizing,
-- high contrast mode,
-- colorblind-friendly palette option,
-- a first pass at predictable visual comfort settings.
+- [x] larger readable text mode or presentation-friendly sizing,
+- [x] high contrast mode,
+- [x] colorblind-friendly palette option,
+- [x] a first pass at predictable visual comfort settings.
 
-The implementation can stay incremental. The release should at least establish
-the settings and one useful visual path through them.
+Current status: the shell settings include large text, high contrast, and a
+colorblind-friendly palette. These options apply immediately to shell screens
+and are persisted with the rest of the user settings. Demo-specific readability
+passes can follow incrementally when individual scenes need deeper layout work.
 
 ## Release Preparation
 

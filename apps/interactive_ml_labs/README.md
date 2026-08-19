@@ -15,7 +15,7 @@ Standalone demo entry points remain supported for development, debugging, and fo
 - global language selection: English and Polish,
 - guided learning paths with persisted lesson, task, theory, and badge progress,
 - home-screen learning progress with keyboard and mouse continue actions,
-- four guided learning paths with compact course maps,
+- five guided learning paths with compact course maps,
 - compact progress bars on home, path details, lesson details, intro, and pause screens,
 - dynamic level and demo selection from manifests,
 - scrollable demo lists with keyboard and mouse navigation,
@@ -23,6 +23,7 @@ Standalone demo entry points remain supported for development, debugging, and fo
 - built-in theory screens for every current demo,
 - pause and help overlays during active demos,
 - display settings for fullscreen, adaptive window size, and fixed-scene scaling,
+- accessibility comfort settings for large text, high contrast, and colorblind-friendly colors,
 - persistent app settings,
 - all current Level 1, Level 2, and Level 3 demos available through the shell.
 
