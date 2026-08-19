@@ -58,11 +58,15 @@ macOS metadata, and accidental shell files are not tracked in git.
 - [x] Add Time Series Forecasting lesson hooks for the planned Level 3 path.
 - [x] Register the Level 3 guided path with shared Calibration and Monitoring lessons.
 - [x] Run a Polish copy and shell-details pass for the Level 3 guided path.
+- [x] Complete the `v0.0.9a` product prerequisites: course map, concept checks, and comfort settings.
+- [x] Prepare `v0.0.9a` release docs and student alpha notes.
 - [ ] Prepare the `v0.0.9a` student-facing alpha release.
 
 The current release plan is captured in [release_v0_0_9a.md](release_v0_0_9a.md).
-The next priority is to make the app feel like a guided course before packaging
-it for students.
+The release runbook is captured in
+[release_checklist_v0_0_9a.md](release_checklist_v0_0_9a.md). The next priority
+is final release preparation: license, issue templates, repository metadata, and
+the GitHub tag/release.
 
 Required product work before `v0.0.9a`:
 
@@ -72,6 +76,7 @@ Required product work before `v0.0.9a`:
 
 Release preparation after those product slices:
 
+- prepare `v0.0.9a` release docs and student alpha notes,
 - add screenshots or short GIFs for the main README and app docs,
 - add a license,
 - add GitHub issue templates for student feedback,

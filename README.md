@@ -23,7 +23,7 @@ Each demo should answer three questions:
 2. How does the algorithm work step by step?
 3. What happens when important parameters change?
 
-The current product direction is to make the app feel like a guided learning platform: demos are connected into learning paths with lessons, concrete tasks, progress, and meaningful badges. The next release target is `v0.0.9a`, a student-facing alpha focused on course-level guidance, better student feedback, and classroom comfort. See [docs/learning_platform.md](docs/learning_platform.md) and [docs/release_v0_0_9a.md](docs/release_v0_0_9a.md) for the learning-platform direction.
+The current product direction is to make the app feel like a guided learning platform: demos are connected into learning paths with lessons, concrete tasks, progress, and meaningful badges. The next release target is `v0.0.9a`, a student-facing alpha focused on course-level guidance, better student feedback, and classroom comfort. The product prerequisites for that alpha are now in place; release preparation is tracked in [docs/release_v0_0_9a.md](docs/release_v0_0_9a.md) and [docs/release_checklist_v0_0_9a.md](docs/release_checklist_v0_0_9a.md).
 
 ## Planned demo levels
 
@@ -101,9 +101,9 @@ This repository is also intended to demonstrate how real software projects are d
 
 ## Current status
 
-The unified app is now the recommended guided experience. The project is no longer only a collection of separate demos: the app shell provides language selection, learning paths, level selection, demo intros, in-app theory, help overlays, settings, and scrollable demo lists.
+The unified app is now the recommended guided experience. The project is no longer only a collection of separate demos: the app shell provides language selection, a course map, learning paths, level selection, demo intros, in-app theory, help overlays, settings, and scrollable demo lists.
 
-Guided lessons now keep learning state visible across the main flow: lesson details, intro screens, and pause menus show task progress, theory status, and badge status when a demo is launched from a learning path.
+Guided lessons now keep learning state visible across the main flow: the course map, lesson details, intro screens, and pause menus show progress, task status, theory status, badge status, and lightweight concept checks when a demo is launched from a learning path.
 
 Five guided learning paths now have checkable task completion:
 
@@ -155,16 +155,15 @@ The original Level 1 and Level 2 demos can still be run as standalone commands. 
 
 ## Next milestones
 
-Near-term work focuses on balancing guided coverage across Level 1, Level 2, and Level 3 while keeping the shell stable:
+Near-term work focuses on preparing the `v0.0.9a` student-facing alpha while keeping the shell stable:
 
 - prepare the `v0.0.9a` student-facing alpha release,
-- add course-level guidance above individual learning paths,
-- improve student feedback with concept checks and stronger completion summaries,
-- add accessibility and classroom comfort settings,
-- add focused labs only when they fill a clear teaching gap rather than simply increasing the demo count,
-- collect classroom-style feedback on the newer Level 3 labs: t-SNE / UMAP Exploration, Model Monitoring Drift, and Time Series Forecasting,
-- iterate on Level 3 only where the interaction teaches a clear idea, not just where the visual result looks impressive,
-- keep improving in-app theory, mini-challenges, and glossary content across Level 1, Level 2, and Level 3,
+- add a license,
+- add GitHub issue templates for student feedback,
+- prepare repository metadata and a small wiki outline,
+- add screenshots or short GIFs for the release docs when available,
+- collect classroom-style feedback on the guided paths and newer Level 3 labs,
+- keep improving in-app theory and mini-challenges where they clarify a real teaching gap,
 - continue polishing Polish copy inside demos without forcing translations of standard ML terms,
 - keep shared demo-scene UI helpers small and avoid forcing shell screens into the same drawing path,
 - keep app settings, scaling, scrollbars, and help overlays stable as new scenes are added.
