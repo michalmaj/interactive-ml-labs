@@ -77,9 +77,9 @@ Required product work before `v0.0.9a`:
 Release preparation after those product slices:
 
 - prepare `v0.0.9a` release docs and student alpha notes,
+- add a license and GitHub issue templates for student feedback,
+- document repository metadata and GitHub home-page settings,
 - add screenshots or short GIFs for the main README and app docs,
-- add a license,
-- add GitHub issue templates for student feedback,
 - refresh the README for the release state,
 - prepare repository metadata and wiki structure.
 

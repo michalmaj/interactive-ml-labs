@@ -90,10 +90,9 @@ The draft student-facing release notes are:
 After the required product work is complete:
 
 - create a GitHub tag and release for `v0.0.9a`,
-- add a project license before the release,
 - refresh the root README for the release state,
-- add GitHub issue templates for student feedback,
-- prepare repository metadata: description, topics, and homepage settings,
+- review the project license and issue templates added for the alpha,
+- apply repository metadata: description, topics, and homepage settings,
 - start or prepare a project wiki for student/instructor-facing notes.
 
 ## After v0.0.9a

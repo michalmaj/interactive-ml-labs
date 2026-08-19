@@ -54,12 +54,14 @@ uv run --package interactive-ml-labs-app interactive-ml-labs
 
 Before publishing the release, prepare the repository page:
 
-- [ ] Add a license file.
-- [ ] Add GitHub issue templates for:
+- [x] Add a license file.
+- [x] Add GitHub issue templates for:
   - bug reports,
   - confusing lesson feedback,
   - missing topic suggestions,
   - classroom usability feedback.
+- [x] Document the recommended repository metadata in
+  [github_repository_setup.md](github_repository_setup.md).
 - [ ] Set repository description:
 
 ```text

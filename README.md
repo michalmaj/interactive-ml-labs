@@ -158,9 +158,8 @@ The original Level 1 and Level 2 demos can still be run as standalone commands. 
 Near-term work focuses on preparing the `v0.0.9a` student-facing alpha while keeping the shell stable:
 
 - prepare the `v0.0.9a` student-facing alpha release,
-- add a license,
-- add GitHub issue templates for student feedback,
-- prepare repository metadata and a small wiki outline,
+- review the MIT license and GitHub issue templates added for student feedback,
+- apply repository metadata and prepare a small wiki outline,
 - add screenshots or short GIFs for the release docs when available,
 - collect classroom-style feedback on the guided paths and newer Level 3 labs,
 - keep improving in-app theory and mini-challenges where they clarify a real teaching gap,
