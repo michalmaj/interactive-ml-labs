@@ -1464,6 +1464,26 @@ class UnifiedAppShell:
             "granica, wzór błędów albo alert powinny teraz wyjaśniać zachowanie modelu.",
         )
 
+    def _lesson_understanding_check_lines(self, lesson: LessonManifest) -> list[str]:
+        """Return concept checks shown after lesson completion."""
+        if lesson.understanding_checks:
+            return [
+                check.for_language(self.context.settings.language)
+                for check in lesson.understanding_checks
+            ]
+
+        learning_goal = lesson.learning_goal.for_language(self.context.settings.language)
+        return [
+            self._text(
+                f"Can you explain this goal in your own words: {learning_goal}",
+                f"Czy umiesz wyjaśnić własnymi słowami ten cel: {learning_goal}",
+            ),
+            self._text(
+                "Can you name the visible signal that proved it in the demo?",
+                "Czy umiesz nazwać widoczny sygnał z demo, który to potwierdził?",
+            ),
+        ]
+
     def _lesson_self_check_lines(self) -> list[str]:
         """Return self-check lines shown on the completion summary."""
         return [
@@ -2256,6 +2276,24 @@ class UnifiedAppShell:
             TEXT,
         )
         panel_y += 14
+        self._draw_text(
+            self._text("Concept check", "Sprawdź rozumienie"),
+            (panel_x, panel_y),
+            self.font_small,
+            ACCENT,
+        )
+        panel_y += 26
+        for line in self._lesson_understanding_check_lines(lesson):
+            panel_y = self._draw_wrapped(
+                "- " + line,
+                (panel_x, panel_y),
+                panel_width,
+                self.font_small,
+                MUTED_TEXT,
+            )
+            panel_y += 4
+
+        panel_y += 10
         self._draw_text(
             self._text("Self-check", "Szybki self-check"),
             (panel_x, panel_y),
