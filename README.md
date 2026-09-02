@@ -25,13 +25,33 @@ Each demo should answer three questions:
 
 The current product direction is to make the app feel like a guided learning platform: demos are connected into learning paths with lessons, concrete tasks, progress, and meaningful badges. The next release target is `v0.0.9a`, a student-facing alpha focused on course-level guidance, better student feedback, and classroom comfort. The product prerequisites for that alpha are now in place; release preparation is tracked in [docs/release_v0_0_9a.md](docs/release_v0_0_9a.md) and [docs/release_checklist_v0_0_9a.md](docs/release_checklist_v0_0_9a.md).
 
-## Planned demo levels
+## Requirements
 
-The recommended way to explore the demos is the unified Pygame app:
+- Python 3.12 or newer
+- [uv](https://docs.astral.sh/uv/) for workspace dependency management
+
+Install or update dependencies from the repository root:
+
+```bash
+uv sync
+```
+
+## Quick Start
+
+The recommended way to explore the labs is the unified Pygame app:
 
 ```bash
 uv run --package interactive-ml-labs-app interactive-ml-labs
 ```
+
+The app starts with language selection, then guides students through the course
+map, learning paths, lesson intros, in-app theory, tasks, help overlays, and
+completion summaries.
+
+More detailed usage instructions are available in [USAGE.md](USAGE.md).
+Polish version: [USAGE.pl.md](USAGE.pl.md).
+
+## Planned demo levels
 
 Individual demo entry points are intentionally still supported. They are useful for focused development, isolated testing, and classroom situations where one demo should be launched directly.
 
@@ -167,8 +187,8 @@ Near-term work focuses on preparing the `v0.0.9a` student-facing alpha while kee
 - keep shared demo-scene UI helpers small and avoid forcing shell screens into the same drawing path,
 - keep app settings, scaling, scrollbars, and help overlays stable as new scenes are added.
 
-## Usage
+## Usage Docs
 
-See [USAGE.md](USAGE.md) for local run commands.
+See [USAGE.md](USAGE.md) for full local run commands.
 
 Polish version: [USAGE.pl.md](USAGE.pl.md).
