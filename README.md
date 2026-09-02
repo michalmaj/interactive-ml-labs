@@ -23,7 +23,7 @@ Each demo should answer three questions:
 2. How does the algorithm work step by step?
 3. What happens when important parameters change?
 
-The current product direction is to make the app feel like a guided learning platform: demos are connected into learning paths with lessons, concrete tasks, progress, and meaningful badges. The next release target is `v0.0.9a`, a student-facing alpha focused on course-level guidance, better student feedback, and classroom comfort. The product prerequisites for that alpha are now in place; release preparation is tracked in [docs/release_v0_0_9a.md](docs/release_v0_0_9a.md) and [docs/release_checklist_v0_0_9a.md](docs/release_checklist_v0_0_9a.md).
+The current product direction is to make the app feel like a guided learning platform: demos are connected into learning paths with lessons, concrete tasks, progress, and meaningful badges. The next release target is `v0.0.9a`, a student-facing alpha focused on course-level guidance, better student feedback, and classroom comfort. The product prerequisites for that alpha are now in place; release preparation is tracked in [docs/release_v0_0_9a.md](docs/release_v0_0_9a.md), [docs/release_checklist_v0_0_9a.md](docs/release_checklist_v0_0_9a.md), and [docs/versioning.md](docs/versioning.md).
 
 ## Requirements
 

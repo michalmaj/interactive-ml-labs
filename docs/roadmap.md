@@ -68,6 +68,10 @@ The release runbook is captured in
 is final release preparation: license, issue templates, repository metadata, and
 the GitHub tag/release.
 
+Versioning is documented in [versioning.md](versioning.md): the `v0.0.9a` tag is
+the student-facing product milestone, while Python package versions remain
+`0.1.0` for now.
+
 Required product work before `v0.0.9a`:
 
 - [x] Add a course-level map above individual learning paths.
