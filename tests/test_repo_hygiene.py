@@ -79,6 +79,17 @@ def test_root_readme_has_first_run_commands() -> None:
     assert "uv run --package interactive-ml-labs-app interactive-ml-labs" in readme
 
 
+def test_pygame_tests_have_headless_default() -> None:
+    """Workspace tests should default to a headless Pygame video driver."""
+    repo_root = Path(__file__).resolve().parents[1]
+    conftest = (repo_root / "conftest.py").read_text(encoding="utf-8")
+    ci = (repo_root / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+
+    assert 'os.environ.setdefault("SDL_VIDEODRIVER", "dummy")' in conftest
+    assert "SDL_VIDEODRIVER: dummy" in ci
+    assert "timeout-minutes:" in ci
+
+
 def test_release_versioning_is_documented() -> None:
     """The alpha release should have a changelog entry and versioning decision."""
     repo_root = Path(__file__).resolve().parents[1]
