@@ -10,6 +10,9 @@ jobs:
   checks:
     name: Code quality and tests
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SDL_VIDEODRIVER: dummy
 
     steps:
       - name: Check out repository
