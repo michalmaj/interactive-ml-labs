@@ -79,6 +79,19 @@ def test_root_readme_has_first_run_commands() -> None:
     assert "uv run --package interactive-ml-labs-app interactive-ml-labs" in readme
 
 
+def test_release_versioning_is_documented() -> None:
+    """The alpha release should have a changelog entry and versioning decision."""
+    repo_root = Path(__file__).resolve().parents[1]
+    changelog = (repo_root / "CHANGELOG.md").read_text(encoding="utf-8")
+    versioning = (repo_root / "docs/versioning.md").read_text(encoding="utf-8")
+    readme = (repo_root / "README.md").read_text(encoding="utf-8")
+
+    assert "## v0.0.9a - Student-Facing Alpha" in changelog
+    assert 'version = "0.1.0"' in versioning
+    assert "v0.0.9a" in versioning
+    assert "docs/versioning.md" in readme
+
+
 def _is_local_artifact(path: str) -> bool:
     """Return whether a tracked path looks like a generated local artifact."""
     filename = Path(path).name

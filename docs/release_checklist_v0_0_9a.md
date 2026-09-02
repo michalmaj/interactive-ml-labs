@@ -49,6 +49,8 @@ uv run --package interactive-ml-labs-app interactive-ml-labs
 - [ ] Review the student release notes:
   - [student_alpha_v0_0_9a.md](student_alpha_v0_0_9a.md),
   - [student_alpha_v0_0_9a.pl.md](student_alpha_v0_0_9a.pl.md).
+- [ ] Review [versioning.md](versioning.md) and confirm that the `v0.0.9a`
+  product tag can remain separate from the `0.1.0` Python package versions.
 
 ## GitHub Repository Setup
 

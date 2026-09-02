@@ -82,6 +82,10 @@ passes can follow incrementally when individual scenes need deeper layout work.
 The concrete release runbook is captured in
 [release_checklist_v0_0_9a.md](release_checklist_v0_0_9a.md).
 
+The current versioning decision is captured in [versioning.md](versioning.md):
+`v0.0.9a` is the student-facing product release tag, while Python package
+versions remain at `0.1.0` until packaging and distribution mature.
+
 The draft student-facing release notes are:
 
 - [student_alpha_v0_0_9a.md](student_alpha_v0_0_9a.md),
