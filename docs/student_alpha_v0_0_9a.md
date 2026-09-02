@@ -59,5 +59,6 @@ Student feedback is especially useful when it says:
 - Concept checks are reflection prompts, not graded quizzes.
 - Comfort settings currently focus on shell screens. Individual demo scenes can
   still need follow-up polish.
-- Some advanced topics are intentionally simplified so the lesson stays visual
-  and teachable.
+- Some topics are intentionally simplified so the lesson stays visual and
+  teachable. Data Leakage uses fixed score scenarios, and t-SNE / UMAP uses
+  conceptual toy embeddings rather than full algorithm implementations.

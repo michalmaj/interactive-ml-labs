@@ -84,6 +84,22 @@ Good task:
 
 - Set the threshold so recall becomes higher than precision, then explain what changed.
 
+## Pedagogical Honesty
+
+The app should be explicit when a scene is a conceptual visualization rather
+than a full algorithm implementation. This is especially important for lessons
+where a simplified visual mechanism could look like the real model output.
+
+Current examples:
+
+- Data Leakage Lab uses fixed score scenarios to teach the workflow smell of
+  suspiciously good validation, not a freshly trained model.
+- t-SNE / UMAP Exploration Lab uses deterministic toy embeddings to teach
+  reading pitfalls, not full t-SNE or UMAP optimization.
+
+This is acceptable for the student-facing alpha when the limitation is visible
+in the intro/theory/docs and the interaction still teaches the intended concept.
+
 Tasks should be checkable from app or scene state whenever possible. Text-only reflection can still exist, but the strongest tasks are based on actions and visible outcomes.
 
 Possible task types:

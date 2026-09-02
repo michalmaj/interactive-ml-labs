@@ -167,7 +167,7 @@ Level 3 has moved beyond placeholders into a real advanced/showcase track:
 - PCA Lab, with dataset presets, noise controls, manual projection rotation, fitted PCA direction, explained variance, reconstruction residuals, and reconstruction error.
 - Model Comparison Lab, with Logistic Regression, k-NN, and Decision Tree previews on shared datasets, active model parameters, train/test accuracy, compact confusion details, and highlighted misclassified test points.
 - Calibration Lab, with overconfident, underconfident, and better calibrated presets, a reliability diagram, score distribution, raw-vs-scaled score reference with a compact legend, accuracy@0.5, Brier score, ECE, worst-gap highlighting, calibration gap error bars, and temperature scaling.
-- t-SNE / UMAP Exploration Lab, with deterministic toy embeddings, raw-vs-embedding comparison, dataset cues, a compact class legend, seed drift, t-SNE/UMAP comparison, and neighborhood tuning.
+- t-SNE / UMAP Exploration Lab, with deterministic conceptual toy embeddings, raw-vs-embedding comparison, dataset cues, a compact class legend, seed drift, t-SNE/UMAP comparison, and neighborhood tuning.
 - Model Monitoring Drift Lab, with production-style data drift, metric drift, monitoring windows, alert thresholds, lead signals, alert rate, persistence, trend readouts, and investigation acknowledgements.
 - Time Series Forecasting Lab, with holdout forecasts, naive/moving-average/trend-seasonal models, forecast horizon controls, residuals, MAE/RMSE, bias, and uncertainty bands.
 
