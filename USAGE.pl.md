@@ -61,7 +61,7 @@ Unified app zawiera te natywne laby z Level 1:
 
 Unified app zawiera te natywne laby z Level 2:
 
-- Data Leakage Lab pokazuje podejrzane cechy, dostępność w czasie predykcji, leaky-vs-clean validation scores i nawyk nieufania metrykom, które wyglądają zbyt idealnie.
+- Data Leakage Lab pokazuje podejrzane cechy, dostępność w czasie predykcji, leaky-vs-clean validation scores i nawyk nieufania metrykom, które wyglądają zbyt idealnie, na stałych koncepcyjnych scenariuszach score.
 - Train / Validation / Test Split Lab pokazuje model selection przez validation scores, overfitting przez train-validation gaps i zostawianie test jako finalnego uczciwego checku.
 - Feature Scaling Lab pokazuje raw-vs-scaled feature ranges, range ratio, modele wrażliwe na skalę oraz wpływ scaling na accuracy i iterations.
 - Feature Importance Lab pokazuje permutation/model importance, skorelowane cechy, leakage warnings i stabilność rankingu.
@@ -76,7 +76,7 @@ Unified app zawiera też natywne laboratoria z Level 3:
 - PCA Lab pokazuje presety danych, noise, ręczne obracanie projekcji, dopasowany kierunek PCA, explained variance, residuals rekonstrukcji i reconstruction error.
 - Model Comparison Lab pokazuje założenia Logistic Regression, k-NN i Decision Tree na tych samych datasetach, z train/test score, kompaktowym confusion summary i podświetlaniem błędów testowych.
 - Calibration Lab pokazuje calibration prawdopodobieństw przez reliability diagram, rozkład score, legendę raw-vs-scaled score, accuracy@0.5, Brier score, ECE, podświetlenie worst gap, error bars kalibracji i temperature scaling.
-- t-SNE / UMAP Exploration Lab pokazuje deterministyczne toy embeddingi, porównanie raw-vs-embedding, wskazówki datasetów, etykiety klas, seed drift, strojenie sąsiedztwa i lokalne połączenia sąsiadów.
+- t-SNE / UMAP Exploration Lab pokazuje deterministyczne koncepcyjne toy embeddingi, porównanie raw-vs-embedding, wskazówki datasetów, etykiety klas, seed drift, strojenie sąsiedztwa i lokalne połączenia sąsiadów. To nie jest pełna implementacja t-SNE/UMAP.
 - Model Monitoring Drift Lab pokazuje data drift, metric drift, monitoring windows, alert thresholds, lead signal, alert rate, persistence, trend i potwierdzanie analizy.
 - Time Series Forecasting Lab pokazuje holdout forecasts, modele naive/moving-average/trend-seasonal, forecast horizon, residuals, MAE/RMSE, bias i uncertainty bands.
 

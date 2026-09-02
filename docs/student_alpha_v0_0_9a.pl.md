@@ -61,5 +61,7 @@ Najbardziej pomagają zgłoszenia, które mówią:
 - Pytania sprawdzające są promptami do refleksji, a nie ocenianymi quizami.
 - Opcje komfortu dotyczą najpierw ekranów shellowych. Pojedyncze dema mogą nadal
   potrzebować osobnego polish passu.
-- Część zaawansowanych tematów jest celowo uproszczona, żeby lekcja była
-  wizualna i możliwa do omówienia na zajęciach.
+- Część tematów jest celowo uproszczona, żeby lekcja była wizualna i możliwa do
+  omówienia na zajęciach. Data Leakage używa stałych scenariuszy score, a
+  t-SNE / UMAP używa koncepcyjnych toy embeddings zamiast pełnej implementacji
+  algorytmów.

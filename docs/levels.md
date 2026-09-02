@@ -70,6 +70,6 @@ Level 3 focuses on advanced, specialized, or visually rich experiments.
 | 2 | Explained Variance Lab | PCA, compression, retained variance |
 | 3 | Model Comparison Lab | Model families and trade-offs |
 | 4 | Calibration Lab | Probability calibration and ECE |
-| 5 | t-SNE / UMAP Lab | Embeddings and visualization pitfalls |
+| 5 | t-SNE / UMAP Lab | Conceptual toy embeddings and visualization pitfalls |
 | 6 | Model Monitoring Drift Lab | Data drift, alerting, monitoring windows |
 | 7 | Time Series Forecasting Lab | Forecast horizon, seasonality, leakage |

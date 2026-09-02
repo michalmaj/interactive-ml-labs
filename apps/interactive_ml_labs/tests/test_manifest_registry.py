@@ -388,6 +388,9 @@ def test_data_leakage_manifest_describes_practical_level_two_lab() -> None:
     assert "prediction time" in text
     assert "target proxy" in text
     assert "validation" in text
+    assert "conceptual visualization" in text
+    assert "fixed teaching scenarios" in text
+    assert "not the output of a freshly trained model" in text
     assert "L" in text
 
 
@@ -948,7 +951,7 @@ def test_tsne_umap_manifest_sets_fifth_level_three_demo_contract() -> None:
     )
     assert manifest.create_scene is create_tsne_umap_exploration_scene
     assert "t-SNE / UMAP Exploration Lab" in text
-    assert "Explore an interactive embedding prototype" in text
+    assert "Explore a conceptual embedding prototype" in text
     assert "exploration lesson" in text
     assert "embedding" in text
     assert "perplexity" in text
@@ -962,6 +965,10 @@ def test_tsne_umap_manifest_sets_fifth_level_three_demo_contract() -> None:
     assert "color legend" in text
     assert "Dataset cues" in text
     assert "global structure" in text
+    assert "conceptual visualization" in text
+    assert "not a full implementation" in text
+    assert "toy embeddings" in text
+    assert "only approximate those intuitions visually" in text
     assert "1-3" in text
     assert "M" in text
     assert "- / =" in text

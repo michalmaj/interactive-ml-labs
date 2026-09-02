@@ -3921,12 +3921,12 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title_en="Data Leakage Lab",
         title_pl="Data Leakage Lab",
         summary_en=(
-            "Toggle suspicious features to see why perfect validation scores "
+            "Use a conceptual score scenario to see why perfect validation scores "
             "can be a data problem, not a great model."
         ),
         summary_pl=(
-            "Przełączaj podejrzane cechy i zobacz, czemu idealne validation scores "
-            "mogą oznaczać problem z danymi, a nie świetny model."
+            "Użyj koncepcyjnego scenariusza score i zobacz, czemu idealne "
+            "validation scores mogą oznaczać problem z danymi, a nie świetny model."
         ),
         objectives=(
             LocalizedText(
@@ -3984,6 +3984,18 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                 TheorySection(
                     title=LocalizedText(en="What this demo shows", pl="Co pokazuje to demo"),
                     body=(
+                        LocalizedText(
+                            en=(
+                                "This lab is a conceptual visualization. The displayed scores "
+                                "are fixed teaching scenarios, not the output of a freshly "
+                                "trained model."
+                            ),
+                            pl=(
+                                "Ten lab jest wizualizacją koncepcyjną. Pokazywane score "
+                                "to stałe scenariusze dydaktyczne, a nie wynik świeżo "
+                                "trenowanego modelu."
+                            ),
+                        ),
                         LocalizedText(
                             en=(
                                 "Data leakage happens when the model sees information "
@@ -6729,11 +6741,11 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
         title_en="t-SNE / UMAP Exploration Lab",
         title_pl="t-SNE / UMAP Exploration Lab",
         summary_en=(
-            "Explore an interactive embedding prototype for comparing local neighborhoods, "
+            "Explore a conceptual embedding prototype for comparing local neighborhoods, "
             "global structure, and projection stability."
         ),
         summary_pl=(
-            "Eksploruj interaktywny prototyp embeddingów do porównywania lokalnych "
+            "Eksploruj koncepcyjny prototyp embeddingów do porównywania lokalnych "
             "sąsiedztw, globalnej struktury i stabilności projekcji."
         ),
         objectives=(
@@ -6843,6 +6855,20 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     body=(
                         LocalizedText(
                             en=(
+                                "This scene is a conceptual visualization, not a full "
+                                "implementation of t-SNE or UMAP. The layouts are "
+                                "deterministic toy embeddings designed to make reading "
+                                "pitfalls visible."
+                            ),
+                            pl=(
+                                "Ta scena jest wizualizacją koncepcyjną, a nie pełną "
+                                "implementacją t-SNE ani UMAP. Układy są deterministycznymi "
+                                "toy embeddings przygotowanymi po to, żeby pokazać pułapki "
+                                "interpretacji."
+                            ),
+                        ),
+                        LocalizedText(
+                            en=(
                                 "t-SNE and UMAP are useful precisely because they are not "
                                 "simple linear projections. That power also makes them easy "
                                 "to misread."
@@ -6881,12 +6907,14 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                         ),
                         LocalizedText(
                             en=(
-                                "For t-SNE that parameter can be perplexity; for UMAP it can "
-                                "be number of neighbors."
+                                "In the real algorithms, t-SNE perplexity shapes neighborhood "
+                                "probabilities, while UMAP neighbors shapes the local graph. "
+                                "Here the controls only approximate those intuitions visually."
                             ),
                             pl=(
-                                "Dla t-SNE tym parametrem może być perplexity; dla UMAP liczba "
-                                "neighbors."
+                                "W prawdziwych algorytmach perplexity w t-SNE wpływa na "
+                                "prawdopodobieństwa sąsiedztwa, a neighbors w UMAP na lokalny "
+                                "graf. Tutaj kontrolki tylko wizualnie przybliżają te intuicje."
                             ),
                         ),
                         LocalizedText(
