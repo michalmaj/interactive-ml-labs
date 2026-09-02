@@ -68,6 +68,17 @@ def test_release_readiness_files_exist() -> None:
         assert (issue_template_dir / template_name).exists()
 
 
+def test_root_readme_has_first_run_commands() -> None:
+    """The public README should show new users how to install and run the app."""
+    repo_root = Path(__file__).resolve().parents[1]
+    readme = (repo_root / "README.md").read_text(encoding="utf-8")
+
+    assert "## Requirements" in readme
+    assert "Python 3.12 or newer" in readme
+    assert "uv sync" in readme
+    assert "uv run --package interactive-ml-labs-app interactive-ml-labs" in readme
+
+
 def _is_local_artifact(path: str) -> bool:
     """Return whether a tracked path looks like a generated local artifact."""
     filename = Path(path).name
