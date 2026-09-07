@@ -72,6 +72,10 @@ Versioning is documented in [versioning.md](versioning.md): the `v0.0.9a` tag is
 the student-facing product milestone, while Python package versions remain
 `0.1.0` for now.
 
+The main post-alpha engineering debt is the large unified app shell entry point.
+Its staged decomposition plan is tracked in
+[app_shell_decomposition.md](app_shell_decomposition.md).
+
 Required product work before `v0.0.9a`:
 
 - [x] Add a course-level map above individual learning paths.
@@ -139,6 +143,17 @@ Current boundaries:
 - shell screens keep their own rendering path for menus, scrollbars, intro screens, theory viewports, and overlays.
 
 Avoid forcing every scene into one renderer inheritance model. Existing demo renderers can remain standalone.
+
+### App Shell Decomposition
+
+`UnifiedAppShell` still owns event handling, routing, rendering for many shell
+screens, scroll state, persistence, language switching, and overlay flow. That is
+the main technical debt to address after `v0.0.9a`.
+
+The decomposition should happen in small pull requests: pure helpers first,
+then persistence, then one shell screen at a time, and registry decoupling last.
+The detailed plan lives in
+[app_shell_decomposition.md](app_shell_decomposition.md).
 
 ### Documentation And Teaching Flow
 

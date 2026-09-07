@@ -109,6 +109,8 @@ The project has grown from separately launched demos into one guided Pygame appl
 The shell lives outside `ml_lab_core`, because it is a concrete application rather than a small reusable primitive. Existing demo entry points remain available while the shell is the recommended guided experience.
 
 See [Unified App Shell](unified_app_shell.md) for the current architecture direction.
+The post-alpha decomposition plan for the large shell entry point is tracked in
+[App Shell Decomposition](app_shell_decomposition.md).
 
 ## Demo packages
 

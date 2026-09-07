@@ -51,6 +51,8 @@ uv run --package interactive-ml-labs-app interactive-ml-labs
   - [student_alpha_v0_0_9a.pl.md](student_alpha_v0_0_9a.pl.md).
 - [ ] Review [versioning.md](versioning.md) and confirm that the `v0.0.9a`
   product tag can remain separate from the `0.1.0` Python package versions.
+- [ ] Confirm that the post-alpha app shell decomposition debt is tracked in
+  [app_shell_decomposition.md](app_shell_decomposition.md).
 
 ## GitHub Repository Setup
 

@@ -50,6 +50,10 @@ The shell lives in `apps/interactive_ml_labs` so `ml_lab_core` can stay focused 
 
 Each demo is registered through a manifest. The manifest provides title, summary, objectives, controls, tags, difficulty, theory content, and a scene factory. The shell uses that metadata to build consistent menu, intro, help, and theory screens.
 
+The current `UnifiedAppShell` is intentionally still the main app coordination
+point for the alpha. Its post-alpha decomposition plan is tracked in
+[App Shell Decomposition](../../docs/app_shell_decomposition.md).
+
 New demos should be added in small pull requests:
 
 1. Add or adapt the demo scene.
