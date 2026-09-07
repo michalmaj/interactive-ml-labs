@@ -56,3 +56,19 @@ def test_v0_0_9a_release_docs_are_linked() -> None:
 
     assert "release_checklist_v0_0_9a.md" in roadmap
     assert "release_checklist_v0_0_9a.md" in readme
+
+
+def test_app_shell_decomposition_debt_is_tracked() -> None:
+    """The large shell entry point should have a visible post-alpha plan."""
+    decomposition = (REPO_ROOT / "docs/app_shell_decomposition.md").read_text()
+    architecture = (REPO_ROOT / "docs/architecture.md").read_text()
+    roadmap = (REPO_ROOT / "docs/roadmap.md").read_text()
+    app_readme = (REPO_ROOT / "apps/interactive_ml_labs/README.md").read_text()
+
+    assert "UnifiedAppShell" in decomposition
+    assert "pygame_app.py" in decomposition
+    assert "post-`v0.0.9a` engineering work" in decomposition
+    assert "Do not rewrite the app shell in one pull request." in decomposition
+    assert "app_shell_decomposition.md" in architecture
+    assert "app_shell_decomposition.md" in roadmap
+    assert "app_shell_decomposition.md" in app_readme
