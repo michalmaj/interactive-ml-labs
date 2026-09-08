@@ -11,6 +11,8 @@ The project follows a lightweight changelog format inspired by Keep a Changelog.
 - Prepare final `v0.0.9a` release assets and GitHub release notes.
 - Add screenshots or short GIFs when the first public-facing alpha is published.
 - Start the post-alpha student distribution track.
+- Decompose the large unified app shell entry point in small post-alpha pull
+  requests.
 
 ## v0.0.9a - Student-Facing Alpha
 
@@ -27,6 +29,7 @@ The project follows a lightweight changelog format inspired by Keep a Changelog.
 - Classroom comfort settings for larger text, high contrast, and a
   colorblind-friendly palette.
 - MIT license, GitHub issue forms, and release-readiness docs.
+- App shell decomposition plan for the main post-alpha technical debt.
 
 ### Changed
 
