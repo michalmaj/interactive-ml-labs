@@ -85,6 +85,7 @@ from interactive_ml_labs.manifest import (
     LessonTask,
     LevelManifest,
     LocalizedText,
+    SceneFactory,
     TheorySection,
 )
 from interactive_ml_labs.model_comparison_scene import (
@@ -221,6 +222,7 @@ __all__ = [
     "Scene",
     "SceneCommand",
     "SceneCommandKind",
+    "SceneFactory",
     "SceneManager",
     "Size",
     "TSNEUMAPExplorationScene",

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
-
 from interactive_ml_labs.activation_scene import create_activation_functions_lab_scene
 from interactive_ml_labs.anomaly_detection_scene import create_anomaly_detection_lab_scene
 from interactive_ml_labs.boosting_scene import create_boosting_mistake_lab_scene
@@ -62,6 +60,7 @@ from interactive_ml_labs.manifest import (
     LessonTask,
     LevelManifest,
     LocalizedText,
+    SceneFactory,
     TheorySection,
 )
 from interactive_ml_labs.model_comparison_scene import (
@@ -90,7 +89,6 @@ from interactive_ml_labs.random_forest_scene import (
     RANDOM_FOREST_LESSON_ID,
     create_random_forest_scene,
 )
-from interactive_ml_labs.scene import Scene
 from interactive_ml_labs.split_lab_scene import (
     CHOOSE_VALIDATION_TASK_ID,
     COMPARE_COMPLEXITY_TASK_ID,
@@ -2268,7 +2266,7 @@ def _demo_manifest(
     tags: tuple[str, ...],
     objectives: tuple[LocalizedText, ...] | None = None,
     controls: tuple[ControlBinding, ...] | None = None,
-    create_scene: Callable[[object], Scene] | None = None,
+    create_scene: SceneFactory | None = None,
     difficulty: LocalizedText | None = None,
     theory: DemoTheory | None = None,
 ) -> DemoManifest:

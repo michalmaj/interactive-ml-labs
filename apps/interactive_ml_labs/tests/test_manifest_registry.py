@@ -1,6 +1,7 @@
 """Tests for the unified app shell manifest registry."""
 
 from collections import Counter
+from typing import get_type_hints
 
 import pytest
 from interactive_ml_labs import (
@@ -17,6 +18,7 @@ from interactive_ml_labs import (
     LessonManifest,
     LessonTask,
     LocalizedText,
+    SceneFactory,
     demos_for_level,
     levels_from_manifests,
     validate_demo_registry,
@@ -94,6 +96,7 @@ from interactive_ml_labs.random_forest_scene import (
     RANDOM_FOREST_LESSON_ID,
     create_random_forest_scene,
 )
+from interactive_ml_labs.settings import AppContext
 from interactive_ml_labs.split_lab_scene import (
     CHOOSE_VALIDATION_TASK_ID,
     COMPARE_COMPLEXITY_TASK_ID,
@@ -993,6 +996,17 @@ def test_manifests_have_required_teaching_content() -> None:
         assert manifest.controls
         assert manifest.tags
         assert manifest.create_scene is not None
+
+
+def test_demo_manifest_scene_factory_uses_app_context_contract() -> None:
+    """Demo scene factories should receive the shell AppContext, not any object."""
+    create_scene_hint = get_type_hints(DemoManifest)["create_scene"]
+    hint_text = repr(create_scene_hint)
+
+    assert "Callable[[interactive_ml_labs.settings.AppContext]" in hint_text
+    assert "interactive_ml_labs.scene.Scene" in hint_text
+    assert "object" not in hint_text
+    assert SceneFactory.__args__[0] == AppContext
 
 
 def test_course_map_covers_learning_paths_once_in_recommended_order() -> None:
