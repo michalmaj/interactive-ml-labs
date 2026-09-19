@@ -292,7 +292,7 @@ class TSNEUMAPExplorationScene:
             surface,
             self._label(
                 "Compare deterministic toy embeddings before adding heavy algorithm dependencies.",
-                "Porównaj deterministyczne toy embeddingi, zanim dodamy cięższe dependency.",
+                "Porównaj deterministyczne toy embeddingi, zanim dodamy cięższe zależności.",
             ),
             (58, 88),
             self._font_body,
@@ -316,10 +316,17 @@ class TSNEUMAPExplorationScene:
             self._font_small,
             ACCENT,
         )
+        self._draw_text(
+            surface,
+            self._toy_embedding_label(),
+            (cue_rect.x, cue_rect.y + 22),
+            self._font_small,
+            SECONDARY,
+        )
         self._draw_wrapped(
             surface,
             self._active_dataset_cue(),
-            (cue_rect.x, cue_rect.y + 22),
+            (cue_rect.x, cue_rect.y + 42),
             cue_rect.width,
             self._font_small,
             MUTED_TEXT,
@@ -585,6 +592,10 @@ class TSNEUMAPExplorationScene:
             return self._label("mixed", "mieszany")
         return self._label("weak", "słaby")
 
+    def _toy_embedding_label(self) -> str:
+        """Return a visible reminder that layouts are conceptual toy embeddings."""
+        return self._label("conceptual toy embedding", "koncepcyjny toy embedding")
+
     def _active_takeaway(self) -> str:
         local_trust = self._local_trust_score()
         global_spread = self._global_spread_score()
@@ -645,7 +656,7 @@ class TSNEUMAPExplorationScene:
 
     def _embedding_plot_rect(self, rect: pygame.Rect) -> pygame.Rect:
         """Return the active embedding plot area."""
-        return pygame.Rect(rect.x + 44, rect.y + 118, rect.width - 88, rect.height - 210)
+        return pygame.Rect(rect.x + 44, rect.y + 148, rect.width - 88, rect.height - 240)
 
     def _draw_class_legend(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         pygame.draw.rect(surface, PLOT_BG, rect, border_radius=6)
