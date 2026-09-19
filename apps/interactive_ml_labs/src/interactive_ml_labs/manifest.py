@@ -6,6 +6,9 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from interactive_ml_labs.scene import Scene
+from interactive_ml_labs.settings import AppContext
+
+SceneFactory = Callable[[AppContext], Scene]
 
 
 @dataclass(frozen=True, slots=True)
@@ -75,7 +78,7 @@ class DemoManifest:
     summary: LocalizedText
     objectives: tuple[LocalizedText, ...]
     controls: tuple[ControlBinding, ...]
-    create_scene: Callable[[object], Scene] | None = None
+    create_scene: SceneFactory | None = None
     difficulty: LocalizedText | None = None
     tags: tuple[str, ...] = field(default_factory=tuple)
     theory: DemoTheory | None = None
