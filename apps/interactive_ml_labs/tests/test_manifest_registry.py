@@ -364,22 +364,23 @@ def test_neural_network_manifest_describes_foundation_level_one_lab() -> None:
 def test_data_leakage_manifest_describes_practical_level_two_lab() -> None:
     """Data Leakage Lab should extend the practical ML track."""
     manifest = DEMO_BY_ID["data_leakage_lab"]
-    text = " ".join(
-        [
-            manifest.title.en,
-            manifest.summary.en,
-            manifest.summary.pl,
-            *(objective.en for objective in manifest.objectives),
-            *(objective.pl for objective in manifest.objectives),
-            *(control.key for control in manifest.controls),
-            *(control.action.en for control in manifest.controls),
-            *(control.action.pl for control in manifest.controls),
-            *(section.title.en for section in manifest.theory.sections),
-            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
-            *(challenge.en for challenge in manifest.theory.mini_challenges),
-            *(entry.term for entry in manifest.theory.glossary),
-        ],
-    )
+    text_parts = [
+        manifest.title.en,
+        manifest.summary.en,
+        manifest.summary.pl,
+        *(objective.en for objective in manifest.objectives),
+        *(objective.pl for objective in manifest.objectives),
+        *(control.key for control in manifest.controls),
+        *(control.action.en for control in manifest.controls),
+        *(control.action.pl for control in manifest.controls),
+        *(section.title.en for section in manifest.theory.sections),
+        *(section.title.pl for section in manifest.theory.sections),
+        *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+        *(paragraph.pl for section in manifest.theory.sections for paragraph in section.body),
+        *(challenge.en for challenge in manifest.theory.mini_challenges),
+        *(entry.term for entry in manifest.theory.glossary),
+    ]
+    text = " ".join(text_parts)
 
     assert manifest.level == 2
     assert manifest.create_scene is create_data_leakage_lab_scene
@@ -394,6 +395,8 @@ def test_data_leakage_manifest_describes_practical_level_two_lab() -> None:
     assert "conceptual visualization" in text
     assert "fixed teaching scenarios" in text
     assert "not the output of a freshly trained model" in text
+    assert "stałe scenariusze dydaktyczne" in text
+    assert "czasie predykcji" in text
     assert "L" in text
 
 

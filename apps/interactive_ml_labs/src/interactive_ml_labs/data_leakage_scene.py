@@ -233,6 +233,13 @@ class DataLeakageLabScene:
             self._font_small,
             WARNING if self.leakage_enabled else GOOD,
         )
+        self._draw_text(
+            surface,
+            self._teaching_scenario_label(),
+            (rect.x + 24, rect.y + 78),
+            self._font_small,
+            MUTED_TEXT,
+        )
         bar_rect = pygame.Rect(rect.x + 80, rect.y + 116, rect.width - 160, 194)
         self._draw_accuracy_bars(surface, bar_rect)
         feature_rect = pygame.Rect(rect.x + 58, rect.y + 350, rect.width - 116, 78)
@@ -254,6 +261,7 @@ class DataLeakageLabScene:
             (self._label("train accuracy", "train accuracy"), self._train_accuracy_label()),
             (self._label("test accuracy", "test accuracy"), self._test_accuracy_label()),
             (self._label("gap", "gap"), self._gap_label()),
+            (self._label("scenario type", "typ scenariusza"), self._teaching_scenario_label()),
             (self._label("diagnosis", "diagnoza"), self._diagnosis_label()),
         )
         options = tuple(
@@ -316,6 +324,10 @@ class DataLeakageLabScene:
         if self.leakage_enabled:
             return self._label("leakage feature included", "cecha leakage włączona")
         return self._label("leakage feature removed", "cecha leakage usunięta")
+
+    def _teaching_scenario_label(self) -> str:
+        """Return a visible reminder that scores are fixed teaching scenarios."""
+        return self._label("fixed teaching scenario", "stały scenariusz dydaktyczny")
 
     def _diagnosis_key(self) -> str:
         if (

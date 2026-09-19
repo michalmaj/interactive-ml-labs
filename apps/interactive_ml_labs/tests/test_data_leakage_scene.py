@@ -76,6 +76,7 @@ def test_data_leakage_scene_localizes_labels(monkeypatch) -> None:
         scene = create_data_leakage_lab_scene(context)
 
         assert scene._model_state_label() == "cecha leakage włączona"
+        assert scene._teaching_scenario_label() == "stały scenariusz dydaktyczny"
         assert scene._diagnosis_label() == "zbyt dobre, by ufać"
 
         scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_l))
@@ -83,6 +84,19 @@ def test_data_leakage_scene_localizes_labels(monkeypatch) -> None:
         assert scene._model_state_label() == "cecha leakage usunięta"
         assert scene._leakage_feature_label() == "usunięta"
         assert scene._diagnosis_label() == "bardziej realistyczne"
+    finally:
+        pygame.quit()
+
+
+def test_data_leakage_scene_labels_fixed_teaching_scenario(monkeypatch) -> None:
+    """The active demo should visibly mark fixed scores as a teaching scenario."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_data_leakage_lab_scene(AppContext())
+
+        assert scene._teaching_scenario_label() == "fixed teaching scenario"
     finally:
         pygame.quit()
 

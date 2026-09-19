@@ -3923,13 +3923,16 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
             "can be a data problem, not a great model."
         ),
         summary_pl=(
-            "Użyj koncepcyjnego scenariusza score i zobacz, czemu idealne "
+            "Użyj koncepcyjnego scenariusza z wynikami i zobacz, czemu idealne "
             "validation scores mogą oznaczać problem z danymi, a nie świetny model."
         ),
         objectives=(
             LocalizedText(
                 en="Compare leaky and cleaned validation results on the same scenario.",
-                pl="Porównaj leaky i cleaned validation results w tym samym scenariuszu.",
+                pl=(
+                    "Porównaj leaky i cleaned validation results w tym samym "
+                    "scenariuszu dydaktycznym."
+                ),
             ),
             LocalizedText(
                 en="Identify whether a feature would exist at prediction time.",
@@ -3989,8 +3992,8 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "trained model."
                             ),
                             pl=(
-                                "Ten lab jest wizualizacją koncepcyjną. Pokazywane score "
-                                "to stałe scenariusze dydaktyczne, a nie wynik świeżo "
+                                "Ten lab jest wizualizacją koncepcyjną. Pokazywane wyniki "
+                                "to stałe scenariusze dydaktyczne, a nie output świeżo "
                                 "trenowanego modelu."
                             ),
                         ),
@@ -4000,7 +4003,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                                 "that would not exist at prediction time."
                             ),
                             pl=(
-                                "Data leakage pojawia sie wtedy, gdy model widzi informacje, "
+                                "Data leakage pojawia się wtedy, gdy model widzi informacje, "
                                 "których nie będzie w czasie predykcji."
                             ),
                         ),
@@ -4017,7 +4020,7 @@ DEMO_MANIFESTS: tuple[DemoManifest, ...] = (
                     ),
                 ),
                 TheorySection(
-                    title=LocalizedText(en="What to notice", pl="Co obserwowac"),
+                    title=LocalizedText(en="What to notice", pl="Co obserwować"),
                     body=(
                         LocalizedText(
                             en=(
