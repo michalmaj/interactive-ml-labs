@@ -64,8 +64,15 @@ def sigmoid(values: ArrayLike) -> FloatArray:
         NumPy array with sigmoid-transformed values.
     """
     scores = np.asarray(values, dtype=float)
+    probabilities = np.empty_like(scores, dtype=float)
 
-    return 1.0 / (1.0 + np.exp(-scores))
+    positive_scores = scores >= 0.0
+    probabilities[positive_scores] = 1.0 / (1.0 + np.exp(-scores[positive_scores]))
+
+    exp_scores = np.exp(scores[~positive_scores])
+    probabilities[~positive_scores] = exp_scores / (1.0 + exp_scores)
+
+    return probabilities
 
 
 def binary_cross_entropy(y_true: ArrayLike, y_probability: ArrayLike) -> float:

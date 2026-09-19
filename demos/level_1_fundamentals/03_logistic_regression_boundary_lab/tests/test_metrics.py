@@ -37,6 +37,14 @@ def test_sigmoid_maps_values_to_probability_range() -> None:
     assert result[0] < result[1] < result[2]
 
 
+def test_sigmoid_handles_extreme_scores_without_overflow() -> None:
+    """Very large scores should saturate cleanly without overflow warnings."""
+    with np.errstate(over="raise"):
+        result = sigmoid(np.array([-1000.0, 0.0, 1000.0]))
+
+    np.testing.assert_allclose(result, np.array([0.0, EXPECTED_SIGMOID_ZERO, 1.0]))
+
+
 def test_predict_labels_from_probabilities_uses_threshold() -> None:
     """Probabilities should be converted to labels using the threshold."""
     probabilities = np.array([0.2, 0.5, 0.8])
