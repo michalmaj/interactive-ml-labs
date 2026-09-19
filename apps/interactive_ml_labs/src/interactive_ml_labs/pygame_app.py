@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
@@ -47,6 +48,8 @@ from interactive_ml_labs.settings import (
     load_app_settings,
     save_app_settings,
 )
+
+LOGGER = logging.getLogger(__name__)
 
 FPS: Final[int] = 60
 BACKGROUND: Final[tuple[int, int, int]] = (22, 25, 29)
@@ -1448,6 +1451,7 @@ class UnifiedAppShell:
         try:
             path_index = LEARNING_PATH_MANIFESTS.index(path)
         except ValueError:
+            LOGGER.warning("Learning path %s is not registered in guided paths.", path.id)
             return self._text(
                 "Suggested next: review another guided path.",
                 "Proponowany kolejny krok: przejrzyj inną prowadzoną ścieżkę.",
@@ -1541,6 +1545,11 @@ class UnifiedAppShell:
         try:
             lesson_index = path.lesson_ids.index(lesson.id)
         except ValueError:
+            LOGGER.warning(
+                "Lesson %s is not part of selected learning path %s.",
+                lesson.id,
+                path.id,
+            )
             return None
 
         next_index = lesson_index + 1
