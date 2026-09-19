@@ -126,6 +126,25 @@ def test_tsne_umap_scene_explains_active_dataset(monkeypatch) -> None:
         pygame.quit()
 
 
+def test_tsne_umap_scene_labels_conceptual_toy_embedding(monkeypatch) -> None:
+    """The active demo should visibly mark layouts as conceptual toy embeddings."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+
+    try:
+        scene = create_tsne_umap_exploration_scene(AppContext())
+
+        assert scene._toy_embedding_label() == "conceptual toy embedding"
+
+        context = AppContext()
+        context.settings.language = "pl"
+        polish_scene = create_tsne_umap_exploration_scene(context)
+
+        assert polish_scene._toy_embedding_label() == "koncepcyjny toy embedding"
+    finally:
+        pygame.quit()
+
+
 def test_tsne_umap_scene_tunes_neighbors_and_seed(monkeypatch) -> None:
     """Minus/equal and S should change deterministic embedding parameters."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")

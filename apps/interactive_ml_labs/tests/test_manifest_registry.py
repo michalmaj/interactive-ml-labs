@@ -929,21 +929,22 @@ def test_calibration_manifest_sets_fourth_level_three_demo_contract() -> None:
 def test_tsne_umap_manifest_sets_fifth_level_three_demo_contract() -> None:
     """t-SNE / UMAP Exploration Lab should define the Level 3 prototype contract."""
     manifest = DEMO_BY_ID["tsne_umap_exploration_lab"]
-    text = " ".join(
-        [
-            manifest.title.en,
-            manifest.summary.en,
-            manifest.summary.pl,
-            *(objective.en for objective in manifest.objectives),
-            *(objective.pl for objective in manifest.objectives),
-            *(control.key for control in manifest.controls),
-            *(control.action.en for control in manifest.controls),
-            *(control.action.pl for control in manifest.controls),
-            *(section.title.en for section in manifest.theory.sections),
-            *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
-            *(entry.term for entry in manifest.theory.glossary),
-        ],
-    )
+    text_parts = [
+        manifest.title.en,
+        manifest.summary.en,
+        manifest.summary.pl,
+        *(objective.en for objective in manifest.objectives),
+        *(objective.pl for objective in manifest.objectives),
+        *(control.key for control in manifest.controls),
+        *(control.action.en for control in manifest.controls),
+        *(control.action.pl for control in manifest.controls),
+        *(section.title.en for section in manifest.theory.sections),
+        *(section.title.pl for section in manifest.theory.sections),
+        *(paragraph.en for section in manifest.theory.sections for paragraph in section.body),
+        *(paragraph.pl for section in manifest.theory.sections for paragraph in section.body),
+        *(entry.term for entry in manifest.theory.glossary),
+    ]
+    text = " ".join(text_parts)
 
     assert manifest.level == 3
     assert manifest.difficulty is not None
@@ -974,6 +975,8 @@ def test_tsne_umap_manifest_sets_fifth_level_three_demo_contract() -> None:
     assert "conceptual visualization" in text
     assert "not a full implementation" in text
     assert "toy embeddings" in text
+    assert "wizualizacją koncepcyjną" in text
+    assert "toy embeddings przygotowanymi" in text
     assert "only approximate those intuitions visually" in text
     assert "1-3" in text
     assert "M" in text
