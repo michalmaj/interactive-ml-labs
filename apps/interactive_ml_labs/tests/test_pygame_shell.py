@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from types import SimpleNamespace
 
 import pygame
@@ -45,7 +46,7 @@ from interactive_ml_labs.logistic_scene import (
     MOVE_BOUNDARY_TASK_ID,
     LogisticRegressionSceneAdapter,
 )
-from interactive_ml_labs.manifest import LocalizedText
+from interactive_ml_labs.manifest import LearningPathManifest, LocalizedText
 from interactive_ml_labs.progress import load_app_progress
 from interactive_ml_labs.pygame_app import (
     ACCENT,
@@ -1297,6 +1298,44 @@ def test_shell_lesson_badge_label_reflects_completion(monkeypatch) -> None:
         app.context.progress.mark_completed(lesson.id)
 
         assert app._lesson_badge_label(lesson) == "Badge unlocked: Loss Navigator"
+    finally:
+        pygame.quit()
+
+
+def test_shell_logs_unregistered_path_completion_fallback(monkeypatch, caplog) -> None:
+    """Path completion fallback should be visible in logs when registry data drifts."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    caplog.set_level(logging.WARNING, logger="interactive_ml_labs.pygame_app")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LearningPathManifest(
+            id="missing_path",
+            title=LocalizedText(en="Missing path", pl="Brakująca ścieżka"),
+            summary=LocalizedText(en="Synthetic path", pl="Sztuczna ścieżka"),
+            lesson_ids=(),
+        )
+
+        label = app._path_completion_next_path_label(path)
+
+        assert label == "Suggested next: review another guided path."
+        assert "Learning path missing_path is not registered" in caplog.text
+    finally:
+        pygame.quit()
+
+
+def test_shell_logs_missing_lesson_in_selected_path(monkeypatch, caplog) -> None:
+    """Lesson fallback should be visible in logs when selected path data drifts."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    caplog.set_level(logging.WARNING, logger="interactive_ml_labs.pygame_app")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.selected_learning_path = LEARNING_PATH_MANIFESTS[0]
+        lesson = LESSON_BY_ID[LEARNING_PATH_MANIFESTS[1].lesson_ids[0]]
+
+        assert app._next_lesson_in_selected_path(lesson) is None
+        assert f"Lesson {lesson.id} is not part of selected learning path" in caplog.text
     finally:
         pygame.quit()
 
