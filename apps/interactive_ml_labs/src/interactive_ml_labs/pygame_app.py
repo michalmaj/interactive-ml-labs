@@ -48,6 +48,13 @@ from interactive_ml_labs.settings import (
     load_app_settings,
     save_app_settings,
 )
+from interactive_ml_labs.shell_scrolling import (
+    clamp_scroll_offset,
+    content_max_scroll,
+    list_max_scroll,
+    scroll_offset_from_thumb_y,
+    scrollbar_rects,
+)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -2833,17 +2840,18 @@ class UnifiedAppShell:
 
     def _update_theory_scroll_limit(self, content_end: int, content_bottom: int) -> None:
         """Update the maximum scroll offset from rendered content height."""
-        self.theory_max_scroll = max(
-            0,
-            content_end + self.theory_scroll_offset - content_bottom,
+        self.theory_max_scroll = content_max_scroll(
+            content_end,
+            self.theory_scroll_offset,
+            content_bottom,
         )
         self._clamp_theory_scroll()
 
     def _clamp_theory_scroll(self) -> None:
         """Keep the theory scroll offset inside the available scroll range."""
-        self.theory_scroll_offset = max(
-            0,
-            min(self.theory_scroll_offset, self.theory_max_scroll),
+        self.theory_scroll_offset = clamp_scroll_offset(
+            self.theory_scroll_offset,
+            self.theory_max_scroll,
         )
 
     def _draw_scroll_indicator(self, top: int, bottom: int) -> None:
@@ -2947,14 +2955,15 @@ class UnifiedAppShell:
         max_scroll: int,
     ) -> tuple[pygame.Rect, pygame.Rect]:
         """Return track and thumb rectangles for a scrollbar."""
-        track_height = bottom - top
-        track_rect = pygame.Rect(x, top, SCROLLBAR_WIDTH, track_height)
-        visible_ratio = track_height / (track_height + max_scroll)
-        thumb_height = max(SCROLLBAR_MIN_THUMB_HEIGHT, round(track_height * visible_ratio))
-        thumb_range = max(1, track_height - thumb_height)
-        thumb_y = top + round(thumb_range * scroll_offset / max_scroll)
-        thumb_rect = pygame.Rect(track_rect.x, thumb_y, track_rect.width, thumb_height)
-        return track_rect, thumb_rect
+        return scrollbar_rects(
+            x=x,
+            top=top,
+            bottom=bottom,
+            scroll_offset=scroll_offset,
+            max_scroll=max_scroll,
+            width=SCROLLBAR_WIDTH,
+            min_thumb_height=SCROLLBAR_MIN_THUMB_HEIGHT,
+        )
 
     def _render_help_overlay(self) -> None:
         width, height = self.context.settings.resolution
@@ -3444,14 +3453,20 @@ class UnifiedAppShell:
             self.demo_scroll_offset = 0
             return
 
-        content_height = ((item_count - 1) * MENU_ITEM_PITCH) + MENU_ITEM_HEIGHT
-        viewport_height = max(0, bottom - top)
-        self.demo_max_scroll = max(0, content_height - viewport_height)
+        self.demo_max_scroll = list_max_scroll(
+            item_count,
+            item_height=MENU_ITEM_HEIGHT,
+            item_pitch=MENU_ITEM_PITCH,
+            viewport_height=bottom - top,
+        )
         self._clamp_demo_scroll()
 
     def _clamp_demo_scroll(self) -> None:
         """Keep the demo list scroll offset inside the available scroll range."""
-        self.demo_scroll_offset = max(0, min(self.demo_scroll_offset, self.demo_max_scroll))
+        self.demo_scroll_offset = clamp_scroll_offset(
+            self.demo_scroll_offset,
+            self.demo_max_scroll,
+        )
 
     def _update_learning_path_details_scroll_limit(
         self,
@@ -3459,20 +3474,18 @@ class UnifiedAppShell:
         content_bottom: int,
     ) -> None:
         """Update maximum scroll offset for the learning path details panel."""
-        self.learning_path_details_max_scroll = max(
-            0,
-            content_end + self.learning_path_details_scroll_offset - content_bottom,
+        self.learning_path_details_max_scroll = content_max_scroll(
+            content_end,
+            self.learning_path_details_scroll_offset,
+            content_bottom,
         )
         self._clamp_learning_path_details_scroll()
 
     def _clamp_learning_path_details_scroll(self) -> None:
         """Keep the learning path details scroll offset inside the available range."""
-        self.learning_path_details_scroll_offset = max(
-            0,
-            min(
-                self.learning_path_details_scroll_offset,
-                self.learning_path_details_max_scroll,
-            ),
+        self.learning_path_details_scroll_offset = clamp_scroll_offset(
+            self.learning_path_details_scroll_offset,
+            self.learning_path_details_max_scroll,
         )
 
     def _update_course_map_details_scroll_limit(
@@ -3481,20 +3494,18 @@ class UnifiedAppShell:
         content_bottom: int,
     ) -> None:
         """Update maximum scroll offset for the course-map details panel."""
-        self.course_map_details_max_scroll = max(
-            0,
-            content_end + self.course_map_details_scroll_offset - content_bottom,
+        self.course_map_details_max_scroll = content_max_scroll(
+            content_end,
+            self.course_map_details_scroll_offset,
+            content_bottom,
         )
         self._clamp_course_map_details_scroll()
 
     def _clamp_course_map_details_scroll(self) -> None:
         """Keep the course-map details scroll offset inside the available range."""
-        self.course_map_details_scroll_offset = max(
-            0,
-            min(
-                self.course_map_details_scroll_offset,
-                self.course_map_details_max_scroll,
-            ),
+        self.course_map_details_scroll_offset = clamp_scroll_offset(
+            self.course_map_details_scroll_offset,
+            self.course_map_details_max_scroll,
         )
 
     def _update_badge_gallery_scroll_limit(
@@ -3503,20 +3514,18 @@ class UnifiedAppShell:
         content_bottom: int,
     ) -> None:
         """Update maximum scroll offset for the badge gallery."""
-        self.badge_gallery_max_scroll = max(
-            0,
-            content_end + self.badge_gallery_scroll_offset - content_bottom,
+        self.badge_gallery_max_scroll = content_max_scroll(
+            content_end,
+            self.badge_gallery_scroll_offset,
+            content_bottom,
         )
         self._clamp_badge_gallery_scroll()
 
     def _clamp_badge_gallery_scroll(self) -> None:
         """Keep the badge gallery scroll offset inside the available range."""
-        self.badge_gallery_scroll_offset = max(
-            0,
-            min(
-                self.badge_gallery_scroll_offset,
-                self.badge_gallery_max_scroll,
-            ),
+        self.badge_gallery_scroll_offset = clamp_scroll_offset(
+            self.badge_gallery_scroll_offset,
+            self.badge_gallery_max_scroll,
         )
 
     def _handle_demo_scrollbar_click(self, position: tuple[int, int]) -> bool:
@@ -3595,9 +3604,13 @@ class UnifiedAppShell:
             scroll_offset=self.demo_scroll_offset,
             max_scroll=self.demo_max_scroll,
         )
-        thumb_range = max(1, (bottom - top) - thumb_rect.height)
-        relative_thumb_y = max(0, min(thumb_y - top, thumb_range))
-        self.demo_scroll_offset = round(relative_thumb_y / thumb_range * self.demo_max_scroll)
+        self.demo_scroll_offset = scroll_offset_from_thumb_y(
+            thumb_y=thumb_y,
+            top=top,
+            bottom=bottom,
+            thumb_height=thumb_rect.height,
+            max_scroll=self.demo_max_scroll,
+        )
         self._clamp_demo_scroll()
         self._select_visible_demo_after_scroll(top, bottom)
 
