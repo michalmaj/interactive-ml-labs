@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 from typing import Final
@@ -54,7 +53,7 @@ from interactive_ml_labs.shell_scrolling import (
     scrollbar_rects,
     selected_index_after_scroll,
 )
-from interactive_ml_labs.shell_types import MenuItem
+from interactive_ml_labs.shell_types import BadgeItem, MenuItem
 
 LOGGER = logging.getLogger(__name__)
 
@@ -117,14 +116,6 @@ class ScreenName(StrEnum):
     BADGES = "badges"
     SETTINGS = "settings"
     PAUSE = "pause"
-
-
-@dataclass(frozen=True, slots=True)
-class BadgeItem:
-    """One visible badge in the guided learning gallery."""
-
-    label: str
-    unlocked: bool
 
 
 class UnifiedAppShell:
