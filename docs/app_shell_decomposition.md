@@ -84,7 +84,8 @@ state in `UnifiedAppShell`.
    Begin with less coupled screens such as badges, concept checks, or settings.
    Each move should keep the same keyboard/mouse behavior.
    Status: the settings screen is the first extracted renderer and keeps input
-   handling in `UnifiedAppShell`.
+   handling in `UnifiedAppShell`. The badge gallery is also extracted; the shell
+   still owns progress-derived badge data and scroll state.
 
 4. Extract navigation state after renderers are smaller.
    Screen transitions are easier to isolate once fewer render methods depend on
