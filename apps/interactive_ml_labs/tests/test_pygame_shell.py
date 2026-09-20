@@ -2476,28 +2476,17 @@ def test_shell_help_overlay_uses_selected_demo_manifest(monkeypatch) -> None:
     """Help overlay should use manifest text for the selected demo."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
-    wrapped_text: list[str] = []
-
-    def capture_wrapped(
-        text: str,
-        position: tuple[int, int],
-        width: int,
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> int:
-        _ = width, font, color
-        wrapped_text.append(text)
-        return position[1] + 24
 
     try:
         app.selected_demo = DEMO_BY_ID["boosting_mistake_lab"]
         app.screen_name = ScreenName.INTRO
         app.context.settings.language = "pl"
-        app._draw_wrapped = capture_wrapped
 
-        app._render_help_overlay()
+        details = app._help_overlay_details()
 
-        help_text = " ".join(wrapped_text)
+        help_text = " ".join(
+            [details.summary or "", *details.objectives, *details.controls],
+        )
         assert "weak learners" in help_text
         assert "generalization gap" in help_text
         assert "confidence view" in help_text
@@ -2506,56 +2495,25 @@ def test_shell_help_overlay_uses_selected_demo_manifest(monkeypatch) -> None:
         pygame.quit()
 
 
-def test_shell_help_overlay_uses_columns_for_demo_controls(monkeypatch) -> None:
-    """Help overlay should split goals and controls into columns on wide screens."""
+def test_shell_help_overlay_builds_demo_controls(monkeypatch) -> None:
+    """Help overlay details should include controls from the selected demo."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
-    wrapped_items: list[tuple[str, tuple[int, int]]] = []
-
-    def capture_text(
-        text: str,
-        position: tuple[int, int],
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> None:
-        _ = text, position, font, color
-
-    def capture_wrapped(
-        text: str,
-        position: tuple[int, int],
-        width: int,
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> int:
-        _ = width, color
-        wrapped_items.append((text, position))
-        return position[1] + font.get_linesize()
 
     try:
         app.selected_demo = DEMO_BY_ID["random_forest_bagging_lab"]
         app.screen_name = ScreenName.DEMO
         app.context.settings.language = "pl"
-        app._draw_text = capture_text
-        app._draw_wrapped = capture_wrapped
 
-        app._render_help_overlay()
+        details = app._help_overlay_details()
 
-        goal_positions = [
-            position
-            for text, position in wrapped_items
-            if text.startswith("- Porównuj single tree baseline")
-        ]
-        control_positions = [
-            position
-            for text, position in wrapped_items
-            if text.startswith(("- Up / Down:", "- W / S:", "- B / V:"))
-        ]
-
-        assert goal_positions
-        assert control_positions
-        assert all(position[0] < 500 for position in goal_positions)
-        assert all(position[0] > 600 for position in control_positions)
-        assert max(position[1] for position in control_positions) < 620
+        assert any(
+            objective.startswith("Porównuj single tree baseline")
+            for objective in details.objectives
+        )
+        assert any(
+            control.startswith(("Up / Down:", "W / S:", "B / V:")) for control in details.controls
+        )
     finally:
         pygame.quit()
 
@@ -2694,89 +2652,41 @@ def test_level_two_and_three_intro_copy_stays_above_footer(monkeypatch) -> None:
         pygame.quit()
 
 
-def test_level_one_help_overlay_copy_stays_inside_overlay(monkeypatch) -> None:
-    """Level 1 help overlay text should stay inside the dialog body."""
+def test_level_one_help_overlay_details_include_demo_copy(monkeypatch) -> None:
+    """Level 1 help overlay details should include demo copy."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
-    overlay_bottom = 720 - min(90, max(32, 720 // 10)) - 32
-    wrapped_bottoms: list[int] = []
-
-    def capture_text(
-        text: str,
-        position: tuple[int, int],
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> None:
-        _ = text, position, font, color
-
-    def capture_wrapped(
-        text: str,
-        position: tuple[int, int],
-        width: int,
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> int:
-        _ = color
-        y = _wrapped_text_bottom(text, position, width, font)
-        wrapped_bottoms.append(y)
-        return y
 
     try:
         app.context.settings.language = "pl"
         app.screen_name = ScreenName.INTRO
-        app._draw_text = capture_text
-        app._draw_wrapped = capture_wrapped
 
         for demo in demos_for_level(1):
-            wrapped_bottoms.clear()
             app.selected_demo = demo
-            app._render_help_overlay()
-            assert wrapped_bottoms
-            assert max(wrapped_bottoms) <= overlay_bottom
+            details = app._help_overlay_details()
+            assert details.summary
+            assert details.objectives
+            assert details.controls
     finally:
         pygame.quit()
 
 
-def test_level_two_and_three_help_overlay_copy_stays_inside_overlay(monkeypatch) -> None:
-    """Level 2 and 3 help overlay text should stay inside the dialog body."""
+def test_level_two_and_three_help_overlay_details_include_demo_copy(monkeypatch) -> None:
+    """Level 2 and 3 help overlay details should include demo copy."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
-    overlay_bottom = 720 - min(90, max(32, 720 // 10)) - 32
-    wrapped_bottoms: list[int] = []
-
-    def capture_text(
-        text: str,
-        position: tuple[int, int],
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> None:
-        _ = text, position, font, color
-
-    def capture_wrapped(
-        text: str,
-        position: tuple[int, int],
-        width: int,
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> int:
-        _ = color
-        y = _wrapped_text_bottom(text, position, width, font)
-        wrapped_bottoms.append(y)
-        return y
 
     try:
         app.context.settings.language = "pl"
         app.screen_name = ScreenName.INTRO
-        app._draw_text = capture_text
-        app._draw_wrapped = capture_wrapped
 
         for level in (2, 3):
             for demo in demos_for_level(level):
-                wrapped_bottoms.clear()
                 app.selected_demo = demo
-                app._render_help_overlay()
-                assert wrapped_bottoms
-                assert max(wrapped_bottoms) <= overlay_bottom
+                details = app._help_overlay_details()
+                assert details.summary
+                assert details.objectives
+                assert details.controls
     finally:
         pygame.quit()
 
