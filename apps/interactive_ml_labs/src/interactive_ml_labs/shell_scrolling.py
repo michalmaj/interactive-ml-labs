@@ -30,6 +30,51 @@ def list_max_scroll(
     return max(0, content_height - max(0, viewport_height))
 
 
+def scroll_offset_for_selected_item(
+    *,
+    selected_index: int,
+    scroll_offset: int,
+    viewport_height: int,
+    item_height: int,
+    item_pitch: int,
+    max_scroll: int,
+) -> int:
+    """Return scroll offset that keeps the selected fixed-pitch item visible."""
+    selected_top = selected_index * item_pitch
+    selected_bottom = selected_top + item_height
+    viewport_height = max(0, viewport_height)
+
+    if selected_top < scroll_offset:
+        scroll_offset = selected_top
+    elif selected_bottom > scroll_offset + viewport_height:
+        scroll_offset = selected_bottom - viewport_height
+
+    return clamp_scroll_offset(scroll_offset, max_scroll)
+
+
+def selected_index_after_scroll(
+    *,
+    selected_index: int,
+    scroll_offset: int,
+    item_count: int,
+    viewport_height: int,
+    item_height: int,
+    item_pitch: int,
+) -> int:
+    """Return a selected index that stays visible after list scrolling."""
+    if item_count <= 0:
+        return 0
+
+    selected_top = selected_index * item_pitch
+    selected_bottom = selected_top + item_height
+    viewport_height = max(0, viewport_height)
+    if scroll_offset <= selected_top and selected_bottom <= scroll_offset + viewport_height:
+        return max(0, min(item_count - 1, selected_index))
+
+    first_visible = scroll_offset // item_pitch
+    return max(0, min(item_count - 1, first_visible))
+
+
 def scrollbar_rects(
     *,
     x: int,
