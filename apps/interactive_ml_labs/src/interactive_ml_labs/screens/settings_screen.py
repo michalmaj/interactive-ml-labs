@@ -162,14 +162,14 @@ class SettingsScreenRenderer:
     def _on_off(settings: AppSettings, value: bool) -> str:
         """Return a localized on/off label."""
         if settings.language == "pl":
-            return "włączone" if value else "wyłączone"
+            return "Włączone" if value else "Wyłączone"
 
-        return "on" if value else "off"
+        return "On" if value else "Off"
 
     @staticmethod
     def _language_label(settings: AppSettings) -> str:
         """Return localized language label."""
         if settings.language == "pl":
-            return "polski"
+            return "Polski"
 
         return "English"

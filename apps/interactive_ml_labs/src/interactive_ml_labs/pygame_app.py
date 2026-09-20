@@ -38,6 +38,11 @@ from interactive_ml_labs.scene import (
     SceneCommandKind,
     SceneManager,
 )
+from interactive_ml_labs.screens.settings_screen import (
+    SettingsScreenColors,
+    SettingsScreenFonts,
+    SettingsScreenRenderer,
+)
 from interactive_ml_labs.settings import AppSettings
 from interactive_ml_labs.shell_persistence import ShellPersistence
 from interactive_ml_labs.shell_scrolling import (
@@ -158,6 +163,7 @@ class UnifiedAppShell:
         self.selected_learning_path: LearningPathManifest | None = None
         self.selected_lesson: LessonManifest | None = None
         self.scene_manager = SceneManager()
+        self.settings_renderer = SettingsScreenRenderer()
         self.menu_items: list[MenuItem] = []
         self.help_visible = False
         self.mouse_position: tuple[int, int] = (0, 0)
@@ -2630,33 +2636,23 @@ class UnifiedAppShell:
         pygame.draw.rect(self.screen, detail, body, border_radius=2)
 
     def _render_settings(self) -> None:
-        settings = self.context.settings
-        self._draw_title(
-            self._text("Settings", "Ustawienia"),
-            self._text("In-memory app options", "Opcje aplikacji w tej sesji"),
-        )
-        labels = [
-            self._text("Language: ", "Język: ") + self._language_label(),
-            self._text("Fullscreen: ", "Pełny ekran: ") + self._on_off(settings.fullscreen_enabled),
-            self._text("Adaptive window size: ", "Adaptacyjny rozmiar okna: ")
-            + self._on_off(settings.adaptive_window_enabled),
-            self._text("Fixed-scene scaling: ", "Skalowanie stałych scen: ")
-            + self._on_off(settings.fixed_scene_scaling_enabled),
-            self._text("Large text: ", "Większy tekst: ")
-            + self._on_off(settings.large_text_enabled),
-            self._text("High contrast: ", "Wysoki kontrast: ")
-            + self._on_off(settings.high_contrast_enabled),
-            self._text("Colorblind-friendly palette: ", "Paleta przyjazna daltonizmowi: ")
-            + self._on_off(settings.colorblind_palette_enabled),
-            self._text("Sound: ", "Dźwięk: ") + self._on_off(settings.sound_enabled),
-            self._text("Back", "Wróć"),
-        ]
-        self._draw_menu(labels, top=168, item_height=44, item_pitch=52)
-        self._draw_footer(
-            self._text(
-                "Enter: toggle/select | Esc/Backspace: back | Most comfort settings apply now",
-                "Enter: przełącz | Esc/Backspace: wróć | Większość opcji komfortu działa od razu",
+        self.menu_items = self.settings_renderer.render(
+            self.screen,
+            settings=self.context.settings,
+            selected_index=self.selected_index,
+            fonts=SettingsScreenFonts(
+                title=self.font_title,
+                body=self.font_body,
+                small=self.font_small,
             ),
+            colors=SettingsScreenColors(
+                text=self._ui_color(TEXT),
+                muted_text=self._ui_color(MUTED_TEXT),
+                panel=self._ui_color(PANEL),
+                selected_panel=self._ui_color(PANEL_SELECTED),
+                border=self._ui_color((72, 79, 88)),
+            ),
+            footer_y=self._footer_y(),
         )
 
     def _draw_title(self, title: str, subtitle: str) -> None:
@@ -3621,15 +3617,6 @@ class UnifiedAppShell:
 
     def _text(self, en: str, pl: str) -> str:
         return LocalizedText(en=en, pl=pl).for_language(self.context.settings.language)
-
-    def _language_label(self) -> str:
-        if self.context.settings.language == "pl":
-            return "Polski"
-
-        return "English"
-
-    def _on_off(self, enabled: bool) -> str:
-        return self._text("On", "Włączone") if enabled else self._text("Off", "Wyłączone")
 
 
 def main() -> None:

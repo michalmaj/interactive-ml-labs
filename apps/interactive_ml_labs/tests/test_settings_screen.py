@@ -70,8 +70,8 @@ def test_settings_screen_uses_polish_labels(monkeypatch) -> None:
             footer_y=670,
         )
 
-        assert menu_items[0].label == "Język: polski"
-        assert menu_items[1].label == "Pełny ekran: włączone"
+        assert menu_items[0].label == "Język: Polski"
+        assert menu_items[1].label == "Pełny ekran: Włączone"
         assert menu_items[-1].label == "Wróć"
     finally:
         pygame.quit()
