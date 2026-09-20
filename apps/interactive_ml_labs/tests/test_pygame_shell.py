@@ -3478,23 +3478,11 @@ def test_shell_settings_menu_lists_accessibility_options(monkeypatch) -> None:
     """Settings should expose accessibility options directly in the shell."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
-    labels: list[str] = []
-
-    def record_menu(
-        menu_labels: list[str],
-        *,
-        top: int,
-        width: int = 760,
-        item_height: int = MENU_ITEM_HEIGHT,
-        item_pitch: int = MENU_ITEM_PITCH,
-    ) -> None:
-        del top, width, item_height, item_pitch
-        labels.extend(menu_labels)
 
     try:
         app.screen_name = ScreenName.SETTINGS
-        app._draw_menu = record_menu  # type: ignore[method-assign]
         app._render_settings()
+        labels = [item.label for item in app.menu_items]
 
         assert "Large text: Off" in labels
         assert "High contrast: Off" in labels

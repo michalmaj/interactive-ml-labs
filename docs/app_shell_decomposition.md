@@ -83,6 +83,8 @@ state in `UnifiedAppShell`.
 3. Extract one screen renderer at a time.
    Begin with less coupled screens such as badges, concept checks, or settings.
    Each move should keep the same keyboard/mouse behavior.
+   Status: the settings screen is the first extracted renderer and keeps input
+   handling in `UnifiedAppShell`.
 
 4. Extract navigation state after renderers are smaller.
    Screen transitions are easier to isolate once fewer render methods depend on
