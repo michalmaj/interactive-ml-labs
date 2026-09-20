@@ -90,6 +90,9 @@ state in `UnifiedAppShell`.
 4. Extract navigation state after renderers are smaller.
    Screen transitions are easier to isolate once fewer render methods depend on
    app-wide mutable fields.
+   Status: screen names and simple Back/Esc/settings/theory navigation rules are
+   now isolated in `shell_navigation.py`; `UnifiedAppShell` still executes the
+   transitions and owns return-screen state.
 
 5. Revisit registry dependencies last.
    The app currently imports the global registry directly. Dependency injection
