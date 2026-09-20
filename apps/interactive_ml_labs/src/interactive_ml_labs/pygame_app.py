@@ -33,6 +33,14 @@ from interactive_ml_labs.screens.badge_screen import (
     BadgeScreenColors,
     BadgeScreenFonts,
 )
+from interactive_ml_labs.screens.course_map_screen import (
+    CourseMapMetric,
+    CourseMapOverviewDetails,
+    CourseMapRenderer,
+    CourseMapScreenColors,
+    CourseMapScreenFonts,
+    CourseMapStepDetails,
+)
 from interactive_ml_labs.screens.settings_screen import (
     SettingsScreenColors,
     SettingsScreenFonts,
@@ -139,6 +147,7 @@ class UnifiedAppShell:
         self.scene_manager = SceneManager()
         self.catalog = ShellCatalog()
         self.badge_renderer = BadgeGalleryRenderer()
+        self.course_map_renderer = CourseMapRenderer()
         self.settings_renderer = SettingsScreenRenderer()
         self.menu_items: list[MenuItem] = []
         self.help_visible = False
@@ -513,31 +522,53 @@ class UnifiedAppShell:
 
     def _render_course_map(self) -> None:
         """Draw the recommended course-level route above individual paths."""
-        self._draw_title(
-            self._text("Course map", "Mapa kursu"),
-            self._text(
-                "Start here, then follow the next idea when it makes sense.",
-                "Zacznij tutaj, a potem przechodź do kolejnych intuicji.",
-            ),
-        )
         labels = [
             self._course_map_step_menu_label(index)
             for index in range(self.catalog.course_map_step_count())
         ]
         labels.append(self._text("All guided paths", "Wszystkie ścieżki"))
-        self._draw_menu(labels, top=170, width=560)
 
         if self.selected_index < self.catalog.course_map_step_count():
-            self._render_course_map_details(self.selected_index)
+            if self.course_map_details_scroll_step_index != self.selected_index:
+                self.course_map_details_scroll_step_index = self.selected_index
+                self.course_map_details_scroll_offset = 0
+            details: CourseMapStepDetails | CourseMapOverviewDetails = (
+                self._course_map_step_details(self.selected_index)
+            )
         else:
-            self._render_course_map_overview()
+            if self.course_map_details_scroll_step_index is not None:
+                self.course_map_details_scroll_step_index = None
+                self.course_map_details_scroll_offset = 0
+            details = self._course_map_overview_details()
 
-        self._draw_footer(
-            self._text(
-                "Enter: open path | Esc/Backspace: home | S: settings | L: language",
-                "Enter: otwórz ścieżkę | Esc/Backspace: start | S: ustawienia | L: język",
+        result = self.course_map_renderer.render(
+            self.screen,
+            settings=self.context.settings,
+            selected_index=self.selected_index,
+            menu_labels=labels,
+            details=details,
+            scroll_offset=self.course_map_details_scroll_offset,
+            max_scroll=self.course_map_details_max_scroll,
+            fonts=CourseMapScreenFonts(
+                title=self.font_title,
+                heading=self.font_heading,
+                body=self.font_body,
+                small=self.font_small,
             ),
+            colors=CourseMapScreenColors(
+                text=self._ui_color(TEXT),
+                muted_text=self._ui_color(MUTED_TEXT),
+                accent=self._ui_color(ACCENT),
+                panel=self._ui_color(PANEL),
+                selected_panel=self._ui_color(PANEL_SELECTED),
+                border=self._ui_color((72, 79, 88)),
+                progress_track=self._ui_color((55, 61, 69)),
+            ),
+            footer_y=self._footer_y(),
         )
+        self.menu_items = result.menu_items
+        self._update_course_map_details_scroll_limit(result.content_end, result.viewport.bottom)
+        self._draw_course_map_details_scroll_indicator(result.viewport)
 
     def _course_map_step_menu_label(self, index: int) -> str:
         """Return one compact course-map menu label."""
@@ -556,167 +587,53 @@ class UnifiedAppShell:
 
         return f"{marker} {prefix}: {title}"
 
-    def _render_course_map_details(self, step_index: int) -> None:
-        """Draw details for one selected course-map step."""
+    def _course_map_step_details(self, step_index: int) -> CourseMapStepDetails:
+        """Return render-ready details for one selected course-map step."""
         language = self.context.settings.language
         step = self.catalog.course_map_step(step_index)
         path = self._course_map_path_for_step(step_index)
-        width, height = self.context.settings.resolution
-        left = 680
-        top = 170
-        panel_width = max(360, width - left - 80)
-        panel_height = max(380, height - top - 100)
-        rect = pygame.Rect(left, top, panel_width, panel_height)
-
-        pygame.draw.rect(self.screen, PANEL, rect, border_radius=8)
-        pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
-
-        if self.course_map_details_scroll_step_index != step_index:
-            self.course_map_details_scroll_step_index = step_index
-            self.course_map_details_scroll_offset = 0
-
-        viewport = rect.inflate(-28, -28)
-        scrollbar_margin = 14 if self.course_map_details_max_scroll > 0 else 0
-        old_clip = self.screen.get_clip()
-        self.screen.set_clip(viewport)
-
-        x = rect.x + 28
-        y = rect.y + 26 - self.course_map_details_scroll_offset
-        content_width = rect.width - 56 - scrollbar_margin
-
-        self._draw_text(
-            self._text(f"Step {step_index + 1}", f"Krok {step_index + 1}"),
-            (x, y),
-            self.font_small,
-            ACCENT,
-        )
-        y += 28
-        y = self._draw_wrapped(
-            path.title.for_language(language),
-            (x, y),
-            content_width,
-            self.font_heading,
-            TEXT,
-        )
-        y += 12
-        y = self._draw_wrapped(
-            step.rationale.for_language(language),
-            (x, y),
-            content_width,
-            self.font_body,
-            MUTED_TEXT,
-        )
-        y += 20
-        for label, completed_count, total_count in self._learning_path_progress_metrics(path):
-            y = self._draw_wrapped(
-                label,
-                (x, y),
-                content_width,
-                self.font_small,
-                TEXT,
-            )
-            self._draw_compact_progress_bar(x, y + 2, content_width, completed_count, total_count)
-            y += 20
-
-        y += 4
-        y = self._draw_wrapped(
-            self._learning_path_next_action_label(path),
-            (x, y),
-            content_width,
-            self.font_small,
-            ACCENT,
-        )
-        y += 18
-        y = self._draw_wrapped(
-            self._course_map_next_reason_label(step),
-            (x, y),
-            content_width,
-            self.font_small,
-            MUTED_TEXT,
+        return CourseMapStepDetails(
+            step_label=self._text(f"Step {step_index + 1}", f"Krok {step_index + 1}"),
+            title=path.title.for_language(language),
+            rationale=step.rationale.for_language(language),
+            progress_metrics=self._course_map_metrics(
+                self._learning_path_progress_metrics(path),
+            ),
+            next_action_label=self._learning_path_next_action_label(path),
+            next_reason_label=self._course_map_next_reason_label(step),
+            practice_heading=self._text("You will practice", "Przećwiczysz"),
+            practice_items=[
+                self.catalog.lesson(lesson_id).title.for_language(language)
+                for lesson_id in path.lesson_ids[:4]
+            ],
         )
 
-        y += 20
-        self._draw_text(
-            self._text("You will practice", "Przećwiczysz"),
-            (x, y),
-            self.font_small,
-            ACCENT,
-        )
-        y += 28
-        for lesson_id in path.lesson_ids[:4]:
-            lesson = self.catalog.lesson(lesson_id)
-            y = self._draw_wrapped(
-                "- " + lesson.title.for_language(language),
-                (x + 18, y),
-                content_width - 18,
-                self.font_small,
-                TEXT,
-            )
-            y += 4
-
-        self.screen.set_clip(old_clip)
-        self._update_course_map_details_scroll_limit(y, viewport.bottom)
-        self._draw_course_map_details_scroll_indicator(viewport)
-
-    def _render_course_map_overview(self) -> None:
-        """Draw the overview panel shown before entering the full path browser."""
-        width, height = self.context.settings.resolution
-        left = 680
-        top = 170
-        panel_width = max(360, width - left - 80)
-        panel_height = max(380, height - top - 100)
-        rect = pygame.Rect(left, top, panel_width, panel_height)
-
-        pygame.draw.rect(self.screen, PANEL, rect, border_radius=8)
-        pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
-
-        if self.course_map_details_scroll_step_index is not None:
-            self.course_map_details_scroll_step_index = None
-            self.course_map_details_scroll_offset = 0
-
-        viewport = rect.inflate(-28, -28)
-        scrollbar_margin = 14 if self.course_map_details_max_scroll > 0 else 0
-        old_clip = self.screen.get_clip()
-        self.screen.set_clip(viewport)
-
-        x = rect.x + 28
-        y = rect.y + 26 - self.course_map_details_scroll_offset
-        content_width = rect.width - 56 - scrollbar_margin
-        y = self._draw_wrapped(
-            self._text("Free exploration", "Swobodna eksploracja"),
-            (x, y),
-            content_width,
-            self.font_heading,
-            TEXT,
-        )
-        y += 12
-        y = self._draw_wrapped(
-            self._text(
+    def _course_map_overview_details(self) -> CourseMapOverviewDetails:
+        """Return render-ready details for the full path browser overview."""
+        return CourseMapOverviewDetails(
+            title=self._text("Free exploration", "Swobodna eksploracja"),
+            body=self._text(
                 "Open the full guided path list when you want to review all routes, "
                 "badges, tasks, and lesson details manually.",
                 "Otwórz pełną listę ścieżek, gdy chcesz ręcznie przejrzeć wszystkie "
                 "trasy, odznaki, zadania i szczegóły lekcji.",
             ),
-            (x, y),
-            content_width,
-            self.font_body,
-            MUTED_TEXT,
+            progress_metrics=self._course_map_metrics(self._home_learning_progress_metrics()),
         )
-        y += 22
-        for label, completed_count, total_count in self._home_learning_progress_metrics():
-            y = self._draw_wrapped(
-                label,
-                (x, y),
-                content_width,
-                self.font_small,
-                TEXT,
-            )
-            self._draw_compact_progress_bar(x, y + 2, content_width, completed_count, total_count)
-            y += 20
 
-        self.screen.set_clip(old_clip)
-        self._update_course_map_details_scroll_limit(y, viewport.bottom)
-        self._draw_course_map_details_scroll_indicator(viewport)
+    def _course_map_metrics(
+        self,
+        metrics: list[tuple[str, int, int]],
+    ) -> list[CourseMapMetric]:
+        """Convert shell progress tuples into course-map renderer metrics."""
+        return [
+            CourseMapMetric(
+                label=label,
+                completed_count=completed_count,
+                total_count=total_count,
+            )
+            for label, completed_count, total_count in metrics
+        ]
 
     def _course_map_path_for_step(self, step_index: int) -> LearningPathManifest:
         """Return the learning path connected to one course-map step."""
