@@ -34,10 +34,23 @@ def test_shell_catalog_exposes_learning_path_lessons() -> None:
     catalog = ShellCatalog()
     path = LEARNING_PATH_MANIFESTS[0]
 
+    assert catalog.all_learning_paths() == LEARNING_PATH_MANIFESTS
+    assert catalog.learning_path_count() == len(LEARNING_PATH_MANIFESTS)
     assert catalog.learning_path(0) == path
+    assert catalog.learning_path_index(path) == 0
     assert catalog.lessons_for_path(path) == tuple(
         LESSON_BY_ID[lesson_id] for lesson_id in path.lesson_ids
     )
+    assert catalog.lesson_exists(path.lesson_ids[0])
+    assert not catalog.lesson_exists("missing_lesson")
+
+
+def test_shell_catalog_exposes_next_learning_path() -> None:
+    """Catalog should expose adjacent guided paths without leaking registry globals."""
+    catalog = ShellCatalog()
+
+    assert catalog.next_learning_path(LEARNING_PATH_MANIFESTS[0]) == LEARNING_PATH_MANIFESTS[1]
+    assert catalog.next_learning_path(LEARNING_PATH_MANIFESTS[-1]) is None
 
 
 def test_shell_catalog_exposes_course_map_paths() -> None:
@@ -45,5 +58,7 @@ def test_shell_catalog_exposes_course_map_paths() -> None:
     catalog = ShellCatalog()
     step = COURSE_MAP_STEPS[0]
 
+    assert catalog.course_map_step_count() == len(COURSE_MAP_STEPS)
+    assert catalog.course_map_menu_item_count() == len(COURSE_MAP_STEPS) + 1
     assert catalog.course_map_step(0) == step
     assert catalog.course_map_path_for_step(0).id == step.path_id
