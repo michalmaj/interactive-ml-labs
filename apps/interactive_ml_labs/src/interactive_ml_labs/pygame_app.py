@@ -22,12 +22,8 @@ from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.progress import AppProgress
 from interactive_ml_labs.registry import (
     COURSE_MAP_STEPS,
-    DEMO_BY_ID,
     LEARNING_PATH_MANIFESTS,
     LESSON_BY_ID,
-    LEVEL_NAMES,
-    demos_for_level,
-    levels_from_manifests,
 )
 from interactive_ml_labs.scene import (
     FixedSizeScene,
@@ -48,6 +44,7 @@ from interactive_ml_labs.screens.settings_screen import (
     SettingsScreenRenderer,
 )
 from interactive_ml_labs.settings import AppSettings
+from interactive_ml_labs.shell_catalog import ShellCatalog
 from interactive_ml_labs.shell_navigation import (
     ScreenName,
     can_open_settings,
@@ -145,6 +142,7 @@ class UnifiedAppShell:
         self.selected_learning_path: LearningPathManifest | None = None
         self.selected_lesson: LessonManifest | None = None
         self.scene_manager = SceneManager()
+        self.catalog = ShellCatalog()
         self.badge_renderer = BadgeGalleryRenderer()
         self.settings_renderer = SettingsScreenRenderer()
         self.menu_items: list[MenuItem] = []
@@ -1607,7 +1605,9 @@ class UnifiedAppShell:
 
     def _render_levels(self) -> None:
         language = self.context.settings.language
-        labels = [LEVEL_NAMES[level].for_language(language) for level in levels_from_manifests()]
+        labels = [
+            self.catalog.level_name(level).for_language(language) for level in self.catalog.levels()
+        ]
         self._draw_title("Interactive ML Labs", self._text("Select level", "Wybierz poziom"))
         self._draw_menu(labels, top=220)
         self._draw_footer(
@@ -1620,7 +1620,7 @@ class UnifiedAppShell:
     def _render_demos(self) -> None:
         demos = self._current_level_demos()
         labels = [demo.title.for_language(self.context.settings.language) for demo in demos]
-        level_name = LEVEL_NAMES[self.context.current_level or 1].for_language(
+        level_name = self.catalog.level_name(self.context.current_level or 1).for_language(
             self.context.settings.language,
         )
 
@@ -3020,7 +3020,7 @@ class UnifiedAppShell:
         self.selected_index = self._next_learning_path_lesson_index(self.selected_learning_path)
 
     def _select_learning_path(self) -> None:
-        self.selected_learning_path = LEARNING_PATH_MANIFESTS[self.selected_index]
+        self.selected_learning_path = self.catalog.learning_path(self.selected_index)
         self._go_to(ScreenName.LESSONS)
         self.selected_index = self._next_learning_path_lesson_index(self.selected_learning_path)
 
@@ -3031,7 +3031,7 @@ class UnifiedAppShell:
     def _open_lesson(self, lesson: LessonManifest) -> None:
         """Open one lesson intro and mark it as started."""
         self.selected_lesson = lesson
-        self.selected_demo = DEMO_BY_ID[lesson.demo_id]
+        self.selected_demo = self.catalog.demo(lesson.demo_id)
         self.context.current_level = self.selected_demo.level
         self.context.selected_demo_id = self.selected_demo.id
         self.context.selected_lesson_id = lesson.id
@@ -3054,7 +3054,7 @@ class UnifiedAppShell:
         self._open_lesson(next_lesson)
 
     def _select_level(self) -> None:
-        levels = levels_from_manifests()
+        levels = self.catalog.levels()
         self.context.current_level = levels[self.selected_index]
         self._go_to(ScreenName.DEMOS)
 
@@ -3277,7 +3277,7 @@ class UnifiedAppShell:
             ScreenName.COURSE_MAP: len(COURSE_MAP_STEPS) + 1,
             ScreenName.PATHS: len(LEARNING_PATH_MANIFESTS),
             ScreenName.LESSONS: len(self._current_learning_path_lessons()),
-            ScreenName.LEVELS: len(levels_from_manifests()),
+            ScreenName.LEVELS: len(self.catalog.levels()),
             ScreenName.DEMOS: len(self._current_level_demos()),
             ScreenName.INTRO: 1,
             ScreenName.THEORY: 1,
@@ -3293,17 +3293,17 @@ class UnifiedAppShell:
         return max(1, counts[self.screen_name])
 
     def _current_level_demos(self) -> tuple[DemoManifest, ...]:
-        return demos_for_level(self.context.current_level or 1)
+        return self.catalog.demos_for_level(self.context.current_level or 1)
 
     def _require_learning_path(self) -> LearningPathManifest:
         if self.selected_learning_path is None:
-            return LEARNING_PATH_MANIFESTS[0]
+            return self.catalog.learning_path(0)
 
         return self.selected_learning_path
 
     def _current_learning_path_lessons(self) -> tuple[LessonManifest, ...]:
         path = self._require_learning_path()
-        return tuple(LESSON_BY_ID[lesson_id] for lesson_id in path.lesson_ids)
+        return self.catalog.lessons_for_path(path)
 
     def _update_demo_scroll_limit(self, item_count: int, top: int, bottom: int) -> None:
         """Update maximum scroll offset for the demo list."""
