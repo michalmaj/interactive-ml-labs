@@ -1931,80 +1931,24 @@ def test_shell_badge_gallery_renders_badges_by_path(monkeypatch) -> None:
     """Badge gallery should show locked and unlocked badges grouped by path."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
-    drawn_text: list[str] = []
-    wrapped_text: list[str] = []
-    menu_labels: list[str] = []
-    badge_states: list[bool] = []
-
-    def capture_text(
-        text: str,
-        position: tuple[int, int],
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> None:
-        _ = position, font, color
-        drawn_text.append(text)
-
-    def capture_wrapped(
-        text: str,
-        position: tuple[int, int],
-        width: int,
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> int:
-        _ = width, font, color
-        wrapped_text.append(text)
-        return position[1] + 24
-
-    def capture_wrapped_visible(
-        text: str,
-        position: tuple[int, int],
-        width: int,
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-        top: int,
-        bottom: int,
-    ) -> int:
-        _ = width, font, color, top, bottom
-        wrapped_text.append(text)
-        return position[1] + 24
-
-    def capture_menu(
-        labels: list[str],
-        *,
-        top: int,
-        width: int = 760,
-    ) -> None:
-        _ = top, width
-        menu_labels.extend(labels)
-
-    def capture_badge_medallion(
-        center: tuple[int, int],
-        *,
-        unlocked: bool,
-    ) -> None:
-        _ = center
-        badge_states.append(unlocked)
 
     try:
         path = LEARNING_PATH_MANIFESTS[0]
         app.context.progress.mark_completed(path.lesson_ids[0])
-        app._draw_text = capture_text
-        app._draw_wrapped = capture_wrapped
-        app._draw_wrapped_visible = capture_wrapped_visible
-        app._draw_menu = capture_menu
-        app._draw_badge_medallion = capture_badge_medallion
+        gallery_paths = app._badge_gallery_paths()
 
         app._render_badges()
 
         badge_total = _guided_lesson_total()
-        assert "Badges" in drawn_text
-        assert f"Badges unlocked: 1/{badge_total}" in wrapped_text
-        assert path.title.en in wrapped_text
-        assert "Residual Reader" in wrapped_text
-        assert "Loss Navigator" in wrapped_text
-        assert badge_states[:2] == [True, False]
-        assert menu_labels == ["Back"]
+        assert app._badge_gallery_summary_label() == f"Badges unlocked: 1/{badge_total}"
+        assert gallery_paths[0].title == path.title.en
+        assert gallery_paths[0].progress_label == "Badges: 1/4 unlocked"
+        assert [badge.label for badge in gallery_paths[0].badges[:2]] == [
+            "Residual Reader",
+            "Loss Navigator",
+        ]
+        assert [badge.unlocked for badge in gallery_paths[0].badges[:2]] == [True, False]
+        assert [item.label for item in app.menu_items] == ["Back"]
     finally:
         pygame.quit()
 

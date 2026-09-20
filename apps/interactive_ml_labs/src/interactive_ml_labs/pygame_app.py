@@ -37,6 +37,12 @@ from interactive_ml_labs.scene import (
     SceneCommandKind,
     SceneManager,
 )
+from interactive_ml_labs.screens.badge_screen import (
+    BadgeGalleryPath,
+    BadgeGalleryRenderer,
+    BadgeScreenColors,
+    BadgeScreenFonts,
+)
 from interactive_ml_labs.screens.settings_screen import (
     SettingsScreenColors,
     SettingsScreenFonts,
@@ -154,6 +160,7 @@ class UnifiedAppShell:
         self.selected_learning_path: LearningPathManifest | None = None
         self.selected_lesson: LessonManifest | None = None
         self.scene_manager = SceneManager()
+        self.badge_renderer = BadgeGalleryRenderer()
         self.settings_renderer = SettingsScreenRenderer()
         self.menu_items: list[MenuItem] = []
         self.help_visible = False
@@ -1109,6 +1116,18 @@ class UnifiedAppShell:
             )
 
         return badges
+
+    def _badge_gallery_paths(self) -> list[BadgeGalleryPath]:
+        """Return render-ready badge gallery data for all learning paths."""
+        language = self.context.settings.language
+        return [
+            BadgeGalleryPath(
+                title=path.title.for_language(language),
+                progress_label=self._learning_path_badge_progress_label(path),
+                badges=self._learning_path_badge_items(path),
+            )
+            for path in LEARNING_PATH_MANIFESTS
+        ]
 
     def _learning_path_lesson_map_label(self, lesson: LessonManifest, index: int) -> str:
         """Return one compact lesson row for a learning path course map."""
@@ -2501,130 +2520,37 @@ class UnifiedAppShell:
 
     def _render_badges(self) -> None:
         """Draw a gallery of guided learning badges."""
-        language = self.context.settings.language
-        width, _ = self.context.settings.resolution
-        content_width = min(1040, width - 160)
-        y = 82
-
-        self._draw_text(
-            self._text("Badges", "Odznaki"),
-            (80, y),
-            self.font_title,
-            TEXT,
-        )
-        y += 58
-        y = self._draw_wrapped(
-            self._text(
-                "Track the concepts you have demonstrated across guided learning paths.",
-                "Zobacz, które pojęcia masz już przećwiczone w prowadzonych ścieżkach.",
+        result = self.badge_renderer.render(
+            self.screen,
+            settings=self.context.settings,
+            paths=self._badge_gallery_paths(),
+            summary_label=self._badge_gallery_summary_label(),
+            scroll_offset=self.badge_gallery_scroll_offset,
+            content_bottom=self._content_bottom(),
+            footer_y=self._footer_y(),
+            fonts=BadgeScreenFonts(
+                title=self.font_title,
+                heading=self.font_heading,
+                body=self.font_body,
+                small=self.font_small,
             ),
-            (80, y),
-            content_width,
-            self.font_body,
-            MUTED_TEXT,
-        )
-        y += 24
-        y = self._draw_wrapped(
-            self._badge_gallery_summary_label(),
-            (80, y),
-            content_width,
-            self.font_heading,
-            ACCENT,
-        )
-        content_top = y + 26
-        content_bottom = self._content_bottom() - 76
-        content_y = content_top - self.badge_gallery_scroll_offset
-        content_end = content_y
-
-        column_count = 2 if width >= 1180 else 1
-        column_gap = 48
-        column_width = (content_width - column_gap) // 2 if column_count == 2 else content_width
-        column_tops = [content_y for _ in range(column_count)]
-        previous_clip = self.screen.get_clip()
-        viewport = pygame.Rect(80, content_top, content_width, max(0, content_bottom - content_top))
-        self.screen.set_clip(viewport)
-
-        try:
-            for index, path in enumerate(LEARNING_PATH_MANIFESTS):
-                column = index % column_count
-                x = 80 + column * (column_width + column_gap)
-                path_y = column_tops[column]
-                path_y = self._draw_wrapped_visible(
-                    path.title.for_language(language),
-                    (x, path_y),
-                    column_width,
-                    self.font_heading,
-                    TEXT,
-                    content_top,
-                    content_bottom,
-                )
-                path_y += 8
-                path_y = self._draw_wrapped_visible(
-                    self._learning_path_badge_progress_label(path),
-                    (x, path_y),
-                    column_width,
-                    self.font_small,
-                    ACCENT,
-                    content_top,
-                    content_bottom,
-                )
-                path_y += 10
-                for badge in self._learning_path_badge_items(path):
-                    icon_y = path_y + self.font_small.get_linesize() // 2
-                    self._draw_badge_medallion(
-                        (x + 12, icon_y),
-                        unlocked=badge.unlocked,
-                    )
-                    path_y = self._draw_wrapped_visible(
-                        badge.label,
-                        (x + 34, path_y),
-                        column_width - 34,
-                        self.font_small,
-                        TEXT if badge.unlocked else MUTED_TEXT,
-                        content_top,
-                        content_bottom,
-                    )
-                    path_y += 4
-
-                column_tops[column] = path_y + 26
-        finally:
-            self.screen.set_clip(previous_clip)
-
-        content_end = max(column_tops) if column_tops else content_y
-        self._update_badge_gallery_scroll_limit(content_end, content_bottom)
-        self._draw_badge_gallery_scroll_indicator(viewport)
-        self._draw_menu([self._text("Back", "Wróć")], top=self._content_bottom() - 62, width=260)
-        self._draw_footer(
-            self._text(
-                "Wheel: scroll | Enter/Esc/Backspace: home | L: language",
-                "Kółko: przewijaj | Enter/Esc/Backspace: start | L: język",
+            colors=BadgeScreenColors(
+                background=self._ui_color(BACKGROUND),
+                text=self._ui_color(TEXT),
+                muted_text=self._ui_color(MUTED_TEXT),
+                accent=self._ui_color(ACCENT),
+                panel=self._ui_color(PANEL),
+                selected_panel=self._ui_color(PANEL_SELECTED),
+                border=self._ui_color((72, 79, 88)),
+                unlocked_fill=self._ui_color((226, 176, 83)),
+                unlocked_outline=self._ui_color((250, 218, 139)),
+                locked_fill=self._ui_color((61, 68, 76)),
+                locked_outline=self._ui_color((109, 118, 128)),
             ),
         )
-
-    def _draw_badge_medallion(
-        self,
-        center: tuple[int, int],
-        *,
-        unlocked: bool,
-    ) -> None:
-        """Draw a small local badge icon without external image assets."""
-        fill = self._ui_color((226, 176, 83) if unlocked else (61, 68, 76))
-        outline = self._ui_color((250, 218, 139) if unlocked else (109, 118, 128))
-        detail = self._ui_color(BACKGROUND if unlocked else MUTED_TEXT)
-        cx, cy = center
-
-        pygame.draw.circle(self.screen, fill, center, 12)
-        pygame.draw.circle(self.screen, outline, center, 12, width=2)
-
-        if unlocked:
-            pygame.draw.line(self.screen, detail, (cx - 5, cy), (cx - 1, cy + 4), width=3)
-            pygame.draw.line(self.screen, detail, (cx - 1, cy + 4), (cx + 6, cy - 5), width=3)
-            return
-
-        shackle = pygame.Rect(cx - 5, cy - 6, 10, 9)
-        body = pygame.Rect(cx - 6, cy - 1, 12, 8)
-        pygame.draw.arc(self.screen, detail, shackle, 3.14, 6.28, width=2)
-        pygame.draw.rect(self.screen, detail, body, border_radius=2)
+        self._update_badge_gallery_scroll_limit(result.content_end, result.viewport.bottom)
+        self._draw_badge_gallery_scroll_indicator(result.viewport)
+        self.menu_items = result.menu_items
 
     def _render_settings(self) -> None:
         self.menu_items = self.settings_renderer.render(
