@@ -49,6 +49,7 @@ from interactive_ml_labs.shell_scrolling import (
     scrollbar_rects,
     selected_index_after_scroll,
 )
+from interactive_ml_labs.shell_types import MenuItem
 
 LOGGER = logging.getLogger(__name__)
 
@@ -111,15 +112,6 @@ class ScreenName(StrEnum):
     BADGES = "badges"
     SETTINGS = "settings"
     PAUSE = "pause"
-
-
-@dataclass(slots=True)
-class MenuItem:
-    """Clickable/selectable menu item."""
-
-    label: str
-    rect: pygame.Rect
-    enabled: bool = True
 
 
 @dataclass(frozen=True, slots=True)
