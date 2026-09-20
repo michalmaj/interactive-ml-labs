@@ -344,41 +344,18 @@ def test_shell_course_map_renders_recommended_steps(monkeypatch) -> None:
     """Course map should render ordered path steps before the full path browser."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
-    menu_labels: list[str] = []
-    wrapped_text: list[str] = []
-
-    def capture_menu(
-        labels: list[str],
-        *,
-        top: int,
-        width: int = 640,
-    ) -> None:
-        _ = top, width
-        menu_labels.extend(labels)
-
-    def capture_wrapped(
-        text: str,
-        position: tuple[int, int],
-        width: int,
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> int:
-        _ = width, font, color
-        wrapped_text.append(text)
-        return position[1] + 24
 
     try:
         app.screen_name = ScreenName.COURSE_MAP
-        app._draw_menu = capture_menu
-        app._draw_wrapped = capture_wrapped
 
         app._render_course_map()
+        details = app._course_map_step_details(0)
 
-        assert menu_labels[0] == "[ ] Step 1: How models learn from error"
-        assert menu_labels[-1] == "All guided paths"
-        assert COURSE_MAP_STEPS[0].rationale.en in wrapped_text
+        assert app.menu_items[0].label == "[ ] Step 1: How models learn from error"
+        assert app.menu_items[-1].label == "All guided paths"
+        assert details.rationale == COURSE_MAP_STEPS[0].rationale.en
         assert COURSE_MAP_STEPS[0].next_reason is not None
-        assert COURSE_MAP_STEPS[0].next_reason.en in wrapped_text
+        assert details.next_reason_label == COURSE_MAP_STEPS[0].next_reason.en
     finally:
         pygame.quit()
 
