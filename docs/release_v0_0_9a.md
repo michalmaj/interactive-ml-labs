@@ -100,7 +100,8 @@ After the required product work is complete:
 - review the root README, `USAGE.md`, and `USAGE.pl.md` for the release state,
 - decide whether screenshots/GIFs are ready for this tag or should wait for
   classroom feedback,
-- start or prepare a project wiki for student/instructor-facing notes,
+- start or prepare a project wiki for student/instructor-facing notes from
+  [wiki_outline.md](wiki_outline.md),
 - verify repository metadata: description, topics, and homepage settings.
 
 ## After v0.0.9a
