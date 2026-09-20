@@ -2112,44 +2112,33 @@ def test_shell_trustworthy_path_details_localize_polish(monkeypatch) -> None:
     """Trustworthy path details should show natural Polish lesson and badge copy."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
-    wrapped_text: list[str] = []
-
-    def capture_wrapped(
-        text: str,
-        position: tuple[int, int],
-        width: int,
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> int:
-        _ = position, width, font, color
-        wrapped_text.append(text)
-        return 24
 
     try:
         app.context.settings.language = "pl"
         path = next(path for path in LEARNING_PATH_MANIFESTS if path.id == "trustworthy_models")
-        app._draw_wrapped = capture_wrapped
 
-        app._render_learning_path_details(path)
+        details = app._learning_path_details(path)
 
-        assert "[ ] Strażnik test set" in wrapped_text
-        assert "[ ] Detektyw leakage" in wrapped_text
-        assert "[ ] Strażnik modelu" in wrapped_text
+        assert "[ ] Strażnik test set" in details.badge_labels
+        assert "[ ] Detektyw leakage" in details.badge_labels
+        assert "[ ] Strażnik modelu" in details.badge_labels
         assert (
             app._learning_path_lesson_map_label(
                 LESSON_BY_ID[path.lesson_ids[2]],
                 3,
             )
-            in wrapped_text
+            in details.lesson_labels
         )
         assert (
             app._learning_path_lesson_map_label(
                 LESSON_BY_ID[path.lesson_ids[3]],
                 4,
             )
-            in wrapped_text
+            in details.lesson_labels
         )
-        assert "naprawdę coś znaczy" not in " ".join(wrapped_text)
+        assert "naprawdę coś znaczy" not in " ".join(
+            [details.summary, *details.badge_labels, *details.lesson_labels],
+        )
     finally:
         pygame.quit()
 
@@ -2158,18 +2147,6 @@ def test_shell_representation_path_details_localize_polish(monkeypatch) -> None:
     """Level 3 representation path details should show natural Polish guided copy."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
-    wrapped_text: list[str] = []
-
-    def capture_wrapped(
-        text: str,
-        position: tuple[int, int],
-        width: int,
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> int:
-        _ = position, width, font, color
-        wrapped_text.append(text)
-        return 24
 
     try:
         app.context.settings.language = "pl"
@@ -2178,26 +2155,25 @@ def test_shell_representation_path_details_localize_polish(monkeypatch) -> None:
             for path in LEARNING_PATH_MANIFESTS
             if path.id == "representation_to_model_behavior"
         )
-        app._draw_wrapped = capture_wrapped
 
-        app._render_learning_path_details(path)
+        details = app._learning_path_details(path)
 
-        assert "[ ] Strażnik wariancji" in wrapped_text
-        assert "[ ] Sceptyk embeddingów" in wrapped_text
-        assert "[ ] Kontroler prognoz" in wrapped_text
+        assert "[ ] Strażnik wariancji" in details.badge_labels
+        assert "[ ] Sceptyk embeddingów" in details.badge_labels
+        assert "[ ] Kontroler prognoz" in details.badge_labels
         assert (
             app._learning_path_lesson_map_label(
                 LESSON_BY_ID[path.lesson_ids[0]],
                 1,
             )
-            in wrapped_text
+            in details.lesson_labels
         )
         assert (
             app._learning_path_lesson_map_label(
                 LESSON_BY_ID[path.lesson_ids[-1]],
                 len(path.lesson_ids),
             )
-            in wrapped_text
+            in details.lesson_labels
         )
     finally:
         pygame.quit()
