@@ -65,7 +65,8 @@ macOS metadata, and accidental shell files are not tracked in git.
 The current release plan is captured in [release_v0_0_9a.md](release_v0_0_9a.md).
 The release runbook is captured in
 [release_checklist_v0_0_9a.md](release_checklist_v0_0_9a.md). The next priority
-is final release preparation: license, issue templates, repository metadata, and
+is final release preparation: green CI on `main`, local release gate,
+student-flow smoke testing, optional release screenshots/GIFs, wiki outline, and
 the GitHub tag/release.
 
 Versioning is documented in [versioning.md](versioning.md): the `v0.0.9a` tag is
@@ -84,12 +85,14 @@ Required product work before `v0.0.9a`:
 
 Release preparation after those product slices:
 
-- prepare `v0.0.9a` release docs and student alpha notes,
-- add a license and GitHub issue templates for student feedback,
-- document repository metadata and GitHub home-page settings,
-- add screenshots or short GIFs for the main README and app docs,
-- refresh the README for the release state,
-- prepare repository metadata and wiki structure.
+- [x] prepare `v0.0.9a` release docs and student alpha notes,
+- [x] add a license and GitHub issue templates for student feedback,
+- [x] document repository metadata and GitHub home-page settings,
+- [ ] run the final local release gate and confirm GitHub Actions on `main`,
+- [ ] smoke-test the core student flow in the app,
+- [ ] add screenshots or short GIFs for the main README and app docs if they are
+  ready before tagging,
+- [ ] prepare a small wiki outline for student/instructor notes.
 
 ## Next Engineering Themes
 
@@ -150,8 +153,9 @@ Avoid forcing every scene into one renderer inheritance model. Existing demo ren
 screens, scroll state, persistence, language switching, and overlay flow. That is
 the main technical debt to address after `v0.0.9a`.
 
-The decomposition should happen in small pull requests: pure helpers first,
-then persistence, then one shell screen at a time, and registry decoupling last.
+The decomposition is now underway in small pull requests: pure scrolling helpers,
+persistence, settings/badge screen renderers, navigation rules, and the first
+catalog facade have been extracted. Continue one narrow boundary at a time.
 The detailed plan lives in
 [app_shell_decomposition.md](app_shell_decomposition.md).
 
@@ -163,12 +167,13 @@ Near-term docs work:
 
 - keep `USAGE.md` and `USAGE.pl.md` aligned with the app,
 - keep `docs/levels.md` aligned with the registry,
-- add screenshots/GIFs as part of `v0.0.9a` release preparation,
+- add screenshots/GIFs as part of `v0.0.9a` release preparation if useful media
+  can be captured before tagging,
 - keep Polish copy natural rather than literal.
 
-The release preparation should also add GitHub issue templates so students can
-report broken behavior, confusing lessons, missing topics, and rough classroom
-UX without needing to know the codebase.
+GitHub issue templates are already present so students can report broken
+behavior, confusing lessons, missing topics, and rough classroom UX without
+needing to know the codebase.
 
 ### Distribution
 

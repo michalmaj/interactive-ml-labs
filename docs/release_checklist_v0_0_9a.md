@@ -46,6 +46,10 @@ uv run --package interactive-ml-labs-app interactive-ml-labs
   - settings menu comfort options.
 
 - [ ] Review `USAGE.md` and `USAGE.pl.md`.
+- [ ] Decide whether screenshots or short GIFs are ready for this tag:
+  - if yes, add them to the root README and app README,
+  - if no, keep the release local-first and note that media will follow after
+    classroom feedback.
 - [ ] Review the student release notes:
   - [student_alpha_v0_0_9a.md](student_alpha_v0_0_9a.md),
   - [student_alpha_v0_0_9a.pl.md](student_alpha_v0_0_9a.pl.md).
@@ -53,6 +57,9 @@ uv run --package interactive-ml-labs-app interactive-ml-labs
   product tag can remain separate from the `0.1.0` Python package versions.
 - [ ] Confirm that the post-alpha app shell decomposition debt is tracked in
   [app_shell_decomposition.md](app_shell_decomposition.md).
+  The first small decomposition slices are already done: scrolling helpers,
+  persistence facade, settings and badge screen renderers, navigation rules, and
+  the first catalog facade.
 
 ## GitHub Repository Setup
 
@@ -91,6 +98,13 @@ ml-education
   - Deployments disabled/unused until there is a deployed website,
   - Packages later, when distribution artifacts exist.
 - [ ] Prepare a small wiki outline for instructor/student notes.
+
+Suggested first wiki pages:
+
+- Getting started in class,
+- Guided learning paths,
+- Reporting confusing lessons,
+- Instructor notes and classroom setup.
 
 ## Tag And Release
 

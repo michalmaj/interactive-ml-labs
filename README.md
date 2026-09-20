@@ -178,9 +178,10 @@ The original Level 1 and Level 2 demos can still be run as standalone commands. 
 Near-term work focuses on preparing the `v0.0.9a` student-facing alpha while keeping the shell stable:
 
 - prepare the `v0.0.9a` student-facing alpha release,
-- review the MIT license and GitHub issue templates added for student feedback,
-- apply repository metadata and prepare a small wiki outline,
-- add screenshots or short GIFs for the release docs when available,
+- confirm the local release gate and green GitHub Actions on `main`,
+- smoke-test the guided student flow end to end,
+- prepare a small wiki outline,
+- add screenshots or short GIFs for the release docs when useful media is ready,
 - collect classroom-style feedback on the guided paths and newer Level 3 labs,
 - keep improving in-app theory and mini-challenges where they clarify a real teaching gap,
 - continue polishing Polish copy inside demos without forcing translations of standard ML terms,
