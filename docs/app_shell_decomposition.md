@@ -97,6 +97,8 @@ state in `UnifiedAppShell`.
 5. Revisit registry dependencies last.
    The app currently imports the global registry directly. Dependency injection
    may help tests later, but it should come after the shell has smaller modules.
+   Status: the first `ShellCatalog` facade now centralizes common shell lookups;
+   remaining direct registry usage can move behind it incrementally.
 
 ## Acceptance Checks For Each Refactor PR
 
