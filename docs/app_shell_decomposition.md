@@ -72,10 +72,13 @@ state in `UnifiedAppShell`.
    Start with functions that do not need Pygame display state: scrollbar
    calculations, scroll clamping, selected-item visibility, and small text-layout
    helpers.
+   Status: initial scrolling and selected-item visibility helpers are extracted.
 
 2. Extract persistence behind a narrow facade.
    Move settings/progress file handling out of `UnifiedAppShell`, while keeping
    the public data model unchanged.
+   Status: the first shell persistence facade now owns settings/progress paths,
+   initial loading, revision-aware progress saves, and settings saves.
 
 3. Extract one screen renderer at a time.
    Begin with less coupled screens such as badges, concept checks, or settings.

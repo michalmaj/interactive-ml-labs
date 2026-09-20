@@ -21,11 +21,7 @@ from interactive_ml_labs.manifest import (
     LocalizedText,
 )
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
-from interactive_ml_labs.progress import (
-    AppProgress,
-    load_app_progress,
-    save_app_progress,
-)
+from interactive_ml_labs.progress import AppProgress
 from interactive_ml_labs.registry import (
     COURSE_MAP_STEPS,
     DEMO_BY_ID,
@@ -42,12 +38,8 @@ from interactive_ml_labs.scene import (
     SceneCommandKind,
     SceneManager,
 )
-from interactive_ml_labs.settings import (
-    AppContext,
-    AppSettings,
-    load_app_settings,
-    save_app_settings,
-)
+from interactive_ml_labs.settings import AppSettings
+from interactive_ml_labs.shell_persistence import ShellPersistence
 from interactive_ml_labs.shell_scrolling import (
     clamp_scroll_offset,
     content_max_scroll,
@@ -151,17 +143,12 @@ class UnifiedAppShell:
         """Initialize the shell."""
         pygame.init()
 
-        self.settings_path = settings_path
-        self.progress_path = progress_path or self._default_progress_path_for(settings_path)
-        self.settings_persistence_enabled = settings is None or settings_path is not None
-        self.progress_persistence_enabled = progress is None and (
-            settings is None or progress_path is not None
+        self.persistence, self.context = ShellPersistence.create(
+            settings=settings,
+            settings_path=settings_path,
+            progress=progress,
+            progress_path=progress_path,
         )
-        self.context = AppContext(
-            settings=settings or load_app_settings(settings_path),
-            progress=progress or self._load_initial_progress(settings, self.progress_path),
-        )
-        self._saved_progress_revision = self.context.progress.revision
         self._apply_adaptive_window_size()
         self.screen = pygame.display.set_mode(
             self.context.settings.resolution,
@@ -242,37 +229,33 @@ class UnifiedAppShell:
             self._display_flags(),
         )
 
+    @property
+    def settings_path(self) -> Path | None:
+        """Return the settings path used by shell persistence."""
+        return self.persistence.settings_path
+
+    @settings_path.setter
+    def settings_path(self, path: Path | None) -> None:
+        """Update the settings path used by shell persistence."""
+        self.persistence.settings_path = path
+
+    @property
+    def progress_path(self) -> Path | None:
+        """Return the progress path used by shell persistence."""
+        return self.persistence.progress_path
+
+    @progress_path.setter
+    def progress_path(self, path: Path | None) -> None:
+        """Update the progress path used by shell persistence."""
+        self.persistence.progress_path = path
+
     def _save_settings(self) -> None:
         """Persist settings when the shell owns settings storage."""
-        if self.settings_persistence_enabled:
-            save_app_settings(self.context.settings, self.settings_path)
+        self.persistence.save_settings(self.context.settings)
 
     def _save_progress(self) -> None:
         """Persist progress when the shell owns progress storage."""
-        if self.context.progress.revision == self._saved_progress_revision:
-            return
-
-        if self.progress_persistence_enabled:
-            save_app_progress(self.context.progress, self.progress_path)
-        self._saved_progress_revision = self.context.progress.revision
-
-    def _default_progress_path_for(self, settings_path: Path | None) -> Path | None:
-        """Keep explicit test settings and progress files next to each other."""
-        if settings_path is None:
-            return None
-
-        return settings_path.with_name("progress.json")
-
-    def _load_initial_progress(
-        self,
-        settings: AppSettings | None,
-        progress_path: Path | None,
-    ) -> AppProgress:
-        """Load progress only when the shell owns persistent app state."""
-        if settings is not None and progress_path is None:
-            return AppProgress()
-
-        return load_app_progress(progress_path)
+        self.persistence.save_progress(self.context.progress)
 
     def run(self) -> None:
         """Run the shell event loop."""
