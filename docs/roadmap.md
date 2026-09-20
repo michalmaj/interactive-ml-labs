@@ -90,9 +90,9 @@ Release preparation after those product slices:
 - [x] document repository metadata and GitHub home-page settings,
 - [ ] run the final local release gate and confirm GitHub Actions on `main`,
 - [ ] smoke-test the core student flow in the app,
-- [ ] add screenshots or short GIFs for the main README and app docs if they are
-  ready before tagging,
-- [ ] prepare a small wiki outline for student/instructor notes.
+- [x] defer screenshots/GIFs until after classroom feedback,
+- [x] prepare a small wiki outline for student/instructor notes:
+  [wiki_outline.md](wiki_outline.md).
 
 ## Next Engineering Themes
 

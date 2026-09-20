@@ -1,6 +1,12 @@
 # Interactive ML Labs
 
 [![CI](https://github.com/michalmaj/interactive-ml-labs/actions/workflows/ci.yml/badge.svg)](https://github.com/michalmaj/interactive-ml-labs/actions/workflows/ci.yml)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![uv](https://img.shields.io/badge/managed%20with-uv-654FF0)](https://docs.astral.sh/uv/)
+[![Pygame](https://img.shields.io/badge/ui-Pygame-1f6f43)](https://www.pygame.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Release target](https://img.shields.io/badge/release%20target-v0.0.9a-orange)](docs/release_v0_0_9a.md)
+[![Languages](https://img.shields.io/badge/languages-EN%20%7C%20PL-blue)](USAGE.pl.md)
 
 Interactive ML Labs is a guided collection of visual, interactive machine learning labs designed for teaching and experimentation.
 

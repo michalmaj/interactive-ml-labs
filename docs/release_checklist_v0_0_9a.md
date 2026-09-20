@@ -46,10 +46,9 @@ uv run --package interactive-ml-labs-app interactive-ml-labs
   - settings menu comfort options.
 
 - [ ] Review `USAGE.md` and `USAGE.pl.md`.
-- [ ] Decide whether screenshots or short GIFs are ready for this tag:
-  - if yes, add them to the root README and app README,
-  - if no, keep the release local-first and note that media will follow after
-    classroom feedback.
+- [x] Decide whether screenshots or short GIFs are ready for this tag.
+  Deferred for `v0.0.9a`: keep the release local-first and add media after
+  classroom feedback.
 - [ ] Review the student release notes:
   - [student_alpha_v0_0_9a.md](student_alpha_v0_0_9a.md),
   - [student_alpha_v0_0_9a.pl.md](student_alpha_v0_0_9a.pl.md).
@@ -97,7 +96,8 @@ ml-education
   - Releases,
   - Deployments disabled/unused until there is a deployed website,
   - Packages later, when distribution artifacts exist.
-- [ ] Prepare a small wiki outline for instructor/student notes.
+- [x] Prepare a small wiki outline for instructor/student notes:
+  [wiki_outline.md](wiki_outline.md).
 
 Suggested first wiki pages:
 
