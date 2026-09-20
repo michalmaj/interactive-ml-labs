@@ -52,7 +52,10 @@ Each demo is registered through a manifest. The manifest provides title, summary
 
 The current `UnifiedAppShell` is intentionally still the main app coordination
 point for the alpha. Its post-alpha decomposition plan is tracked in
-[App Shell Decomposition](../../docs/app_shell_decomposition.md).
+[App Shell Decomposition](../../docs/app_shell_decomposition.md), and the first
+small slices are already extracted: scrolling helpers, persistence facade,
+settings and badge screen renderers, navigation rules, and the initial shell
+catalog facade.
 
 New demos should be added in small pull requests:
 

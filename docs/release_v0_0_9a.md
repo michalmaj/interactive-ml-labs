@@ -21,9 +21,10 @@ stay lightweight, local-first, and demo-driven.
 
 ## Required Product Work
 
-Current status: the required product work is complete. The remaining work is
-release preparation: repository metadata, issue templates, license, final
-verification, and publishing the tag/release.
+Current status: the required product work is complete. Repository metadata
+guidance, issue templates, and license are in place. The remaining work is final
+verification, optional release media, wiki outline preparation, and publishing
+the tag/release.
 
 ### 1. Course Feeling Above Individual Paths
 
@@ -94,10 +95,13 @@ The draft student-facing release notes are:
 After the required product work is complete:
 
 - create a GitHub tag and release for `v0.0.9a`,
-- refresh the root README for the release state,
-- review the project license and issue templates added for the alpha,
-- apply repository metadata: description, topics, and homepage settings,
-- start or prepare a project wiki for student/instructor-facing notes.
+- confirm green CI on `main` and run the local release gate,
+- smoke-test the guided student flow in the app,
+- review the root README, `USAGE.md`, and `USAGE.pl.md` for the release state,
+- decide whether screenshots/GIFs are ready for this tag or should wait for
+  classroom feedback,
+- start or prepare a project wiki for student/instructor-facing notes,
+- verify repository metadata: description, topics, and homepage settings.
 
 ## After v0.0.9a
 
