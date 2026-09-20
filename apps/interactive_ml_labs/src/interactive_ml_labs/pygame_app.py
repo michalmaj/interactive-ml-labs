@@ -20,11 +20,6 @@ from interactive_ml_labs.manifest import (
 )
 from interactive_ml_labs.placeholder_scene import PlaceholderDemoScene
 from interactive_ml_labs.progress import AppProgress
-from interactive_ml_labs.registry import (
-    COURSE_MAP_STEPS,
-    LEARNING_PATH_MANIFESTS,
-    LESSON_BY_ID,
-)
 from interactive_ml_labs.scene import (
     FixedSizeScene,
     Scene,
@@ -525,11 +520,14 @@ class UnifiedAppShell:
                 "Zacznij tutaj, a potem przechodź do kolejnych intuicji.",
             ),
         )
-        labels = [self._course_map_step_menu_label(index) for index in range(len(COURSE_MAP_STEPS))]
+        labels = [
+            self._course_map_step_menu_label(index)
+            for index in range(self.catalog.course_map_step_count())
+        ]
         labels.append(self._text("All guided paths", "Wszystkie ścieżki"))
         self._draw_menu(labels, top=170, width=560)
 
-        if self.selected_index < len(COURSE_MAP_STEPS):
+        if self.selected_index < self.catalog.course_map_step_count():
             self._render_course_map_details(self.selected_index)
         else:
             self._render_course_map_overview()
@@ -561,7 +559,7 @@ class UnifiedAppShell:
     def _render_course_map_details(self, step_index: int) -> None:
         """Draw details for one selected course-map step."""
         language = self.context.settings.language
-        step = COURSE_MAP_STEPS[step_index]
+        step = self.catalog.course_map_step(step_index)
         path = self._course_map_path_for_step(step_index)
         width, height = self.context.settings.resolution
         left = 680
@@ -646,7 +644,7 @@ class UnifiedAppShell:
         )
         y += 28
         for lesson_id in path.lesson_ids[:4]:
-            lesson = LESSON_BY_ID[lesson_id]
+            lesson = self.catalog.lesson(lesson_id)
             y = self._draw_wrapped(
                 "- " + lesson.title.for_language(language),
                 (x + 18, y),
@@ -722,8 +720,7 @@ class UnifiedAppShell:
 
     def _course_map_path_for_step(self, step_index: int) -> LearningPathManifest:
         """Return the learning path connected to one course-map step."""
-        path_id = COURSE_MAP_STEPS[step_index].path_id
-        return next(path for path in LEARNING_PATH_MANIFESTS if path.id == path_id)
+        return self.catalog.course_map_path_for_step(step_index)
 
     def _course_map_next_reason_label(self, step: CourseMapStep) -> str:
         """Return the reason why the next path follows."""
@@ -754,7 +751,9 @@ class UnifiedAppShell:
         pygame.draw.rect(self.screen, self._ui_color(ACCENT), fill_rect, border_radius=3)
 
     def _render_learning_paths(self) -> None:
-        labels = [self._learning_path_menu_label(path) for path in LEARNING_PATH_MANIFESTS]
+        labels = [
+            self._learning_path_menu_label(path) for path in self.catalog.all_learning_paths()
+        ]
         self._draw_title(
             self._text("Guided learning paths", "Prowadzone ścieżki nauki"),
             self._text(
@@ -763,7 +762,7 @@ class UnifiedAppShell:
             ),
         )
         self._draw_menu(labels, top=210, width=520)
-        self._render_learning_path_details(LEARNING_PATH_MANIFESTS[self.selected_index])
+        self._render_learning_path_details(self.catalog.learning_path(self.selected_index))
         self._draw_footer(
             self._text(
                 "Enter: lessons | Esc/Backspace: home | S: settings | L: language",
@@ -871,7 +870,7 @@ class UnifiedAppShell:
         )
         y += 28
         for index, lesson_id in enumerate(path.lesson_ids, start=1):
-            lesson = LESSON_BY_ID[lesson_id]
+            lesson = self.catalog.lesson(lesson_id)
             y = self._draw_wrapped(
                 self._learning_path_lesson_map_label(lesson, index),
                 (content_x, y),
@@ -1085,7 +1084,7 @@ class UnifiedAppShell:
         """Return badge labels and unlock state for one learning path."""
         badges: list[BadgeItem] = []
         for lesson_id in path.lesson_ids:
-            lesson = LESSON_BY_ID[lesson_id]
+            lesson = self.catalog.lesson(lesson_id)
             if lesson.completion_badge is None:
                 continue
 
@@ -1109,7 +1108,7 @@ class UnifiedAppShell:
                 progress_label=self._learning_path_badge_progress_label(path),
                 badges=self._learning_path_badge_items(path),
             )
-            for path in LEARNING_PATH_MANIFESTS
+            for path in self.catalog.all_learning_paths()
         ]
 
     def _learning_path_lesson_map_label(self, lesson: LessonManifest, index: int) -> str:
@@ -1174,18 +1173,23 @@ class UnifiedAppShell:
     def _home_learning_progress_metrics(self) -> list[tuple[str, int, int]]:
         """Return localized progress labels and counts for the home snapshot."""
         completed_lessons = sum(
-            self._completed_learning_path_lesson_count(path) for path in LEARNING_PATH_MANIFESTS
+            self._completed_learning_path_lesson_count(path)
+            for path in self.catalog.all_learning_paths()
         )
-        total_lessons = sum(len(path.lesson_ids) for path in LEARNING_PATH_MANIFESTS)
+        total_lessons = sum(len(path.lesson_ids) for path in self.catalog.all_learning_paths())
         completed_tasks = sum(
-            self._completed_learning_path_task_count(path) for path in LEARNING_PATH_MANIFESTS
+            self._completed_learning_path_task_count(path)
+            for path in self.catalog.all_learning_paths()
         )
-        total_tasks = sum(self._learning_path_task_count(path) for path in LEARNING_PATH_MANIFESTS)
+        total_tasks = sum(
+            self._learning_path_task_count(path) for path in self.catalog.all_learning_paths()
+        )
         unlocked_badges = sum(
-            self._unlocked_learning_path_badge_count(path) for path in LEARNING_PATH_MANIFESTS
+            self._unlocked_learning_path_badge_count(path)
+            for path in self.catalog.all_learning_paths()
         )
         total_badges = sum(
-            self._learning_path_badge_count(path) for path in LEARNING_PATH_MANIFESTS
+            self._learning_path_badge_count(path) for path in self.catalog.all_learning_paths()
         )
 
         return [
@@ -1241,7 +1245,7 @@ class UnifiedAppShell:
         self,
     ) -> tuple[LearningPathManifest | None, LessonManifest | None]:
         """Return the next path and lesson to continue from the home screen."""
-        for path in LEARNING_PATH_MANIFESTS:
+        for path in self.catalog.all_learning_paths():
             next_lesson = self._next_learning_path_lesson(path)
             if next_lesson is None:
                 continue
@@ -1257,7 +1261,7 @@ class UnifiedAppShell:
         """Return the first incomplete lesson in one learning path."""
         for lesson_id in path.lesson_ids:
             if not self._is_lesson_completed(lesson_id):
-                return LESSON_BY_ID[lesson_id]
+                return self.catalog.lesson(lesson_id)
 
         return None
 
@@ -1283,7 +1287,7 @@ class UnifiedAppShell:
         """Count completed tasks across one learning path."""
         completed_count = 0
         for lesson_id in path.lesson_ids:
-            lesson = LESSON_BY_ID[lesson_id]
+            lesson = self.catalog.lesson(lesson_id)
             completed_task_ids = self._completed_lesson_task_ids(lesson)
             completed_count += len(completed_task_ids)
 
@@ -1293,7 +1297,7 @@ class UnifiedAppShell:
         """Count all tasks across one learning path."""
         task_count = 0
         for lesson_id in path.lesson_ids:
-            task_count += len(LESSON_BY_ID[lesson_id].tasks)
+            task_count += len(self.catalog.lesson(lesson_id).tasks)
 
         return task_count
 
@@ -1311,7 +1315,7 @@ class UnifiedAppShell:
         """Count unlocked badges across one learning path."""
         unlocked_count = 0
         for lesson_id in path.lesson_ids:
-            lesson = LESSON_BY_ID[lesson_id]
+            lesson = self.catalog.lesson(lesson_id)
             if lesson.completion_badge is not None and self._is_lesson_completed(lesson_id):
                 unlocked_count += 1
 
@@ -1321,7 +1325,7 @@ class UnifiedAppShell:
         """Count all badges available in one learning path."""
         badge_count = 0
         for lesson_id in path.lesson_ids:
-            if LESSON_BY_ID[lesson_id].completion_badge is not None:
+            if self.catalog.lesson(lesson_id).completion_badge is not None:
                 badge_count += 1
 
         return badge_count
@@ -1357,9 +1361,9 @@ class UnifiedAppShell:
             )
 
         labels = [
-            self._lesson_requirement_label(LESSON_BY_ID[lesson_id])
+            self._lesson_requirement_label(self.catalog.lesson(lesson_id))
             for lesson_id in lesson.prerequisites
-            if lesson_id in LESSON_BY_ID
+            if self.catalog.lesson_exists(lesson_id)
         ]
         if not labels:
             return self._text(
@@ -1432,7 +1436,7 @@ class UnifiedAppShell:
     def _path_completion_next_path_label(self, path: LearningPathManifest) -> str:
         """Return a localized suggested next path label."""
         try:
-            path_index = LEARNING_PATH_MANIFESTS.index(path)
+            next_path = self.catalog.next_learning_path(path)
         except ValueError:
             LOGGER.warning("Learning path %s is not registered in guided paths.", path.id)
             return self._text(
@@ -1440,23 +1444,24 @@ class UnifiedAppShell:
                 "Proponowany kolejny krok: przejrzyj inną prowadzoną ścieżkę.",
             )
 
-        next_index = path_index + 1
-        if next_index >= len(LEARNING_PATH_MANIFESTS):
+        if next_path is None:
             return self._text(
                 "Suggested next: revisit any path and explain it without the controls.",
                 "Proponowany kolejny krok: wróć do dowolnej ścieżki i wyjaśnij ją bez sterowania.",
             )
 
-        next_path = LEARNING_PATH_MANIFESTS[next_index]
         title = next_path.title.for_language(self.context.settings.language)
         return self._text(f"Suggested next: {title}", f"Proponowany kolejny krok: {title}")
 
     def _badge_gallery_summary_label(self) -> str:
         """Return a localized global badge progress summary."""
         unlocked_count = sum(
-            self._unlocked_learning_path_badge_count(path) for path in LEARNING_PATH_MANIFESTS
+            self._unlocked_learning_path_badge_count(path)
+            for path in self.catalog.all_learning_paths()
         )
-        total_count = sum(self._learning_path_badge_count(path) for path in LEARNING_PATH_MANIFESTS)
+        total_count = sum(
+            self._learning_path_badge_count(path) for path in self.catalog.all_learning_paths()
+        )
         return self._text(
             f"Badges unlocked: {unlocked_count}/{total_count}",
             f"Zdobyte odznaki: {unlocked_count}/{total_count}",
@@ -1539,7 +1544,7 @@ class UnifiedAppShell:
         if next_index >= len(path.lesson_ids):
             return None
 
-        return LESSON_BY_ID[path.lesson_ids[next_index]]
+        return self.catalog.lesson(path.lesson_ids[next_index])
 
     def _is_lesson_completed(self, lesson_id: str) -> bool:
         """Return whether one lesson is completed."""
@@ -3011,7 +3016,7 @@ class UnifiedAppShell:
 
     def _select_course_map_item(self) -> None:
         """Open the selected recommended path or the full path browser."""
-        if self.selected_index >= len(COURSE_MAP_STEPS):
+        if self.selected_index >= self.catalog.course_map_step_count():
             self._go_to(ScreenName.PATHS)
             return
 
@@ -3274,8 +3279,8 @@ class UnifiedAppShell:
         counts = {
             ScreenName.LANGUAGE: 2,
             ScreenName.HOME: 4,
-            ScreenName.COURSE_MAP: len(COURSE_MAP_STEPS) + 1,
-            ScreenName.PATHS: len(LEARNING_PATH_MANIFESTS),
+            ScreenName.COURSE_MAP: self.catalog.course_map_menu_item_count(),
+            ScreenName.PATHS: self.catalog.learning_path_count(),
             ScreenName.LESSONS: len(self._current_learning_path_lessons()),
             ScreenName.LEVELS: len(self.catalog.levels()),
             ScreenName.DEMOS: len(self._current_level_demos()),
