@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from enum import StrEnum
 from pathlib import Path
 from typing import Final
 
@@ -49,6 +48,12 @@ from interactive_ml_labs.screens.settings_screen import (
     SettingsScreenRenderer,
 )
 from interactive_ml_labs.settings import AppSettings
+from interactive_ml_labs.shell_navigation import (
+    ScreenName,
+    can_open_settings,
+    can_open_theory,
+    default_back_target,
+)
 from interactive_ml_labs.shell_persistence import ShellPersistence
 from interactive_ml_labs.shell_scrolling import (
     clamp_scroll_offset,
@@ -102,26 +107,6 @@ SCROLLBAR_WIDTH: Final[int] = 4
 SCROLLBAR_MIN_THUMB_HEIGHT: Final[int] = 36
 DEMO_SCROLLBAR_X: Final[int] = 80 + DEMO_MENU_WIDTH + 18
 DEMO_SCROLLBAR_HIT_WIDTH: Final[int] = 18
-
-
-class ScreenName(StrEnum):
-    """Top-level shell screens."""
-
-    LANGUAGE = "language"
-    HOME = "home"
-    COURSE_MAP = "course_map"
-    PATHS = "paths"
-    LESSONS = "lessons"
-    LEVELS = "levels"
-    DEMOS = "demos"
-    INTRO = "intro"
-    THEORY = "theory"
-    DEMO = "demo"
-    LESSON_COMPLETE = "lesson_complete"
-    PATH_COMPLETE = "path_complete"
-    BADGES = "badges"
-    SETTINGS = "settings"
-    PAUSE = "pause"
 
 
 class UnifiedAppShell:
@@ -3188,19 +3173,7 @@ class UnifiedAppShell:
             self._resume()
             return
 
-        back_targets = {
-            ScreenName.HOME: ScreenName.LANGUAGE,
-            ScreenName.COURSE_MAP: ScreenName.HOME,
-            ScreenName.PATHS: ScreenName.HOME,
-            ScreenName.LESSONS: ScreenName.COURSE_MAP,
-            ScreenName.LEVELS: ScreenName.HOME,
-            ScreenName.DEMOS: ScreenName.LEVELS,
-            ScreenName.INTRO: ScreenName.DEMOS,
-            ScreenName.LESSON_COMPLETE: ScreenName.LESSONS,
-            ScreenName.PATH_COMPLETE: ScreenName.PATHS,
-            ScreenName.BADGES: ScreenName.HOME,
-        }
-        if target := back_targets.get(self.screen_name):
+        if target := default_back_target(self.screen_name):
             self._go_to(target)
 
     def _open_pause(self) -> None:
@@ -3211,7 +3184,7 @@ class UnifiedAppShell:
         self._go_to(self.previous_screen)
 
     def _open_settings(self) -> None:
-        if self.screen_name in {ScreenName.DEMO, ScreenName.SETTINGS, ScreenName.THEORY}:
+        if not can_open_settings(self.screen_name):
             return
 
         self.help_visible = False
@@ -3222,11 +3195,7 @@ class UnifiedAppShell:
         self.help_visible = not self.help_visible
 
     def _open_theory(self) -> None:
-        if self.screen_name not in {
-            ScreenName.INTRO,
-            ScreenName.DEMO,
-            ScreenName.PAUSE,
-        }:
+        if not can_open_theory(self.screen_name):
             return
 
         self.help_visible = False
