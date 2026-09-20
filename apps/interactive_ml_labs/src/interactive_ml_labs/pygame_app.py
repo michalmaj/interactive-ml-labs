@@ -52,8 +52,10 @@ from interactive_ml_labs.shell_scrolling import (
     clamp_scroll_offset,
     content_max_scroll,
     list_max_scroll,
+    scroll_offset_for_selected_item,
     scroll_offset_from_thumb_y,
     scrollbar_rects,
+    selected_index_after_scroll,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -3616,30 +3618,25 @@ class UnifiedAppShell:
 
     def _ensure_selected_demo_visible(self, top: int, bottom: int) -> None:
         """Scroll the demo list so the selected item stays inside the viewport."""
-        selected_top = self.selected_index * MENU_ITEM_PITCH
-        selected_bottom = selected_top + MENU_ITEM_HEIGHT
-        viewport_height = max(0, bottom - top)
-
-        if selected_top < self.demo_scroll_offset:
-            self.demo_scroll_offset = selected_top
-        elif selected_bottom > self.demo_scroll_offset + viewport_height:
-            self.demo_scroll_offset = selected_bottom - viewport_height
-
-        self._clamp_demo_scroll()
+        self.demo_scroll_offset = scroll_offset_for_selected_item(
+            selected_index=self.selected_index,
+            scroll_offset=self.demo_scroll_offset,
+            viewport_height=bottom - top,
+            item_height=MENU_ITEM_HEIGHT,
+            item_pitch=MENU_ITEM_PITCH,
+            max_scroll=self.demo_max_scroll,
+        )
 
     def _select_visible_demo_after_scroll(self, top: int, bottom: int) -> None:
         """Keep selection on a visible demo after mouse-wheel scrolling."""
-        viewport_height = max(0, bottom - top)
-        selected_top = self.selected_index * MENU_ITEM_PITCH
-        selected_bottom = selected_top + MENU_ITEM_HEIGHT
-        if self.demo_scroll_offset <= selected_top and selected_bottom <= (
-            self.demo_scroll_offset + viewport_height
-        ):
-            return
-
-        first_visible = self.demo_scroll_offset // MENU_ITEM_PITCH
-        item_count = len(self._current_level_demos())
-        self.selected_index = max(0, min(item_count - 1, first_visible))
+        self.selected_index = selected_index_after_scroll(
+            selected_index=self.selected_index,
+            scroll_offset=self.demo_scroll_offset,
+            item_count=len(self._current_level_demos()),
+            viewport_height=bottom - top,
+            item_height=MENU_ITEM_HEIGHT,
+            item_pitch=MENU_ITEM_PITCH,
+        )
 
     def _require_demo(self) -> DemoManifest:
         if self.selected_demo is None:

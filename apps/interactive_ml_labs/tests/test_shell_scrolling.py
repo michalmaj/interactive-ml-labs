@@ -5,8 +5,10 @@ from interactive_ml_labs.shell_scrolling import (
     clamp_scroll_offset,
     content_max_scroll,
     list_max_scroll,
+    scroll_offset_for_selected_item,
     scroll_offset_from_thumb_y,
     scrollbar_rects,
+    selected_index_after_scroll,
 )
 
 
@@ -28,6 +30,66 @@ def test_list_max_scroll_handles_empty_and_overflowing_lists() -> None:
     assert list_max_scroll(0, item_height=54, item_pitch=70, viewport_height=300) == 0
     assert list_max_scroll(3, item_height=54, item_pitch=70, viewport_height=300) == 0
     assert list_max_scroll(8, item_height=54, item_pitch=70, viewport_height=300) == 244
+
+
+def test_scroll_offset_for_selected_item_reveals_item_above_viewport() -> None:
+    """Selection visibility should scroll upward when the item is above view."""
+    assert (
+        scroll_offset_for_selected_item(
+            selected_index=2,
+            scroll_offset=240,
+            viewport_height=180,
+            item_height=54,
+            item_pitch=70,
+            max_scroll=400,
+        )
+        == 140
+    )
+
+
+def test_scroll_offset_for_selected_item_reveals_item_below_viewport() -> None:
+    """Selection visibility should scroll downward when the item is below view."""
+    assert (
+        scroll_offset_for_selected_item(
+            selected_index=6,
+            scroll_offset=100,
+            viewport_height=180,
+            item_height=54,
+            item_pitch=70,
+            max_scroll=400,
+        )
+        == 294
+    )
+
+
+def test_selected_index_after_scroll_keeps_visible_selection_when_possible() -> None:
+    """Mouse-wheel scroll should keep selection when the selected item is visible."""
+    assert (
+        selected_index_after_scroll(
+            selected_index=3,
+            scroll_offset=140,
+            item_count=8,
+            viewport_height=180,
+            item_height=54,
+            item_pitch=70,
+        )
+        == 3
+    )
+
+
+def test_selected_index_after_scroll_moves_to_first_visible_item() -> None:
+    """Mouse-wheel scroll should move selection to the first visible item if needed."""
+    assert (
+        selected_index_after_scroll(
+            selected_index=0,
+            scroll_offset=210,
+            item_count=8,
+            viewport_height=180,
+            item_height=54,
+            item_pitch=70,
+        )
+        == 3
+    )
 
 
 def test_scrollbar_rects_maps_scroll_offset_to_thumb_position() -> None:
