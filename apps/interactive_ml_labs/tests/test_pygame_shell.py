@@ -725,25 +725,15 @@ def test_shell_learning_paths_screen_renders_progress_markers(monkeypatch) -> No
     """Learning path selection should pass progress-aware labels to the menu."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
-    menu_labels: list[str] = []
-
-    def capture_menu(
-        labels: list[str],
-        *,
-        top: int,
-        width: int = 640,
-    ) -> None:
-        _ = top, width
-        menu_labels.extend(labels)
 
     try:
         path = LEARNING_PATH_MANIFESTS[0]
         app.context.progress.mark_completed(path.lesson_ids[0])
         app.screen_name = ScreenName.PATHS
-        app._draw_menu = capture_menu
 
         app._render_learning_paths()
 
+        menu_labels = [item.label for item in app.menu_items]
         assert "[1/4] How models learn from error" in menu_labels
     finally:
         pygame.quit()
@@ -1954,60 +1944,28 @@ def test_shell_learning_path_details_render_progress_summary(monkeypatch) -> Non
     """Learning path details should render aggregate progress."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
-    drawn_text: list[str] = []
-    wrapped_text: list[str] = []
-    progress_bars: list[tuple[int, int]] = []
-
-    def capture_text(
-        text: str,
-        position: tuple[int, int],
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> None:
-        _ = position, font, color
-        drawn_text.append(text)
-
-    def capture_wrapped(
-        text: str,
-        position: tuple[int, int],
-        width: int,
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> int:
-        _ = width, font, color
-        wrapped_text.append(text)
-        return position[1] + 24
-
-    def capture_progress_bar(
-        x: int,
-        y: int,
-        width: int,
-        completed_count: int,
-        total_count: int,
-    ) -> None:
-        _ = x, y, width
-        progress_bars.append((completed_count, total_count))
 
     try:
         path = LEARNING_PATH_MANIFESTS[0]
         app.context.progress.mark_completed(path.lesson_ids[0])
-        app._draw_text = capture_text
-        app._draw_wrapped = capture_wrapped
-        app._draw_compact_progress_bar = capture_progress_bar
 
-        app._render_learning_path_details(path)
+        details = app._learning_path_details(path)
 
-        assert "4 lessons" in drawn_text
-        assert "Course map" in drawn_text
-        assert "Lessons: 1/4 completed" in wrapped_text
-        assert "Tasks: 0/8 completed" in wrapped_text
-        assert "Theory: 0/4 visited" in wrapped_text
-        assert "Badges: 1/4 unlocked" in wrapped_text
-        assert progress_bars == [(1, 4), (0, 8), (0, 4), (1, 4)]
-        assert "In progress" in wrapped_text
-        assert "Next action: start Let an algorithm reduce loss" in wrapped_text
-        assert "[x] Residual Reader" in wrapped_text
-        assert "[ ] Loss Navigator" in wrapped_text
+        assert details.lesson_count_label == "4 lessons"
+        assert details.course_map_heading == "Course map"
+        assert [metric.label for metric in details.progress_metrics] == [
+            "Lessons: 1/4 completed",
+            "Tasks: 0/8 completed",
+            "Theory: 0/4 visited",
+            "Badges: 1/4 unlocked",
+        ]
+        assert [
+            (metric.completed_count, metric.total_count) for metric in details.progress_metrics
+        ] == [(1, 4), (0, 8), (0, 4), (1, 4)]
+        assert details.status_label == "In progress"
+        assert details.next_action_label == "Next action: start Let an algorithm reduce loss"
+        assert "[x] Residual Reader" in details.badge_labels
+        assert "[ ] Loss Navigator" in details.badge_labels
     finally:
         pygame.quit()
 
@@ -2074,32 +2032,19 @@ def test_shell_learning_path_details_render_all_lessons_and_badges(monkeypatch) 
     """Scrollable path details should not hide later lessons or badges."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
     app = UnifiedAppShell(settings=AppSettings(resolution=(1280, 720)))
-    wrapped_text: list[str] = []
-
-    def capture_wrapped(
-        text: str,
-        position: tuple[int, int],
-        width: int,
-        font: pygame.font.Font,
-        color: tuple[int, int, int],
-    ) -> int:
-        _ = width, font, color
-        wrapped_text.append(text)
-        return position[1] + 24
 
     try:
         path = LEARNING_PATH_MANIFESTS[1]
-        app._draw_wrapped = capture_wrapped
 
-        app._render_learning_path_details(path)
+        details = app._learning_path_details(path)
 
-        assert "[ ] Soft Cluster Reader" in wrapped_text
+        assert "[ ] Soft Cluster Reader" in details.badge_labels
         assert (
             app._learning_path_lesson_map_label(
                 LESSON_BY_ID[path.lesson_ids[-1]],
                 len(path.lesson_ids),
             )
-            in wrapped_text
+            in details.lesson_labels
         )
     finally:
         pygame.quit()
