@@ -41,6 +41,12 @@ from interactive_ml_labs.screens.course_map_screen import (
     CourseMapScreenFonts,
     CourseMapStepDetails,
 )
+from interactive_ml_labs.screens.help_overlay import (
+    HelpOverlayColors,
+    HelpOverlayDetails,
+    HelpOverlayFonts,
+    HelpOverlayRenderer,
+)
 from interactive_ml_labs.screens.settings_screen import (
     SettingsScreenColors,
     SettingsScreenFonts,
@@ -148,6 +154,7 @@ class UnifiedAppShell:
         self.catalog = ShellCatalog()
         self.badge_renderer = BadgeGalleryRenderer()
         self.course_map_renderer = CourseMapRenderer()
+        self.help_overlay_renderer = HelpOverlayRenderer()
         self.settings_renderer = SettingsScreenRenderer()
         self.menu_items: list[MenuItem] = []
         self.help_visible = False
@@ -2763,105 +2770,53 @@ class UnifiedAppShell:
         )
 
     def _render_help_overlay(self) -> None:
-        width, height = self.context.settings.resolution
-        margin_x = min(120, max(32, width // 12))
-        margin_y = min(90, max(32, height // 10))
-        rect = pygame.Rect(
-            margin_x,
-            margin_y,
-            width - 2 * margin_x,
-            height - 2 * margin_y,
+        self.help_overlay_renderer.render(
+            self.screen,
+            settings=self.context.settings,
+            details=self._help_overlay_details(),
+            fonts=HelpOverlayFonts(
+                heading=self.font_heading,
+                body=self.font_body,
+                small=self.font_small,
+            ),
+            colors=HelpOverlayColors(
+                text=self._ui_color(TEXT),
+                muted_text=self._ui_color(MUTED_TEXT),
+                accent=self._ui_color(ACCENT),
+                background=self._ui_color((12, 14, 17)),
+            ),
         )
-        pygame.draw.rect(self.screen, self._ui_color((12, 14, 17)), rect, border_radius=8)
-        pygame.draw.rect(self.screen, self._ui_color(ACCENT), rect, width=2, border_radius=8)
+
+    def _help_overlay_details(self) -> HelpOverlayDetails:
+        """Return render-ready help overlay content."""
         language = self.context.settings.language
         demo = self._active_help_demo()
-
-        self._draw_text(
-            self._help_title(demo, language),
-            (rect.x + 32, rect.y + 28),
-            self.font_heading,
-            TEXT,
-        )
-
-        y = rect.y + 78
-        content_width = rect.width - 64
         if demo is None:
-            self._draw_wrapped(
-                self._text(
+            return HelpOverlayDetails(
+                title=self._help_title(demo, language),
+                summary=None,
+                objectives=[],
+                controls=[],
+                fallback_body=self._text(
                     "Use arrow keys, Enter, Esc, H, or the mouse.",
                     "Używaj strzałek, Enter, Esc, H albo myszy.",
                 ),
-                (rect.x + 32, y),
-                content_width,
-                self.font_body,
-                MUTED_TEXT,
+                goals_heading=self._text("Goals", "Cele"),
+                controls_heading=self._text("Controls", "Sterowanie"),
             )
-            return
 
-        y = self._draw_wrapped(
-            demo.summary.for_language(language),
-            (rect.x + 32, y),
-            content_width,
-            self.font_body,
-            MUTED_TEXT,
+        return HelpOverlayDetails(
+            title=self._help_title(demo, language),
+            summary=demo.summary.for_language(language),
+            objectives=[objective.for_language(language) for objective in demo.objectives],
+            controls=[
+                f"{control.key}: {control.action.for_language(language)}"
+                for control in demo.controls
+            ],
+            fallback_body="",
+            goals_heading=self._text("Goals", "Cele"),
+            controls_heading=self._text("Controls", "Sterowanie"),
         )
-        y += 22
-        objectives = [objective.for_language(language) for objective in demo.objectives]
-        controls = [
-            f"{control.key}: {control.action.for_language(language)}" for control in demo.controls
-        ]
-
-        if rect.width >= 880:
-            gap = 36
-            column_width = (content_width - gap) // 2
-            self._draw_help_section(
-                self._text("Goals", "Cele"),
-                objectives,
-                rect.x + 32,
-                y,
-                column_width,
-            )
-            self._draw_help_section(
-                self._text("Controls", "Sterowanie"),
-                controls,
-                rect.x + 32 + column_width + gap,
-                y,
-                column_width,
-            )
-            return
-
-        y = self._draw_help_section(
-            self._text("Goals", "Cele"),
-            objectives,
-            rect.x + 32,
-            y,
-            content_width,
-        )
-        y += 12
-        self._draw_help_section(
-            self._text("Controls", "Sterowanie"),
-            controls,
-            rect.x + 32,
-            y,
-            content_width,
-        )
-
-    def _draw_help_section(
-        self,
-        title: str,
-        items: list[str],
-        x: int,
-        y: int,
-        width: int,
-    ) -> int:
-        self._draw_text(title, (x, y), self.font_small, ACCENT)
-        y += 28
-        for item in items:
-            y = self._draw_wrapped(f"- {item}", (x + 16, y), width - 16, self.font_small, TEXT)
-            y += 4
-
-        return y
 
     def _help_title(self, demo: DemoManifest | None, language: str) -> str:
         if demo is None:
