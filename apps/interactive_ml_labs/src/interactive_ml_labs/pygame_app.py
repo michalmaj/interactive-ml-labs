@@ -1258,14 +1258,21 @@ class UnifiedAppShell:
         """Return self-check lines shown on the completion summary."""
         return [
             self._text(
-                "I can explain the result without looking at the controls.",
-                "Umiem wyjaśnić wynik bez patrzenia na sterowanie.",
+                "Answer the mini-check without looking at the controls.",
+                "Odpowiedz na mini-check bez patrzenia na sterowanie.",
             ),
             self._text(
-                "If not, I should review the lesson before continuing.",
-                "Jeśli nie, warto powtórzyć lekcję przed przejściem dalej.",
+                "Then choose I understand or Needs review.",
+                "Potem wybierz Rozumiem albo Do powtórki.",
             ),
         ]
+
+    def _lesson_mini_check_intro(self) -> str:
+        """Return a short instruction for the lesson mini-check."""
+        return self._text(
+            "Answer these before moving on:",
+            "Odpowiedz, zanim przejdziesz dalej:",
+        )
 
     def _lesson_reflection_status_label(self, lesson: LessonManifest) -> str:
         """Return the saved self-check status for one lesson."""
@@ -2066,12 +2073,20 @@ class UnifiedAppShell:
         )
         panel_y += 14
         self._draw_text(
-            self._text("Concept check", "Sprawdź rozumienie"),
+            self._text("Mini-check", "Mini-check"),
             (panel_x, panel_y),
             self.font_small,
             ACCENT,
         )
         panel_y += 26
+        panel_y = self._draw_wrapped(
+            self._lesson_mini_check_intro(),
+            (panel_x, panel_y),
+            panel_width,
+            self.font_small,
+            TEXT,
+        )
+        panel_y += 6
         for line in self._lesson_understanding_check_lines(lesson):
             panel_y = self._draw_wrapped(
                 "- " + line,

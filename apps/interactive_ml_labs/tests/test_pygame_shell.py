@@ -1636,15 +1636,17 @@ def test_shell_lesson_self_check_lines_localize_polish(monkeypatch) -> None:
 
     try:
         assert app._lesson_self_check_lines() == [
-            "I can explain the result without looking at the controls.",
-            "If not, I should review the lesson before continuing.",
+            "Answer the mini-check without looking at the controls.",
+            "Then choose I understand or Needs review.",
         ]
+        assert app._lesson_mini_check_intro() == "Answer these before moving on:"
 
         app.context.settings.language = "pl"
         assert app._lesson_self_check_lines() == [
-            "Umiem wyjaśnić wynik bez patrzenia na sterowanie.",
-            "Jeśli nie, warto powtórzyć lekcję przed przejściem dalej.",
+            "Odpowiedz na mini-check bez patrzenia na sterowanie.",
+            "Potem wybierz Rozumiem albo Do powtórki.",
         ]
+        assert app._lesson_mini_check_intro() == "Odpowiedz, zanim przejdziesz dalej:"
     finally:
         pygame.quit()
 
@@ -1824,7 +1826,7 @@ def test_shell_completion_summary_renders_lesson_progress(monkeypatch) -> None:
         assert "Theory: not visited" in wrapped_text
         assert app._lesson_badge_label(lesson) in wrapped_text
         assert app._lesson_recap_prompt(lesson) in wrapped_text
-        assert "- I can explain the result without looking at the controls." in wrapped_text
+        assert "- Answer the mini-check without looking at the controls." in wrapped_text
         assert "Status: not marked yet" in wrapped_text
         assert progress_bars == [(1, 2)]
         assert menu_labels[0].startswith("Next lesson:")
@@ -1874,7 +1876,8 @@ def test_shell_completion_summary_renders_understanding_checks(monkeypatch) -> N
 
         app._render_lesson_complete()
 
-        assert "Concept check" in drawn_text
+        assert "Mini-check" in drawn_text
+        assert app._lesson_mini_check_intro() in wrapped_text
         assert "- " + app._lesson_understanding_check_lines(lesson)[0] in wrapped_text
     finally:
         pygame.quit()
