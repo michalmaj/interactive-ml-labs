@@ -78,7 +78,7 @@ def test_progress_report_summarizes_completed_work() -> None:
     assert details.paths[0].badge_label == "Badges: 1/4"
     assert any(badge.unlocked for badge in details.badges)
     assert details.reflection_lines == [
-        "No completed lesson has a self-check mark yet.",
+        "No completed lesson has a reflection mark yet.",
     ]
 
 
@@ -116,7 +116,7 @@ def test_progress_report_summarizes_lesson_reflection_statuses() -> None:
 
     details = _view_data(progress, language="pl").progress_report_details()
 
-    assert details.reflection_heading == "Self-check"
+    assert details.reflection_heading == "Samoocena"
     assert details.reflection_lines == [
         "Rozumiem: 1",
         "Do powtórki: 1",
