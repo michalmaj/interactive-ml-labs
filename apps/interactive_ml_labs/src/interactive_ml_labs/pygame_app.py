@@ -66,6 +66,10 @@ from interactive_ml_labs.screens.settings_screen import (
 )
 from interactive_ml_labs.settings import AppSettings
 from interactive_ml_labs.shell_catalog import ShellCatalog
+from interactive_ml_labs.shell_home_progress_view_data import (
+    HomeProgressDetails,
+    ShellHomeProgressViewData,
+)
 from interactive_ml_labs.shell_learning_path_view_data import ShellLearningPathViewData
 from interactive_ml_labs.shell_navigation import (
     ScreenName,
@@ -273,6 +277,15 @@ class UnifiedAppShell:
     def _learning_path_view_data(self) -> ShellLearningPathViewData:
         """Return a view-data builder for current learning path UI settings."""
         return ShellLearningPathViewData(
+            catalog=self.catalog,
+            progress=self.progress_summary,
+            language=self.context.settings.language,
+            text=self._text,
+        )
+
+    def _home_progress_view_data(self) -> ShellHomeProgressViewData:
+        """Return a view-data builder for the home progress snapshot."""
+        return ShellHomeProgressViewData(
             catalog=self.catalog,
             progress=self.progress_summary,
             language=self.context.settings.language,
@@ -543,12 +556,18 @@ class UnifiedAppShell:
             TEXT,
         )
         y += 14
-        progress_metrics = self._home_learning_progress_metrics()
-        next_action_line = self._home_learning_next_action_label()
+        progress_details = self._home_learning_progress_details()
+        next_action_line = progress_details.next_action_label
         self.home_continue_rect = None
-        for label, completed_count, total_count in progress_metrics:
-            y = self._draw_wrapped(label, (x, y), content_width, self.font_small, MUTED_TEXT)
-            self._draw_compact_progress_bar(x, y + 2, content_width, completed_count, total_count)
+        for metric in progress_details.metrics:
+            y = self._draw_wrapped(metric.label, (x, y), content_width, self.font_small, MUTED_TEXT)
+            self._draw_compact_progress_bar(
+                x,
+                y + 2,
+                content_width,
+                metric.completed_count,
+                metric.total_count,
+            )
             y += 20
 
         line_top = y
@@ -990,80 +1009,22 @@ class UnifiedAppShell:
 
     def _home_learning_progress_lines(self) -> list[str]:
         """Return localized progress lines for the home learning snapshot."""
-        lines = [label for label, _, _ in self._home_learning_progress_metrics()]
-        lines.append(self._home_learning_next_action_label())
-        return lines
+        return self._home_learning_progress_details().lines
 
     def _home_learning_progress_metrics(self) -> list[tuple[str, int, int]]:
         """Return localized progress labels and counts for the home snapshot."""
-        completed_lessons = sum(
-            self._completed_learning_path_lesson_count(path)
-            for path in self.catalog.all_learning_paths()
-        )
-        total_lessons = sum(len(path.lesson_ids) for path in self.catalog.all_learning_paths())
-        completed_tasks = sum(
-            self._completed_learning_path_task_count(path)
-            for path in self.catalog.all_learning_paths()
-        )
-        total_tasks = sum(
-            self._learning_path_task_count(path) for path in self.catalog.all_learning_paths()
-        )
-        unlocked_badges = sum(
-            self._unlocked_learning_path_badge_count(path)
-            for path in self.catalog.all_learning_paths()
-        )
-        total_badges = sum(
-            self._learning_path_badge_count(path) for path in self.catalog.all_learning_paths()
-        )
-
         return [
-            (
-                self._text(
-                    f"Lessons: {completed_lessons}/{total_lessons} completed",
-                    f"Lekcje: {completed_lessons}/{total_lessons} ukończone",
-                ),
-                completed_lessons,
-                total_lessons,
-            ),
-            (
-                self._text(
-                    f"Tasks: {completed_tasks}/{total_tasks} completed",
-                    f"Zadania: {completed_tasks}/{total_tasks} ukończone",
-                ),
-                completed_tasks,
-                total_tasks,
-            ),
-            (
-                self._text(
-                    f"Badges: {unlocked_badges}/{total_badges} unlocked",
-                    f"Odznaki: {unlocked_badges}/{total_badges} zdobyte",
-                ),
-                unlocked_badges,
-                total_badges,
-            ),
+            (metric.label, metric.completed_count, metric.total_count)
+            for metric in self._home_learning_progress_details().metrics
         ]
 
     def _home_learning_next_action_label(self) -> str:
         """Return a localized next learning action across all paths."""
-        next_path, next_lesson = self._next_learning_path_step()
-        if next_path is None or next_lesson is None:
-            return self._text(
-                "All guided paths completed",
-                "Wszystkie ścieżki ukończone",
-            )
+        return self._home_learning_progress_details().next_action_label
 
-        lesson_title = next_lesson.title.for_language(self.context.settings.language)
-        path_title = next_path.title.for_language(self.context.settings.language)
-        if self._has_lesson_progress(next_lesson.id):
-            return self._text(
-                f"Continue: {lesson_title} ({path_title})",
-                f"Kontynuuj: {lesson_title} ({path_title})",
-            )
-
-        return self._text(
-            f"Start: {lesson_title} ({path_title})",
-            f"Zacznij: {lesson_title} ({path_title})",
-        )
+    def _home_learning_progress_details(self) -> HomeProgressDetails:
+        """Return render-ready home learning progress details."""
+        return self._home_progress_view_data().home_progress_details()
 
     def _next_learning_path_step(
         self,
