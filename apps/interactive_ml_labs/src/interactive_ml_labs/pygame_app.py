@@ -53,6 +53,12 @@ from interactive_ml_labs.screens.learning_path_screen import (
     LearningPathScreenColors,
     LearningPathScreenFonts,
 )
+from interactive_ml_labs.screens.progress_report_screen import (
+    ProgressReportColors,
+    ProgressReportDetails,
+    ProgressReportFonts,
+    ProgressReportRenderer,
+)
 from interactive_ml_labs.screens.settings_screen import (
     SettingsScreenColors,
     SettingsScreenFonts,
@@ -68,6 +74,7 @@ from interactive_ml_labs.shell_navigation import (
     default_back_target,
 )
 from interactive_ml_labs.shell_persistence import ShellPersistence
+from interactive_ml_labs.shell_progress_report_view_data import ShellProgressReportViewData
 from interactive_ml_labs.shell_progress_summary import ShellProgressSummary
 from interactive_ml_labs.shell_scrolling import (
     clamp_scroll_offset,
@@ -168,6 +175,7 @@ class UnifiedAppShell:
         self.course_map_renderer = CourseMapRenderer()
         self.help_overlay_renderer = HelpOverlayRenderer()
         self.learning_path_renderer = LearningPathRenderer()
+        self.progress_report_renderer = ProgressReportRenderer()
         self.settings_renderer = SettingsScreenRenderer()
         self.menu_items: list[MenuItem] = []
         self.help_visible = False
@@ -186,6 +194,8 @@ class UnifiedAppShell:
         self.learning_path_details_scroll_path_id: str | None = None
         self.badge_gallery_scroll_offset = 0
         self.badge_gallery_max_scroll = 0
+        self.progress_report_scroll_offset = 0
+        self.progress_report_max_scroll = 0
         self.home_continue_rect: pygame.Rect | None = None
 
         pygame.display.set_caption("Interactive ML Labs")
@@ -393,6 +403,9 @@ class UnifiedAppShell:
         elif self.screen_name == ScreenName.PATHS:
             self.learning_path_details_scroll_offset -= y * THEORY_SCROLL_STEP
             self._clamp_learning_path_details_scroll()
+        elif self.screen_name == ScreenName.PROGRESS_REPORT:
+            self.progress_report_scroll_offset -= y * THEORY_SCROLL_STEP
+            self._clamp_progress_report_scroll()
         elif self.screen_name == ScreenName.BADGES:
             self.badge_gallery_scroll_offset -= y * THEORY_SCROLL_STEP
             self._clamp_badge_gallery_scroll()
@@ -474,6 +487,7 @@ class UnifiedAppShell:
             ScreenName.DEMO: self._render_demo,
             ScreenName.LESSON_COMPLETE: self._render_lesson_complete,
             ScreenName.PATH_COMPLETE: self._render_path_complete,
+            ScreenName.PROGRESS_REPORT: self._render_progress_report,
             ScreenName.BADGES: self._render_badges,
             ScreenName.SETTINGS: self._render_settings,
             ScreenName.PAUSE: self._render_pause,
@@ -498,6 +512,7 @@ class UnifiedAppShell:
         labels = [
             self._text("Guided learning paths", "Prowadzone ścieżki nauki"),
             self._text("Browse demos by level", "Przeglądaj dema według poziomu"),
+            self._text("Progress report", "Raport postępu"),
             self._text("Badges", "Odznaki"),
             self._text("Settings", "Ustawienia"),
         ]
@@ -1221,6 +1236,16 @@ class UnifiedAppShell:
             f"Badges unlocked: {unlocked_count}/{total_count}",
             f"Zdobyte odznaki: {unlocked_count}/{total_count}",
         )
+
+    def _progress_report_details(self) -> ProgressReportDetails:
+        """Return render-ready progress report data."""
+        return ShellProgressReportViewData(
+            catalog=self.catalog,
+            progress=self.progress_summary,
+            learning_paths=self._learning_path_view_data(),
+            language=self.context.settings.language,
+            text=self._text,
+        ).progress_report_details()
 
     def _lesson_recap_prompt(self, lesson: LessonManifest) -> str:
         """Return the recap prompt shown after lesson completion."""
@@ -2289,6 +2314,41 @@ class UnifiedAppShell:
         self._draw_badge_gallery_scroll_indicator(result.viewport)
         self.menu_items = result.menu_items
 
+    def _render_progress_report(self) -> None:
+        """Draw the guided course progress report."""
+        result = self.progress_report_renderer.render(
+            self.screen,
+            settings=self.context.settings,
+            details=self._progress_report_details(),
+            scroll_offset=self.progress_report_scroll_offset,
+            max_scroll=self.progress_report_max_scroll,
+            content_bottom=self._content_bottom(),
+            footer_y=self._footer_y(),
+            fonts=ProgressReportFonts(
+                title=self.font_title,
+                heading=self.font_heading,
+                body=self.font_body,
+                small=self.font_small,
+            ),
+            colors=ProgressReportColors(
+                background=self._ui_color(BACKGROUND),
+                text=self._ui_color(TEXT),
+                muted_text=self._ui_color(MUTED_TEXT),
+                accent=self._ui_color(ACCENT),
+                panel=self._ui_color(PANEL),
+                selected_panel=self._ui_color(PANEL_SELECTED),
+                border=self._ui_color((72, 79, 88)),
+                progress_track=self._ui_color((55, 61, 69)),
+                unlocked_fill=self._ui_color((226, 176, 83)),
+                unlocked_outline=self._ui_color((250, 218, 139)),
+                locked_fill=self._ui_color((61, 68, 76)),
+                locked_outline=self._ui_color((109, 118, 128)),
+            ),
+        )
+        self._update_progress_report_scroll_limit(result.content_end, result.viewport.bottom)
+        self._draw_progress_report_scroll_indicator(result.viewport)
+        self.menu_items = result.menu_items
+
     def _render_settings(self) -> None:
         self.menu_items = self.settings_renderer.render(
             self.screen,
@@ -2547,6 +2607,19 @@ class UnifiedAppShell:
             max_scroll=self.badge_gallery_max_scroll,
         )
 
+    def _draw_progress_report_scroll_indicator(self, viewport: pygame.Rect) -> None:
+        """Draw a small scrollbar for long progress report content."""
+        if self.progress_report_max_scroll <= 0:
+            return
+
+        self._draw_scroll_indicator_at(
+            x=viewport.right - SCROLLBAR_WIDTH,
+            top=viewport.y,
+            bottom=viewport.bottom,
+            scroll_offset=self.progress_report_scroll_offset,
+            max_scroll=self.progress_report_max_scroll,
+        )
+
     def _draw_scroll_indicator_at(
         self,
         *,
@@ -2688,6 +2761,7 @@ class UnifiedAppShell:
             ScreenName.DEMO: self._open_pause,
             ScreenName.LESSON_COMPLETE: self._select_lesson_complete_item,
             ScreenName.PATH_COMPLETE: self._select_path_complete_item,
+            ScreenName.PROGRESS_REPORT: self._go_home,
             ScreenName.BADGES: self._go_home,
             ScreenName.SETTINGS: self._select_settings_item,
             ScreenName.PAUSE: self._select_pause_item,
@@ -2705,6 +2779,8 @@ class UnifiedAppShell:
         elif self.selected_index == 1:
             self._go_to(ScreenName.LEVELS)
         elif self.selected_index == 2:
+            self._go_to(ScreenName.PROGRESS_REPORT)
+        elif self.selected_index == 3:
             self._go_to(ScreenName.BADGES)
         else:
             self._open_settings()
@@ -2931,6 +3007,8 @@ class UnifiedAppShell:
             self.course_map_details_scroll_offset = 0
         elif screen_name == ScreenName.PATHS:
             self.learning_path_details_scroll_offset = 0
+        elif screen_name == ScreenName.PROGRESS_REPORT:
+            self.progress_report_scroll_offset = 0
         elif screen_name == ScreenName.BADGES:
             self.badge_gallery_scroll_offset = 0
 
@@ -2973,7 +3051,7 @@ class UnifiedAppShell:
     def _current_menu_item_count(self) -> int:
         counts = {
             ScreenName.LANGUAGE: 2,
-            ScreenName.HOME: 4,
+            ScreenName.HOME: 5,
             ScreenName.COURSE_MAP: self.catalog.course_map_menu_item_count(),
             ScreenName.PATHS: self.catalog.learning_path_count(),
             ScreenName.LESSONS: len(self._current_learning_path_lessons()),
@@ -2986,6 +3064,7 @@ class UnifiedAppShell:
                 self._lesson_completion_menu_labels(self.selected_lesson),
             ),
             ScreenName.PATH_COMPLETE: len(self._path_completion_menu_labels()),
+            ScreenName.PROGRESS_REPORT: 1,
             ScreenName.BADGES: 1,
             ScreenName.SETTINGS: 9,
             ScreenName.PAUSE: 7,
@@ -3085,6 +3164,26 @@ class UnifiedAppShell:
         self.badge_gallery_scroll_offset = clamp_scroll_offset(
             self.badge_gallery_scroll_offset,
             self.badge_gallery_max_scroll,
+        )
+
+    def _update_progress_report_scroll_limit(
+        self,
+        content_end: int,
+        content_bottom: int,
+    ) -> None:
+        """Update maximum scroll offset for the progress report."""
+        self.progress_report_max_scroll = content_max_scroll(
+            content_end,
+            self.progress_report_scroll_offset,
+            content_bottom,
+        )
+        self._clamp_progress_report_scroll()
+
+    def _clamp_progress_report_scroll(self) -> None:
+        """Keep the progress report scroll offset inside the available range."""
+        self.progress_report_scroll_offset = clamp_scroll_offset(
+            self.progress_report_scroll_offset,
+            self.progress_report_max_scroll,
         )
 
     def _handle_demo_scrollbar_click(self, position: tuple[int, int]) -> bool:
