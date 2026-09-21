@@ -1137,8 +1137,8 @@ class UnifiedAppShell:
 
         return [
             primary,
-            self._text("Mark: I understand", "Oznacz: rozumiem"),
-            self._text("Mark: review later", "Oznacz: do powtórki"),
+            self._text("I understand", "Rozumiem"),
+            self._text("Needs review", "Do powtórki"),
             self._text("Review this lesson", "Powtórz tę lekcję"),
             self._text("Back to path", "Wróć do ścieżki"),
         ]
@@ -1273,18 +1273,18 @@ class UnifiedAppShell:
         status = None if lesson_progress is None else lesson_progress.reflection_status
         if status == "understood":
             return self._text(
-                "Self-check status: I understand",
-                "Status self-checku: rozumiem",
+                "Status: I understand",
+                "Status: rozumiem",
             )
         if status == "review":
             return self._text(
-                "Self-check status: review later",
-                "Status self-checku: do powtórki",
+                "Status: needs review",
+                "Status: do powtórki",
             )
 
         return self._text(
-            "Self-check status: not marked yet",
-            "Status self-checku: jeszcze nieoznaczony",
+            "Status: not marked yet",
+            "Status: jeszcze nieoznaczony",
         )
 
     def _next_lesson_in_selected_path(self, lesson: LessonManifest) -> LessonManifest | None:
@@ -2084,7 +2084,7 @@ class UnifiedAppShell:
 
         panel_y += 10
         self._draw_text(
-            self._text("Self-check", "Szybki self-check"),
+            self._text("Self-check", "Samoocena"),
             (panel_x, panel_y),
             self.font_small,
             ACCENT,

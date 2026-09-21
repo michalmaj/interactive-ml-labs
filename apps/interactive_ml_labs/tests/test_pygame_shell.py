@@ -1434,10 +1434,14 @@ def test_shell_completion_summary_marks_reflection_status(monkeypatch) -> None:
         app.selected_index = 2
         app._activate_selected()
         assert app.context.progress.lessons[lesson.id].reflection_status == "review"
-        assert app._lesson_reflection_status_label(lesson) == "Self-check status: review later"
+        assert app._lesson_reflection_status_label(lesson) == "Status: needs review"
 
         app.context.settings.language = "pl"
-        assert app._lesson_reflection_status_label(lesson) == "Status self-checku: do powtórki"
+        assert app._lesson_completion_menu_labels(lesson)[1:3] == [
+            "Rozumiem",
+            "Do powtórki",
+        ]
+        assert app._lesson_reflection_status_label(lesson) == "Status: do powtórki"
     finally:
         pygame.quit()
 
@@ -1821,7 +1825,7 @@ def test_shell_completion_summary_renders_lesson_progress(monkeypatch) -> None:
         assert app._lesson_badge_label(lesson) in wrapped_text
         assert app._lesson_recap_prompt(lesson) in wrapped_text
         assert "- I can explain the result without looking at the controls." in wrapped_text
-        assert "Self-check status: not marked yet" in wrapped_text
+        assert "Status: not marked yet" in wrapped_text
         assert progress_bars == [(1, 2)]
         assert menu_labels[0].startswith("Next lesson:")
         assert menu_tops

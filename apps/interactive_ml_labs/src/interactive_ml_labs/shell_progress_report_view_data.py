@@ -45,7 +45,7 @@ class ShellProgressReportViewData:
                 "Co już umiesz wyjaśnić",
             ),
             explain_lines=self._explain_lines(),
-            reflection_heading=self.text("Self-check", "Self-check"),
+            reflection_heading=self.text("Self-check", "Samoocena"),
             reflection_lines=self._reflection_lines(),
             paths_heading=self.text("Guided paths", "Prowadzone ścieżki"),
             paths=self._path_summaries(),
@@ -151,8 +151,8 @@ class ShellProgressReportViewData:
         if understood_count == 0 and review_count == 0:
             return [
                 self.text(
-                    "No completed lesson has a self-check mark yet.",
-                    "Żadna ukończona lekcja nie ma jeszcze oznaczenia self-check.",
+                    "No completed lesson has a reflection mark yet.",
+                    "Żadna ukończona lekcja nie ma jeszcze oznaczenia samooceny.",
                 ),
             ]
 
@@ -162,7 +162,7 @@ class ShellProgressReportViewData:
                 f"Rozumiem: {understood_count}",
             ),
             self.text(
-                f"Review later: {review_count}",
+                f"Needs review: {review_count}",
                 f"Do powtórki: {review_count}",
             ),
         ]
