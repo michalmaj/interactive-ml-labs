@@ -41,6 +41,8 @@ class ProgressReportDetails:
     metrics: list[ProgressReportMetric]
     explain_heading: str
     explain_lines: list[str]
+    reflection_heading: str
+    reflection_lines: list[str]
     paths_heading: str
     paths: list[ProgressReportPath]
     badges_heading: str
@@ -139,6 +141,16 @@ class ProgressReportRenderer:
                 surface,
                 details.explain_heading,
                 details.explain_lines,
+                (80, content_y),
+                content_width,
+                fonts=fonts,
+                colors=colors,
+            )
+            content_y += 20
+            content_y = self._draw_section(
+                surface,
+                details.reflection_heading,
+                details.reflection_lines,
                 (80, content_y),
                 content_width,
                 fonts=fonts,

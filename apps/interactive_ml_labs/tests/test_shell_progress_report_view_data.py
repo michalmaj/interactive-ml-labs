@@ -77,6 +77,9 @@ def test_progress_report_summarizes_completed_work() -> None:
     assert details.paths[0].task_label == "Tasks: 1/8"
     assert details.paths[0].badge_label == "Badges: 1/4"
     assert any(badge.unlocked for badge in details.badges)
+    assert details.reflection_lines == [
+        "No completed lesson has a self-check mark yet.",
+    ]
 
 
 def test_progress_report_lists_completed_learning_claims() -> None:
@@ -100,4 +103,21 @@ def test_progress_report_has_empty_state_explanation() -> None:
 
     assert details.explain_lines == [
         "Ukończ pierwszą prowadzoną lekcję, a pojawi się tu krótkie podsumowanie.",
+    ]
+
+
+def test_progress_report_summarizes_lesson_reflection_statuses() -> None:
+    """Progress report should summarize saved self-check reflection statuses."""
+    progress = AppProgress()
+    first_lesson_id = LEARNING_PATH_MANIFESTS[0].lesson_ids[0]
+    second_lesson_id = LEARNING_PATH_MANIFESTS[0].lesson_ids[1]
+    progress.set_reflection_status(first_lesson_id, "understood")
+    progress.set_reflection_status(second_lesson_id, "review")
+
+    details = _view_data(progress, language="pl").progress_report_details()
+
+    assert details.reflection_heading == "Self-check"
+    assert details.reflection_lines == [
+        "Rozumiem: 1",
+        "Do powtórki: 1",
     ]

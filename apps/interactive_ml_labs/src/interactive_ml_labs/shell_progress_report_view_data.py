@@ -45,6 +45,8 @@ class ShellProgressReportViewData:
                 "Co już umiesz wyjaśnić",
             ),
             explain_lines=self._explain_lines(),
+            reflection_heading=self.text("Self-check", "Self-check"),
+            reflection_lines=self._reflection_lines(),
             paths_heading=self.text("Guided paths", "Prowadzone ścieżki"),
             paths=self._path_summaries(),
             badges_heading=self.text("Badges", "Odznaki"),
@@ -133,6 +135,38 @@ class ShellProgressReportViewData:
 
         return [self._lesson_explanation_line(lesson) for lesson in completed_lessons[:6]]
 
+    def _reflection_lines(self) -> list[str]:
+        """Return a compact summary of saved lesson reflection statuses."""
+        understood_count = 0
+        review_count = 0
+        for lesson_id in self._guided_lesson_ids():
+            lesson_progress = self.progress.progress.lessons.get(lesson_id)
+            if lesson_progress is None:
+                continue
+            if lesson_progress.reflection_status == "understood":
+                understood_count += 1
+            elif lesson_progress.reflection_status == "review":
+                review_count += 1
+
+        if understood_count == 0 and review_count == 0:
+            return [
+                self.text(
+                    "No completed lesson has a self-check mark yet.",
+                    "Żadna ukończona lekcja nie ma jeszcze oznaczenia self-check.",
+                ),
+            ]
+
+        return [
+            self.text(
+                f"I understand: {understood_count}",
+                f"Rozumiem: {understood_count}",
+            ),
+            self.text(
+                f"Review later: {review_count}",
+                f"Do powtórki: {review_count}",
+            ),
+        ]
+
     def _lesson_explanation_line(self, lesson: LessonManifest) -> str:
         """Return one natural explanation line for a completed lesson."""
         title = lesson.title.for_language(self.language)
@@ -197,3 +231,16 @@ class ShellProgressReportViewData:
         return len(path.lesson_ids) > 0 and all(
             self.progress.is_lesson_completed(lesson_id) for lesson_id in path.lesson_ids
         )
+
+    def _guided_lesson_ids(self) -> tuple[str, ...]:
+        """Return unique lesson ids referenced by guided learning paths."""
+        lesson_ids: list[str] = []
+        seen: set[str] = set()
+        for path in self.catalog.all_learning_paths():
+            for lesson_id in path.lesson_ids:
+                if lesson_id in seen:
+                    continue
+                seen.add(lesson_id)
+                lesson_ids.append(lesson_id)
+
+        return tuple(lesson_ids)

@@ -20,12 +20,14 @@ def test_app_progress_creates_lesson_records_on_demand() -> None:
     progress.mark_theory_visited("lesson_one")
     progress.complete_task("lesson_one", "task_a")
     progress.mark_completed("lesson_one")
+    progress.set_reflection_status("lesson_one", "understood")
 
     lesson = progress.lessons["lesson_one"]
     assert lesson.started is True
     assert lesson.theory_visited is True
     assert lesson.completed_task_ids == {"task_a"}
     assert lesson.completed is True
+    assert lesson.reflection_status == "understood"
     assert progress.revision > 0
 
 
@@ -42,6 +44,14 @@ def test_app_progress_revision_changes_only_for_new_state() -> None:
     progress.complete_task("lesson_one", "task_a")
     assert progress.revision > revision
 
+    revision = progress.revision
+    progress.set_reflection_status("lesson_one", "review")
+    assert progress.revision > revision
+
+    revision = progress.revision
+    progress.set_reflection_status("lesson_one", "review")
+    assert progress.revision == revision
+
 
 def test_progress_serialization_round_trips_lesson_state() -> None:
     """Lesson progress should round-trip through JSON-friendly data."""
@@ -52,6 +62,7 @@ def test_progress_serialization_round_trips_lesson_state() -> None:
                 theory_visited=True,
                 completed_task_ids={"task_b", "task_a"},
                 completed=False,
+                reflection_status="review",
             ),
         },
     )
@@ -67,10 +78,12 @@ def test_progress_serialization_round_trips_lesson_state() -> None:
                 "theory_visited": True,
                 "completed_task_ids": ["task_a", "task_b"],
                 "completed": False,
+                "reflection_status": "review",
             },
         },
     }
     assert loaded.lessons["lesson_one"].completed_task_ids == {"task_a", "task_b"}
+    assert loaded.lessons["lesson_one"].reflection_status == "review"
 
 
 def test_progress_from_json_ignores_malformed_records() -> None:
@@ -83,6 +96,7 @@ def test_progress_from_json_ignores_malformed_records() -> None:
                     "theory_visited": "yes",
                     "completed_task_ids": ["a", 2, "b"],
                     "completed": False,
+                    "reflection_status": "maybe",
                 },
                 42: {"started": True},
                 "bad": "not a mapping",
@@ -94,6 +108,7 @@ def test_progress_from_json_ignores_malformed_records() -> None:
     assert progress.lessons["valid"].started is True
     assert progress.lessons["valid"].theory_visited is False
     assert progress.lessons["valid"].completed_task_ids == {"a", "b"}
+    assert progress.lessons["valid"].reflection_status is None
 
 
 def test_load_app_progress_returns_empty_when_file_is_missing(tmp_path) -> None:
