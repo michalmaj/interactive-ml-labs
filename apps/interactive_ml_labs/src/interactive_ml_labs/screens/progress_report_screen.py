@@ -213,7 +213,8 @@ class ProgressReportRenderer:
             column = index % column_count
             card_x = x + column * (column_width + gap)
             card_y = row_tops[column]
-            rect = pygame.Rect(card_x, card_y, column_width, 82)
+            label_height = self._wrapped_height(metric.label, column_width - 36, fonts.small)
+            rect = pygame.Rect(card_x, card_y, column_width, max(82, label_height + 48))
             pygame.draw.rect(surface, colors.panel, rect, border_radius=8)
             pygame.draw.rect(surface, colors.border, rect, width=1, border_radius=8)
             label_y = self._draw_wrapped(
@@ -274,7 +275,22 @@ class ProgressReportRenderer:
         self._draw_text(surface, heading, (x, y), fonts.heading, colors.text)
         y += 48
         for path in paths:
-            rect = pygame.Rect(x, y, width, 122)
+            detail_label = f"{path.lesson_label} | {path.task_label} | {path.badge_label}"
+            title_height = self._wrapped_height(path.title, width - 36, fonts.body)
+            detail_height = self._wrapped_height(detail_label, width - 36, fonts.small)
+            card_height = max(
+                122,
+                14
+                + title_height
+                + 2
+                + fonts.small.get_linesize()
+                + 24
+                + 8
+                + 18
+                + detail_height
+                + 14,
+            )
+            rect = pygame.Rect(x, y, width, card_height)
             pygame.draw.rect(surface, colors.panel, rect, border_radius=8)
             pygame.draw.rect(surface, colors.border, rect, width=1, border_radius=8)
             content_x = rect.x + 18
@@ -305,7 +321,7 @@ class ProgressReportRenderer:
             content_y += 18
             y_after = self._draw_wrapped(
                 surface,
-                f"{path.lesson_label} | {path.task_label} | {path.badge_label}",
+                detail_label,
                 (content_x, content_y),
                 label_width,
                 fonts.small,
@@ -357,6 +373,29 @@ class ProgressReportRenderer:
             y += 6
 
         return y
+
+    def _wrapped_height(self, text: str, width: int, font: pygame.font.Font) -> int:
+        """Return the height needed to draw wrapped text."""
+        words = text.split()
+        if not words:
+            return 0
+
+        line = ""
+        line_count = 0
+        for word in words:
+            candidate = f"{line} {word}".strip()
+            if font.size(candidate)[0] <= width:
+                line = candidate
+                continue
+
+            if line:
+                line_count += 1
+            line = word
+
+        if line:
+            line_count += 1
+
+        return line_count * font.get_linesize()
 
     def _draw_menu(
         self,

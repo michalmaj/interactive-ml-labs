@@ -35,11 +35,15 @@ class ShellProgressReportViewData:
         return ProgressReportDetails(
             title=self.text("Progress report", "Raport postępu"),
             subtitle=self.text(
-                "A compact view of what you have completed and what you can already explain.",
-                "Krótki przegląd tego, co masz ukończone i co umiesz już wyjaśnić.",
+                "See which parts of the course are already behind you "
+                "and what is worth reviewing next.",
+                "Zobacz, które części kursu masz już za sobą i do czego warto jeszcze wrócić.",
             ),
             metrics=self._global_metrics(),
-            explain_heading=self.text("You can already explain", "Umiesz już wyjaśnić"),
+            explain_heading=self.text(
+                "What you can already explain",
+                "Co już umiesz wyjaśnić",
+            ),
             explain_lines=self._explain_lines(),
             paths_heading=self.text("Guided paths", "Prowadzone ścieżki"),
             paths=self._path_summaries(),
@@ -123,7 +127,7 @@ class ShellProgressReportViewData:
             return [
                 self.text(
                     "Start a guided lesson to unlock your first explanation.",
-                    "Rozpocznij prowadzoną lekcję, żeby odblokować pierwsze podsumowanie.",
+                    "Ukończ pierwszą prowadzoną lekcję, a pojawi się tu krótkie podsumowanie.",
                 ),
             ]
 
@@ -134,8 +138,8 @@ class ShellProgressReportViewData:
         title = lesson.title.for_language(self.language)
         goal = lesson.learning_goal.for_language(self.language)
         return self.text(
-            f"{title}: {goal}",
-            f"{title}: {goal}",
+            f"After {title}: {goal}",
+            f"Po lekcji {title}: {goal}",
         )
 
     def _path_summaries(self) -> list[ProgressReportPath]:
@@ -153,16 +157,16 @@ class ShellProgressReportViewData:
                     title=path.title.for_language(self.language),
                     status_label=self.learning_paths.learning_path_status_label(path),
                     lesson_label=self.text(
-                        f"Lessons {lesson_count}/{total_lessons}",
-                        f"Lekcje {lesson_count}/{total_lessons}",
+                        f"Lessons: {lesson_count}/{total_lessons}",
+                        f"Lekcje: {lesson_count}/{total_lessons}",
                     ),
                     task_label=self.text(
-                        f"Tasks {task_count}/{total_tasks}",
-                        f"Zadania {task_count}/{total_tasks}",
+                        f"Tasks: {task_count}/{total_tasks}",
+                        f"Zadania: {task_count}/{total_tasks}",
                     ),
                     badge_label=self.text(
-                        f"Badges {badge_count}/{total_badges}",
-                        f"Odznaki {badge_count}/{total_badges}",
+                        f"Badges: {badge_count}/{total_badges}",
+                        f"Odznaki: {badge_count}/{total_badges}",
                     ),
                     completed_count=lesson_count,
                     total_count=total_lessons,
