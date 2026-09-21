@@ -72,9 +72,7 @@ class ShellProgressSummary:
 
     def completed_learning_path_lesson_count(self, path: LearningPathManifest) -> int:
         """Count completed lessons in one learning path."""
-        return sum(
-            1 for lesson_id in path.lesson_ids if self.is_lesson_completed(lesson_id)
-        )
+        return sum(1 for lesson_id in path.lesson_ids if self.is_lesson_completed(lesson_id))
 
     def completed_learning_path_task_count(self, path: LearningPathManifest) -> int:
         """Count completed tasks across one learning path."""

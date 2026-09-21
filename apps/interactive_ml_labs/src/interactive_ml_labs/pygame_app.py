@@ -68,6 +68,7 @@ from interactive_ml_labs.shell_navigation import (
     default_back_target,
 )
 from interactive_ml_labs.shell_persistence import ShellPersistence
+from interactive_ml_labs.shell_progress_summary import ShellProgressSummary
 from interactive_ml_labs.shell_scrolling import (
     clamp_scroll_offset,
     content_max_scroll,
@@ -159,6 +160,10 @@ class UnifiedAppShell:
         self.selected_lesson: LessonManifest | None = None
         self.scene_manager = SceneManager()
         self.catalog = ShellCatalog()
+        self.progress_summary = ShellProgressSummary(
+            catalog=self.catalog,
+            progress=self.context.progress,
+        )
         self.badge_renderer = BadgeGalleryRenderer()
         self.course_map_renderer = CourseMapRenderer()
         self.help_overlay_renderer = HelpOverlayRenderer()
@@ -1156,100 +1161,46 @@ class UnifiedAppShell:
         self,
     ) -> tuple[LearningPathManifest | None, LessonManifest | None]:
         """Return the next path and lesson to continue from the home screen."""
-        for path in self.catalog.all_learning_paths():
-            next_lesson = self._next_learning_path_lesson(path)
-            if next_lesson is None:
-                continue
-
-            return path, next_lesson
-
-        return None, None
+        return self.progress_summary.next_learning_path_step()
 
     def _next_learning_path_lesson(
         self,
         path: LearningPathManifest,
     ) -> LessonManifest | None:
         """Return the first incomplete lesson in one learning path."""
-        for lesson_id in path.lesson_ids:
-            if not self._is_lesson_completed(lesson_id):
-                return self.catalog.lesson(lesson_id)
-
-        return None
+        return self.progress_summary.next_learning_path_lesson(path)
 
     def _next_learning_path_lesson_index(self, path: LearningPathManifest) -> int:
         """Return the first incomplete lesson index in one learning path."""
-        for index, lesson_id in enumerate(path.lesson_ids):
-            if not self._is_lesson_completed(lesson_id):
-                return index
-
-        return 0
+        return self.progress_summary.next_learning_path_lesson_index(path)
 
     def _completed_learning_path_lesson_count(self, path: LearningPathManifest) -> int:
         """Count completed lessons in one learning path."""
-        completed_count = 0
-        for lesson_id in path.lesson_ids:
-            progress = self.context.progress.lessons.get(lesson_id)
-            if progress is not None and progress.completed:
-                completed_count += 1
-
-        return completed_count
+        return self.progress_summary.completed_learning_path_lesson_count(path)
 
     def _completed_learning_path_task_count(self, path: LearningPathManifest) -> int:
         """Count completed tasks across one learning path."""
-        completed_count = 0
-        for lesson_id in path.lesson_ids:
-            lesson = self.catalog.lesson(lesson_id)
-            completed_task_ids = self._completed_lesson_task_ids(lesson)
-            completed_count += len(completed_task_ids)
-
-        return completed_count
+        return self.progress_summary.completed_learning_path_task_count(path)
 
     def _learning_path_task_count(self, path: LearningPathManifest) -> int:
         """Count all tasks across one learning path."""
-        task_count = 0
-        for lesson_id in path.lesson_ids:
-            task_count += len(self.catalog.lesson(lesson_id).tasks)
-
-        return task_count
+        return self.progress_summary.learning_path_task_count(path)
 
     def _visited_learning_path_theory_count(self, path: LearningPathManifest) -> int:
         """Count lessons with visited theory in one learning path."""
-        visited_count = 0
-        for lesson_id in path.lesson_ids:
-            progress = self.context.progress.lessons.get(lesson_id)
-            if progress is not None and progress.theory_visited:
-                visited_count += 1
-
-        return visited_count
+        return self.progress_summary.visited_learning_path_theory_count(path)
 
     def _unlocked_learning_path_badge_count(self, path: LearningPathManifest) -> int:
         """Count unlocked badges across one learning path."""
-        unlocked_count = 0
-        for lesson_id in path.lesson_ids:
-            lesson = self.catalog.lesson(lesson_id)
-            if lesson.completion_badge is not None and self._is_lesson_completed(lesson_id):
-                unlocked_count += 1
-
-        return unlocked_count
+        return self.progress_summary.unlocked_learning_path_badge_count(path)
 
     def _learning_path_badge_count(self, path: LearningPathManifest) -> int:
         """Count all badges available in one learning path."""
-        badge_count = 0
-        for lesson_id in path.lesson_ids:
-            if self.catalog.lesson(lesson_id).completion_badge is not None:
-                badge_count += 1
-
-        return badge_count
+        return self.progress_summary.learning_path_badge_count(path)
 
     def _started_learning_path_lesson_count(self, path: LearningPathManifest) -> int:
         """Count started lessons in one learning path."""
-        started_count = 0
-        for lesson_id in path.lesson_ids:
-            progress = self.context.progress.lessons.get(lesson_id)
-            if progress is not None and progress.started:
-                started_count += 1
-
-        return started_count
+        return self.progress_summary.started_learning_path_lesson_count(path)
 
     def _lesson_task_summary(self, lesson: LessonManifest) -> str:
         """Return a short localized task completion summary."""
@@ -1459,15 +1410,11 @@ class UnifiedAppShell:
 
     def _is_lesson_completed(self, lesson_id: str) -> bool:
         """Return whether one lesson is completed."""
-        progress = self.context.progress.lessons.get(lesson_id)
-        return progress is not None and progress.completed
+        return self.progress_summary.is_lesson_completed(lesson_id)
 
     def _has_lesson_progress(self, lesson_id: str) -> bool:
         """Return whether one lesson has any saved progress."""
-        progress = self.context.progress.lessons.get(lesson_id)
-        return progress is not None and (
-            progress.started or progress.theory_visited or bool(progress.completed_task_ids)
-        )
+        return self.progress_summary.has_lesson_progress(lesson_id)
 
     def _lesson_task_label(self, lesson: LessonManifest, task_id: str, title: str) -> str:
         """Return one task label with a stable checkbox prefix."""
@@ -1501,11 +1448,7 @@ class UnifiedAppShell:
 
     def _completed_lesson_task_ids(self, lesson: LessonManifest) -> set[str]:
         """Return completed task ids for one lesson."""
-        progress = self.context.progress.lessons.get(lesson.id)
-        if progress is None:
-            return set()
-
-        return progress.completed_task_ids
+        return self.progress_summary.completed_lesson_task_ids(lesson)
 
     def _lesson_badge_label(self, lesson: LessonManifest) -> str:
         """Return a localized badge status label for one lesson."""
