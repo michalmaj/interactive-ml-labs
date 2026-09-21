@@ -55,6 +55,8 @@ def _details() -> ProgressReportDetails:
         explain_lines=["After a long lesson title: explain the visible signal."],
         reflection_heading="Self-check",
         reflection_lines=["I understand: 1", "Needs review: 0"],
+        review_heading="Needs review",
+        review_lines=["One lesson to revisit"],
         paths_heading="Guided paths",
         paths=[
             ProgressReportPath(
