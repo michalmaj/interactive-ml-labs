@@ -47,6 +47,13 @@ from interactive_ml_labs.screens.help_overlay import (
     HelpOverlayFonts,
     HelpOverlayRenderer,
 )
+from interactive_ml_labs.screens.learning_path_screen import (
+    LearningPathDetails,
+    LearningPathMetric,
+    LearningPathRenderer,
+    LearningPathScreenColors,
+    LearningPathScreenFonts,
+)
 from interactive_ml_labs.screens.settings_screen import (
     SettingsScreenColors,
     SettingsScreenFonts,
@@ -155,6 +162,7 @@ class UnifiedAppShell:
         self.badge_renderer = BadgeGalleryRenderer()
         self.course_map_renderer = CourseMapRenderer()
         self.help_overlay_renderer = HelpOverlayRenderer()
+        self.learning_path_renderer = LearningPathRenderer()
         self.settings_renderer = SettingsScreenRenderer()
         self.menu_items: list[MenuItem] = []
         self.help_visible = False
@@ -678,135 +686,114 @@ class UnifiedAppShell:
         labels = [
             self._learning_path_menu_label(path) for path in self.catalog.all_learning_paths()
         ]
-        self._draw_title(
-            self._text("Guided learning paths", "Prowadzone ścieżki nauki"),
-            self._text(
-                "Follow lessons that build one idea at a time.",
-                "Przechodź lekcje, które budują intuicję krok po kroku.",
+        path = self.catalog.learning_path(self.selected_index)
+        self._reset_learning_path_details_scroll_if_needed(path)
+        result = self.learning_path_renderer.render(
+            self.screen,
+            settings=self.context.settings,
+            selected_index=self.selected_index,
+            menu_labels=labels,
+            details=self._learning_path_details(path),
+            scroll_offset=self.learning_path_details_scroll_offset,
+            max_scroll=self.learning_path_details_max_scroll,
+            fonts=LearningPathScreenFonts(
+                title=self.font_title,
+                heading=self.font_heading,
+                body=self.font_body,
+                small=self.font_small,
             ),
-        )
-        self._draw_menu(labels, top=210, width=520)
-        self._render_learning_path_details(self.catalog.learning_path(self.selected_index))
-        self._draw_footer(
-            self._text(
-                "Enter: lessons | Esc/Backspace: home | S: settings | L: language",
-                "Enter: lekcje | Esc/Backspace: start | S: ustawienia | L: język",
+            colors=LearningPathScreenColors(
+                text=self._ui_color(TEXT),
+                muted_text=self._ui_color(MUTED_TEXT),
+                accent=self._ui_color(ACCENT),
+                panel=self._ui_color(PANEL),
+                selected_panel=self._ui_color(PANEL_SELECTED),
+                border=self._ui_color((72, 79, 88)),
+                progress_track=self._ui_color((55, 61, 69)),
             ),
+            footer_y=self._footer_y(),
         )
+        self.menu_items = result.menu_items
+        self._update_learning_path_details_scroll_limit(result.content_end, result.viewport.bottom)
+        self._draw_learning_path_details_scroll_indicator(result.viewport)
 
     def _render_learning_path_details(self, path: LearningPathManifest) -> None:
         """Draw details for the selected learning path."""
+        self._reset_learning_path_details_scroll_if_needed(path)
+        result = self.learning_path_renderer.render(
+            self.screen,
+            settings=self.context.settings,
+            selected_index=self.selected_index,
+            menu_labels=[],
+            details=self._learning_path_details(path),
+            scroll_offset=self.learning_path_details_scroll_offset,
+            max_scroll=self.learning_path_details_max_scroll,
+            fonts=LearningPathScreenFonts(
+                title=self.font_title,
+                heading=self.font_heading,
+                body=self.font_body,
+                small=self.font_small,
+            ),
+            colors=LearningPathScreenColors(
+                text=self._ui_color(TEXT),
+                muted_text=self._ui_color(MUTED_TEXT),
+                accent=self._ui_color(ACCENT),
+                panel=self._ui_color(PANEL),
+                selected_panel=self._ui_color(PANEL_SELECTED),
+                border=self._ui_color((72, 79, 88)),
+                progress_track=self._ui_color((55, 61, 69)),
+            ),
+            footer_y=self._footer_y(),
+        )
+        self._update_learning_path_details_scroll_limit(result.content_end, result.viewport.bottom)
+        self._draw_learning_path_details_scroll_indicator(result.viewport)
+
+    def _reset_learning_path_details_scroll_if_needed(self, path: LearningPathManifest) -> None:
+        """Reset learning path details scroll when the selected path changes."""
+        if self.learning_path_details_scroll_path_id == path.id:
+            return
+
+        self.learning_path_details_scroll_path_id = path.id
+        self.learning_path_details_scroll_offset = 0
+
+    def _learning_path_details(self, path: LearningPathManifest) -> LearningPathDetails:
+        """Return render-ready details for one learning path."""
         language = self.context.settings.language
-        width, height = self.context.settings.resolution
-        left = 660
-        top = 190
-        panel_width = max(360, width - left - 80)
-        panel_height = max(320, height - top - 100)
-        rect = pygame.Rect(left, top, panel_width, panel_height)
-
-        pygame.draw.rect(self.screen, PANEL, rect, border_radius=8)
-        pygame.draw.rect(self.screen, (72, 79, 88), rect, width=1, border_radius=8)
-
-        if self.learning_path_details_scroll_path_id != path.id:
-            self.learning_path_details_scroll_path_id = path.id
-            self.learning_path_details_scroll_offset = 0
-
-        viewport = rect.inflate(-28, -28)
-        scrollbar_margin = 14 if self.learning_path_details_max_scroll > 0 else 0
-        old_clip = self.screen.get_clip()
-        self.screen.set_clip(viewport)
-
-        y = rect.y + 28 - self.learning_path_details_scroll_offset
-        content_x = rect.x + 28
-        content_width = rect.width - 56 - scrollbar_margin
-        y = self._draw_wrapped(
-            path.title.for_language(language),
-            (content_x, y),
-            content_width,
-            self.font_heading,
-            TEXT,
-        )
-        y += 12
-        y = self._draw_wrapped(
-            path.summary.for_language(language),
-            (content_x, y),
-            content_width,
-            self.font_body,
-            MUTED_TEXT,
-        )
-        y += 22
         lesson_count = len(path.lesson_ids)
-        lesson_label = self._text(
+        lesson_count_label = self._text(
             f"{lesson_count} lessons",
             f"{lesson_count} lekcje" if lesson_count < 5 else f"{lesson_count} lekcji",
         )
-        self._draw_text(lesson_label, (content_x, y), self.font_small, ACCENT)
-        y += 28
-        for label, completed_count, total_count in self._learning_path_progress_metrics(path):
-            y = self._draw_wrapped(
-                label,
-                (content_x, y),
-                content_width,
-                self.font_small,
-                TEXT,
-            )
-            self._draw_compact_progress_bar(
-                content_x,
-                y + 2,
-                content_width,
-                completed_count,
-                total_count,
-            )
-            y += 20
-
-        y = self._draw_wrapped(
-            self._learning_path_status_label(path),
-            (content_x, y),
-            content_width,
-            self.font_small,
-            ACCENT,
+        return LearningPathDetails(
+            title=path.title.for_language(language),
+            summary=path.summary.for_language(language),
+            lesson_count_label=lesson_count_label,
+            progress_metrics=self._learning_path_metrics(
+                self._learning_path_progress_metrics(path),
+            ),
+            status_label=self._learning_path_status_label(path),
+            next_action_label=self._learning_path_next_action_label(path),
+            badge_labels=self._learning_path_badge_labels(path),
+            course_map_heading=self._text("Course map", "Mapa kursu"),
+            lesson_labels=[
+                self._learning_path_lesson_map_label(self.catalog.lesson(lesson_id), index)
+                for index, lesson_id in enumerate(path.lesson_ids, start=1)
+            ],
         )
-        y += 6
-        y = self._draw_wrapped(
-            self._learning_path_next_action_label(path),
-            (content_x, y),
-            content_width,
-            self.font_small,
-            ACCENT,
-        )
-        y += 18
-        for badge_label in self._learning_path_badge_labels(path):
-            y = self._draw_wrapped(
-                badge_label,
-                (content_x, y),
-                content_width,
-                self.font_small,
-                MUTED_TEXT,
-            )
-            y += 4
 
-        y += 16
-        self._draw_text(
-            self._text("Course map", "Mapa kursu"),
-            (content_x, y),
-            self.font_small,
-            ACCENT,
-        )
-        y += 28
-        for index, lesson_id in enumerate(path.lesson_ids, start=1):
-            lesson = self.catalog.lesson(lesson_id)
-            y = self._draw_wrapped(
-                self._learning_path_lesson_map_label(lesson, index),
-                (content_x, y),
-                content_width,
-                self.font_small,
-                TEXT,
+    def _learning_path_metrics(
+        self,
+        metrics: list[tuple[str, int, int]],
+    ) -> list[LearningPathMetric]:
+        """Convert shell progress tuples into learning path renderer metrics."""
+        return [
+            LearningPathMetric(
+                label=label,
+                completed_count=completed_count,
+                total_count=total_count,
             )
-            y += 4
-
-        self.screen.set_clip(old_clip)
-        self._update_learning_path_details_scroll_limit(y, viewport.bottom)
-        self._draw_learning_path_details_scroll_indicator(viewport)
+            for label, completed_count, total_count in metrics
+        ]
 
     def _render_lessons(self) -> None:
         path = self._require_learning_path()
