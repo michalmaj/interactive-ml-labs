@@ -17,6 +17,7 @@ def test_default_back_target_covers_menu_flow() -> None:
     assert default_back_target(ScreenName.LEVELS) == ScreenName.HOME
     assert default_back_target(ScreenName.DEMOS) == ScreenName.LEVELS
     assert default_back_target(ScreenName.INTRO) == ScreenName.DEMOS
+    assert default_back_target(ScreenName.PROGRESS_REPORT) == ScreenName.HOME
     assert default_back_target(ScreenName.BADGES) == ScreenName.HOME
 
 

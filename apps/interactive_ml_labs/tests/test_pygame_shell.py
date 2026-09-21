@@ -559,8 +559,24 @@ def test_shell_home_menu_does_not_overlap_progress_panel(monkeypatch) -> None:
         app._render_home()
         progress_rect = app._home_learning_progress_rect()
 
-        assert len(app.menu_items) == 4
+        assert len(app.menu_items) == 5
         assert all(item.rect.right < progress_rect.left for item in app.menu_items)
+    finally:
+        pygame.quit()
+
+
+def test_shell_home_opens_progress_report(monkeypatch) -> None:
+    """Home screen should expose the progress report."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        app.screen_name = ScreenName.HOME
+        app.selected_index = 2
+
+        app._activate_selected()
+
+        assert app.screen_name == ScreenName.PROGRESS_REPORT
     finally:
         pygame.quit()
 
@@ -572,7 +588,7 @@ def test_shell_home_opens_badge_gallery(monkeypatch) -> None:
 
     try:
         app.screen_name = ScreenName.HOME
-        app.selected_index = 2
+        app.selected_index = 3
 
         app._activate_selected()
 
@@ -588,7 +604,7 @@ def test_shell_home_opens_settings_after_badge_gallery(monkeypatch) -> None:
 
     try:
         app.screen_name = ScreenName.HOME
-        app.selected_index = 3
+        app.selected_index = 4
 
         app._activate_selected()
 
