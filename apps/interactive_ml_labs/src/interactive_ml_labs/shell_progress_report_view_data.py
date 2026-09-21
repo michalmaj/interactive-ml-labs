@@ -47,6 +47,8 @@ class ShellProgressReportViewData:
             explain_lines=self._explain_lines(),
             reflection_heading=self.text("Self-check", "Samoocena"),
             reflection_lines=self._reflection_lines(),
+            review_heading=self.text("Needs review", "Do powtórki"),
+            review_lines=self._review_lines(),
             paths_heading=self.text("Guided paths", "Prowadzone ścieżki"),
             paths=self._path_summaries(),
             badges_heading=self.text("Badges", "Odznaki"),
@@ -164,6 +166,34 @@ class ShellProgressReportViewData:
             self.text(
                 f"Needs review: {review_count}",
                 f"Do powtórki: {review_count}",
+            ),
+        ]
+
+    def _review_lines(self) -> list[str]:
+        """Return lessons explicitly marked for review."""
+        review_lines: list[str] = []
+        seen: set[str] = set()
+        for path in self.catalog.all_learning_paths():
+            path_title = path.title.for_language(self.language)
+            for lesson_id in path.lesson_ids:
+                if lesson_id in seen:
+                    continue
+                lesson_progress = self.progress.progress.lessons.get(lesson_id)
+                if lesson_progress is None or lesson_progress.reflection_status != "review":
+                    continue
+
+                seen.add(lesson_id)
+                lesson = self.catalog.lesson(lesson_id)
+                lesson_title = lesson.title.for_language(self.language)
+                review_lines.append(f"{lesson_title} ({path_title})")
+
+        if review_lines:
+            return review_lines
+
+        return [
+            self.text(
+                "No lessons are marked for review.",
+                "Żadna lekcja nie jest teraz oznaczona do powtórki.",
             ),
         ]
 

@@ -80,6 +80,9 @@ def test_progress_report_summarizes_completed_work() -> None:
     assert details.reflection_lines == [
         "No completed lesson has a reflection mark yet.",
     ]
+    assert details.review_lines == [
+        "No lessons are marked for review.",
+    ]
 
 
 def test_progress_report_lists_completed_learning_claims() -> None:
@@ -120,4 +123,8 @@ def test_progress_report_summarizes_lesson_reflection_statuses() -> None:
     assert details.reflection_lines == [
         "Rozumiem: 1",
         "Do powtórki: 1",
+    ]
+    assert details.review_heading == "Do powtórki"
+    assert details.review_lines == [
+        (f"{LESSON_BY_ID[second_lesson_id].title.pl} ({LEARNING_PATH_MANIFESTS[0].title.pl})"),
     ]
