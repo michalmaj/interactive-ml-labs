@@ -1414,6 +1414,34 @@ def test_shell_completion_summary_primary_action_opens_path_summary(monkeypatch)
         pygame.quit()
 
 
+def test_shell_completion_summary_marks_reflection_status(monkeypatch) -> None:
+    """The completion summary should store a lightweight self-check status."""
+    monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
+    app = UnifiedAppShell(settings=AppSettings(resolution=(640, 360)))
+
+    try:
+        path = LEARNING_PATH_MANIFESTS[0]
+        lesson = LESSON_BY_ID[path.lesson_ids[0]]
+        app.selected_learning_path = path
+        app.selected_lesson = lesson
+        app.screen_name = ScreenName.LESSON_COMPLETE
+
+        app.selected_index = 1
+        app._activate_selected()
+        assert app.context.progress.lessons[lesson.id].reflection_status == "understood"
+        assert app.screen_name == ScreenName.LESSON_COMPLETE
+
+        app.selected_index = 2
+        app._activate_selected()
+        assert app.context.progress.lessons[lesson.id].reflection_status == "review"
+        assert app._lesson_reflection_status_label(lesson) == "Self-check status: review later"
+
+        app.context.settings.language = "pl"
+        assert app._lesson_reflection_status_label(lesson) == "Status self-checku: do powtórki"
+    finally:
+        pygame.quit()
+
+
 def test_shell_path_completion_actions_navigate_from_summary(monkeypatch) -> None:
     """Path completion actions should review, browse paths, or return home."""
     monkeypatch.setenv("SDL_VIDEODRIVER", "dummy")
@@ -1793,10 +1821,14 @@ def test_shell_completion_summary_renders_lesson_progress(monkeypatch) -> None:
         assert app._lesson_badge_label(lesson) in wrapped_text
         assert app._lesson_recap_prompt(lesson) in wrapped_text
         assert "- I can explain the result without looking at the controls." in wrapped_text
+        assert "Self-check status: not marked yet" in wrapped_text
         assert progress_bars == [(1, 2)]
         assert menu_labels[0].startswith("Next lesson:")
         assert menu_tops
-        assert menu_tops[0] + 2 * MENU_ITEM_PITCH + MENU_ITEM_HEIGHT < app._footer_y()
+        assert (
+            menu_tops[0] + (len(menu_labels) - 1) * MENU_ITEM_PITCH + MENU_ITEM_HEIGHT
+            < app._footer_y()
+        )
     finally:
         pygame.quit()
 

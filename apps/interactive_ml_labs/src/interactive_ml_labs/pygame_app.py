@@ -1137,6 +1137,8 @@ class UnifiedAppShell:
 
         return [
             primary,
+            self._text("Mark: I understand", "Oznacz: rozumiem"),
+            self._text("Mark: review later", "Oznacz: do powtórki"),
             self._text("Review this lesson", "Powtórz tę lekcję"),
             self._text("Back to path", "Wróć do ścieżki"),
         ]
@@ -1264,6 +1266,26 @@ class UnifiedAppShell:
                 "Jeśli nie, warto powtórzyć lekcję przed przejściem dalej.",
             ),
         ]
+
+    def _lesson_reflection_status_label(self, lesson: LessonManifest) -> str:
+        """Return the saved self-check status for one lesson."""
+        lesson_progress = self.context.progress.lessons.get(lesson.id)
+        status = None if lesson_progress is None else lesson_progress.reflection_status
+        if status == "understood":
+            return self._text(
+                "Self-check status: I understand",
+                "Status self-checku: rozumiem",
+            )
+        if status == "review":
+            return self._text(
+                "Self-check status: review later",
+                "Status self-checku: do powtórki",
+            )
+
+        return self._text(
+            "Self-check status: not marked yet",
+            "Status self-checku: jeszcze nieoznaczony",
+        )
 
     def _next_lesson_in_selected_path(self, lesson: LessonManifest) -> LessonManifest | None:
         """Return the next lesson in the selected learning path."""
@@ -2078,6 +2100,15 @@ class UnifiedAppShell:
             )
             panel_y += 4
 
+        panel_y += 6
+        panel_y = self._draw_wrapped(
+            self._lesson_reflection_status_label(lesson),
+            (panel_x, panel_y),
+            panel_width,
+            self.font_small,
+            ACCENT,
+        )
+
         return panel_y
 
     def _render_path_complete(self) -> None:
@@ -2845,6 +2876,12 @@ class UnifiedAppShell:
             self.selected_index = self._current_learning_path_lessons().index(next_lesson)
             self._open_lesson(next_lesson)
         elif self.selected_index == 1:
+            self.context.progress.set_reflection_status(lesson.id, "understood")
+            self._save_progress()
+        elif self.selected_index == 2:
+            self.context.progress.set_reflection_status(lesson.id, "review")
+            self._save_progress()
+        elif self.selected_index == 3:
             self._open_lesson(lesson)
         else:
             self._go_to(ScreenName.LESSONS)
