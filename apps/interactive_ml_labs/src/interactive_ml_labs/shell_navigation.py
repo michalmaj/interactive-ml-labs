@@ -20,6 +20,7 @@ class ScreenName(StrEnum):
     DEMO = "demo"
     LESSON_COMPLETE = "lesson_complete"
     PATH_COMPLETE = "path_complete"
+    PROGRESS_REPORT = "progress_report"
     BADGES = "badges"
     SETTINGS = "settings"
     PAUSE = "pause"
@@ -35,6 +36,7 @@ DEFAULT_BACK_TARGETS: dict[ScreenName, ScreenName] = {
     ScreenName.INTRO: ScreenName.DEMOS,
     ScreenName.LESSON_COMPLETE: ScreenName.LESSONS,
     ScreenName.PATH_COMPLETE: ScreenName.PATHS,
+    ScreenName.PROGRESS_REPORT: ScreenName.HOME,
     ScreenName.BADGES: ScreenName.HOME,
 }
 
