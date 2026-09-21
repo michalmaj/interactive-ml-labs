@@ -73,9 +73,9 @@ def test_progress_report_summarizes_completed_work() -> None:
         f"Badges unlocked: 1/{total_badges}",
     ]
     assert details.paths[0].status_label == "In progress"
-    assert details.paths[0].lesson_label == "Lessons 1/4"
-    assert details.paths[0].task_label == "Tasks 1/8"
-    assert details.paths[0].badge_label == "Badges 1/4"
+    assert details.paths[0].lesson_label == "Lessons: 1/4"
+    assert details.paths[0].task_label == "Tasks: 1/8"
+    assert details.paths[0].badge_label == "Badges: 1/4"
     assert any(badge.unlocked for badge in details.badges)
 
 
@@ -88,8 +88,9 @@ def test_progress_report_lists_completed_learning_claims() -> None:
 
     details = view_data.progress_report_details()
 
-    assert details.explain_heading == "Umiesz już wyjaśnić"
+    assert details.explain_heading == "Co już umiesz wyjaśnić"
     assert len(details.explain_lines) == 1
+    assert details.explain_lines[0].startswith("Po lekcji")
     assert "residuals" in details.explain_lines[0]
 
 
@@ -98,5 +99,5 @@ def test_progress_report_has_empty_state_explanation() -> None:
     details = _view_data(AppProgress(), language="pl").progress_report_details()
 
     assert details.explain_lines == [
-        "Rozpocznij prowadzoną lekcję, żeby odblokować pierwsze podsumowanie.",
+        "Ukończ pierwszą prowadzoną lekcję, a pojawi się tu krótkie podsumowanie.",
     ]
