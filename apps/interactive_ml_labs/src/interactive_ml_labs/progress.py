@@ -7,9 +7,12 @@ import os
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Literal
 
 PROGRESS_FILE_NAME = "progress.json"
 PROGRESS_SCHEMA_VERSION = 1
+ReflectionStatus = Literal["understood", "review"]
+VALID_REFLECTION_STATUSES: frozenset[str] = frozenset({"understood", "review"})
 
 
 @dataclass(slots=True)
@@ -20,6 +23,7 @@ class LessonProgress:
     theory_visited: bool = False
     completed_task_ids: set[str] = field(default_factory=set)
     completed: bool = False
+    reflection_status: ReflectionStatus | None = None
 
 
 @dataclass(slots=True)
@@ -79,6 +83,24 @@ class AppProgress:
         progress.completed = True
         self.revision += 1
 
+    def set_reflection_status(
+        self,
+        lesson_id: str,
+        status: ReflectionStatus,
+    ) -> None:
+        """Store the student's self-reported understanding for one lesson."""
+        progress = self.lesson(lesson_id)
+        changed = (
+            not progress.started or not progress.completed or progress.reflection_status != status
+        )
+        if not changed:
+            return
+
+        progress.started = True
+        progress.completed = True
+        progress.reflection_status = status
+        self.revision += 1
+
 
 def default_progress_path() -> Path:
     """Return the per-user progress path for the shell."""
@@ -104,6 +126,7 @@ def progress_to_json(progress: AppProgress) -> dict[str, object]:
                 "theory_visited": lesson_progress.theory_visited,
                 "completed_task_ids": sorted(lesson_progress.completed_task_ids),
                 "completed": lesson_progress.completed,
+                "reflection_status": lesson_progress.reflection_status,
             }
             for lesson_id, lesson_progress in sorted(progress.lessons.items())
         },
@@ -127,6 +150,9 @@ def progress_from_json(data: object) -> AppProgress:
         completed_task_ids = lesson_data.get("completed_task_ids", [])
         if not isinstance(completed_task_ids, list):
             completed_task_ids = []
+        reflection_status = lesson_data.get("reflection_status")
+        if reflection_status not in VALID_REFLECTION_STATUSES:
+            reflection_status = None
 
         progress.lessons[lesson_id] = LessonProgress(
             started=lesson_data.get("started") is True,
@@ -135,6 +161,7 @@ def progress_from_json(data: object) -> AppProgress:
                 task_id for task_id in completed_task_ids if isinstance(task_id, str)
             },
             completed=lesson_data.get("completed") is True,
+            reflection_status=reflection_status,
         )
 
     return progress
